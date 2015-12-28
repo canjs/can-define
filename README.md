@@ -19,4 +19,5 @@ define(Person.prototype,{
       return this.first+" "+this.last;
     }
   }
+});
 ```
