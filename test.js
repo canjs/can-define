@@ -43,4 +43,38 @@ QUnit.test("basics on a prototype", function(){
 	
 });
 
+QUnit.test('basics set', function () {
+
+		var Defined = function(prop){
+			this.prop = prop;
+		};
+
+		define(Defined.prototype,{
+			prop: {
+				set: function(newVal) {
+					return "foo" + newVal;
+				}
+			}
+		});
+
+		var def = new Defined();
+		def.prop = "bar";
+
+
+		QUnit.equal(def.prop, "foobar", "setter works");
+
+		define(Defined.prototype, {
+			prop: {
+				set: function(newVal,setter) {
+					setter("foo" + newVal);
+				}
+			}
+		});
+
+		def = new Defined();
+		def.prop = "bar";
+		QUnit.equal(def.prop, "foobar", "setter callback works");
+
+	});
+
 

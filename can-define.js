@@ -29,9 +29,13 @@ module.exports = function(objPrototype, defines){
 				this.__computeAttrs = {};
 				for (var attr in defines) {
 					var def = defines[attr],
-						get = def.get;
+						get = def.get,
+						set = def.set;
 					if (get) {
 						mapHelpers.addComputedAttr(this, attr, can.compute.async(undefined, get, this));
+					}
+					if (set) {
+						mapHelpers.addComputedAttr(this, attr, can.compute.async(undefined, set, this));
 					}
 				}
 				
