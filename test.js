@@ -53,7 +53,8 @@ QUnit.test('basics set', function () {
 			prop: {
 				set: function(newVal) {
 					return "foo" + newVal;
-				}
+				},
+				configurable: true
 			}
 		});
 
@@ -63,7 +64,11 @@ QUnit.test('basics set', function () {
 
 		QUnit.equal(def.prop, "foobar", "setter works");
 
-		define(Defined.prototype, {
+		var DefinedCB = function(prop){
+			this.prop = prop;
+		};
+
+		define(DefinedCB.prototype, {
 			prop: {
 				set: function(newVal,setter) {
 					setter("foo" + newVal);
@@ -71,9 +76,9 @@ QUnit.test('basics set', function () {
 			}
 		});
 
-		def = new Defined();
+		defCallback = new DefinedCB();
 		def.prop = "bar";
-		QUnit.equal(def.prop, "foobar", "setter callback works");
+		QUnit.equal(defCallback.prop, "foobar", "setter callback works");
 
 	});
 
