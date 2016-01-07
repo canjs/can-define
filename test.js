@@ -84,7 +84,7 @@ QUnit.test('basics set', function () {
 
 QUnit.test("basic type", function () {
 
-		QUnit.expect(5);
+		QUnit.expect(6);
 
 		var Typer = function(arrayWithAddedItem,listWithAddedItem){
 			this.arrayWithAddedItem = arrayWithAddedItem;
@@ -115,7 +115,7 @@ QUnit.test("basic type", function () {
 
 
 		var t = new Typer();
-		//deepEqual(t.keys(), [], "no keys");
+		deepEqual(Object.keys(t), ["__computeAttrs","__data"], "no keys");
 
 		var array = [];
 		t.arrayWithAddedItem = array;
