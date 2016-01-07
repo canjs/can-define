@@ -135,3 +135,32 @@ QUnit.test("basic type", function () {
 		t.listWithAddedItem.push("another item");
 
 	});	
+
+QUnit.test("basic Type", function () {
+		var Foo = function (name) {
+			this.name = name;
+		};
+		Foo.prototype.getName = function () {
+			return this.name;
+		};
+		
+		var Typer = function(foo){
+			this.foo = foo;
+		};
+
+		define(Typer.prototype,{
+				foo: {
+					Type: Foo
+				}
+		});
+
+		var t = new Typer("Justin");
+		QUnit.equal(t.foo.getName(), "Justin", "correctly created an instance");
+
+		var brian = new Foo("brian");
+
+		t.foo= brian;
+
+		QUnit.equal(t.foo, brian, "same instances");
+
+	});
