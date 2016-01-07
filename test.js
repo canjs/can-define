@@ -82,4 +82,58 @@ QUnit.test('basics set', function () {
 
 	});
 
+QUnit.test("basic type", function () {
+
+		QUnit.expect(5);
+
+		var Typer = function(arrayWithAddedItem,listWithAddedItem){
+			this.arrayWithAddedItem = arrayWithAddedItem;
+			this.listWithAddedItem = listWithAddedItem;
+		};
+
+		define(Typer.prototype,{
+				arrayWithAddedItem: {
+					type: function (value) {
+						if (value && value.push) {
+							value.push("item");
+						}
+						return value;
+					}
+				},
+				listWithAddedItem: {
+					type: function (value) {
+						if (value && value.push) {
+							value.push("item");
+						}
+						return value;
+					},
+					Type: can.List
+				}
+		}); 
+			
+			
+
+
+		var t = new Typer();
+		//deepEqual(t.keys(), [], "no keys");
+
+		var array = [];
+		t.arrayWithAddedItem = array;
+
+		deepEqual(array, ["item"], "updated array");
+		QUnit.equal(t.arrayWithAddedItem, array, "leave value as array");
+
+		t.listWithAddedItem = [];
+
+		QUnit.ok(t.listWithAddedItem instanceof can.List, "convert to can.List");
+		QUnit.equal(t.listWithAddedItem[0], "item", "has item in it");
+
+		t.bind("change", function (ev, attr) {
+			QUnit.equal(attr, "listWithAddedItem.1", "got a bubbling event");
+		});
+
+		t.listWithAddedItem.push("another item");
+
+	});
+
 
