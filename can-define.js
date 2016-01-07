@@ -4,7 +4,7 @@ var event = require("can/event/");
 var compute = require("can/compute/");
 var Map = require("can/map/");
 var mapHelpers = require("can/map/map_helpers");
-
+require("can/map/define/");
 
 
 module.exports = function(objPrototype, defines){
@@ -22,6 +22,8 @@ module.exports = function(objPrototype, defines){
 			this._data[prop] = val;
 		}	
 	};
+	// this has to be here for the existing define plugin to find it.
+	objPrototype.define = defines;
 	
 	Object.defineProperty(objPrototype, "_computedAttrs", {
 		get: function(){
@@ -33,9 +35,6 @@ module.exports = function(objPrototype, defines){
 						set = def.set;
 					if (get) {
 						mapHelpers.addComputedAttr(this, attr, can.compute.async(undefined, get, this));
-					}
-					if (set) {
-						mapHelpers.addComputedAttr(this, attr, can.compute.async(undefined, set, this));
 					}
 				}
 				

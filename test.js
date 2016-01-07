@@ -76,8 +76,8 @@ QUnit.test('basics set', function () {
 			}
 		});
 
-		defCallback = new DefinedCB();
-		def.prop = "bar";
+		var defCallback = new DefinedCB();
+		defCallback.prop = "bar";
 		QUnit.equal(defCallback.prop, "foobar", "setter callback works");
 
 	});

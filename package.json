@@ -20,8 +20,9 @@
   },
   "homepage": "https://github.com/canjs/can-define",
   "dependencies": {
-    "can": "^2.3.0",
-    "jquery": "^2.1.4",
+    "can": "^2.3.0"
+  },
+  "devDependencies": {
     "steal": "^0.12.0",
     "steal-qunit": "^0.1.1"
   }
