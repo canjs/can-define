@@ -134,6 +134,4 @@ QUnit.test("basic type", function () {
 
 		t.listWithAddedItem.push("another item");
 
-	});
-
-
+	});	
