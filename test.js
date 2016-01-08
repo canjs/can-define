@@ -209,6 +209,6 @@ QUnit.test("type converters", function () {
 		
 		t.number = '15';
 		
-		ok(t.number === 15, "converted to number");
+		QUnit.ok(t.number === 15, "converted to number");
 
 	});
