@@ -44,16 +44,15 @@ QUnit.test("basics on a prototype", function(){
 });
 
 QUnit.test('basics set', function () {
+	var Defined = function(prop){
+		this.prop = prop;
+	};
 
-		var Defined = function(prop){
-			this.prop = prop;
-		};
-
-		define(Defined.prototype,{
-			prop: {
-				set: function(newVal) {
+	define(Defined.prototype,{
+		prop: {
+			set: function(newVal) {
 					return "foo" + newVal;
-				},
+			},
 				configurable: true
 			}
 		});
@@ -162,5 +161,54 @@ QUnit.test("basic Type", function () {
 		t.foo= brian;
 
 		QUnit.equal(t.foo, brian, "same instances");
+
+	});
+
+QUnit.test("type converters", function () {
+
+		var Typer = function(date,string,number,bool,htmlbool,leaveAlone) {
+			this.date = date,
+			this.string = string,
+			this.number = number,
+			this.bool= bool,
+			this.htmlbool = htmlbool,
+			this.leaveAlone = leaveAlone
+		};
+
+		define(Typer.prototype,{
+			date: {  type: 'date' },
+			string: {type: 'string'},
+			number: {  type: 'number' },
+			bool: {  type: 'boolean' },
+			htmlbool: {  type: 'htmlbool' },
+			leaveAlone: {  type: '*' },
+			});
+		
+		var obj = {};
+
+		var t = new Typer(
+			1395896701516,
+			5,
+			'5',
+			'false',
+			"",
+			obj
+		);
+
+		QUnit.ok(t.date instanceof Date, "converted to date");
+
+		QUnit.equal(t.string, '5', "converted to string");
+
+		QUnit.equal(t.number, 5, "converted to number");
+
+		QUnit.equal(t.bool, false, "converted to boolean");
+
+		QUnit.equal(t.htmlbool, true, "converted to htmlbool");
+
+		QUnit.equal(t.leaveAlone, obj, "left as object");
+		
+		t.number = '15';
+		
+		ok(t.number === 15, "converted to number");
 
 	});
