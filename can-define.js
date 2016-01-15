@@ -34,16 +34,7 @@ module.exports = function(objPrototype, defines){
 						get = def.get;
 					if (get) {
 						mapHelpers.addComputedAttr(this, attr, can.compute.async(undefined, get, this));
-					} /*else if(can.isPlainObject(def)){
-						if(def.value) {
-							var val = mapHelpers.getValue(this,attr,def.value),
-								computedValue;
-								computedValue = compute(val);
-								mapHelpers.addComputedAttr(this, attr, computedValue);
-							
-							
-						}
-					}*/
+					}
 
 				}
 				
