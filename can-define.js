@@ -8,7 +8,6 @@ require("can/map/define/");
 
 
 module.exports = function(objPrototype, defines){
-	
 	// Copy every method on Map
 	can.each(Map.prototype, function(value, prop){
 		objPrototype[prop]= value;
@@ -24,18 +23,28 @@ module.exports = function(objPrototype, defines){
 	};
 	// this has to be here for the existing define plugin to find it.
 	objPrototype.define = defines;
-	
+
+		
 	Object.defineProperty(objPrototype, "_computedAttrs", {
 		get: function(){
 			if(!this.__computeAttrs) {
 				this.__computeAttrs = {};
 				for (var attr in defines) {
 					var def = defines[attr],
-						get = def.get,
-						set = def.set;
+						get = def.get;
 					if (get) {
 						mapHelpers.addComputedAttr(this, attr, can.compute.async(undefined, get, this));
-					}
+					} /*else if(can.isPlainObject(def)){
+						if(def.value) {
+							var val = mapHelpers.getValue(this,attr,def.value),
+								computedValue;
+								computedValue = compute(val);
+								mapHelpers.addComputedAttr(this, attr, computedValue);
+							
+							
+						}
+					}*/
+
 				}
 				
 			}
@@ -51,13 +60,20 @@ module.exports = function(objPrototype, defines){
 		}
 	});
 	
+
 	
 	can.each(defines, function(value, prop){
+		var hasBeenSet = false;
 		Object.defineProperty(objPrototype, prop,{
 			get: function(){
+					
+				
 				return this._get(prop);
+					
+				
 			},
 			set: function(val){
+				hasBeenSet = true;
 				return this._set(prop, val);
 			}
 		});
