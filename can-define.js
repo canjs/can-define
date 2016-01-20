@@ -8,6 +8,21 @@ require("can/map/define/");
 
 
 module.exports = function(objPrototype, defines){
+	var getPropDefineBehavior = function(behavior, attr, define) {
+		var prop, defaultProp;
+
+		if(define) {
+			prop = define[attr];
+			defaultProp = define['*'];
+
+			if(prop && prop[behavior] !== undefined) {
+				return prop[behavior];
+			}
+			else if(defaultProp && defaultProp[behavior] !== undefined) {
+				return defaultProp[behavior];
+			}
+		}
+	};
 	// Copy every method on Map
 	can.each(Map.prototype, function(value, prop){
 		objPrototype[prop]= value;
@@ -35,9 +50,7 @@ module.exports = function(objPrototype, defines){
 					if (get) {
 						mapHelpers.addComputedAttr(this, attr, can.compute.async(undefined, get, this));
 					}
-
 				}
-				
 			}
 			return this.__computeAttrs;
 		}
@@ -54,23 +67,15 @@ module.exports = function(objPrototype, defines){
 
 	
 	can.each(defines, function(value, prop){
-		var hasBeenSet = false;
-		Object.defineProperty(objPrototype, prop,{
-			get: function(){
-					
-				
-				return this._get(prop);
-					
-				
-			},
-			set: function(val){
-				hasBeenSet = true;
-				return this._set(prop, val);
-			}
-		});
-	});
-	
-	
-	
-	return objPrototype;
+    Object.defineProperty(objPrototype, prop,{
+        get: function(){
+					return this._get(prop);
+        },
+        set: function(val){
+        	return this._set(prop, val);
+        }
+    });
+});
+
+return objPrototype;
 };
