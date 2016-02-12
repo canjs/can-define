@@ -114,7 +114,7 @@ QUnit.test("basic type", function() {
 
 
     var t = new Typer();
-    deepEqual(Object.keys(t), ["__computeAttrs", "__data"], "no keys");
+    deepEqual(Object.keys(t), [], "no keys");
 
     var array = [];
     t.arrayWithAddedItem = array;
@@ -259,6 +259,7 @@ QUnit.test("basics value", function() {
 
     var t1 = new Typer2(),
         t2 = new Typer2();
+    
     QUnit.ok(t1.prop !== t2.prop, "different array instances");
     QUnit.ok(can.isArray(t1.prop), "its an array");
 
@@ -268,7 +269,7 @@ QUnit.test("basics value", function() {
 test("basics Value", function() {
 
     var Typer = function(prop) {
-        this.prop = prop;
+        //this.prop = prop;
     };
 
     define(Typer.prototype, {

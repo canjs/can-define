@@ -41,7 +41,10 @@ module.exports = function(objPrototype, defines) {
     Object.defineProperty(objPrototype, "_computedAttrs", {
         get: function() {
             if (!this.__computeAttrs) {
-                this.__computeAttrs = {};
+                 Object.defineProperty(this,'__computeAttrs',{
+                    value: {},
+                    enumerable:false
+                });
                 for (var attr in defines) {
                     var def = defines[attr],
                         get = def.get;
@@ -58,42 +61,63 @@ module.exports = function(objPrototype, defines) {
     Object.defineProperty(objPrototype, "_data", {
         get: function() {
             if (!this.__data) {
-                this.__data = {};
+                Object.defineProperty(this,'__data',{
+                    value: {},
+                    enumerable:false
+                });
             }
             return this.__data;
+        }
+    });
+
+    Object.defineProperty(objPrototype,"_meta", {
+        get:function() {
+            if(!this.__meta) {
+                Object.defineProperty(this,'__meta',{
+                    value: {},
+                    enumerable:false
+                });
+            }
+            return this.__meta;
         }
     });
 
 
 
     can.each(defines, function(value, prop) {
-        var hasBeenSet = false,
-            defaultValueRetrieved,
-            defaultValue;
         Object.defineProperty(objPrototype, prop, {
             get: function() {
-                if (hasBeenSet) {
+                var meta = this._meta[prop];
+                if (!meta) {
+                    meta = this._meta[prop] = {};
+                }
+                if (meta.hasBeenSet) {
                     return this._get(prop);
                 } else {
-                    if (defaultValueRetrieved) {
-                        return defaultValue;
+                    if (meta.defaultValueRetrieved) {
+                        return meta.defaultValue;
                     }
-                    defaultValueRetrieved = true;
+                    meta.defaultValueRetrieved = true;
                     var value = getPropDefineBehavior("value", prop, defines);
                     if (value) {
                         if (typeof value === "function") {
                             value = value.call(this);
                         }
-                        return defaultValue = value;
+                        return meta.defaultValue = value;
                     }
                     var Value = getPropDefineBehavior("Value", prop, defines);
                     if (Value) {
-                        return defaultValue = new Value();
+                        return meta.defaultValue = new Value();
                     }
                 }
             },
             set: function(val) {
-                hasBeenSet = true;
+                var meta = this._meta[prop];
+                if (!meta) {
+                    meta = this._meta[prop] = {};
+                }
+
+                meta.hasBeenSet = true;
                 return this._set(prop, val);
             }
         });
