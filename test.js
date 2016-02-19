@@ -127,7 +127,6 @@ QUnit.test("basic type", function() {
     QUnit.ok(t.listWithAddedItem instanceof can.List, "convert to can.List");
     QUnit.equal(t.listWithAddedItem[0], "item", "has item in it");
 
-<<<<<<< HEAD
     t.bind("change", function(ev, attr) {
         QUnit.equal(attr, "listWithAddedItem.1", "got a bubbling event");
     });
@@ -289,6 +288,4 @@ test("basics Value", function() {
 
 
 });
-=======
-	});
->>>>>>> master
+
