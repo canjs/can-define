@@ -4,19 +4,15 @@ var define = require("can-define");
 var stache = require("can/view/stache/");
 
 
-QUnit.test("basics on a prototype", function() {
+QUnit.test("basics on a prototype", 5, function() {
 
     var Person = function(first, last) {
         this.first = first;
         this.last = last;
     };
     define(Person.prototype, {
-        first: {
-            type: "string"
-        },
-        last: {
-            type: "string"
-        },
+        first: "*",
+        last: "*",
         fullName: {
             get: function() {
                 return this.first + " " + this.last;
@@ -30,6 +26,8 @@ QUnit.test("basics on a prototype", function() {
         QUnit.equal(oldVal, "Mohamed Cherif");
         QUnit.equal(newVal, "Justin Meyer");
     });
+    
+    equal(p.fullName, "Mohamed Cherif", "fullName initialized right");
 
     p.bind("first", function(el, newVal, oldVal) {
         QUnit.equal(newVal, "Justin", "first new value");
@@ -43,7 +41,7 @@ QUnit.test("basics on a prototype", function() {
 
 });
 
-QUnit.test('basics set', function() {
+QUnit.test('basics set', 2,function() {
     var Defined = function(prop) {
         this.prop = prop;
     };
@@ -52,8 +50,7 @@ QUnit.test('basics set', function() {
         prop: {
             set: function(newVal) {
                 return "foo" + newVal;
-            },
-            configurable: true
+            }
         }
     });
 
@@ -127,8 +124,10 @@ QUnit.test("basic type", function() {
     QUnit.ok(t.listWithAddedItem instanceof can.List, "convert to can.List");
     QUnit.equal(t.listWithAddedItem[0], "item", "has item in it");
 
-    t.bind("change", function(ev, attr) {
-        QUnit.equal(attr, "listWithAddedItem.1", "got a bubbling event");
+	can.compute(function(){
+		return t.listWithAddedItem.attr("length");
+	}).bind("change", function(ev, newVal) {
+        QUnit.equal(newVal, 2, "got a length change");
     });
 
     t.listWithAddedItem.push("another item");
@@ -231,7 +230,7 @@ QUnit.test("basics value", function() {
         if (prop !== undefined) {
             this.prop = prop;
         }
-    }
+    };
 
     define(Typer.prototype, {
         prop: {
@@ -246,7 +245,7 @@ QUnit.test("basics value", function() {
         if (prop !== undefined) {
             this.prop = prop;
         }
-    }
+    };
 
     define(Typer2.prototype, {
         prop: {
@@ -271,7 +270,6 @@ test("basics Value", function() {
     var Typer = function(prop) {
         //this.prop = prop;
     };
-
     define(Typer.prototype, {
 
         prop: {
@@ -287,5 +285,445 @@ test("basics Value", function() {
     QUnit.ok(can.isArray(t1.prop), "its an array");
 
 
+});
+
+test("setter with no arguments and returns undefined does the default behavior, the setter is for side effects only", function () {
+	var Typer = function(prop) {
+        //this.prop = prop;
+    };
+    define(Typer.prototype, {
+
+        prop: {
+            set: function () {
+				this.foo = "bar";
+			}
+        },
+        foo: "*"
+
+    });
+
+	var t = new Typer();
+
+	t.prop = false;
+	
+	deepEqual(t.props(), { foo: "bar", prop: false }, "got the right props");
+
+});
+
+test("type happens before the set", 2,function () {
+	
+	var Typer = function() {
+    };
+    define(Typer.prototype, {
+
+        prop: {
+			type: "number",
+			set: function (newValue) {
+				equal(typeof newValue, "number", "got a number");
+				return newValue + 1;
+			}
+		}
+
+    });
+
+	var map = new Typer();
+	map.prop = "5";
+
+	equal(map.prop, 6, "number");
+});
+
+
+test("getter and setter work", function () {
+	expect(5);
+	
+	var Paginate = define.Constructor({
+		limit: "*",
+		offset: "*",
+		page: {
+			set: function (newVal) {
+				this.offset = (parseInt(newVal) - 1) * this.limit;
+			},
+			get: function () {
+				return Math.floor(this.offset / this.limit) + 1;
+			}
+		}
+	});
+
+	var p = new Paginate({limit: 10, offset: 20});
+
+	equal(p.page, 3, "page get right");
+
+	p.bind("page", function (ev, newValue, oldValue) {
+		equal(newValue, 2, "got new value event");
+		equal(oldValue, 3, "got old value event");
+	});
+
+
+	p.page = 2;
+
+	equal(p.page, 2, "page set right");
+
+	equal(p.offset, 10, "page offset set");
+
+});
+
+test("getter with initial value", function(){
+
+	var compute = can.compute(1);
+
+	var Grabber = define.Constructor({
+		vals: {
+			type: "*",
+			Value: Array,
+			get: function(current, setVal){
+				if(setVal){
+					current.push( compute() );
+				}
+				return current;
+			}
+		}
+	});
+
+	var g = new Grabber();
+	// This assertion doesn't mean much.  It's mostly testing
+	// that there were no errors.
+	equal(g.vals.length,0,"zero items in array" );
+
+});
+
+/*
+test("value generator is not called if default passed", function () {
+	var TestMap = define.Constructor({
+		foo: {
+			value: function () {
+				throw '"foo"\'s value method should not be called.';
+			}
+		}
+	});
+
+	var tm = new TestMap({ foo: 'baz' });
+
+	equal(tm.foo, 'baz');
+});*/
+
+test("Value generator can read other properties", function () {
+	var Map = define.Constructor({
+		letters: {
+			value: "ABC"
+		},
+		numbers: {
+			value: [1,2,3]
+		},
+		definedLetters: {
+			value: 'DEF'
+		},
+		definedNumbers: {
+			value: [4, 5, 6]
+		},
+		generatedLetters: {
+			value: function () {
+				return 'GHI';
+			}
+		},
+		generatedNumbers: {
+			value: function () {
+				return new can.List([7, 8, 9]);
+			}
+		},
+
+		// Get prototype defaults
+		firstLetter: {
+			value: function () {
+				return this.letters.substr(0, 1);
+			}
+		},
+		firstNumber: {
+			value: function () {
+				return this.numbers[0];
+			}
+		},
+
+		// Get defined simple `value` defaults
+		middleLetter: {
+			value: function () {
+				return this.definedLetters.substr(1, 1);
+			}
+		},
+		middleNumber: {
+			value: function () {
+				return this.definedNumbers[1];
+			}
+		},
+
+		// Get defined `value` function defaults
+		lastLetter: {
+			value: function () {
+				return this.generatedLetters.substr(2, 1);
+			}
+		},
+		lastNumber: {
+			value: function () {
+				return this.generatedNumbers[2];
+			}
+		}
+	});
+
+	var map = new Map();
+	var prefix = 'Was able to read dependent value from ';
+
+	equal(map.firstLetter, 'A',
+		prefix + 'traditional can.Map style property definition');
+	equal(map.firstNumber, 1,
+		prefix + 'traditional can.Map style property definition');
+
+	equal(map.middleLetter, 'E',
+		prefix + 'define plugin style default property definition');
+	equal(map.middleNumber, 5,
+		prefix + 'define plugin style default property definition');
+
+	equal(map.lastLetter, 'I',
+		prefix + 'define plugin style generated default property definition');
+	equal(map.lastNumber, 9,
+		prefix + 'define plugin style generated default property definition');
+});
+
+test('default behaviors with "*" work for attributes', function() {
+	expect(5);
+	var DefaultMap = define.Constructor({
+		'*': {
+			type: 'number',
+			set: function(newVal) {
+				ok(true, 'set called');
+				return newVal;
+			}
+		},
+		someNumber: {
+			value: '5'
+		},
+		number: {}
+	});
+
+	var map = new DefaultMap(),
+		serializedMap;
+
+	equal(map.someNumber, '5', 'default values are not type converted anymore');
+	map.someNumber = '5';
+	equal(map.someNumber, 5, 'on a set, they should be type converted');
+	
+	map.number = '10'; // Custom set should be called
+	equal(map.number, 10, 'value of number should be converted to a number');
+
+});
+
+
+test("nested define", function() {
+	var nailedIt = 'Nailed it';
+	
+	var Example = define.Constructor({
+		name : {
+			value : nailedIt
+		}
+	});
+
+	var NestedMap = define.Constructor({
+		isEnabled : {
+			value : true
+		},
+		test : {
+			Value : Example
+		},
+		examples : {
+			type: {
+				one: {
+					Value: Example
+				},
+				two: {
+					type: {
+						deep : {
+							Value : Example
+						}
+					},
+					Value : Object
+				}
+			},
+			Value: Object
+		}
+	});
+
+	var nested = new NestedMap();
+
+	// values are correct
+	equal(nested.test.name, nailedIt);
+	equal(nested.examples.one.name, nailedIt);
+	equal(nested.examples.two.deep.name, nailedIt);
+
+	// objects are correctly instanced
+	ok(nested.test instanceof Example);
+	ok(nested.examples.one instanceof Example);
+	ok(nested.examples.two.deep instanceof Example);
+});
+
+test('Can make an attr alias a compute (#1470)', 9, function(){
+	var computeValue = can.compute(1);
+	
+	var GetMap = define.Constructor({
+		value: {
+			set: function(newValue, setVal, oldValue){
+				//debugger;
+				if(newValue.isComputed) {
+					return newValue;
+				}
+				if(oldValue && oldValue.isComputed) {
+					oldValue(newValue);
+					return oldValue;
+				}
+				return newValue;
+			},
+			get: function(value){
+				return value && value.isComputed ? value() : value;
+			}
+		}
+	});
+
+	var getMap = new GetMap();
+
+	getMap.value = computeValue;
+
+	equal(getMap.value, 1, "initial value read from compute");
+
+	var bindCallbacks = 0;
+
+	getMap.bind("value", function(ev, newVal, oldVal){
+
+		switch(bindCallbacks) {
+			case 0:
+				equal(newVal, 2, "0 - bind called with new val");
+				equal(oldVal, 1, "0 - bind called with old val");
+				break;
+			case 1:
+				equal(newVal, 3, "1 - bind called with new val");
+				equal(oldVal, 2, "1 - bind called with old val");
+				break;
+			case 2:
+				equal(newVal, 4, "2 - bind called with new val");
+				equal(oldVal, 3, "2 - bind called with old val");
+				break;
+		}
+
+
+		bindCallbacks++;
+	});
+
+	// Try updating the compute's value
+	computeValue(2);
+
+	// Try setting the value of the property
+	getMap.value = 3;
+
+	equal(getMap.value, 3, "read value is 3");
+	equal(computeValue(), 3, "the compute value is 3");
+
+	// Try setting to a new comptue
+	var newComputeValue = can.compute(4);
+
+	getMap.value = newComputeValue;
+
+});
+
+test('value and get (#1521)', function () {
+	// problem here is that previously, can.Map would set `size:1` on 
+	// the map. This would effectively set the "lastSetValue".
+	
+	// in this new version, default values are not set.  They
+	// are only present. later.
+	// one option is that there's a "read-mode" for last-set.  Until it's
+	// been set, it should get it's value from any default value?
+	
+	var MyMap = define.Constructor({
+		data: {
+			value: function () {
+				return new can.List(['test']);
+			}
+		},
+		size: {
+			value: 1,
+			get: function (val) {
+				var list = this.data;
+				var length = list.attr('length');
+				return val + length;
+			}
+		}
+	});
+
+	var map = new MyMap({});
+	equal(map.size, 2);
+});
+
+
+test("One event on getters (#1585)", function(){
+	var Person = define.Constructor({
+		name: "*",
+		id: "number"
+	});
+
+	var AppState = define.Constructor({
+		person: {
+			get: function(lastSetValue, resolve) {
+				if (lastSetValue) {
+					return lastSetValue;
+				} else if (this.personId) {
+					resolve( new Person({name: "Jose", id: 5}) );
+				} else {
+					return null;
+				}
+			},
+			Type: Person
+		},
+		personId: "*"
+	});
+
+	var appState = new AppState();
+	var personEvents = 0;
+	appState.bind("person", function(ev, person) {
+		personEvents++;
+	});
+	
+	equal(appState.person, null, "no personId and no lastSetValue");
+
+	appState.personId = 5;
+	equal(appState.person.name, "Jose", "a personId, providing Jose");
+	ok(appState.person instanceof Person, "got a person instance");
+
+	appState.person = {
+		name: "Julia"
+	};
+	ok(appState.person instanceof Person, "got a person instance");
+
+	equal(personEvents,2);
+});
+
+test('Can read a defined property with a set/get method (#1648)', function () {
+	// Problem: "get" is not passed the correct "lastSetVal"
+	// Problem: Cannot read the value of "foo"
+
+	var Map = define.Constructor({
+		foo: {
+			value: '',
+			set: function (setVal) {
+				return setVal;
+			},
+			get: function (lastSetVal) {
+				return lastSetVal;
+			}
+		}
+	});
+
+	var map = new Map();
+
+	equal(map.foo, '', 'Calling .foo returned the correct value');
+
+	map.foo = 'baz';
+
+	equal(map.foo, 'baz', 'Calling .foo returned the correct value');
 });
 
