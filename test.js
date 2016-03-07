@@ -839,9 +839,13 @@ test("getters produce change events", function(){
 
     var map = new Map();
 
-    map.bind("change", function(){
-      ok(true, "change called");
-    });
+    // map.bind("change", function(){
+    //   ok(true, "change called");
+    // });
+
+  map.bind('count',function(){
+    ok(true, "change called");
+  });
 
   map.count = 22 ;
 });
