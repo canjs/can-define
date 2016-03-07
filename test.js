@@ -727,3 +727,161 @@ test('Can read a defined property with a set/get method (#1648)', function () {
 	equal(map.foo, 'baz', 'Calling .foo returned the correct value');
 });
 
+test('Can bind to a defined property with a set/get method (#1648)', 3, function () {
+  // Problem: "get" is not called before and after the "set"
+  // Problem: Function bound to "foo" is not called
+  // Problem: Cannot read the value of "foo"
+
+  var Map = define.Constructor({
+    foo: {
+      value: '',
+      set: function (setVal) {
+        return setVal;
+      },
+      get: function (lastSetVal) {
+        return lastSetVal;
+      }
+    }
+  });
+
+    var map = new Map();
+
+    map.bind('foo', function () {
+      ok(true, 'Bound function is called');
+    });
+
+    equal(map.foo, '', 'Calling .attr(\'foo\') returned the correct value');
+
+    map.foo = 'baz';
+
+    equal(map.foo, 'baz', 'Calling .attr(\'foo\') returned the correct value');
+});
+
+test("type converters handle null and undefined in expected ways (1693)", function () {
+
+    var Typer = define.Constructor({
+        date: {  type: 'date' },
+        string: {type: 'string'},
+        number: {  type: 'number' },
+        'boolean': {  type: 'boolean' },
+        htmlbool: {  type: 'htmlbool' },
+        leaveAlone: {  type: '*' }
+    });
+
+    var t = new Typer({
+      date: undefined,
+      string: undefined,
+      number: undefined,
+      'boolean': undefined,
+      htmlbool: undefined,
+      leaveAlone: undefined
+    });
+
+    equal(t.date, undefined, "converted to date");
+
+    equal(t.string, undefined, "converted to string");
+
+    equal(t.number, undefined, "converted to number");
+
+    equal(t.boolean, false, "converted to boolean");
+
+    equal(t.htmlbool, false, "converted to htmlbool");
+
+    equal(t.leaveAlone, undefined, "left as object");
+
+    t = new Typer({
+      date: null,
+      string: null,
+      number: null,
+      'boolean': null,
+      htmlbool: null,
+      leaveAlone: null
+    });
+
+    equal(t.date, null, "converted to date");
+
+    equal(t.string, null, "converted to string");
+
+    equal(t.number, null, "converted to number");
+
+    equal(t.boolean, false, "converted to boolean");
+
+    equal(t.htmlbool, false, "converted to htmlbool");
+
+    equal(t.leaveAlone, null, "left as object");
+
+  });
+
+test('Initial value does not call getter', function() {
+  expect(0);
+
+  var Map = define.Constructor({
+    count: {
+      get: function(lastVal) {
+        ok(false, 'Should not be called');
+        return lastVal;
+      }
+    }
+  });
+
+  new Map({ count: 100 });
+});
+
+test("getters produce change events", function(){
+    var Map = define.Constructor({
+        count: {
+          get: function(lastVal) {
+            return lastVal;
+          }
+        }
+      
+    });
+
+    var map = new Map();
+
+    map.bind("change", function(){
+      ok(true, "change called");
+    });
+
+  map.count = 22 ;
+});
+
+test("Asynchronous virtual properties cause extra recomputes (#1915)", function() {
+
+    stop();
+
+    var ran = false;
+
+    var VM = define.Constructor({
+        foo : {
+          get : function(lastVal, setVal) {
+            setTimeout(function() {
+              if (setVal) {
+                setVal(5);
+              }
+            }, 10);
+          }
+        },
+        bar : {
+          get : function() {
+            var foo = this.foo;
+            if (foo) {
+              if (ran) {
+                ok(false, 'Getter ran twice');
+              }
+              ran = true;
+              return foo * 2;
+            }
+          }
+        }
+    });
+
+    var vm = new VM();
+    vm.bind('bar', function() {});
+    
+    setTimeout(function() {
+      equal(vm.bar, 10);
+      start();
+    }, 200);
+
+  });
