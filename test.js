@@ -889,3 +889,16 @@ test("Asynchronous virtual properties cause extra recomputes (#1915)", function(
     }, 200);
 
   });
+
+test("Stache with single property",function(){
+  var Typer = define.Constructor({
+    foo:{type:'string'}
+  });
+
+  var stached = stache('{{foo}}');
+  var t = new Typer({foo:'bar'});
+  var frag = stached(t);
+  equal(frag.firstChild.nodeValue, 'bar');
+  t.foo = "baz"
+  equal(frag.firstChild.nodeValue, 'baz');
+});
