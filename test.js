@@ -727,3 +727,29 @@ test('Can read a defined property with a set/get method (#1648)', function () {
 	equal(map.foo, 'baz', 'Calling .foo returned the correct value');
 });
 
+QUnit.test('Cannot observe properties with lowercase value (#8)', function () {
+  var Person = function(){};
+
+  define(Person.prototype, {
+    first: {
+      type: 'string',
+      value: 'Chris'
+    },
+    last: {
+      type: 'string',
+      value: 'Gomez'
+    },
+    fullName: {
+      get: function(){
+        return this.first + ' ' + this.last;
+      }
+    }
+  });
+
+  var p = new Person();
+  p.first = 'Chris';
+  p.last = 'Gomez';
+  QUnit.equal(p.fullName, 'Chris Gomez', 'Fullname is correct');
+  p.first = 'Sara';
+  QUnit.equal(p.fullName, 'Sara Gomez', 'Fullname is correct after update');
+});
