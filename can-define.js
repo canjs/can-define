@@ -124,7 +124,7 @@ module.exports = define = function(objPrototype, defines) {
 		var map = this;
 		var data = {};
 		for(var prop in dataInitializers) {
-			replaceWith(data, prop, dataInitializers[prop].bind(map));
+			replaceWith(data, prop, dataInitializers[prop].bind(map), true);
 		}
 		return data;
 	});
@@ -434,13 +434,14 @@ var makeDefinition = function(prop, defines){
 	});
 	return definition;
 };
-var replaceWith = function(obj, prop, cb) {
+var replaceWith = function(obj, prop, cb, writable) {
 	Object.defineProperty(obj, prop, {
 		configurable: true,
 		get: function(){
 			var value = cb.call(this, obj, prop);
 			Object.defineProperty(this, prop,{
-				value: value
+				value: value,
+				writable: !!writable
 			});
 			return value;
 		}
