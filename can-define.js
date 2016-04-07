@@ -1,21 +1,25 @@
 "format cjs";
+
 var can = require("can/util/");
 var event = require("can/event/");
-var compute = require("can/compute/");
-var mapHelpers = require("can/map/map_helpers");
 
-var define;
+require("can/map/map_helpers");
+require("can/compute/");
+
+var behaviors, eventsProto, getPropDefineBehavior, define,
+	make, makeDefinition, replaceWith;
+
 module.exports = define = function(objPrototype, defines) {
-	
+
 	// default property definitions on _data
 	var dataInitializers = {},
 		// computed property definitions on _computed
 		computedInitializers = {};
-    
+
     // Goes through each property definition and creates
     // a `getter` and `setter` function for `Object.defineProperty`.
     can.each(defines, function(d, prop){
-		
+
 		// Figure out the `definition` object.
 		var definition;
 		if(typeof d === "string") {
@@ -26,10 +30,10 @@ module.exports = define = function(objPrototype, defines) {
 		if(can.isEmptyObject(definition)) {
 			definition = {type: "*"};
 		}
-		
+
 		var type = definition.type;
 		delete definition.type;
-		
+
 		// Special case definitions that have only `type: "*"`.
 		if(type && can.isEmptyObject(definition) && type === "*") {
 			Object.defineProperty(objPrototype, prop, {
@@ -40,12 +44,12 @@ module.exports = define = function(objPrototype, defines) {
 			return;
 		}
 		definition.type = type;
-		
+
 		// Where the value is stored.  If there is a `get` the source of the value
-		// will be a compute in `this._computed[prop]`.  If not, the source of the 
+		// will be a compute in `this._computed[prop]`.  If not, the source of the
 		// value will be in `this._data[prop]`.
 		var dataProperty = definition.get ? "computed" : "data",
-			
+
 			// simple functions that all read/get/set to the right place.
 			// - reader - reads the value but does not observe.
 			// - getter - reads the value and notifies observers.
@@ -54,18 +58,18 @@ module.exports = define = function(objPrototype, defines) {
 			getter = make.get[dataProperty](prop),
 			setter = make.set[dataProperty](prop),
 			getInitialValue;
-			
-		
+
+
 		// Determine the type converter
 		var typeConvert = function(val){ return val; };
-		
+
 		if(definition.Type) {
 			typeConvert =  make.set.Type(prop, definition.Type, typeConvert);
 		}
 		if(type) {
 			typeConvert =  make.set.type(prop, type, typeConvert);
 		}
-		
+
 		// Determine a function that will provide the initial property value.
 		if( (definition.value !== undefined || definition.Value !== undefined) ) {
 			getInitialValue = make.get.defaultValue(prop, definition, typeConvert);
@@ -73,28 +77,28 @@ module.exports = define = function(objPrototype, defines) {
 		// If property has a getter, create the compute that stores its data.
 		if(definition.get) {
 			computedInitializers[prop] = make.compute(prop, definition.get, getInitialValue);
-		} 
-		// If the property isn't a getter, but has an initial value, setup a 
+		}
+		// If the property isn't a getter, but has an initial value, setup a
 		// default value on `this._data[prop]`.
 		else if(getInitialValue) {
 			dataInitializers[prop] = getInitialValue;
 		}
-		
-		
+
+
 		// Define setter behavior.
-		
-		// If there's a `get` and `set`, make the setter get the `lastSetValue` on the 
+
+		// If there's a `get` and `set`, make the setter get the `lastSetValue` on the
 		// `get`'s compute.
 		if(definition.get && definition.set) {
 			setter = make.set.setter(prop, definition.set, make.read.lastSet(prop), setter, true);
-		} 
-		// If there's a `set` and no `get`, 
+		}
+		// If there's a `set` and no `get`,
 		else if(definition.set) {
 			// make a set that produces events.
 			setter = make.set.events(prop, reader, setter, make.eventType[dataProperty](prop) );
 			// Add `set` functionality to the setter.
 			setter = make.set.setter(prop, definition.set, reader, setter, false);
-		} 
+		}
 		// If there's niether `set` or `get`,
 		else if(!definition.get){
 			// make a set that produces events.
@@ -108,7 +112,7 @@ module.exports = define = function(objPrototype, defines) {
 		if(type) {
 			setter =  make.set.type(prop, type, setter);
 		}
-		
+
 		// Define the property.
 		Object.defineProperty(objPrototype, prop, {
 			get:getter,
@@ -116,9 +120,9 @@ module.exports = define = function(objPrototype, defines) {
 			enumerable: !definition.get
 		});
     });
-    
+
     // Places a `_data` on the prototype that when first called replaces itself
-    // with a `_data` object local to the instance.  It also defines getters 
+    // with a `_data` object local to the instance.  It also defines getters
     // for any value that has a default value.
     replaceWith(objPrototype, "_data", function(){
 		var map = this;
@@ -128,9 +132,9 @@ module.exports = define = function(objPrototype, defines) {
 		}
 		return data;
 	});
-    
+
     // Places a `_computed` on the prototype that when first called replaces itself
-    // with a `_computed` object local to the instance.  It also defines getters 
+    // with a `_computed` object local to the instance.  It also defines getters
     // that will create the property's compute when read.
     replaceWith(objPrototype, "_computed", function(){
 		var map = this;
@@ -140,8 +144,8 @@ module.exports = define = function(objPrototype, defines) {
 		}
 		return data;
 	});
-    
-	
+
+
 	// Add necessary event methods to this object.
     for(var prop in eventsProto) {
     	Object.defineProperty(objPrototype, prop, {
@@ -164,7 +168,7 @@ define.Constructor = function(defines){
 };
 
 // A bunch of helper functions that are used to create various behaviors.
-var make = {
+make = {
 	// Returns a function that creates the `_computed` prop.
 	compute: function(prop, get, defaultValue){
 		return function(){
@@ -198,7 +202,7 @@ var make = {
 				var current = getCurrent.call(this);
 				if(newVal !== current) {
 					setData.call(this, newVal);
-					
+
 					can.batch.trigger(this, {
 						type: prop,
 						target: this
@@ -211,45 +215,45 @@ var make = {
 				//!steal-remove-start
 				var asyncTimer;
 				//!steal-remove-end
-		
+
 				var self = this;
-				
+
 				// call the setter, if returned value is undefined,
 				// this means the setter is async so we
 				// do not call update property and return right away
-				
+
 				can.batch.start();
 				var setterCalled = false,
 					current = getCurrent.call(this),
 					setValue = setter.call(this, value, function (value) {
 						setEvents.call(self, value);
-						
+
 						setterCalled = true;
 						//!steal-remove-start
 						clearTimeout(asyncTimer);
 						//!steal-remove-end
 					}, current);
-				
+
 				if(setterCalled) {
 					can.batch.stop();
 				} else {
 					if(hasGetter) {
 						// we got a return value
 						if(setValue !== undefined) {
-							// if the current `set` value is returned, don't set 
+							// if the current `set` value is returned, don't set
 							// because current might be the `lastSetVal` of the internal compute.
 							if(current !== setValue) {
 								setEvents.call(this, setValue);
 							}
 							can.batch.stop();
-						} 
+						}
 						// this is a side effect, it didn't take a value
 						// so use the original set value
 						else if(setter.length === 0) {
 							setEvents.call(this, value);
 							can.batch.stop();
 							return;
-						} 
+						}
 						// it took a value
 						else if(setter.length === 1) {
 							// if we have a getter, and undefined was returned,
@@ -267,22 +271,22 @@ var make = {
 							can.batch.stop();
 							return;
 						}
-					} 
+					}
 					else {
 						// we got a return value
 						if(setValue !== undefined) {
-							// if the current `set` value is returned, don't set 
+							// if the current `set` value is returned, don't set
 							// because current might be the `lastSetVal` of the internal compute.
 							setEvents.call(this, setValue);
 							can.batch.stop();
-						} 
+						}
 						// this is a side effect, it didn't take a value
 						// so use the original set value
 						else if(setter.length === 0) {
 							setEvents.call(this, value);
 							can.batch.stop();
 							return;
-						} 
+						}
 						// it took a value
 						else if(setter.length === 1) {
 							// if we don't have a getter, we should probably be setting the
@@ -301,8 +305,8 @@ var make = {
 							return;
 						}
 					}
-					
-					
+
+
 				}
 			};
 		},
@@ -310,11 +314,11 @@ var make = {
 			if (typeof type === "string") {
 				type = define.types[type];
 			}
-			
+
 			if(typeof type === "object") {
-				
+
 				var SubType = define.Constructor(type);
-				
+
 				return function(newValue){
 					if(newValue instanceof SubType) {
 						return set.call(this, newValue);
@@ -322,7 +326,7 @@ var make = {
 						return set.call(this, new SubType(newValue));
 					}
 				};
-				
+
 			} else {
 				return function(newValue){
 					return set.call(this, type.call(this, newValue, prop) );
@@ -333,7 +337,7 @@ var make = {
 			// `type`: {foo: "string"}
 			if(typeof Type === "object") {
 				Type = define.constructor(Type);
-			} 
+			}
 			return function(newValue){
 				if(newValue instanceof Type) {
 					return set.call(this, newValue);
@@ -407,10 +411,10 @@ var make = {
 	}
 };
 
-var behaviors = ["get","set","value","Value", "type","Type","serialize"];
+behaviors = ["get","set","value","Value", "type","Type","serialize"];
 
-var getPropDefineBehavior = function(behavior, prop, defines) {
-    var prop, defaultProp;
+getPropDefineBehavior = function(behavior, prop, defines) {
+    var defaultProp;
 
     if (defines) {
         prop = defines[prop];
@@ -424,7 +428,7 @@ var getPropDefineBehavior = function(behavior, prop, defines) {
     }
 };
 
-var makeDefinition = function(prop, defines){
+makeDefinition = function(prop, defines){
 	var definition = {};
 	behaviors.forEach(function(behavior){
 		var behaviorDef = getPropDefineBehavior(behavior, prop, defines);
@@ -434,7 +438,8 @@ var makeDefinition = function(prop, defines){
 	});
 	return definition;
 };
-var replaceWith = function(obj, prop, cb, writable) {
+
+replaceWith = function(obj, prop, cb, writable) {
 	Object.defineProperty(obj, prop, {
 		configurable: true,
 		get: function(){
@@ -448,7 +453,7 @@ var replaceWith = function(obj, prop, cb, writable) {
 	});
 };
 
-var eventsProto = can.simpleExtend({}, event);
+eventsProto = can.simpleExtend({}, event);
 can.simpleExtend(eventsProto, {
 	bind: function (eventName, handler) {
 
