@@ -735,6 +735,7 @@ test('Can read a defined property with a set/get method (#1648)', function() {
 	equal(map.foo, 'baz', 'Calling .foo returned the correct value');
 });
 
+
 test('Can bind to a defined property with a set/get method (#1648)', 3, function() {
 	// Problem: "get" is not called before and after the "set"
 	// Problem: Function bound to "foo" is not called
@@ -1083,4 +1084,30 @@ test("Stache with two nested property", function() {
 	template = stache('{{examples.two.deep.name}}');
 	frag = template(nested);
 	equal(frag.firstChild.nodeValue, nailedIt);
+});
+
+QUnit.test('Default values cannot be set (#8)', function () {
+  var Person = function(){};
+
+  define(Person.prototype, {
+    first: {
+      type: 'string',
+      value: 'Chris'
+    },
+    last: {
+      type: 'string',
+      value: 'Gomez'
+    },
+    fullName: {
+      get: function(){
+        return this.first + ' ' + this.last;
+      }
+    }
+  });
+
+  var p = new Person();
+
+  QUnit.equal(p.fullName, 'Chris Gomez', 'Fullname is correct');
+  p.first = 'Sara';
+  QUnit.equal(p.fullName, 'Sara Gomez', 'Fullname is correct after update');
 });
