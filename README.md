@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/canjs/can-define.svg?branch=master)](https://travis-ci.org/canjs/can-define)
+
 # can-define
 
 Add `can.compute` observable properties, type conversion, and getter/setter logic to your constructor prototypes.
