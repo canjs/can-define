@@ -1,7 +1,11 @@
 var QUnit = require("steal-qunit");
-var compute = require("can/compute/");
+var compute = require("can-compute");
 var define = require("can-define");
-var stache = require("can/view/stache/");
+var stache = require("can-stache");
+var CanList = require("can-list");
+var canBatch = require("can-event/batch/batch");
+
+var isArray = require("can-util/js/is-array/is-array");
 
 
 QUnit.test("basics on a prototype", 5, function() {
@@ -28,16 +32,16 @@ QUnit.test("basics on a prototype", 5, function() {
 	});
 
 	equal(p.fullName, "Mohamed Cherif", "fullName initialized right");
-
+	
 	p.bind("first", function(el, newVal, oldVal) {
 		QUnit.equal(newVal, "Justin", "first new value");
 		QUnit.equal(oldVal, "Mohamed", "first old value");
 	});
 
-	can.batch.start();
+	canBatch.start();
 	p.first = "Justin";
 	p.last = "Meyer";
-	can.batch.stop();
+	canBatch.stop();
 
 });
 
@@ -103,7 +107,7 @@ QUnit.test("basic type", function() {
 				}
 				return value;
 			},
-			Type: can.List
+			Type: CanList
 		}
 	});
 
@@ -121,12 +125,12 @@ QUnit.test("basic type", function() {
 
 	t.listWithAddedItem = [];
 
-	QUnit.ok(t.listWithAddedItem instanceof can.List, "convert to can.List");
+	QUnit.ok(t.listWithAddedItem instanceof CanList, "convert to CanList");
 	QUnit.equal(t.listWithAddedItem[0], "item", "has item in it");
 
-	can.compute(function() {
+	compute(function() {
 		return t.listWithAddedItem.attr("length");
-	}).bind("change", function(ev, newVal) {
+	}).addEventListener("change", function(ev, newVal) {
 		QUnit.equal(newVal, 2, "got a length change");
 	});
 
@@ -260,7 +264,7 @@ QUnit.test("basics value", function() {
 		t2 = new Typer2();
 
 	QUnit.ok(t1.prop !== t2.prop, "different array instances");
-	QUnit.ok(can.isArray(t1.prop), "its an array");
+	QUnit.ok(isArray(t1.prop), "its an array");
 
 
 });
@@ -282,7 +286,7 @@ test("basics Value", function() {
 	var t1 = new Typer(),
 		t2 = new Typer();
 	QUnit.ok(t1.prop !== t2.prop, "different array instances");
-	QUnit.ok(can.isArray(t1.prop), "its an array");
+	QUnit.ok(isArray(t1.prop), "its an array");
 
 
 });
@@ -374,7 +378,7 @@ test("getter and setter work", function() {
 
 test("getter with initial value", function() {
 
-	var compute = can.compute(1);
+	var comp = compute(1);
 
 	var Grabber = define.Constructor({
 		vals: {
@@ -382,7 +386,7 @@ test("getter with initial value", function() {
 			Value: Array,
 			get: function(current, setVal) {
 				if (setVal) {
-					current.push(compute());
+					current.push(comp());
 				}
 				return current;
 			}
@@ -432,7 +436,7 @@ test("Value generator can read other properties", function() {
 		},
 		generatedNumbers: {
 			value: function() {
-				return new can.List([7, 8, 9]);
+				return new CanList([7, 8, 9]);
 			}
 		},
 
@@ -569,7 +573,7 @@ test("nested define", function() {
 });
 
 test('Can make an attr alias a compute (#1470)', 9, function() {
-	var computeValue = can.compute(1);
+	var computeValue = compute(1);
 
 	var GetMap = define.Constructor({
 		value: {
@@ -629,14 +633,14 @@ test('Can make an attr alias a compute (#1470)', 9, function() {
 	equal(computeValue(), 3, "the compute value is 3");
 
 	// Try setting to a new comptue
-	var newComputeValue = can.compute(4);
+	var newComputeValue = compute(4);
 
 	getMap.value = newComputeValue;
 
 });
 
 test('value and get (#1521)', function() {
-	// problem here is that previously, can.Map would set `size:1` on 
+	// problem here is that previously, can.Map would set `size:1` on
 	// the map. This would effectively set the "lastSetValue".
 
 	// in this new version, default values are not set.  They
@@ -647,7 +651,7 @@ test('value and get (#1521)', function() {
 	var MyMap = define.Constructor({
 		data: {
 			value: function() {
-				return new can.List(['test']);
+				return new CanList(['test']);
 			}
 		},
 		size: {

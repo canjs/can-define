@@ -1,10 +1,18 @@
 "format cjs";
 
-var can = require("can/util/");
-var event = require("can/event/");
 
-require("can/map/map_helpers");
-require("can/compute/");
+var event = require("can-event");
+var eventLifecycle = require("can-event/lifecycle/lifecycle");
+var canBatch = require("can-event/batch/batch");
+
+var compute = require("can-compute");
+var ObserveInfo = require("can-observe-info");
+
+var canEach = require("can-util/js/each/each");
+var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
+var assign = require("can-util/js/assign/assign");
+var dev = require("can-util/js/dev/dev");
+
 
 var behaviors, eventsProto, getPropDefineBehavior, define,
 	make, makeDefinition, replaceWith;
@@ -18,7 +26,7 @@ module.exports = define = function(objPrototype, defines) {
 
     // Goes through each property definition and creates
     // a `getter` and `setter` function for `Object.defineProperty`.
-    can.each(defines, function(d, prop){
+    canEach(defines, function(d, prop){
 
 		// Figure out the `definition` object.
 		var definition;
@@ -27,7 +35,7 @@ module.exports = define = function(objPrototype, defines) {
 		} else {
 			definition = makeDefinition(prop, defines);
 		}
-		if(can.isEmptyObject(definition)) {
+		if(isEmptyObject(definition)) {
 			definition = {type: "*"};
 		}
 
@@ -35,7 +43,7 @@ module.exports = define = function(objPrototype, defines) {
 		delete definition.type;
 
 		// Special case definitions that have only `type: "*"`.
-		if(type && can.isEmptyObject(definition) && type === "*") {
+		if(type && isEmptyObject(definition) && type === "*") {
 			Object.defineProperty(objPrototype, prop, {
 				get: make.get.data(prop),
 				set: make.set.events(prop, make.get.data(prop), make.set.data(prop), make.eventType.data(prop) ),
@@ -161,7 +169,7 @@ module.exports = define = function(objPrototype, defines) {
 // Makes a simple constructor function.
 define.Constructor = function(defines){
     var constructor = function(props){
-		can.simpleExtend(this, props);
+		assign(this, props);
 	};
     define(constructor.prototype, defines);
     return constructor;
@@ -174,10 +182,10 @@ make = {
 		return function(){
 			var map = this;
 			return {
-				compute: can.compute.async(defaultValue && defaultValue(), get, map),
+				compute: compute.async(defaultValue && defaultValue(), get, map),
 				count: 0,
 				handler: function (ev, newVal, oldVal) {
-					can.batch.trigger(map, {
+					canBatch.trigger.call(map, {
 						type: prop,
 						target: map
 					}, [newVal, oldVal]);
@@ -203,7 +211,7 @@ make = {
 				if(newVal !== current) {
 					setData.call(this, newVal);
 
-					can.batch.trigger(this, {
+					canBatch.trigger.call(this, {
 						type: prop,
 						target: this
 					}, [newVal, current]);
@@ -222,7 +230,7 @@ make = {
 				// this means the setter is async so we
 				// do not call update property and return right away
 
-				can.batch.start();
+				canBatch.start();
 				var setterCalled = false,
 					current = getCurrent.call(this),
 					setValue = setter.call(this, value, function (value) {
@@ -235,7 +243,7 @@ make = {
 					}, current);
 
 				if(setterCalled) {
-					can.batch.stop();
+					canBatch.stop();
 				} else {
 					if(hasGetter) {
 						// we got a return value
@@ -245,13 +253,13 @@ make = {
 							if(current !== setValue) {
 								setEvents.call(this, setValue);
 							}
-							can.batch.stop();
+							canBatch.stop();
 						}
 						// this is a side effect, it didn't take a value
 						// so use the original set value
 						else if(setter.length === 0) {
 							setEvents.call(this, value);
-							can.batch.stop();
+							canBatch.stop();
 							return;
 						}
 						// it took a value
@@ -259,16 +267,16 @@ make = {
 							// if we have a getter, and undefined was returned,
 							// we should assume this is setting the getters properties
 							// and we shouldn't do anything.
-							can.batch.stop();
+							canBatch.stop();
 						}
 						// we are expecting something
 						else {
 							//!steal-remove-start
 							asyncTimer = setTimeout(function () {
-								can.dev.warn('can/map/setter.js: Setter "' + prop + '" did not return a value or call the setter callback.');
-							}, can.dev.warnTimeout);
+								dev.warn('can/map/setter.js: Setter "' + prop + '" did not return a value or call the setter callback.');
+							}, dev.warnTimeout);
 							//!steal-remove-end
-							can.batch.stop();
+							canBatch.stop();
 							return;
 						}
 					}
@@ -278,13 +286,13 @@ make = {
 							// if the current `set` value is returned, don't set
 							// because current might be the `lastSetVal` of the internal compute.
 							setEvents.call(this, setValue);
-							can.batch.stop();
+							canBatch.stop();
 						}
 						// this is a side effect, it didn't take a value
 						// so use the original set value
 						else if(setter.length === 0) {
 							setEvents.call(this, value);
-							can.batch.stop();
+							canBatch.stop();
 							return;
 						}
 						// it took a value
@@ -292,16 +300,16 @@ make = {
 							// if we don't have a getter, we should probably be setting the
 							// value to undefined
 							setEvents.call(this, undefined);
-							can.batch.stop();
+							canBatch.stop();
 						}
 						// we are expecting something
 						else {
 							//!steal-remove-start
 							asyncTimer = setTimeout(function () {
-								can.dev.warn('can/map/setter.js: Setter "' + prop + '" did not return a value or call the setter callback.');
-							}, can.dev.warnTimeout);
+								dev.warn('can/map/setter.js: Setter "' + prop + '" did not return a value or call the setter callback.');
+							}, dev.warnTimeout);
 							//!steal-remove-end
-							can.batch.stop();
+							canBatch.stop();
 							return;
 						}
 					}
@@ -399,7 +407,7 @@ make = {
 		},
 		data: function(prop){
 			return function(){
-				can.__observe(this, prop);
+				ObserveInfo.observe(this, prop);
 				return this._data[prop];
 			};
 		},
@@ -453,41 +461,41 @@ replaceWith = function(obj, prop, cb, writable) {
 	});
 };
 
-eventsProto = can.simpleExtend({}, event);
-can.simpleExtend(eventsProto, {
-	bind: function (eventName, handler) {
+eventsProto = assign({}, event);
+assign(eventsProto, {
+	addEventListener: function (eventName, handler) {
 
 		var computedBinding = this._computed && this._computed[eventName];
 		if (computedBinding && computedBinding.compute) {
 			if (!computedBinding.count) {
 				computedBinding.count = 1;
-				computedBinding.compute.bind("change", computedBinding.handler);
+				computedBinding.compute.addEventListener("change", computedBinding.handler);
 			} else {
 				computedBinding.count++;
 			}
 
 		}
 
-		return can.bindAndSetup.apply(this, arguments);
+		return eventLifecycle.addAndSetup.apply(this, arguments);
 	},
 
 	// ### unbind
 	// Stops listening to an event.
 	// If this is the last listener of a computed property,
 	// stop forwarding events of the computed property to this map.
-	unbind: function (eventName, handler) {
+	removeEventListener: function (eventName, handler) {
 		var computedBinding = this._computed && this._computed[eventName];
 		if (computedBinding) {
 			if (computedBinding.count === 1) {
 				computedBinding.count = 0;
-				computedBinding.compute.unbind("change", computedBinding.handler);
+				computedBinding.compute.removeEventListener("change", computedBinding.handler);
 			} else {
 				computedBinding.count--;
 			}
 
 		}
 
-		return can.unbindAndTeardown.apply(this, arguments);
+		return eventLifecycle.removeAndTeardown.apply(this, arguments);
 
 	},
 	props: function(){
@@ -498,6 +506,9 @@ can.simpleExtend(eventsProto, {
 		return obj;
 	}
 });
+eventsProto.on = eventsProto.bind = eventsProto.addEventListener;
+eventsProto.off = eventsProto.unbind = eventsProto.removeEventListener;
+
 delete eventsProto.one;
 
 
