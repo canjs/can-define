@@ -32,7 +32,7 @@ QUnit.test("basics on a prototype", 5, function() {
 	});
 
 	equal(p.fullName, "Mohamed Cherif", "fullName initialized right");
-	
+
 	p.bind("first", function(el, newVal, oldVal) {
 		QUnit.equal(newVal, "Justin", "first new value");
 		QUnit.equal(oldVal, "Mohamed", "first old value");
@@ -171,11 +171,11 @@ QUnit.test("type converters", function() {
 
 	var Typer = function(date, string, number, bool, htmlbool, leaveAlone) {
 		this.date = date,
-		this.string = string,
-		this.number = number,
-		this.bool = bool,
-		this.htmlbool = htmlbool,
-		this.leaveAlone = leaveAlone
+			this.string = string,
+			this.number = number,
+			this.bool = bool,
+			this.htmlbool = htmlbool,
+			this.leaveAlone = leaveAlone
 	};
 
 	define(Typer.prototype, {
@@ -1090,28 +1090,28 @@ test("Stache with two nested property", function() {
 	equal(frag.firstChild.nodeValue, nailedIt);
 });
 
-QUnit.test('Default values cannot be set (#8)', function () {
-  var Person = function(){};
+QUnit.test('Default values cannot be set (#8)', function() {
+	var Person = function() {};
 
-  define(Person.prototype, {
-    first: {
-      type: 'string',
-      value: 'Chris'
-    },
-    last: {
-      type: 'string',
-      value: 'Gomez'
-    },
-    fullName: {
-      get: function(){
-        return this.first + ' ' + this.last;
-      }
-    }
-  });
+	define(Person.prototype, {
+		first: {
+			type: 'string',
+			value: 'Chris'
+		},
+		last: {
+			type: 'string',
+			value: 'Gomez'
+		},
+		fullName: {
+			get: function() {
+				return this.first + ' ' + this.last;
+			}
+		}
+	});
 
-  var p = new Person();
+	var p = new Person();
 
-  QUnit.equal(p.fullName, 'Chris Gomez', 'Fullname is correct');
-  p.first = 'Sara';
-  QUnit.equal(p.fullName, 'Sara Gomez', 'Fullname is correct after update');
+	QUnit.equal(p.fullName, 'Chris Gomez', 'Fullname is correct');
+	p.first = 'Sara';
+	QUnit.equal(p.fullName, 'Sara Gomez', 'Fullname is correct after update');
 });
