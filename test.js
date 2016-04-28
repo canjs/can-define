@@ -1,3 +1,5 @@
+require("./map/map-test");
+
 var QUnit = require("steal-qunit");
 var compute = require("can-compute");
 var define = require("can-define");
@@ -7,6 +9,7 @@ var canBatch = require("can-event/batch/batch");
 
 var isArray = require("can-util/js/is-array/is-array");
 
+QUnit.module("can-define");
 
 QUnit.test("basics on a prototype", 5, function() {
 
