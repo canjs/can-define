@@ -511,9 +511,9 @@ eventsProto.off = eventsProto.unbind = eventsProto.removeEventListener;
 
 delete eventsProto.one;
 
-
-
-
+define.replaceWith = replaceWith;
+define.eventsProto = eventsProto;
+define.make = make;
 define.types = {
 	'date': function (str) {
 		var type = typeof str;
