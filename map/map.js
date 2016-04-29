@@ -6,21 +6,15 @@ var isArray = require("can-util/js/is-array/is-array");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object")
 var defineHelpers = require("../define-helpers/define-helpers");
 var CID = require("can-util/js/cid/cid");
-
-
 var make = define.make;
 
-var extendedSetup = function(props){
-    CID(this);
-    assign(this, props)
-}
 
 
 var DefineMap = Construct.extend("DefineMap",{
     setup: function(){
         if(DefineMap) {
             define(this.prototype, defineHelpers.getDefine(this.prototype) );
-            this.prototype.setup = extendedSetup;
+            this.prototype.setup = define.setup;
         }
     }
 },{
@@ -34,6 +28,11 @@ var DefineMap = Construct.extend("DefineMap",{
             // possibly convert value to List or DefineMap
             data[prop] = defineHelpers.simpleTypeConvert(value);
         });
+        //!steal-remove-start
+        this.__bindEvents= {};
+        this._bindings = 0;
+        Object.seal(this);
+    	//!steal-remove-end
     }
 });
 

@@ -1,3 +1,4 @@
+"use strict";
 "format cjs";
 
 
@@ -12,6 +13,7 @@ var canEach = require("can-util/js/each/each");
 var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
 var assign = require("can-util/js/assign/assign");
 var dev = require("can-util/js/dev/dev");
+var CID = require("can-util/js/cid/cid");
 
 
 var behaviors, eventsProto, getPropDefineBehavior, define,
@@ -169,7 +171,7 @@ module.exports = define = function(objPrototype, defines) {
 // Makes a simple constructor function.
 define.Constructor = function(defines){
     var constructor = function(props){
-		assign(this, props);
+		define.setup.call(this, props);
 	};
     define(constructor.prototype, defines);
     return constructor;
@@ -511,6 +513,19 @@ eventsProto.off = eventsProto.unbind = eventsProto.removeEventListener;
 
 delete eventsProto.one;
 
+
+define.setup = function(props){
+	CID(this);
+    assign(this, props);
+	// only seal in dev mode for performance reasons.
+	//!steal-remove-start
+	this._data;
+	this._computed;
+    this.__bindEvents= {};
+    this._bindings = 0;
+    Object.seal(this);
+	//!steal-remove-end
+};
 define.replaceWith = replaceWith;
 define.eventsProto = eventsProto;
 define.make = make;

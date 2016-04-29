@@ -1,3 +1,4 @@
+"use strict";
 var QUnit = require("steal-qunit");
 var DefineMap = require("can-define/map/map");
 
@@ -39,4 +40,19 @@ QUnit.test("extending", function(){
     });
 
     map.prop = "BAR";
+});
+
+QUnit.test("setting not defined property", function(){
+    "use strict";
+    var MyMap = DefineMap.extend({
+        prop: {}
+    });
+    var mymap = new MyMap();
+
+    try {
+        mymap.notdefined = "value"
+        ok(false, "no error")
+    } catch(e) {
+        ok(true, "error thrown")
+    }
 });
