@@ -34,7 +34,7 @@
     "can-construct": "^3.0.0-pre.2",
     "can-event": "^3.0.0-pre.2",
     "can-observe-info": "^3.0.0-pre.4",
-    "can-util": "^3.0.0-pre.10"
+    "can-util": "^3.0.0-pre.11"
   },
   "devDependencies": {
     "can-list": "^3.0.0-pre.1",

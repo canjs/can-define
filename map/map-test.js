@@ -29,9 +29,7 @@ QUnit.test("creating an instance with nested prop", function(){
 
 QUnit.test("extending", function(){
     var MyMap = DefineMap.extend({
-        define: {
-            prop: {}
-        }
+        prop: {}
     });
 
     var map = new MyMap();

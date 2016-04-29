@@ -16,10 +16,10 @@ var extendedSetup = function(props){
 }
 
 
-var DefineMap = Construct.extend({
+var DefineMap = Construct.extend("DefineMap",{
     setup: function(){
         if(DefineMap) {
-            define(this.prototype, this.prototype.define);
+            define(this.prototype, defineHelpers.getDefine(this.prototype) );
             this.prototype.setup = extendedSetup;
         }
     }

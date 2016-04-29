@@ -15,10 +15,33 @@ var CID = require("can-util/js/cid/cid");
 
 var splice = [].splice;
 
-var DefineList = Construct.extend({
+var identity = function(x){
+    return x;
+};
+
+var makeFilterCallback = function(props) {
+    return function(item){
+        for(var prop in props) {
+            if(!item[prop] === props[prop]) {
+                return false;
+            }
+        }
+        return true;
+    };
+}
+
+var DefineList = Construct.extend("DefineList",{
     setup: function(){
         if(DefineList) {
-            define(this.prototype, this.prototype.define);
+            var definitions = defineHelpers.getDefine(this.prototype);
+            if(definitions["*"]) {
+                var itemsDefinition = definitions["*"];
+                delete definitions["*"];
+                if(itemsDefinition.Type) {
+                    this.prototype.__type = make.set.Type("*",itemsDefinition.Type, identity);
+                }
+            }
+            define(this.prototype,  definitions);
         }
     }
 },{
@@ -26,7 +49,9 @@ var DefineList = Construct.extend({
     setup: function(items){
         CID(this);
         this._length = 0;
-        this.splice.apply(this, [0,0].concat(items));
+        if(items) {
+            this.splice.apply(this, [0,0].concat(items));
+        }
     },
     __type: defineHelpers.simpleTypeConvert,
     _triggerChange: function (attr, how, newVal, oldVal) {
@@ -760,16 +785,19 @@ assign(DefineList.prototype, {
         return this;
     },
     filter: function (callback, thisArg) {
-        var filteredList = new this.constructor(),
+        var filteredList = [],
             self = this,
             filtered;
+        if(typeof callback === "object") {
+            callback = makeFilterCallback(callback);
+        }
         this.each(function(item, index, list){
             filtered = callback.call( thisArg | self, item, index, self);
             if(filtered){
                 filteredList.push(item);
             }
         });
-        return filteredList;
+        return new this.constructor(filteredList);
     },
     map: function (callback, thisArg) {
         var filteredList = new Define.DefineList(),
@@ -796,7 +824,9 @@ for(var prop in define.eventsProto) {
 var length = 0;
 Object.defineProperty(DefineList.prototype, "length", {
     get: function(){
-        ObserveInfo.observe(this,"length");
+        if(!this.__inSetup) {
+            ObserveInfo.observe(this,"length");
+        }
         return this._length;
     },
     set: function(newVal){

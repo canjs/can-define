@@ -2,6 +2,10 @@ var QUnit = require("steal-qunit");
 var DefineList = require("can-define/list/list");
 var DefineMap = require("can-define/map/map");
 var ObserveInfo = require("can-observe-info");
+var define = require("can-define");
+
+var assign = require("can-util/js/assign/assign");
+var CID = require("can-util/js/cid/cid");
 
 QUnit.module("can-define/list");
 
@@ -252,5 +256,67 @@ test("slice and join are observable by a compute (#1884)", function(){
 
 	list.shift();
 
+
+});
+
+
+test("list defines", 6, function(){
+    var Todo = function(props){
+        assign(this, props);
+        CID(this);
+    };
+    define(Todo.prototype,{
+        completed: "boolean",
+        destroyed: {
+            value: false
+        }
+    });
+    Todo.prototype.destroy = function(){
+        this.destroyed = true;
+    };
+
+    var TodoList = DefineList.extend({
+
+    	"*": Todo,
+    	remaining: {
+    		get: function() {
+    			return this.filter({
+    				completed: false
+    			});
+    		}
+    	},
+    	completed: {
+    		get: function() {
+    			return this.filter({
+    				completed: true
+    			});
+    		}
+    	},
+
+    	destroyCompleted: function() {
+    		this.completed.forEach(function(todo) {
+    			todo.destroy()
+    		});
+    	},
+    	setCompletedTo: function(value) {
+    		this.forEach(function(todo) {
+    			todo.completed = value;
+    		});
+    	}
+    });
+
+    var todos = new TodoList([{completed: true},{completed: false}]);
+    
+    ok(todos.item(0) instanceof Todo, "correct instance");
+    equal(todos.completed.length, 1, "only one todo");
+
+    todos.on("completed", function(ev, newVal, oldVal){
+        ok(newVal instanceof TodoList, "right type");
+        equal(newVal.length, 2, "all items");
+        ok(oldVal instanceof TodoList, "right type");
+        equal(oldVal.length, 1, "all items");
+    });
+
+    todos.setCompletedTo(true);
 
 });

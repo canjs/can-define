@@ -1,9 +1,11 @@
 var simpleGetterSetters = {};
+var make = require("can-define").make;
 var isArray = require("can-util/js/is-array/is-array");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
 var CID = require("can-util/js/cid/cid");
 var types = require("can-util/js/types/types");
-var make = require("can-define").make;
+var each = require("can-util/js/each/each");
+
 
 var defineHelpers = {
     extendedSetup: function(props){
@@ -102,5 +104,26 @@ var defineHelpers = {
 			return where;
 		};
 	})(),
+    getDefine: function(prototype) {
+        var define = {};
+        each(Object.keys(prototype), function(prop){
+            if(prop !== "constructor") {
+                var value = prototype[prop];
+                if(typeof value === "function") {
+                    if(types.isConstructor(value)) {
+                        define[prop] = {Type: value};
+                    } else if(types.isDefineType) {
+                        define[prop] = {type: value};
+                    }
+                } else {
+                    define[prop] = value;
+                }
+                if(define[prop]) {
+                    delete prototype[prop];
+                }
+            }
+        });
+        return define;
+    }
 };
 module.exports = defineHelpers;
