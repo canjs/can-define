@@ -515,6 +515,7 @@ delete eventsProto.one;
 
 
 define.setup = function(props){
+	/* jshint -W030 */
 	CID(this);
     assign(this, props);
 	// only seal in dev mode for performance reasons.
