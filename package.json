@@ -8,6 +8,7 @@
     "jshint": "jshint can-define.js --config",
     "postversion": "git push --tags && git checkout master && git branch -D release && git push",
     "preversion": "npm test && npm run build",
+    "release:pre": "npm version prerelease && npm publish",
     "release:patch": "npm version patch && npm publish",
     "release:minor": "npm version minor && npm publish",
     "release:major": "npm version major && npm publish",
@@ -34,7 +35,7 @@
     "can-construct": "^3.0.0-pre.3",
     "can-event": "^3.0.0-pre.2",
     "can-observe-info": "^3.0.0-pre.4",
-    "can-util": "^3.0.0-pre.11"
+    "can-util": "^3.0.0-pre.13"
   },
   "devDependencies": {
     "can-list": "^3.0.0-pre.1",
