@@ -6,7 +6,7 @@ var isArray = require("can-util/js/is-array/is-array");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object")
 var defineHelpers = require("../define-helpers/define-helpers");
 var CID = require("can-util/js/cid/cid");
-var types = require("can-util/js/types/types")
+var types = require("can-util/js/types/types");
 
 var make = define.make;
 

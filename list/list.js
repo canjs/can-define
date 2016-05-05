@@ -9,9 +9,10 @@ var defineHelpers = require("../define-helpers/define-helpers");
 var assign = require("can-util/js/assign/assign");
 var each = require("can-util/js/each/each");
 var isArray = require("can-util/js/is-array/is-array");
-var isPlainObject = require("can-util/js/is-plain-object/is-plain-object")
+var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
 var makeArray = require("can-util/js/make-array/make-array");
 var CID = require("can-util/js/cid/cid");
+var types = require("can-util/js/types/types");
 
 var splice = [].splice;
 
@@ -845,5 +846,5 @@ DefineList.prototype.attr = function(prop){
     }
 }
 defineHelpers.DefineList = DefineList;
-
+types.DefaultList = DefineList;
 module.exports = DefineList;
