@@ -278,6 +278,9 @@ var DefineList = Construct.extend("DefineList",{
     serialize: function () {
         return defineHelpers.serialize(this, 'serialize', []);
     },
+    toObject: function () {
+        return defineHelpers.serialize(this, 'toObject', []);
+    },
     /*_getAttrs: function(){
         return mapHelpers.serialize(this, 'attr', []);
     },

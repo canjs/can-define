@@ -7,6 +7,10 @@ var types = require("can-util/js/types/types");
 var each = require("can-util/js/each/each");
 
 
+var hasMethod = function(obj, method){
+    return obj && typeof obj == "object" && (method in obj);
+}
+
 var defineHelpers = {
     extendedSetup: function(props){
         assign(this, props)
@@ -39,7 +43,7 @@ var defineHelpers = {
 	// If `val` is an observable, calls `how` on it; otherwise
 	// returns the value of `val`.
 	getValue: function(map, name, val, how){
-		if( types.isMapLike(val) ) {
+		if( hasMethod(val, how) ) {
 			return val[how]();
 		} else {
 			return val;
@@ -69,7 +73,7 @@ var defineHelpers = {
 			if(!serializeMap) {
 				firstSerialize = true;
 				serializeMap = {
-					attr: {},
+					toObject: {},
 					serialize: {}
 				};
 			}
@@ -78,24 +82,20 @@ var defineHelpers = {
 			// Go through each property.
 			map.each(function (val, name) {
 				// If the value is an `object`, and has an `attr` or `serialize` function.
-				var result,
-					isObservable =  types.isMapLike(val),
+
+                var result,
+					isObservable =   hasMethod(val, how),
 					serialized = isObservable && serializeMap[how][CID(val)];
 
 				if( serialized ) {
 					result = serialized;
 				} else {
 					// special attr or serializer
-					if(map["___"+how]) {
-						result =  map["___"+how](name, val);
-					} else {
-						result = defineHelpers.getValue(map, name, val, how);
-					}
+					result = defineHelpers.getValue(map, name, val, how);
 				}
 				// this is probably removable
-				if(result !== undefined){
-					where[name] = result;
-				}
+				where[name] = result;
+
 			});
 
 			if(firstSerialize) {

@@ -122,12 +122,11 @@ module.exports = define = function(objPrototype, defines) {
 		if(type) {
 			setter =  make.set.type(prop, type, setter);
 		}
-
 		// Define the property.
 		Object.defineProperty(objPrototype, prop, {
 			get:getter,
 			set: setter,
-			enumerable: !definition.get
+			enumerable: "serialize" in definition ? !!definition.serialize : !definition.get
 		});
     });
 
@@ -515,8 +514,19 @@ eventsProto.off = eventsProto.unbind = eventsProto.removeEventListener;
 
 delete eventsProto.one;
 
+var defineConfigurableAndNotEnumerable = function(obj, prop, value){
+	Object.defineProperty(obj, prop, {
+		configurable: true,
+		enumerable: false,
+		writable: true,
+		value: value
+	});
+};
 
 define.setup = function(props){
+	defineConfigurableAndNotEnumerable(this,"_cid");
+	defineConfigurableAndNotEnumerable(this,"__bindEvents", {});
+	defineConfigurableAndNotEnumerable(this,"_bindings", 0);
 	/* jshint -W030 */
 	CID(this);
     assign(this, props);
@@ -524,13 +534,12 @@ define.setup = function(props){
 	//!steal-remove-start
 	this._data;
 	this._computed;
-    this.__bindEvents= {};
-    this._bindings = 0;
     Object.seal(this);
 	//!steal-remove-end
 };
 define.replaceWith = replaceWith;
 define.eventsProto = eventsProto;
+define.defineConfigurableAndNotEnumerable = defineConfigurableAndNotEnumerable;
 define.make = make;
 define.types = {
 	'date': function (str) {

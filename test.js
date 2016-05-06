@@ -15,4 +15,18 @@ QUnit.test("basics", function(){
     QUnit.ok(items.people.item(1) instanceof DefineMap, "2nd object is Map");
     QUnit.equal(items.people.item(1).name, "Brian", "2nd object's name is right");
     QUnit.equal(items.count, 1000, "count is number");
-})
+});
+
+QUnit.test("serialize works", function(){
+    var Person = DefineMap.extend({
+        first: "string",
+        last: "string"
+    });
+    var People = DefineList.extend({
+        "*": Person
+    });
+
+    var people = new People([{first: "j", last: "m"}]);
+    QUnit.deepEqual(people.serialize(), [{first: "j", last: "m"}]);
+
+});

@@ -15,7 +15,8 @@ var make = define.make;
 var DefineMap = Construct.extend("DefineMap",{
     setup: function(){
         if(DefineMap) {
-            define(this.prototype, defineHelpers.getDefine(this.prototype) );
+            this.defines = defineHelpers.getDefine(this.prototype)
+            define(this.prototype, this.defines );
             this.prototype.setup = define.setup;
         }
     }
@@ -35,8 +36,27 @@ var DefineMap = Construct.extend("DefineMap",{
         this._bindings = 0;
         Object.seal(this);
     	//!steal-remove-end
+    },
+    serialize: function () {
+        return defineHelpers.serialize(this, 'serialize', {});
+    },
+    toObject: function () {
+        return defineHelpers.serialize(this, 'toObject', {});
+    },
+    each: function(cb, thisarg){
+        for(var prop in this.constructor.defines) {
+            var definition = this.constructor.defines[prop];
+            if(typeof definition !== "object" || ("serialize" in definition ? !!definition.serialize : !definition.get)) {
+                var item = this[prop];
+                if (cb.call(thisarg || item, item, prop, this) === false) {
+                    break;
+                }
+            }
+        }
+        return this;
     }
 });
+
 
 
 // Add necessary event methods to this object.

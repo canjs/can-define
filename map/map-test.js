@@ -56,3 +56,19 @@ QUnit.test("setting not defined property", function(){
         ok(true, "error thrown")
     }
 });
+
+QUnit.test("loop only through defined serializable props", function(){
+    var MyMap = DefineMap.extend({
+        propA: {},
+        propB: {serialize: false},
+        propC: {
+            get: function(){
+                return propA
+            }
+        }
+    });
+    var inst = new MyMap();
+
+    QUnit.deepEqual(Object.keys(inst.toObject()), ["propA"]);
+
+});
