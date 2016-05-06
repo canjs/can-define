@@ -465,6 +465,8 @@ replaceWith = function(obj, prop, cb, writable) {
 
 eventsProto = assign({}, event);
 assign(eventsProto, {
+	_eventSetup: function(){},
+	_eventTeardown: function(){},
 	addEventListener: function (eventName, handler) {
 
 		var computedBinding = this._computed && this._computed[eventName];
