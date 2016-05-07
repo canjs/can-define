@@ -34,15 +34,21 @@ var makeFilterCallback = function(props) {
 var DefineList = Construct.extend("DefineList",{
     setup: function(){
         if(DefineList) {
-            var definitions = defineHelpers.getDefine(this.prototype);
-            if(definitions["*"]) {
-                var itemsDefinition = definitions["*"];
-                delete definitions["*"];
+            // remove "*" because it means something else
+            var prototype = this.prototype;
+            var itemsDefinition = prototype["*"];
+            if(itemsDefinition) {
+                delete prototype["*"];
+                define(prototype,  prototype);
+                prototype["*"] = itemsDefinition;
+                itemsDefinition = define.getDefinitionOrMethod("*", itemsDefinition, {});
+
                 if(itemsDefinition.Type) {
                     this.prototype.__type = make.set.Type("*",itemsDefinition.Type, identity);
+                } else if(itemsDefinition.type) {
+                    this.prototype.__type = make.set.type("*",itemsDefinition.type, identity);
                 }
             }
-            define(this.prototype,  definitions);
         }
     }
 },{

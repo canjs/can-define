@@ -1116,3 +1116,23 @@ QUnit.test('Default values cannot be set (#8)', function() {
 	p.first = 'Sara';
 	QUnit.equal(p.fullName, 'Sara Gomez', 'Fullname is correct after update');
 });
+
+
+QUnit.test('default type is setable', function() {
+	var Person = function() {};
+
+	define(Person.prototype, {
+		'*': 'string',
+		first: {
+			value: 1
+		},
+		last: {
+			value: 2
+		}
+	});
+
+	var p = new Person();
+
+	QUnit.ok(p.first === '1', typeof p.first);
+	QUnit.ok(p.last === '2', typeof p.last);
+});

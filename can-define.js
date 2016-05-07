@@ -14,126 +14,25 @@ var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
 var assign = require("can-util/js/assign/assign");
 var dev = require("can-util/js/dev/dev");
 var CID = require("can-util/js/cid/cid");
-
+var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
+var types = require("can-util/js/types/types");
 
 var behaviors, eventsProto, getPropDefineBehavior, define,
-	make, makeDefinition, replaceWith;
+	make, makeDefinition, replaceWith, getDefinitionsAndMethods,
+	isDefineType, getDefinitionOrMethod;
 
 module.exports = define = function(objPrototype, defines) {
-
 	// default property definitions on _data
 	var dataInitializers = {},
 		// computed property definitions on _computed
 		computedInitializers = {};
 
+	var result = getDefinitionsAndMethods(defines);
+
 	// Goes through each property definition and creates
 	// a `getter` and `setter` function for `Object.defineProperty`.
-	canEach(defines, function(d, prop) {
-
-		// Figure out the `definition` object.
-		var definition;
-		if (typeof d === "string") {
-			definition = {
-				type: d
-			};
-		} else {
-			definition = makeDefinition(prop, defines);
-		}
-		if (isEmptyObject(definition)) {
-			definition = {
-				type: "*"
-			};
-		}
-
-		var type = definition.type;
-		delete definition.type;
-
-		// Special case definitions that have only `type: "*"`.
-		if (type && isEmptyObject(definition) && type === "*") {
-			Object.defineProperty(objPrototype, prop, {
-				get: make.get.data(prop),
-				set: make.set.events(prop, make.get.data(prop), make.set.data(prop), make.eventType.data(prop)),
-				enumerable: true
-			});
-			return;
-		}
-		definition.type = type;
-
-		// Where the value is stored.  If there is a `get` the source of the value
-		// will be a compute in `this._computed[prop]`.  If not, the source of the
-		// value will be in `this._data[prop]`.
-		var dataProperty = definition.get ? "computed" : "data",
-
-			// simple functions that all read/get/set to the right place.
-			// - reader - reads the value but does not observe.
-			// - getter - reads the value and notifies observers.
-			// - setter - sets the value.
-			reader = make.read[dataProperty](prop),
-			getter = make.get[dataProperty](prop),
-			setter = make.set[dataProperty](prop),
-			getInitialValue;
-
-
-		// Determine the type converter
-		var typeConvert = function(val) {
-			return val;
-		};
-
-		if (definition.Type) {
-			typeConvert = make.set.Type(prop, definition.Type, typeConvert);
-		}
-		if (type) {
-			typeConvert = make.set.type(prop, type, typeConvert);
-		}
-
-		// Determine a function that will provide the initial property value.
-		if ((definition.value !== undefined || definition.Value !== undefined)) {
-			getInitialValue = make.get.defaultValue(prop, definition, typeConvert);
-		}
-		// If property has a getter, create the compute that stores its data.
-		if (definition.get) {
-			computedInitializers[prop] = make.compute(prop, definition.get, getInitialValue);
-		}
-		// If the property isn't a getter, but has an initial value, setup a
-		// default value on `this._data[prop]`.
-		else if (getInitialValue) {
-			dataInitializers[prop] = getInitialValue;
-		}
-
-
-		// Define setter behavior.
-
-		// If there's a `get` and `set`, make the setter get the `lastSetValue` on the
-		// `get`'s compute.
-		if (definition.get && definition.set) {
-			setter = make.set.setter(prop, definition.set, make.read.lastSet(prop), setter, true);
-		}
-		// If there's a `set` and no `get`,
-		else if (definition.set) {
-			// make a set that produces events.
-			setter = make.set.events(prop, reader, setter, make.eventType[dataProperty](prop));
-			// Add `set` functionality to the setter.
-			setter = make.set.setter(prop, definition.set, reader, setter, false);
-		}
-		// If there's niether `set` or `get`,
-		else if (!definition.get) {
-			// make a set that produces events.
-			setter = make.set.events(prop, reader, setter, make.eventType[dataProperty](prop));
-		}
-
-		// Add type behavior to the setter.
-		if (definition.Type) {
-			setter = make.set.Type(prop, definition.Type, setter);
-		}
-		if (type) {
-			setter = make.set.type(prop, type, setter);
-		}
-		// Define the property.
-		Object.defineProperty(objPrototype, prop, {
-			get: getter,
-			set: setter,
-			enumerable: "serialize" in definition ? !!definition.serialize : !definition.get
-		});
+	canEach(result.definitions, function(definition, property){
+		define.property(objPrototype, property, definition, dataInitializers, computedInitializers);
 	});
 
 	// Places a `_data` on the prototype that when first called replaces itself
@@ -172,8 +71,103 @@ module.exports = define = function(objPrototype, defines) {
 	}
 
 
-	return objPrototype;
+	return result;
 };
+
+define.property = function(objPrototype, prop, definition, dataInitializers, computedInitializers) {
+
+	var type = definition.type;
+	delete definition.type;
+
+	// Special case definitions that have only `type: "*"`.
+	if (type && isEmptyObject(definition) && type === define.types["*"]) {
+		definition.type = type;
+		Object.defineProperty(objPrototype, prop, {
+			get: make.get.data(prop),
+			set: make.set.events(prop, make.get.data(prop), make.set.data(prop), make.eventType.data(prop)),
+			enumerable: true
+		});
+		return;
+	}
+	definition.type = type;
+
+	// Where the value is stored.  If there is a `get` the source of the value
+	// will be a compute in `this._computed[prop]`.  If not, the source of the
+	// value will be in `this._data[prop]`.
+	var dataProperty = definition.get ? "computed" : "data",
+
+		// simple functions that all read/get/set to the right place.
+		// - reader - reads the value but does not observe.
+		// - getter - reads the value and notifies observers.
+		// - setter - sets the value.
+		reader = make.read[dataProperty](prop),
+		getter = make.get[dataProperty](prop),
+		setter = make.set[dataProperty](prop),
+		getInitialValue;
+
+
+	// Determine the type converter
+	var typeConvert = function(val) {
+		return val;
+	};
+
+	if (definition.Type) {
+		typeConvert = make.set.Type(prop, definition.Type, typeConvert);
+	}
+	if (type) {
+		typeConvert = make.set.type(prop, type, typeConvert);
+	}
+
+	// Determine a function that will provide the initial property value.
+	if ((definition.value !== undefined || definition.Value !== undefined)) {
+		getInitialValue = make.get.defaultValue(prop, definition, typeConvert);
+	}
+	// If property has a getter, create the compute that stores its data.
+	if (definition.get) {
+		computedInitializers[prop] = make.compute(prop, definition.get, getInitialValue);
+	}
+	// If the property isn't a getter, but has an initial value, setup a
+	// default value on `this._data[prop]`.
+	else if (getInitialValue) {
+		dataInitializers[prop] = getInitialValue;
+	}
+
+
+	// Define setter behavior.
+
+	// If there's a `get` and `set`, make the setter get the `lastSetValue` on the
+	// `get`'s compute.
+	if (definition.get && definition.set) {
+		setter = make.set.setter(prop, definition.set, make.read.lastSet(prop), setter, true);
+	}
+	// If there's a `set` and no `get`,
+	else if (definition.set) {
+		// make a set that produces events.
+		setter = make.set.events(prop, reader, setter, make.eventType[dataProperty](prop));
+		// Add `set` functionality to the setter.
+		setter = make.set.setter(prop, definition.set, reader, setter, false);
+	}
+	// If there's niether `set` or `get`,
+	else if (!definition.get) {
+		// make a set that produces events.
+		setter = make.set.events(prop, reader, setter, make.eventType[dataProperty](prop));
+	}
+
+	// Add type behavior to the setter.
+	if (definition.Type) {
+		setter = make.set.Type(prop, definition.Type, setter);
+	}
+	if (type) {
+		setter = make.set.type(prop, type, setter);
+	}
+	// Define the property.
+	Object.defineProperty(objPrototype, prop, {
+		get: getter,
+		set: setter,
+		enumerable: "serialize" in definition ? !!definition.serialize : !definition.get
+	});
+};
+
 
 // Makes a simple constructor function.
 define.Constructor = function(defines) {
@@ -327,9 +321,7 @@ make = {
 			};
 		},
 		type: function(prop, type, set) {
-			if (typeof type === "string") {
-				type = define.types[type];
-			}
+
 
 			if (typeof type === "object") {
 
@@ -429,30 +421,84 @@ make = {
 
 behaviors = ["get", "set", "value", "Value", "type", "Type", "serialize"];
 
-getPropDefineBehavior = function(behavior, prop, defines) {
-	var defaultProp;
-
-	if (defines) {
-		prop = defines[prop];
-		defaultProp = defines['*'];
-
-		if (prop && prop[behavior] !== undefined) {
-			return prop[behavior];
-		} else if (defaultProp && defaultProp[behavior] !== undefined) {
-			return defaultProp[behavior];
-		}
+// gets a behavior for a definition or from the defaultDefinition
+getPropDefineBehavior = function(behaviorName, prop, def, defaultDefinition) {
+	if(behaviorName in def) {
+		return def[behaviorName];
+	} else {
+		return defaultDefinition[behaviorName];
 	}
 };
-
-makeDefinition = function(prop, defines) {
+// makes a full definition, using the defaultDefinition
+makeDefinition = function(prop, def, defaultDefinition) {
 	var definition = {};
 	behaviors.forEach(function(behavior) {
-		var behaviorDef = getPropDefineBehavior(behavior, prop, defines);
-		if (behaviorDef != null) {
+		var behaviorDef = getPropDefineBehavior(behavior, prop, def, defaultDefinition);
+		if (behaviorDef !== undefined) {
+			if(behavior === "type" && typeof behaviorDef === "string") {
+				behaviorDef = define.types[behaviorDef];
+			}
 			definition[behavior] = behaviorDef;
 		}
 	});
+	if( isEmptyObject(definition) ) {
+		definition.type = define.types["*"];
+	}
 	return definition;
+};
+
+
+
+getDefinitionOrMethod = function(prop, value, defaultDefinition){
+	var definition;
+	if(typeof value === "string") {
+		definition = {type: value};
+	}
+	else if(typeof value === "function") {
+		if(types.isConstructor(value)) {
+			definition = {Type: value};
+		} else if(isDefineType(value)) {
+			definition = {type: value};
+		}
+	} else if(isPlainObject(value)){
+		definition = value;
+	}
+	if(definition) {
+		return makeDefinition(prop, definition, defaultDefinition);
+	} else {
+		return value;
+	}
+};
+getDefinitionsAndMethods = function(defines) {
+	var definitions = {};
+	var methods = {};
+	// first lets get a default if it exists
+	var defaults = defines["*"],
+		defaultDefinition;
+	if(defaults) {
+		delete defines["*"];
+		defaultDefinition = getDefinitionOrMethod("*", defaults, {});
+	} else {
+		defaultDefinition = {};
+	}
+
+	canEach(defines, function(value, prop) {
+		if(prop === "constructor") {
+			methods[prop] = value;
+			return;
+		} else {
+			var result = getDefinitionOrMethod(prop, value, defaultDefinition);
+			if(result && typeof result === "object") {
+				definitions[prop] = result;
+			} else {
+				methods[prop] = result;
+			}
+		}
+	});
+	if(defaults) {
+		defines["*"] = defaults;
+	}
+	return {definitions: definitions, methods: methods, defaultDefinition: defaultDefinition};
 };
 
 replaceWith = function(obj, prop, cb, writable) {
@@ -530,7 +576,7 @@ var defineConfigurableAndNotEnumerable = function(obj, prop, value) {
 	});
 };
 
-define.setup = function(props) {
+define.setup = function(props, sealed) {
 	defineConfigurableAndNotEnumerable(this, "_cid");
 	defineConfigurableAndNotEnumerable(this, "__bindEvents", {});
 	defineConfigurableAndNotEnumerable(this, "_bindings", 0);
@@ -541,13 +587,21 @@ define.setup = function(props) {
 	//!steal-remove-start
 	this._data;
 	this._computed;
-	Object.seal(this);
+	if(sealed !== false) {
+		Object.seal(this);
+	}
 	//!steal-remove-end
 };
 define.replaceWith = replaceWith;
 define.eventsProto = eventsProto;
 define.defineConfigurableAndNotEnumerable = defineConfigurableAndNotEnumerable;
 define.make = make;
+define.getDefinitionOrMethod = getDefinitionOrMethod;
+
+isDefineType = function(func){
+	return func && func.canDefineType === true;
+};
+
 define.types = {
 	'date': function(str) {
 		var type = typeof str;

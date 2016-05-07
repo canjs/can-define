@@ -30,3 +30,19 @@ QUnit.test("serialize works", function(){
     QUnit.deepEqual(people.serialize(), [{first: "j", last: "m"}]);
 
 });
+
+QUnit.test("Extended Map with empty def converts to default Observables", function(){
+    var School = DefineMap.extend({
+        students: {},
+        teacher: {}
+    });
+
+    var school = new School();
+
+    school.students = [{name: "J"}];
+    school.teacher = {name: "M"};
+
+    ok(school.students instanceof DefineList, "converted to DefineList");
+    ok(school.teacher instanceof DefineMap, "converted to DefineMap");
+
+});
