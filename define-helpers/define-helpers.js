@@ -93,7 +93,10 @@ var defineHelpers = {
 					result = defineHelpers.getValue(map, name, val, how);
 				}
 				// this is probably removable
-				where[name] = result;
+                if(result !== undefined) {
+                    where[name] = result;
+                }
+
 
 			});
 

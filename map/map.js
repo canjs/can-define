@@ -5,8 +5,10 @@ var each = require("can-util/js/each/each");
 var isArray = require("can-util/js/is-array/is-array");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object")
 var defineHelpers = require("../define-helpers/define-helpers");
+var ObserveInfo = require("can-observe-info");
 var CID = require("can-util/js/cid/cid");
 var types = require("can-util/js/types/types");
+var canBatch = require("can-event/batch/batch");
 
 var make = define.make;
 
@@ -30,17 +32,77 @@ var defineExpando = function(map, prop, value) {
     }
 };
 
-var eachDefinition = function(map, cb, thisarg, definitions) {
+var readWithoutObserve = ObserveInfo.notObserve(function(map, prop){
+    return map[prop]
+});
+
+var eachDefinition = function(map, cb, thisarg, definitions, observe) {
+
     for(var prop in definitions) {
         var definition = definitions[prop];
         if(typeof definition !== "object" || ("serialize" in definition ? !!definition.serialize : !definition.get)) {
-            var item = map[prop];
+
+            var item = observe === false ? readWithoutObserve(map, prop) : map[prop];
+
             if (cb.call(thisarg || item, item, prop, map) === false) {
                 return false;
             }
         }
     }
 };
+
+var setProps = function(props, remove) {
+    props = assign({}, props);
+    var prop,
+        self = this,
+        newVal;
+
+    // Batch all of the change events until we are done.
+    canBatch.start();
+    // Merge current properties with the new ones.
+    this.each(function(curVal, prop) {
+        // You can not have a _cid property; abort.
+        if (prop === "_cid") {
+            return;
+        }
+        newVal = props[prop];
+
+        // If we are merging, remove the property if it has no value.
+        if (newVal === undefined) {
+            if (remove) {
+                self[prop] = undefined;
+            }
+            return;
+        }
+        if( (typeof curVal !== "object") && curVal) {
+            self.set(prop, newVal);
+        }
+        else if( ("set" in curVal) && isPlainObject(obj) ) {
+            curVal.set(obj, remove);
+        }
+        else if( ("attr" in curVal) && (isPlainObject(obj) || isArray(obj)) ) {
+            curVal.attr(obj, remove);
+        }
+        else if("replace" in curVal && isArray(obj)) {
+            curVal.replace(obj)
+        }
+        else if(curVal !== newVal) {
+            self.set(prop, newVal);
+        }
+        delete props[prop];
+    }, this, false);
+    // Add remaining props.
+    for (prop in props) {
+        // Ignore _cid.
+        if (prop !== "_cid") {
+            newVal = props[prop];
+            this.set(prop, newVal);
+        }
+
+    }
+    canBatch.stop();
+    return this;
+}
 
 var DefineMap = Construct.extend("DefineMap",{
     setup: function(){
@@ -82,8 +144,12 @@ var DefineMap = Construct.extend("DefineMap",{
         return this[prop];
     },
     set: function(prop, value){
+        if(typeof prop === "object") {
+            return setProps.call(this, prop, value);
+        }
         defineExpando(this, prop);
-        return this[prop] = value;
+        this[prop] = value;
+        return this;
     },
     serialize: function () {
         return defineHelpers.serialize(this, 'serialize', {});
@@ -91,17 +157,17 @@ var DefineMap = Construct.extend("DefineMap",{
     toObject: function () {
         return defineHelpers.serialize(this, 'toObject', {});
     },
-    each: function(cb, thisarg){
+    each: function(cb, thisarg, observe){
         var res;
         var constructorDefinitions = this.constructor.definitions;
         if(constructorDefinitions) {
-            res = eachDefinition(this, cb, thisarg, constructorDefinitions);
+            res = eachDefinition(this, cb, thisarg, constructorDefinitions, observe);
         }
         if(res === false) {
             return this;
         }
         if(this._definitions) {
-            eachDefinition(this, cb, thisarg, this._definitions);
+            eachDefinition(this, cb, thisarg, this._definitions, observe);
         }
 
         return this;
