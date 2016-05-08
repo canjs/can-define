@@ -29,6 +29,11 @@ var defineExpando = function(map, prop, value) {
         // possibly convert value to List or DefineMap
         map._data[prop] = defaultDefinition.type ? defaultDefinition.type(value) : defineHelpers.simpleTypeConvert(value);
         instanceDefines[prop] = {};
+
+        canBatch.trigger.call(map, {
+            type: "__keys",
+            target: map
+        });
     }
 };
 
@@ -158,6 +163,9 @@ var DefineMap = Construct.extend("DefineMap",{
         return defineHelpers.serialize(this, 'toObject', {});
     },
     each: function(cb, thisarg, observe){
+        if(observe !== false) {
+            ObserveInfo.observe(this, '__keys');
+        }
         var res;
         var constructorDefinitions = this.constructor.definitions;
         if(constructorDefinitions) {

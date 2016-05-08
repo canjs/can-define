@@ -134,3 +134,17 @@ QUnit.test("set multiple props", function(){
 
     QUnit.deepEqual(map.toObject(), {foo: {bar: "VALUE"}, a: 2});
 });
+
+QUnit.test("serialize responds to added props", function(){
+    var map = new DefineMap();
+    var oi = new ObserveInfo(function(){
+        return map.serialize();
+    },null,{
+        updater: function(newVal){
+            QUnit.deepEqual(newVal, {a: 1, b: 2}, "updated right");
+        }
+    })
+    oi.getValueAndBind();
+
+    map.set({a: 1, b: 2});
+});
