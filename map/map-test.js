@@ -122,9 +122,9 @@ QUnit.test("toObject with dynamically added properties", function(){
 
 QUnit.test("set multiple props", function(){
     var map = new DefineMap();
-    map.set({a: 1, b: 2});
+    map.set({a: 0, b: 2});
 
-    QUnit.deepEqual(map.toObject(), {a: 1, b:2});
+    QUnit.deepEqual(map.toObject(), {a: 0, b:2});
 
     map.set({a: 2}, true);
 
