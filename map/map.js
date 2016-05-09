@@ -29,11 +29,19 @@ var defineExpando = function(map, prop, value) {
         // possibly convert value to List or DefineMap
         map._data[prop] = defaultDefinition.type ? defaultDefinition.type(value) : defineHelpers.simpleTypeConvert(value);
         instanceDefines[prop] = {};
-
+        canBatch.start();
         canBatch.trigger.call(map, {
             type: "__keys",
             target: map
         });
+        if(map._data[prop] !== undefined) {
+            canBatch.trigger.call(map, {
+                type: prop,
+                target: map
+            },[map._data[prop], undefined]);
+        }
+        canBatch.stop();
+        return true;
     }
 };
 
@@ -82,14 +90,14 @@ var setProps = function(props, remove) {
         if( typeof curVal !== "object" ) {
             self.set(prop, newVal);
         }
-        else if( ("set" in curVal) && isPlainObject(obj) ) {
-            curVal.set(obj, remove);
+        else if( ("set" in curVal) && isPlainObject(newVal) ) {
+            curVal.set(newVal, remove);
         }
-        else if( ("attr" in curVal) && (isPlainObject(obj) || isArray(obj)) ) {
-            curVal.attr(obj, remove);
+        else if( ("attr" in curVal) && (isPlainObject(newVal) || isArray(newVal)) ) {
+            curVal.attr(newVal, remove);
         }
-        else if("replace" in curVal && isArray(obj)) {
-            curVal.replace(obj)
+        else if("replace" in curVal && isArray(newVal)) {
+            curVal.replace(newVal)
         }
         else if(curVal !== newVal) {
             self.set(prop, newVal);
@@ -119,7 +127,14 @@ var DefineMap = Construct.extend("DefineMap",{
             this.defaultDefinition = result.defaultDefinition;
 
             this.prototype.setup = function(props){
-                define.setup.call(this, props, this.constructor.seal)
+                if(this.constructor.seal === false) {
+                    var self = this;
+                    each(props, function(value, prop){
+                        defineExpando(self, prop);
+                    });
+                }
+                define.setup.call(this, props, this.constructor.seal);
+
             };
         }
     }
@@ -152,8 +167,10 @@ var DefineMap = Construct.extend("DefineMap",{
         if(typeof prop === "object") {
             return setProps.call(this, prop, value);
         }
-        defineExpando(this, prop);
-        this[prop] = value;
+        var defined = defineExpando(this, prop, value);
+        if(!defined) {
+            this[prop] = value;
+        }
         return this;
     },
     serialize: function () {

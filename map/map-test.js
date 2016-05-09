@@ -148,3 +148,32 @@ QUnit.test("serialize responds to added props", function(){
 
     map.set({a: 1, b: 2});
 });
+
+QUnit.test("initialize an undefined property", function(){
+    var MyMap = DefineMap.extend({seal: false},{});
+    var instance = new MyMap({foo:"bar"});
+
+    equal(instance.foo, "bar");
+});
+
+QUnit.test("creating a new key doesn't cause two changes", 1, function(){
+    var map = new DefineMap();
+    var oi = new ObserveInfo(function(){
+        return map.serialize();
+    },null,{
+        updater: function(newVal){
+            QUnit.deepEqual(newVal, {a: 1}, "updated right");
+        }
+    })
+    oi.getValueAndBind();
+
+    map.set("a", 1);
+});
+
+QUnit.test("setting nested object", function(){
+    var m = new DefineMap({});
+
+    m.set({foo: {}});
+    m.set({foo: {}});
+    QUnit.deepEqual(m.toObject(), {foo: {}});
+});

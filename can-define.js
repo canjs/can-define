@@ -15,6 +15,7 @@ var assign = require("can-util/js/assign/assign");
 var dev = require("can-util/js/dev/dev");
 var CID = require("can-util/js/cid/cid");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
+var isArray = require("can-util/js/is-array/is-array");
 var types = require("can-util/js/types/types");
 
 var behaviors, eventsProto, getPropDefineBehavior, define,
@@ -626,6 +627,17 @@ define.types = {
 		}
 		return true;
 	},
+	'stringOrObservable': function(newVal) {
+		if(isArray(newVal)) {
+			return new types.DefaultList(newVal);
+		}
+		else if(isPlainObject(newVal)) {
+			return new types.DefaultMap(newVal);
+		}
+		else {
+			return define.types.string(newVal);
+		}
+	},
 	/**
 	 * Implements HTML-style boolean logic for attribute strings, where
 	 * any string, including "", is truthy.
@@ -642,6 +654,7 @@ define.types = {
 		}
 		return '' + val;
 	},
+
 	'compute': {
 		set: function(newValue, setVal, setErr, oldValue) {
 			if (newValue.isComputed) {
