@@ -1,12 +1,10 @@
 var bitDocs = require("bit-docs");
-var generateReadme = require("bit-docs-generate-readme");
 var path = require("path");
 
 bitDocs(
     path.join(__dirname, "package.json"),
     {
         debug: true,
-        generators: [generateReadme],
         readme: {
             apis: [
                 {"can-define": ["can-define.types.propDefinition","can-define.types"]},
