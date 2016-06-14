@@ -5,6 +5,7 @@ bitDocs(
     path.join(__dirname, "package.json"),
     {
         debug: true,
+        forceBuild: true,
         readme: {
             apis: [
                 {"can-define": ["can-define.types.propDefinition","can-define.types"]},
