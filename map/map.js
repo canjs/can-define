@@ -159,10 +159,26 @@ var DefineMap = Construct.extend("DefineMap",{
         }
     	//!steal-remove-end
     },
+    /**
+     * @function can-define/map.prototype.get get
+     * @parent can-define/map.prototype
+     *
+     * @description Get a value that was not predefined.
+     *
+     * @signature `map.get(propName)`
+     */
     get: function(prop){
         defineExpando(this, prop);
         return this[prop];
     },
+    /**
+     * @function can-define/map.prototype.set set
+     * @parent can-define/map.prototype
+     *
+     * @description Set a value that was not predefined.
+     *
+     * @signature `map.set(propName, value)`
+     */
     set: function(prop, value){
         if(typeof prop === "object") {
             return setProps.call(this, prop, value);
@@ -173,12 +189,36 @@ var DefineMap = Construct.extend("DefineMap",{
         }
         return this;
     },
+    /**
+     * @function can-define/map.prototype.serialize serialize
+     * @parent can-define/map.prototype
+     *
+     * @description Get a value that was not predefined.
+     *
+     * @signature `map.serialize()`
+     */
     serialize: function () {
         return defineHelpers.serialize(this, 'serialize', {});
     },
+    /**
+     * @function can-define/map.prototype.toObject toObject
+     * @parent can-define/map.prototype
+     *
+     * @description Get a value that was not predefined.
+     *
+     * @signature `map.toObject()`
+     */
     toObject: function () {
         return defineHelpers.serialize(this, 'toObject', {});
     },
+    /**
+     * @function can-define/map.prototype.each each
+     * @parent can-define/map.prototype
+     *
+     * @description Get a value that was not predefined.
+     *
+     * @signature `map.each()`
+     */
     each: function(cb, thisarg, observe){
         if(observe !== false) {
             ObserveInfo.observe(this, '__keys');

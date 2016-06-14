@@ -15,11 +15,11 @@
     "start": "serve -p 8080",
     "testee": "testee test.html --browsers firefox",
     "test": "npm run jshint && npm run testee",
-    "version": "git commit -am \"Update dist for release\" && git checkout -b release && git add -f dist/"
+    "version": "git commit -am \"Update dist for release\" && git checkout -b release && git add -f dist\/"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/canjs/can-define"
+    "url": "https:\/\/github.com\/canjs\/can-define"
   },
   "keywords": [
     "CanJS"
@@ -27,9 +27,9 @@
   "author": "Bitovi",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/canjs/can-define/issues"
+    "url": "https:\/\/github.com\/canjs\/can-define\/issues"
   },
-  "homepage": "https://github.com/canjs/can-define",
+  "homepage": "https:\/\/github.com\/canjs\/can-define",
   "dependencies": {
     "can-compute": "^3.0.0-pre.2",
     "can-construct": "^3.0.0-pre.3",
@@ -39,15 +39,29 @@
   },
   "devDependencies": {
     "can-list": "^3.0.0-pre.1",
-    "can-stache": "canjs/can-stache#master",
+    "can-stache": "canjs\/can-stache#master",
     "jshint": "^2.9.1",
     "serve": "^1.4.0",
     "steal": "^0.16.0",
     "steal-qunit": "^0.1.1",
     "steal-tools": "^0.16.0",
-    "testee": "^0.2.5"
+    "testee": "^0.2.5",
+    "bit-docs": "^0.0.5",
+    "bit-docs-generate-readme": "^0.0.1"
   },
   "system": {
     "npmAlgorithm": "flat"
+  },
+  "bit-docs": {
+    "dependencies": {
+      "bit-docs-glob-finder": "^0.0.5",
+      "bit-docs-dev": "^0.0.3",
+      "bit-docs-js": "^0.0.3"
+    },
+    "glob": {
+      "pattern": "**\/*.{js,md}",
+      "ignore": "node_modules\/**\/*"
+    },
+    "parent": "can-define"
   }
 }

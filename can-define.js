@@ -648,6 +648,9 @@ define.types = {
 	'*': function(val) {
 		return val;
 	},
+	'any': function(val) {
+		return val;
+	},
 	'string': function(val) {
 		if (val == null) {
 			return val;
