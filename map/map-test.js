@@ -3,7 +3,7 @@ var QUnit = require("steal-qunit");
 var DefineMap = require("can-define/map/map");
 var ObserveInfo = require("can-observe-info");
 
-QUnit.module("can-define/map");
+QUnit.module("can-define/map/map");
 
 QUnit.test("creating an instance", function(){
     var map = new DefineMap({prop: "foo"});
