@@ -1,6 +1,6 @@
 {
   "name": "can-define",
-  "version": "0.7.4",
+  "version": "0.7.5",
   "description": "Like can.Map, but without the .attr method.",
   "main": "can-define.js",
   "scripts": {
@@ -15,11 +15,11 @@
     "start": "serve -p 8080",
     "testee": "testee test.html --browsers firefox",
     "test": "npm run jshint && npm run testee",
-    "version": "git commit -am \"Update dist for release\" && git checkout -b release && git add -f dist\/"
+    "version": "git commit -am \"Update dist for release\" && git checkout -b release && git add -f dist/"
   },
   "repository": {
     "type": "git",
-    "url": "https:\/\/github.com\/canjs\/can-define"
+    "url": "https://github.com/canjs/can-define"
   },
   "keywords": [
     "CanJS"
@@ -27,9 +27,9 @@
   "author": "Bitovi",
   "license": "MIT",
   "bugs": {
-    "url": "https:\/\/github.com\/canjs\/can-define\/issues"
+    "url": "https://github.com/canjs/can-define/issues"
   },
-  "homepage": "https:\/\/github.com\/canjs\/can-define",
+  "homepage": "https://github.com/canjs/can-define",
   "dependencies": {
     "can-compute": "^3.0.0-pre.2",
     "can-construct": "^3.0.0-pre.3",
@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "can-list": "^3.0.0-pre.1",
-    "can-stache": "canjs\/can-stache#master",
+    "can-stache": "canjs/can-stache#master",
     "jshint": "^2.9.1",
     "serve": "^1.4.0",
     "steal": "^0.16.0",
@@ -58,12 +58,12 @@
       "bit-docs-js": "^0.0.4"
     },
     "glob": {
-      "pattern": "**\/*.{js,md}",
-      "ignore": "node_modules\/**\/*"
+      "pattern": "**/*.{js,md}",
+      "ignore": "node_modules/**/*"
     },
     "parent": "can-define",
     "readme": {
-        "apis": "./docs/apis.json"
+      "apis": "./docs/apis.json"
     }
   }
 }
