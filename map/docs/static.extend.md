@@ -1,5 +1,5 @@
-@function can-define/map.extend extend
-@parent can-define/map.static
+@function can-define/map/map.extend extend
+@parent can-define/map/map.static
 
 @description Create a custom map type
 
@@ -104,4 +104,4 @@ me.age      //-> 0
   me.address.zip //-> 60048
   ```
 
-@return {can-define/map} A DefineMap constructor function.
+@return {can-define/map/map} A DefineMap constructor function.

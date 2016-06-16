@@ -1,4 +1,4 @@
-@module {function} can-define/list can-define/list
+@module {function} can-define/list/list
 @alias can.DefineMap
 @inherits can.Construct
 

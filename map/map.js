@@ -160,8 +160,8 @@ var DefineMap = Construct.extend("DefineMap",{
     	//!steal-remove-end
     },
     /**
-     * @function can-define/map.prototype.get get
-     * @parent can-define/map.prototype
+     * @function can-define/map/map.prototype.get get
+     * @parent can-define/map/map.prototype
      *
      * @description Get a value that was not predefined.
      *
@@ -172,8 +172,8 @@ var DefineMap = Construct.extend("DefineMap",{
         return this[prop];
     },
     /**
-     * @function can-define/map.prototype.set set
-     * @parent can-define/map.prototype
+     * @function can-define/map/map.prototype.set set
+     * @parent can-define/map/map.prototype
      *
      * @description Set a value that was not predefined.
      *
@@ -190,8 +190,8 @@ var DefineMap = Construct.extend("DefineMap",{
         return this;
     },
     /**
-     * @function can-define/map.prototype.serialize serialize
-     * @parent can-define/map.prototype
+     * @function can-define/map/map.prototype.serialize serialize
+     * @parent can-define/map/map.prototype
      *
      * @description Get a value that was not predefined.
      *
@@ -201,8 +201,8 @@ var DefineMap = Construct.extend("DefineMap",{
         return defineHelpers.serialize(this, 'serialize', {});
     },
     /**
-     * @function can-define/map.prototype.toObject toObject
-     * @parent can-define/map.prototype
+     * @function can-define/map/map.prototype.toObject toObject
+     * @parent can-define/map/map.prototype
      *
      * @description Get a value that was not predefined.
      *
@@ -212,8 +212,8 @@ var DefineMap = Construct.extend("DefineMap",{
         return defineHelpers.serialize(this, 'toObject', {});
     },
     /**
-     * @function can-define/map.prototype.each each
-     * @parent can-define/map.prototype
+     * @function can-define/map/map.prototype.each each
+     * @parent can-define/map/map.prototype
      *
      * @description Get a value that was not predefined.
      *

@@ -1,4 +1,4 @@
-@module {function} can-define/map can-define/map
+@module {function} can-define/map/map
 @alias can.DefineMap
 @inherits can.Construct
 
@@ -16,4 +16,4 @@ var person = new can.DefineMap({
 ```
 
   @param {Object} [props] Properties and values to seed the map with.
-  @return {can-define/map} An instance of `can.DefineMap` with the properties from _props_.
+  @return {can-define/map/map} An instance of `can.DefineMap` with the properties from _props_.

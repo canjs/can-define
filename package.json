@@ -55,13 +55,15 @@
     "dependencies": {
       "bit-docs-glob-finder": "^0.0.5",
       "bit-docs-dev": "^0.0.3",
-      "bit-docs-js": "^0.0.3",
-      "bit-docs-generate-readme": "^0.0.2"
+      "bit-docs-js": "^0.0.4"
     },
     "glob": {
       "pattern": "**\/*.{js,md}",
       "ignore": "node_modules\/**\/*"
     },
-    "parent": "can-define"
+    "parent": "can-define",
+    "readme": {
+        "apis": "./docs/apis.json"
+    }
   }
 }

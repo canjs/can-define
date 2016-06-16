@@ -1,11 +1,11 @@
-@property {Boolean} can-define/map.seal seal
+@property {Boolean} can-define/map/map.seal seal
 
-@parent can-define/map.static
+@parent can-define/map/map.static
 
 @description Defines if instances of the map should be [sealed](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/seal) in development.
 
 @option {Boolean} If `true`, in development, instances of this object will be [sealed](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/seal).  In  [strict mode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode) errors will be thrown when undefined properties are set.  This is the default
-behavior of [can-define/map.extend extended DefineMaps]:
+behavior of [can-define/map/map.extend extended DefineMaps]:
 
 ```js
 "use strict";
@@ -15,7 +15,7 @@ me.age = 33 //-> throws "TypeError: Can't add property age, object is not extens
 ```
 
 If `false`, the object will not be sealed.  This is the default behavior of
-unextended [can-define/map DefineMaps].  Use [can-define/map.prototype.get] and [can-define/map.prototype.set] to get and set values:
+unextended [can-define/map/map DefineMaps].  Use [can-define/map/map.prototype.get] and [can-define/map/map.prototype.set] to get and set values:
 
 ```js
 var person = new can.DefineMap();

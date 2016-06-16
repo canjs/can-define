@@ -1,5 +1,6 @@
 @module {function} can-define
-@description Define observable properties and their behavior.
+@description Exports the `can.define` method that defines observable properties
+and their behavior.
 
 @signature `can.define(prototype, propDefinitions)`
 

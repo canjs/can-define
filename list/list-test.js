@@ -1,3 +1,4 @@
+"use strict";
 var QUnit = require("steal-qunit");
 var DefineList = require("can-define/list/list");
 var DefineMap = require("can-define/map/map");
@@ -7,7 +8,7 @@ var define = require("can-define");
 var assign = require("can-util/js/assign/assign");
 var CID = require("can-util/js/cid/cid");
 
-QUnit.module("can-define/list");
+QUnit.module("can-define/list/list");
 
 QUnit.test("creating an instance", function(){
     var list = new DefineList(["a","b","c"]);
@@ -306,7 +307,7 @@ test("list defines", 6, function(){
     });
 
     var todos = new TodoList([{completed: true},{completed: false}]);
-    
+
     ok(todos.item(0) instanceof Todo, "correct instance");
     equal(todos.completed.length, 1, "only one todo");
 
@@ -319,4 +320,13 @@ test("list defines", 6, function(){
 
     todos.setCompletedTo(true);
 
+});
+
+QUnit.test("extending the base supports overwriting _eventSetup", function(){
+    var L = DefineList.extend({});
+    var c = Object.getOwnPropertyDescriptor(DefineMap.prototype,"_eventSetup");
+    L.prototype.arbitraryProp = true;
+    ok(true,"set arbitraryProp");
+    L.prototype._eventSetup = function(){};
+    ok(true, "worked");
 });

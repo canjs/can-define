@@ -88,8 +88,8 @@ var DefineList = Construct.extend("DefineList",{
 
     },
     /**
-     * @function can-define/list.prototype.item item
-     * @parent can-define/list.prototype
+     * @function can-define/list/list.prototype.item item
+     * @parent can-define/list/list.prototype
      *
      * @description Get a value that was not predefined.
      *
@@ -104,8 +104,8 @@ var DefineList = Construct.extend("DefineList",{
         }
     },
     /**
-     * @function can-define/list.prototype.items items
-     * @parent can-define/list.prototype
+     * @function can-define/list/list.prototype.items items
+     * @parent can-define/list/list.prototype
      *
      * @description Get a value that was not predefined.
      *
@@ -155,7 +155,7 @@ var DefineList = Construct.extend("DefineList",{
     },
 
     /**
-     * @function can-define/list.prototype.each each
+     * @function can-define/list/list.prototype.each each
      * @description Call a function on each element of a DefineList.
      * @signature `list.each( callback(item, index) )`
      *
@@ -191,7 +191,7 @@ var DefineList = Construct.extend("DefineList",{
      */
     //
     /**
-     * @function can-define/list.prototype.splice splice
+     * @function can-define/list/list.prototype.splice splice
      * @description Insert and remove elements from a DefineList.
      * @signature `list.splice(index[, howMany[, ...newElements]])`
      * @param {Number} index where to start removing or inserting elements
@@ -349,7 +349,7 @@ getArgs = function (args) {
 // Create `push`, `pop`, `shift`, and `unshift`
 each({
     /**
-     * @function can-define/list.prototype.push push
+     * @function can-define/list/list.prototype.push push
      * @description Add elements to the end of a list.
      * @signature `list.push(...elements)`
      *
@@ -391,7 +391,7 @@ each({
      */
     push: "length",
     /**
-     * @function can-define/list.prototype.unshift unshift
+     * @function can-define/list/list.prototype.unshift unshift
      * @description Add elements to the beginning of a DefineList.
      * @signature `list.unshift(...elements)`
      *
@@ -466,7 +466,7 @@ function (where, name) {
 
 each({
     /**
-     * @function can-define/list.prototype.pop pop
+     * @function can-define/list/list.prototype.pop pop
      * @description Remove an element from the end of a DefineList.
      * @signature `list.pop()`
      *
@@ -499,7 +499,7 @@ each({
      */
     pop: "length",
     /**
-     * @function can-define/list.prototype.shift shift
+     * @function can-define/list/list.prototype.shift shift
      * @description Remove en element from the front of a list.
      * @signature `list.shift()`
      *
@@ -561,7 +561,7 @@ function (where, name) {
 
 assign(DefineList.prototype, {
     /**
-     * @function can-define/list.prototype.indexOf indexOf
+     * @function can-define/list/list.prototype.indexOf indexOf
      * @description Look for an item in a DefineList.
      * @signature `list.indexOf(item)`
      *
@@ -596,7 +596,7 @@ assign(DefineList.prototype, {
     },
 
     /**
-     * @function can-define/list.prototype.join join
+     * @function can-define/list/list.prototype.join join
      * @description Join a DefineList's elements into a string.
      * @signature `list.join(separator)`
      *
@@ -622,7 +622,7 @@ assign(DefineList.prototype, {
     },
 
     /**
-     * @function can-define/list.prototype.reverse reverse
+     * @function can-define/list/list.prototype.reverse reverse
      * @description Reverse the order of a DefineList.
      * @signature `list.reverse()`
      *
@@ -646,7 +646,7 @@ assign(DefineList.prototype, {
     },
 
     /**
-     * @function can-define/list.prototype.slice slice
+     * @function can-define/list/list.prototype.slice slice
      * @description Make a copy of a part of a DefineList.
      * @signature `list.slice([start[, end]])`
      *
@@ -684,7 +684,7 @@ assign(DefineList.prototype, {
     },
 
     /**
-     * @function can-define/list.prototype.concat concat
+     * @function can-define/list/list.prototype.concat concat
      * @description Merge many collections together into a DefineList.
      * @signature `list.concat(...args)`
      * @param {Array|can.DefineList|*} args Any number of arrays, Lists, or values to add in
@@ -714,7 +714,7 @@ assign(DefineList.prototype, {
     },
 
     /**
-     * @function can-define/list.prototype.forEach forEach
+     * @function can-define/list/list.prototype.forEach forEach
      * @description Call a function for each element of a DefineList.
      * @signature `list.forEach(callback[, thisArg])`
      * @param {function(element, index, list)} callback a function to call with each element of the DefineList
@@ -745,7 +745,7 @@ assign(DefineList.prototype, {
     },
 
     /**
-     * @function can-define/list.prototype.replace replace
+     * @function can-define/list/list.prototype.replace replace
      * @description Replace all the elements of a DefineList.
      * @signature `list.replace(collection)`
      * @param {Array|can.DefineList|can.Deferred} collection the collection of new elements to use
@@ -843,7 +843,8 @@ assign(DefineList.prototype, {
 for(var prop in define.eventsProto) {
     Object.defineProperty(DefineList.prototype, prop, {
         enumerable:false,
-        value: define.eventsProto[prop]
+        value: define.eventsProto[prop],
+        writable: true
     });
 }
 

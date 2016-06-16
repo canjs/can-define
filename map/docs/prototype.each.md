@@ -1,5 +1,5 @@
-@function can-define/map.prototype.each each
-@parent can-define/map.prototype
+@function can-define/map/map.prototype.each each
+@parent can-define/map/map.prototype
 
 @description Call a function on each property of a Map.
 
