@@ -1,4 +1,7 @@
 @module {function} can-define/map/map
+@parent can-core
+@group can-define/map/map.prototype prototype
+@group can-define/map/map.static static
 @alias can.DefineMap
 @inherits can.Construct
 

@@ -30,8 +30,10 @@ var makeFilterCallback = function(props) {
         return true;
     };
 }
-
-var DefineList = Construct.extend("DefineList",{
+/** @add can-define/list/list */
+var DefineList = Construct.extend("DefineList",
+/** @static */
+{
     setup: function(){
         if(DefineList) {
             // remove "*" because it means something else
@@ -51,7 +53,9 @@ var DefineList = Construct.extend("DefineList",{
             }
         }
     }
-},{
+},
+/** @prototype */
+{
     // setup for only dynamic DefineMap instances
     setup: function(items){
         CID(this);
@@ -156,7 +160,10 @@ var DefineList = Construct.extend("DefineList",{
 
     /**
      * @function can-define/list/list.prototype.each each
+     * @parent can-define/list/list.prototype
+     *
      * @description Call a function on each element of a DefineList.
+     *
      * @signature `list.each( callback(item, index) )`
      *
      * `each` iterates through the Map, calling a function
@@ -192,6 +199,7 @@ var DefineList = Construct.extend("DefineList",{
     //
     /**
      * @function can-define/list/list.prototype.splice splice
+     * @parent can-define/list/list.prototype
      * @description Insert and remove elements from a DefineList.
      * @signature `list.splice(index[, howMany[, ...newElements]])`
      * @param {Number} index where to start removing or inserting elements

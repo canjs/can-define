@@ -1,4 +1,5 @@
 @module {function} can-define
+@parent can-core
 @description Exports the `can.define` method that defines observable properties
 and their behavior.
 

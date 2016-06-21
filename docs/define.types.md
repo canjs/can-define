@@ -1,5 +1,5 @@
 @property {Object} can-define.types types
-
+@parent can-define
 Defines the type, initial value, and get, set, and serialize behavior for an
 observable property. All type converters leave `null` and `undefined` as is except for
 the `"boolean"` type converter.
