@@ -2,7 +2,7 @@
 var QUnit = require("steal-qunit");
 var DefineList = require("can-define/list/list");
 var DefineMap = require("can-define/map/map");
-var ObserveInfo = require("can-observe-info");
+var Observation = require("can-observation");
 var define = require("can-define");
 
 var assign = require("can-util/js/assign/assign");
@@ -236,7 +236,7 @@ test("slice and join are observable by a compute (#1884)", function(){
 
 	var list = new DefineList([1,2,3]);
 
-	var sliced = new ObserveInfo(function(){
+	var sliced = new Observation(function(){
 		return list.slice(0,1);
 	}, null, {
 		updater: function(newVal){
@@ -245,7 +245,7 @@ test("slice and join are observable by a compute (#1884)", function(){
 	});
 	sliced.getValueAndBind();
 
-	var joined = new ObserveInfo(function(){
+	var joined = new Observation(function(){
 		return list.join(",");
 	}, null, {
 		updater: function(newVal){

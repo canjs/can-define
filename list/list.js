@@ -2,7 +2,7 @@ var Construct = require("can-construct");
 var define = require("can-define");
 var make = define.make;
 var canBatch = require("can-event/batch/batch");
-var ObserveInfo = require("can-observe-info");
+var Observation = require("can-observation");
 
 var defineHelpers = require("../define-helpers/define-helpers");
 
@@ -101,7 +101,7 @@ var DefineList = Construct.extend("DefineList",
      */
     item: function(index, newVal){
         if(arguments.length === 1) {
-            ObserveInfo.observe(this,""+index);
+            Observation.add(this,""+index);
             return this[index];
         } else {
             this.__set(index, newVal)
@@ -625,7 +625,7 @@ assign(DefineList.prototype, {
      * ```
      */
     join: function () {
-        ObserveInfo.observe(this, "length");
+        Observation.add(this, "length");
         return [].join.apply(this, arguments);
     },
 
@@ -686,7 +686,7 @@ assign(DefineList.prototype, {
      */
     slice: function () {
         // tells computes to listen on length for changes.
-        ObserveInfo.observe(this, "length");
+        Observation.add(this, "length");
         var temp = Array.prototype.slice.apply(this, arguments);
         return new this.constructor(temp);
     },
@@ -860,7 +860,7 @@ var length = 0;
 Object.defineProperty(DefineList.prototype, "length", {
     get: function(){
         if(!this.__inSetup) {
-            ObserveInfo.observe(this,"length");
+            Observation.add(this,"length");
         }
         return this._length;
     },

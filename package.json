@@ -31,14 +31,14 @@
   },
   "homepage": "https://github.com/canjs/can-define",
   "dependencies": {
-    "can-compute": "^3.0.0-pre.2",
+    "can-compute": "^3.0.0-pre.5",
     "can-construct": "^3.0.0-pre.3",
     "can-event": "^3.0.0-pre.2",
-    "can-observe-info": "^3.0.0-pre.4",
+    "can-observation": "^3.0.0-pre.0",
     "can-util": "^3.0.0-pre.13"
   },
   "devDependencies": {
-    "can-list": "^3.0.0-pre.1",
+    "can-list": "^3.0.0-pre.4",
     "can-stache": "canjs/can-stache#master",
     "jshint": "^2.9.1",
     "serve": "^1.4.0",
