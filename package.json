@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "can-list": "^3.0.0-pre.4",
-    "can-stache": "canjs/can-stache#master",
+    "can-stache": "^3.0.0-pre.8",
     "jshint": "^2.9.1",
     "serve": "^1.4.0",
     "steal": "^0.16.0",
