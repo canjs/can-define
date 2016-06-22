@@ -1,7 +1,7 @@
 "use strict";
 var QUnit = require("steal-qunit");
 var DefineMap = require("can-define/map/map");
-var ObserveInfo = require("can-observe-info");
+var Observation = require("can-observation");
 
 QUnit.module("can-define/map/map");
 
@@ -74,7 +74,7 @@ QUnit.test("loop only through defined serializable props", function(){
 
 QUnit.test("get and set can setup expandos", function(){
     var map = new DefineMap();
-    var oi = new ObserveInfo(function(){
+    var oi = new Observation(function(){
         return map.get("foo");
     },null,{
         updater: function(newVal){
@@ -137,7 +137,7 @@ QUnit.test("set multiple props", function(){
 
 QUnit.test("serialize responds to added props", function(){
     var map = new DefineMap();
-    var oi = new ObserveInfo(function(){
+    var oi = new Observation(function(){
         return map.serialize();
     },null,{
         updater: function(newVal){
@@ -158,7 +158,7 @@ QUnit.test("initialize an undefined property", function(){
 
 QUnit.test("creating a new key doesn't cause two changes", 1, function(){
     var map = new DefineMap();
-    var oi = new ObserveInfo(function(){
+    var oi = new Observation(function(){
         return map.serialize();
     },null,{
         updater: function(newVal){
