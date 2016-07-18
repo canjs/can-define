@@ -14,21 +14,21 @@ var make = define.make;
 
 var defineExpando = function(map, prop, value) {
     // first check if it's already a constructor define
-    var constructorDefines = map.constructor.definitions;
+    var constructorDefines = map._define.definitions;
     if(constructorDefines && constructorDefines[prop]) {
         return;
     }
     // next if it's already on this instances
-    var instanceDefines = map._definitions;
+    var instanceDefines = map._instanceDefinitions;
     if(!instanceDefines) {
-        instanceDefines = map._definitions = {};
+        instanceDefines = map._instanceDefinitions = {};
     }
     if(!instanceDefines[prop]) {
-        var defaultDefinition = map.constructor.defaultDefinition || {type: defineHelpers.simpleTypeConvert};
+        var defaultDefinition = map._define.defaultDefinition || {type: define.types.observable};
         define.property(map, prop, defaultDefinition, {},{});
         // possibly convert value to List or DefineMap
-        map._data[prop] = defaultDefinition.type ? defaultDefinition.type(value) : defineHelpers.simpleTypeConvert(value);
-        instanceDefines[prop] = {};
+        map._data[prop] = defaultDefinition.type ? defaultDefinition.type(value) : define.types.observable(value);
+        instanceDefines[prop] = defaultDefinition;
         canBatch.start();
         canBatch.trigger.call(map, {
             type: "__keys",
@@ -123,41 +123,28 @@ var DefineMap = Construct.extend("DefineMap",{
             var prototype = this.prototype;
             var result = define(prototype, prototype);
 
-            this.definitions = result.definitions;
-            this.defaultDefinition = result.defaultDefinition;
-
             this.prototype.setup = function(props){
-                if(this.constructor.seal === false) {
-                    var self = this;
-                    each(props, function(value, prop){
-                        defineExpando(self, prop);
-                    });
-                }
                 define.setup.call(this, props, this.constructor.seal);
-
             };
         }
     }
 },{
     // setup for only dynamic DefineMap instances
     setup: function(props, sealed){
-        CID(this);
-        var data = this._data = {};
-        var map = this;
-        this._definitions = {};
-        each(props, function(value, prop){
-            Object.defineProperty(map, prop, defineHelpers.makeSimpleGetterSetter(prop));
-            // possibly convert value to List or DefineMap
-            data[prop] = defineHelpers.simpleTypeConvert(value);
-            map._definitions[prop] = {};
-        });
-        //!steal-remove-start
-        this.__bindEvents= {};
-        this._bindings = 0;
-        if(sealed){
-            Object.seal(this);
+        if(!this._define) {
+            Object.defineProperty(this,"_define",{
+                enumerable: false,
+                value: {
+                    definitions: {}
+                }
+            });
+            Object.defineProperty(this,"_data",{
+                enumerable: false,
+                value: {}
+            });
         }
-    	//!steal-remove-end
+
+        define.setup.call(this, props, sealed === true);
     },
     /**
      * @function can-define/map/map.prototype.get get
@@ -224,21 +211,21 @@ var DefineMap = Construct.extend("DefineMap",{
             ObserveInfo.observe(this, '__keys');
         }
         var res;
-        var constructorDefinitions = this.constructor.definitions;
+        var constructorDefinitions = this._define.definitions;
         if(constructorDefinitions) {
             res = eachDefinition(this, cb, thisarg, constructorDefinitions, observe);
         }
         if(res === false) {
             return this;
         }
-        if(this._definitions) {
-            eachDefinition(this, cb, thisarg, this._definitions, observe);
+        if(this._instanceDefinitions) {
+            eachDefinition(this, cb, thisarg, this._instanceDefinitions, observe);
         }
 
         return this;
     },
     "*": {
-        type: defineHelpers.simpleTypeConvert
+        type: define.types.observable
     }
 });
 
@@ -249,7 +236,7 @@ for(var prop in define.eventsProto) {
         value: define.eventsProto[prop]
     });
 }
-defineHelpers.DefineMap = DefineMap;
+types.DefineMap = DefineMap;
 
 types.DefaultMap = DefineMap;
 

@@ -1,5 +1,5 @@
 @function can-define.types.get get
-@parent can.Map.prototype.define
+@parent can-define
 
 Specify what happens when a certain property is read on a map. `get` functions
 work like a [can.compute] and automatically update themselves when a dependent

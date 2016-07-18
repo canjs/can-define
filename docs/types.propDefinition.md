@@ -1,5 +1,5 @@
 @typedef {Object} can-define.types.propDefinition propDefinition
-@parent can-define.types
+@parent can-define
 
 Defines the type, initial value, and get, set, and serialize behavior for an
 observable property.
@@ -68,22 +68,26 @@ me.hobbies //-> ["bball","js"]
 ```
 
 @option {function} Type A constructor function that takes
-the value passed to [can.Map::attr attr] as the first argument and called with
-new. For example, if you want whatever
-gets passed to go through `new Array(newValue)` you can do that like:
+the assigned property value as the first argument and called with new. For example, the following will call
+`new Address(newValue)` with whatever non null, undefined, or address type is set as a `Person`'s address property.
 
 ```js
-define: {
-  items: {
-    Type: Array
-  }
-}
+var Address = DefineMap.extend({
+  street: "string",
+  state: "string"    
+});
+
+var Person = DefineMap.extend({
+  address: {Type: Address}    
+});
+var me = new Person();
+me.address = {street: "1234 Pinetree", state: "IL"};
+me.address instanceof Address //-> true
+me.address = null;
+me.address //-> null;
 ```
 
-If the value passed to [can.Map::attr attr] is already an Array, it will be left as is.
-
-@option {can.Map.prototype.define.set} set A set function that specifies what should happen when an attribute
-is set on a [can.Map]. `set` is called with the result of `type` or `Type`. The following
+@option {can.Map.prototype.define.set} set A set function that specifies what should happen when a property is set. `set` is called with the result of `type` or `Type`. The following
 defines a `page` setter that updates the map's offset:
 
 ```js
@@ -98,8 +102,7 @@ define: {
 ```
 
 @option {can-define.types.get} get A function that specifies how the value is retrieved.  The get function is
-converted to an [can.compute.async async compute].  It should derive its value from other values
-on the map. The following
+converted to an [can-compute.async async compute].  It should derive its value from other values on the object. The following
 defines a `page` getter that reads from a map's offset and limit:
 
 ```js
@@ -113,10 +116,9 @@ define: {
 }
 ```
 
-A `get` definition makes the property __computed__ which means it will not be serialized by default.
+A `get` definition makes the property __computed__ which means it will not be enumerable by default.
 
-@option {can.Map.prototype.define.serialize|Boolean} serialize Specifies the behavior of the
-property when [can.Map::serialize serialize] is called.
+@option {can.Map.prototype.define.serialize|Boolean} serialize Specifies the behavior of the property when [can.Map::serialize serialize] is called.
 
 By default, serialize does not include computed values. Properties with a `get` definition
 are computed and therefore are not added to the result.  Non-computed properties values are

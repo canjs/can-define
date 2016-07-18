@@ -9,10 +9,10 @@
 
 @signature `new can.DefineMap([props])`
 
-Creates a new instance of DefineMap or an extended DefineMap.
+Creates a new instance of DefineMap or an extended DefineMap. Then, assigns every property on `props` to the new instance.  If props are passed that are not defined already, those property definitions are created.  If the instance should be sealed, it is sealed.
 
 ```js
-var person = new can.DefineMap({
+var person = new DefineMap({
   first: "Justin",
   last: "Meyer"
 })

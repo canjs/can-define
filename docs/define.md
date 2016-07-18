@@ -1,18 +1,20 @@
 @module {function} can-define
 @parent can-core
-@description Exports the `can.define` method that defines observable properties
-and their behavior.
+@description Exports the `define` method that defines observable properties
+and their behavior on a prototype object.
 
-@signature `can.define(prototype, propDefinitions)`
+@signature `define(prototype, propDefinitions)`
 
-Define observable properties, type conversion, and getter/setter logic to your constructor prototypes.
+Define observable properties, type conversion, and getter/setter logic on [https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain prototype objects].
 
 ```js
+var define = require("can-define");
+
 var Person = function(first, last){
   this.first = first;
   this.last = last;
 };
-can.define(Person.prototype,{
+define(Person.prototype,{
   first: {
     type: "string"
   },
@@ -27,7 +29,7 @@ can.define(Person.prototype,{
 });
 ```
 
-@param {Object} prototype The prototype object of a constructor function.
+@param {Object} prototype The prototype object of a constructor function or [class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/class).
 
 @param {Object<String,can-define.types.propDefinition>} propDefinitions An object of
 properties and their definitions.

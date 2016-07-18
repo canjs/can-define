@@ -1136,3 +1136,14 @@ QUnit.test('default type is setable', function() {
 	QUnit.ok(p.first === '1', typeof p.first);
 	QUnit.ok(p.last === '2', typeof p.last);
 });
+
+QUnit.test("expandos are added in define.setup (#25)", function(){
+	var MyMap = define.Constructor({
+	});
+
+	var map = new MyMap({prop: 4});
+	map.on("prop", function(){
+		QUnit.ok(true,"prop event called");
+	});
+	map.prop = 5;
+});

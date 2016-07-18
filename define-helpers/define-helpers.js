@@ -1,4 +1,4 @@
-var simpleGetterSetters = {};
+
 var make = require("can-define").make;
 var isArray = require("can-util/js/is-array/is-array");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
@@ -14,30 +14,7 @@ var defineHelpers = {
     extendedSetup: function(props){
         assign(this, props)
     },
-    simpleTypeConvert: function(newVal) {
-        if(isArray(newVal)) {
-            newVal = new defineHelpers.DefineList(newVal);
-        }
-        else if(isPlainObject(newVal)) {
-            newVal = new defineHelpers.DefineMap(newVal);
-        }
-        return newVal;
-    },
-    makeSimpleGetterSetter: function(prop){
-        if(!simpleGetterSetters[prop]) {
 
-            var setter = make.set.events(prop, make.get.data(prop), make.set.data(prop), make.eventType.data(prop) );
-
-            simpleGetterSetters[prop] = {
-                get: make.get.data(prop),
-                set: function(newVal){
-                    return setter.call(this, defineHelpers.simpleTypeConvert(newVal));
-                },
-                enumerable: true
-            }
-        }
-        return simpleGetterSetters[prop];
-    },
     // ## getValue
 	// If `val` is an observable, calls `how` on it; otherwise
 	// returns the value of `val`.

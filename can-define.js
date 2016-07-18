@@ -17,6 +17,7 @@ var CID = require("can-util/js/cid/cid");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
 var isArray = require("can-util/js/is-array/is-array");
 var types = require("can-util/js/types/types");
+var each = require("can-util/js/each/each");
 
 var behaviors, eventsProto, getPropDefineBehavior, define,
 	make, makeDefinition, replaceWith, getDefinitionsAndMethods,
@@ -70,7 +71,13 @@ module.exports = define = function(objPrototype, defines) {
 			writable: true
 		});
 	}
-
+	// add so instance defs can be dynamically added
+	Object.defineProperty(objPrototype,"_define",{
+		enumerable: false,
+		value: result,
+		configurable: true,
+		writable: true
+	})
 
 	return result;
 };
@@ -583,7 +590,24 @@ define.setup = function(props, sealed) {
 	defineConfigurableAndNotEnumerable(this, "_bindings", 0);
 	/* jshint -W030 */
 	CID(this);
-	assign(this, props);
+	var definitions = this._define.definitions;
+	var instanceDefinitions = {};
+	var map = this;
+	each(props, function(value, prop){
+		if(definitions[prop]) {
+			map[prop] = value;
+		} else {
+
+			var def = define.makeSimpleGetterSetter(prop);
+			instanceDefinitions[prop] = {};
+			Object.defineProperty(map, prop, def);
+			// possibly convert value to List or DefineMap
+			map[prop] = define.types.observable(value);
+		}
+	});
+	if(!isEmptyObject(instanceDefinitions)) {
+		defineConfigurableAndNotEnumerable(this, "_instanceDefinitions", instanceDefinitions);
+	}
 	// only seal in dev mode for performance reasons.
 	//!steal-remove-start
 	this._data;
@@ -598,6 +622,23 @@ define.eventsProto = eventsProto;
 define.defineConfigurableAndNotEnumerable = defineConfigurableAndNotEnumerable;
 define.make = make;
 define.getDefinitionOrMethod = getDefinitionOrMethod;
+var simpleGetterSetters = {};
+define.makeSimpleGetterSetter = function(prop){
+	if(!simpleGetterSetters[prop]) {
+
+		var setter = make.set.events(prop, make.get.data(prop), make.set.data(prop), make.eventType.data(prop) );
+
+		simpleGetterSetters[prop] = {
+			get: make.get.data(prop),
+			set: function(newVal){
+				return setter.call(this, define.types.observable(newVal));
+			},
+			enumerable: true
+		}
+	}
+	return simpleGetterSetters[prop];
+};
+
 
 isDefineType = function(func){
 	return func && func.canDefineType === true;
@@ -627,6 +668,15 @@ define.types = {
 		}
 		return true;
 	},
+	'observable': function(newVal) {
+        if(isArray(newVal) && types.DefineList) {
+            newVal = new types.DefineList(newVal);
+        }
+        else if(isPlainObject(newVal) &&  types.DefineMap) {
+            newVal = new types.DefineMap(newVal);
+        }
+        return newVal;
+    },
 	'stringOrObservable': function(newVal) {
 		if(isArray(newVal)) {
 			return new types.DefaultList(newVal);

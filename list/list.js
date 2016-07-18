@@ -64,7 +64,7 @@ var DefineList = Construct.extend("DefineList",
             this.splice.apply(this, [0,0].concat(items));
         }
     },
-    __type: defineHelpers.simpleTypeConvert,
+    __type: define.types.observable,
     _triggerChange: function (attr, how, newVal, oldVal) {
 
         canBatch.trigger.call(this, {
@@ -879,6 +879,6 @@ DefineList.prototype.attr = function(prop){
         return this.item.apply(this, arguments);
     }
 }
-defineHelpers.DefineList = DefineList;
+types.DefineList = DefineList;
 types.DefaultList = DefineList;
 module.exports = DefineList;

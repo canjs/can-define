@@ -129,7 +129,7 @@ QUnit.test("set multiple props", function(){
     map.set({a: 2}, true);
 
     QUnit.deepEqual(map.toObject(), {a: 2});
-
+    
     map.set({foo: {bar: "VALUE"}});
 
     QUnit.deepEqual(map.toObject(), {foo: {bar: "VALUE"}, a: 2});
