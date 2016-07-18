@@ -27,7 +27,7 @@ test('list attr changes length', function () {
 		1,
 		2
 	]);
-	l.attr(3, 3);
+	l.set(3, 3);
 	equal(l.length, 4);
 });
 test('remove on pop', function() {
@@ -35,7 +35,7 @@ test('remove on pop', function() {
     l.pop();
 
 	equal(l.length, 2);
-	deepEqual(l.attr(), [0, 1]);
+	deepEqual(l.get(), [0, 1]);
 });
 test('list splice', function () {
 	var l = new DefineList([
@@ -63,7 +63,7 @@ test('list splice', function () {
     });
 
 	l.splice(1, 2, 'a', 'b');
-	deepEqual(l.items(), [
+	deepEqual(l.get(), [
 		0,
 		'a',
 		'b',
@@ -110,7 +110,7 @@ test('Array accessor methods', 11, function () {
 test('splice removes items in IE (#562)', function () {
 	var l = new DefineList(['a']);
 	l.splice(0, 1);
-	ok(!l.attr(0), 'all props are removed');
+	ok(!l.get(0), 'all props are removed');
 });
 
 
@@ -124,7 +124,7 @@ test('reverse triggers add/remove events (#851)', function() {
 
 	l.reverse();
 
-    deepEqual(l.items(), [3,2,1], "reversed")
+    deepEqual(l.get(), [3,2,1], "reversed")
 });
 
 test('filter', function(){
@@ -166,20 +166,20 @@ test("add event always returns an array as the value (#998)", function() {
 	list.push(4);
 	list.pop();
 	msg = "works on attr()";
-	list.attr(0, 4);
+	list.set(0, 4);
 	list.pop();
 	msg = "works on replace()";
 	list.replace([4]);
 });
 
-test("Setting with .attr() out of bounds of length triggers add event with leading undefineds", function() {
+test("Setting with .set() out of bounds of length triggers add event with leading undefineds", function() {
 	var list = new DefineList([1]);
 	list.bind("add", function(ev, newElements, index) {
 		deepEqual(newElements, [undefined, undefined, 4],
 				  "Leading undefineds are included");
-		equal(index, 1, "Index takes into account the leading undefineds from a .attr()");
+		equal(index, 1, "Index takes into account the leading undefineds from a .set()");
 	});
-	list.attr(3, 4);
+	list.set(3, 4);
 });
 
 test("No events should fire if removals happened on empty arrays", function() {
@@ -199,18 +199,18 @@ test('setting an index out of bounds does not create an array', function() {
 	expect(1);
 	var l = new DefineList();
 
-	l.attr('1', 'foo');
-	equal(l.attr('1'), 'foo');
+	l.set('1', 'foo');
+	equal(l.get('1'), 'foo');
 });
 
 test('splice with similar but less items works (#1606)', function() {
 	var list = new DefineList([ 'aa', 'bb', 'cc']);
 
 	list.splice(0, list.length, 'aa', 'cc', 'dd');
-	deepEqual(list.attr(), ['aa', 'cc', 'dd']);
+	deepEqual(list.get(), ['aa', 'cc', 'dd']);
 
 	list.splice(0, list.length, 'aa', 'cc');
-	deepEqual(list.attr(), ['aa', 'cc']);
+	deepEqual(list.get(), ['aa', 'cc']);
 });
 
 test('filter returns same list type (#1744)', function() {
@@ -240,7 +240,7 @@ test("slice and join are observable by a compute (#1884)", function(){
 		return list.slice(0,1);
 	}, null, {
 		updater: function(newVal){
-			deepEqual(newVal.attr(), [2], "got a new DefineList");
+			deepEqual(newVal.get(), [2], "got a new DefineList");
 		}
 	});
 	sliced.getValueAndBind();

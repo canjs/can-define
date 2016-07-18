@@ -155,8 +155,12 @@ var DefineMap = Construct.extend("DefineMap",{
      * @signature `map.get(propName)`
      */
     get: function(prop){
-        defineExpando(this, prop);
-        return this[prop];
+        if(arguments.length) {
+            defineExpando(this, prop);
+            return this[prop];
+        } else {
+            return defineHelpers.serialize(this, 'get', {});
+        }
     },
     /**
      * @function can-define/map/map.prototype.set set
@@ -165,6 +169,8 @@ var DefineMap = Construct.extend("DefineMap",{
      * @description Set a value that was not predefined.
      *
      * @signature `map.set(propName, value)`
+     *
+     * @signature `map.set(props [,removeProps])`
      */
     set: function(prop, value){
         if(typeof prop === "object") {
@@ -187,17 +193,7 @@ var DefineMap = Construct.extend("DefineMap",{
     serialize: function () {
         return defineHelpers.serialize(this, 'serialize', {});
     },
-    /**
-     * @function can-define/map/map.prototype.toObject toObject
-     * @parent can-define/map/map.prototype
-     *
-     * @description Get a value that was not predefined.
-     *
-     * @signature `map.toObject()`
-     */
-    toObject: function () {
-        return defineHelpers.serialize(this, 'toObject', {});
-    },
+
     /**
      * @function can-define/map/map.prototype.each each
      * @parent can-define/map/map.prototype
@@ -237,7 +233,11 @@ for(var prop in define.eventsProto) {
     });
 }
 types.DefineMap = DefineMap;
-
 types.DefaultMap = DefineMap;
+
+DefineMap.prototype.toObject = function(){
+    console.warn("Use DefineMap::get instead of DefineMap::toObject");
+    return this.get();
+}
 
 module.exports = DefineMap;

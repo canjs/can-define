@@ -49,7 +49,7 @@ var defineHelpers = {
 			if(!serializeMap) {
 				firstSerialize = true;
 				serializeMap = {
-					toObject: {},
+					get: {},
 					serialize: {}
 				};
 			}

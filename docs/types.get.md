@@ -47,25 +47,25 @@ Whenever a getter is provided, it is wrapped in a [can.compute], which ensures
 that whenever its dependent properties change, a change event will fire for this property also.
 
 ```
-var Person = can.Model.extend({
-	define: {
-		fullName: {
-			get: function () {
-				return this.attr("first") + " " + this.attr("last");
-			}
+var Person = DefineMap.extend({
+    first: "string",
+    last: "string",
+	fullName: {
+		get: function () {
+			return this.first + " " + this.last;
 		}
 	}
 });
 
 var p = new Person({first: "Justin", last: "Meyer"});
 
-p.attr("fullName"); // "Justin Meyer"
+p.fullName; // "Justin Meyer"
 
-p.bind("fullName", function(ev, newVal){
+p.on("fullName", function(ev, newVal){
   newVal //-> "Lincoln Meyer";
 });
 
-p.attr("first","Lincoln");
+p.first = "Lincoln";
 ```
 
 ## Asyncronous virtual properties
