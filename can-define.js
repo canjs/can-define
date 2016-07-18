@@ -77,7 +77,7 @@ module.exports = define = function(objPrototype, defines) {
 		value: result,
 		configurable: true,
 		writable: true
-	})
+	});
 
 	return result;
 };
@@ -634,7 +634,7 @@ define.makeSimpleGetterSetter = function(prop){
 				return setter.call(this, define.types.observable(newVal));
 			},
 			enumerable: true
-		}
+		};
 	}
 	return simpleGetterSetters[prop];
 };
