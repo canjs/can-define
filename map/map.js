@@ -5,7 +5,7 @@ var each = require("can-util/js/each/each");
 var isArray = require("can-util/js/is-array/is-array");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object")
 var defineHelpers = require("../define-helpers/define-helpers");
-var ObserveInfo = require("can-observe-info");
+var Observation = require("can-observation");
 var CID = require("can-util/js/cid/cid");
 var types = require("can-util/js/types/types");
 var canBatch = require("can-event/batch/batch");
@@ -45,7 +45,7 @@ var defineExpando = function(map, prop, value) {
     }
 };
 
-var readWithoutObserve = ObserveInfo.notObserve(function(map, prop){
+var readWithoutObserve = Observation.ignore(function(map, prop){
     return map[prop]
 });
 
@@ -204,7 +204,7 @@ var DefineMap = Construct.extend("DefineMap",{
      */
     each: function(cb, thisarg, observe){
         if(observe !== false) {
-            ObserveInfo.observe(this, '__keys');
+            Observation.add(this, '__keys');
         }
         var res;
         var constructorDefinitions = this._define.definitions;

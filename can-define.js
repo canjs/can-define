@@ -7,7 +7,7 @@ var eventLifecycle = require("can-event/lifecycle/lifecycle");
 var canBatch = require("can-event/batch/batch");
 
 var compute = require("can-compute");
-var ObserveInfo = require("can-observe-info");
+var Observation = require("can-observation");
 
 var canEach = require("can-util/js/each/each");
 var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
@@ -415,7 +415,7 @@ make = {
 		},
 		data: function(prop) {
 			return function() {
-				ObserveInfo.observe(this, prop);
+				Observation.add(this, prop);
 				return this._data[prop];
 			};
 		},
