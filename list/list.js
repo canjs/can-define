@@ -14,6 +14,7 @@ var makeArray = require("can-util/js/make-array/make-array");
 var CID = require("can-util/js/cid/cid");
 var types = require("can-util/js/types/types");
 
+
 var splice = [].splice;
 
 var identity = function(x){
@@ -39,9 +40,9 @@ var DefineList = Construct.extend("DefineList",
             // remove "*" because it means something else
             var prototype = this.prototype;
             var itemsDefinition = prototype["*"];
+            delete prototype["*"];
+            define(prototype,  prototype);
             if(itemsDefinition) {
-                delete prototype["*"];
-                define(prototype,  prototype);
                 prototype["*"] = itemsDefinition;
                 itemsDefinition = define.getDefinitionOrMethod("*", itemsDefinition, {});
 
@@ -58,7 +59,19 @@ var DefineList = Construct.extend("DefineList",
 {
     // setup for only dynamic DefineMap instances
     setup: function(items){
-        CID(this);
+        if(!this._define) {
+            Object.defineProperty(this,"_define",{
+                enumerable: false,
+                value: {
+                    definitions: {}
+                }
+            });
+            Object.defineProperty(this,"_data",{
+                enumerable: false,
+                value: {}
+            });
+        }
+        define.setup.call(this, {}, false);
         this._length = 0;
         if(items) {
             this.splice.apply(this, [0,0].concat(items));
@@ -106,32 +119,52 @@ var DefineList = Construct.extend("DefineList",
         } else {
             var arr = [];
             each(this, function(item){
+                // TODO: look up enumerable?
                 arr.push(item);
             });
             return arr;
         }
     },
     set: function(prop, value){
-        if(arguments.length === 2) {
+        // if we are setting a single value
+        if(typeof prop !== "object") {
             // We want change events to notify using integers if we're
             // setting an integer index. Note that <float> % 1 !== 0;
             prop = isNaN(+prop) || (prop % 1) ? prop : +prop;
-
-            // Check to see if we're doing a .attr() on an out of
-            // bounds index property.
-            if (typeof prop === "number" &&
-                prop > this._length - 1) {
-                var newArr = new Array((prop + 1) - this._length);
-                newArr[newArr.length-1] = value;
-                this.push.apply(this, newArr);
-                return newArr;
+            if(typeof prop === "number") {
+                // Check to see if we're doing a .attr() on an out of
+                // bounds index property.
+                if (typeof prop === "number" &&
+                    prop > this._length - 1) {
+                    var newArr = new Array((prop + 1) - this._length);
+                    newArr[newArr.length-1] = value;
+                    this.push.apply(this, newArr);
+                    return newArr;
+                }
+                this.splice(prop,1,value);
+            } else {
+                var defined = defineHelpers.defineExpando(this, prop, value);
+                if(!defined) {
+                    this[prop] = value;
+                }
             }
-            this.splice(prop,1,value);
+
         }
-        //
+        // otherwise we are setting multiple
         else {
-            throw "can't set items";
+            if(isArray(prop)) {
+                if(value) {
+                    this.replace(prop);
+                } else {
+                    this.splice.apply(this, [0, prop.length].concat(prop) )
+                }
+            } else {
+                each(prop, function(value, prop){
+                    this.set(prop, value);
+                }, this)
+            }
         }
+        return this;
     },
     _items: function(){
         var arr = [];
@@ -806,7 +839,6 @@ for(var prop in define.eventsProto) {
     });
 }
 
-var length = 0;
 Object.defineProperty(DefineList.prototype, "length", {
     get: function(){
         if(!this.__inSetup) {
