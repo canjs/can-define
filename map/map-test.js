@@ -68,7 +68,7 @@ QUnit.test("loop only through defined serializable props", function(){
         }
     });
     var inst = new MyMap({propA: 1, propB: 2});
-    QUnit.deepEqual(Object.keys(inst.toObject()), ["propA"]);
+    QUnit.deepEqual(Object.keys(inst.get()), ["propA"]);
 
 });
 
@@ -112,11 +112,11 @@ QUnit.test("default settings on unsealed", function(){
 
 });
 
-QUnit.test("toObject with dynamically added properties", function(){
+QUnit.test("get with dynamically added properties", function(){
     var map = new DefineMap();
     map.set("a",1);
     map.set("b",2);
-    QUnit.deepEqual(map.toObject(), {a: 1, b:2});
+    QUnit.deepEqual(map.get(), {a: 1, b:2});
 });
 
 
@@ -124,15 +124,15 @@ QUnit.test("set multiple props", function(){
     var map = new DefineMap();
     map.set({a: 0, b: 2});
 
-    QUnit.deepEqual(map.toObject(), {a: 0, b:2});
+    QUnit.deepEqual(map.get(), {a: 0, b:2});
 
     map.set({a: 2}, true);
 
-    QUnit.deepEqual(map.toObject(), {a: 2});
+    QUnit.deepEqual(map.get(), {a: 2});
 
     map.set({foo: {bar: "VALUE"}});
 
-    QUnit.deepEqual(map.toObject(), {foo: {bar: "VALUE"}, a: 2});
+    QUnit.deepEqual(map.get(), {foo: {bar: "VALUE"}, a: 2});
 });
 
 QUnit.test("serialize responds to added props", function(){
@@ -175,5 +175,5 @@ QUnit.test("setting nested object", function(){
 
     m.set({foo: {}});
     m.set({foo: {}});
-    QUnit.deepEqual(m.toObject(), {foo: {}});
+    QUnit.deepEqual(m.get(), {foo: {}});
 });

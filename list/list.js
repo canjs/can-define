@@ -64,7 +64,7 @@ var DefineList = Construct.extend("DefineList",
             this.splice.apply(this, [0,0].concat(items));
         }
     },
-    __type: defineHelpers.simpleTypeConvert,
+    __type: define.types.observable,
     _triggerChange: function (attr, how, newVal, oldVal) {
 
         canBatch.trigger.call(this, {
@@ -99,28 +99,39 @@ var DefineList = Construct.extend("DefineList",
      *
      * @signature `map.item(index, [newVal])`
      */
-    item: function(index, newVal){
-        if(arguments.length === 1) {
+    get: function(index){
+        if(arguments.length) {
             Observation.add(this,""+index);
             return this[index];
         } else {
-            this.__set(index, newVal)
+            var arr = [];
+            each(this, function(item){
+                arr.push(item);
+            });
+            return arr;
         }
     },
-    /**
-     * @function can-define/list/list.prototype.items items
-     * @parent can-define/list/list.prototype
-     *
-     * @description Get a value that was not predefined.
-     *
-     * @signature `map.items()`
-     */
-    items: function(){
-        var arr = [];
-        each(this, function(item){
-            arr.push(item);
-        });
-        return arr;
+    set: function(prop, value){
+        if(arguments.length === 2) {
+            // We want change events to notify using integers if we're
+            // setting an integer index. Note that <float> % 1 !== 0;
+            prop = isNaN(+prop) || (prop % 1) ? prop : +prop;
+
+            // Check to see if we're doing a .attr() on an out of
+            // bounds index property.
+            if (typeof prop === "number" &&
+                prop > this._length - 1) {
+                var newArr = new Array((prop + 1) - this._length);
+                newArr[newArr.length-1] = value;
+                this.push.apply(this, newArr);
+                return newArr;
+            }
+            this.splice(prop,1,value);
+        }
+        //
+        else {
+            throw "can't set items";
+        }
     },
     _items: function(){
         var arr = [];
@@ -129,29 +140,6 @@ var DefineList = Construct.extend("DefineList",
         });
         return arr;
     },
-    __set: function (prop, value) {
-        // We want change events to notify using integers if we're
-        // setting an integer index. Note that <float> % 1 !== 0;
-        prop = isNaN(+prop) || (prop % 1) ? prop : +prop;
-
-        // Check to see if we're doing a .attr() on an out of
-        // bounds index property.
-        if (typeof prop === "number" &&
-            prop > this._length - 1) {
-            var newArr = new Array((prop + 1) - this._length);
-            newArr[newArr.length-1] = value;
-            this.push.apply(this, newArr);
-            return newArr;
-        }
-        this.splice(prop,1,value);
-    },
-    ___set: function (attr, val) {
-        this[attr] = val;
-        if (+attr >= this._length) {
-            this.length = (+attr + 1);
-        }
-    },
-
     _each: function (callback) {
         for (var i = 0, len = this._length; i < len; i++) {
             callback(this[i], i);
@@ -307,45 +295,7 @@ var DefineList = Construct.extend("DefineList",
     },
     serialize: function () {
         return defineHelpers.serialize(this, 'serialize', []);
-    },
-    toObject: function () {
-        return defineHelpers.serialize(this, 'toObject', []);
-    },
-    /*_getAttrs: function(){
-        return mapHelpers.serialize(this, 'attr', []);
-    },
-    _setAttrs: function (items, remove) {
-        // Create a copy.
-        items = makeArray(items);
-
-        canBatch.start();
-        this._updateAttrs(items, remove);
-        canBatch.stop();
-    },
-
-    _updateAttrs: function (items, remove) {
-        var len = Math.min(items.length, this._length);
-
-        for (var prop = 0; prop < len; prop++) {
-            var curVal = this[prop],
-                newVal = items[prop];
-
-            if ( types.isMapLike(curVal) && mapHelpers.canMakeObserve(newVal)) {
-                curVal.attr(newVal, remove);
-                //changed from a coercion to an explicit
-            } else if (curVal !== newVal) {
-                this._set(prop+"", newVal);
-            } else {
-
-            }
-        }
-        if (items.length > this._length) {
-            // Add in the remaining props.
-            this.push.apply(this, items.slice(this.length));
-        } else if (items.length < this.length && remove) {
-            this.splice(items.length);
-        }
-    }*/
+    }
 });
 
 // Converts to an `array` of arguments.
@@ -596,7 +546,7 @@ assign(DefineList.prototype, {
      */
     indexOf: function (item, fromIndex) {
         for(var i = fromIndex || 0, len = this.length; i < len; i++) {
-            if(this.attr(i) === item) {
+            if(this.get(i) === item) {
                 return i;
             }
         }
@@ -736,15 +686,15 @@ assign(DefineList.prototype, {
      * ```
      * var list = new can.DefineList([1, 2, 3]);
      * list.forEach(function(element, index, list) {
-     *     list.attr(index, element * element);
+     *     list.get(index, element * element);
      * });
-     * list.attr(); // [1, 4, 9]
+     * list.get(); // [1, 4, 9]
      * ```
      */
     forEach: function (cb, thisarg) {
         var item;
         for (var i = 0, len = this.length; i < len; i++) {
-            item = this.attr(i);
+            item = this.get(i);
             if (cb.call(thisarg || item, item, i, this) === false) {
                 break;
             }
@@ -871,14 +821,30 @@ Object.defineProperty(DefineList.prototype, "length", {
 });
 
 DefineList.prototype.each = DefineList.prototype.forEach;
-DefineList.prototype.attr = function(prop){
-    var type = typeof prop;
-    if(type === "undefined" || (prop && type === "object") ) {
-        return this.items.apply(this, arguments);
+DefineList.prototype.attr = function(prop, value){
+    console.warn("DefineMap::attr shouldn't be called");
+    if(arguments.length === 0) {
+        return this.get();
+    } else if(prop && typeof prop === "object") {
+        return this.set.apply(this, arguments);
+    } else if(arguments.length === 1) {
+        return this.get(prop)
     } else {
-        return this.item.apply(this, arguments);
+        return this.set(prop, value);
     }
+};
+DefineList.prototype.item = function(index, value){
+    if(arguments.length === 1) {
+        return this.get(index);
+    } else {
+        return this.set(index, value);
+    }
+};
+DefineList.prototype.items = function(){
+   console.warn("DefineList::get should should be used instead of DefineList::items");
+   return this.get();
 }
-defineHelpers.DefineList = DefineList;
+
+types.DefineList = DefineList;
 types.DefaultList = DefineList;
 module.exports = DefineList;
