@@ -105,12 +105,49 @@ var DefineList = Construct.extend("DefineList",
 
     },
     /**
-     * @function can-define/list/list.prototype.item item
+     * @function can-define/list/list.prototype.get get
      * @parent can-define/list/list.prototype
      *
-     * @description Get a value that was not predefined.
+     * @signature `list.get(index)`
      *
-     * @signature `map.item(index, [newVal])`
+     * Gets the item at `index`.
+     *
+     * ```js
+     * var list = new DefineList(["A","B"]);
+     * list.get(1) //-> "B"
+     * ```
+     *
+     *   @param {Number} index A numeric position in the list.
+     *
+     *   @return {*} The value at index.
+     *
+     * @signature `list.get()`
+     *
+     * Returns the list converted into a plain JS array.
+     *
+     * ```js
+     * var list = new DefineList(["A","B"]);
+     * list.get() //-> ["A","B"]
+     * ```
+     *
+     *   @param {Number} index A numeric position in the list.
+     *
+     *   @return {*} The value at index.
+     *
+     * @signature `list.get(prop)`
+     *
+     * Gets the property at `prop` if it migth not have already been defined.
+     *
+     *
+     * ```js
+     * var list = new DefineList(["A","B"]);
+     * list.set("count",1000)
+     * list.get("count") //-> 1000
+     * ```
+     *
+     *   @param {String} prop A property on the list.
+     *
+     *   @return {*} The value at index.
      */
     get: function(index){
         if(arguments.length) {
@@ -125,6 +162,64 @@ var DefineList = Construct.extend("DefineList",
             return arr;
         }
     },
+    /**
+     * @function can-define/list/list.prototype.set set
+     * @parent can-define/list/list.prototype
+     *
+     * @signature `list.set(index, value)`
+     *
+     * Sets the item at `index`.
+     *
+     * ```js
+     * var list = new DefineList(["A","B"]);
+     * list.set(2,"C");
+     * ```
+     *
+     *   @param {Number} index A numeric position in the list.
+     *   @param {*} value The value to add to the list.
+     *   @return {can-define/list/list} The list instance.
+     *
+     * @signature `list.set(newItems [,replaceAll])`
+     *
+     * Replaces items in the list with `newItems`
+     *
+     * ```js
+     * var list = new DefineList(["A","B"]);
+     * list.set(["c"])        //-> DefineList["c","B"]
+     * list.set(["x"], true)  //-> DefineList["x"]
+     * ```
+     *
+     *   @param {Array} newItems Items used to replace existing items in the list.
+     *   @param {Boolean} [replaceAll] If true, will remove items at the end of the list.
+     *   @return {can-define/list/list} The list instance.
+     *
+     * @signature `list.set(prop, value)`
+     *
+     * Sets the property at `prop`.
+     *
+     * ```js
+     * var list = new DefineList(["A","B"]);
+     * list.set("count",1000);
+     * list.get("count") //-> 1000;
+     * ```
+     *
+     *   @param {Number} prop A property name.
+     *   @param {*} value The value to add to the list.
+     *   @return {can-define/list/list} The list instance.
+     *
+     * @signature `list.set(newProps)`
+     *
+     * Updates the properties on the list with `newProps`.
+     *
+     * ```js
+     * var list = new DefineList(["A","B"]);
+     * list.set({count: 1000, skip: 2});
+     * list.get("count") //-> 1000
+     * ```
+     *
+     *   @param {Object} newProps An object of properties and values to set on the list.
+     *   @return {can-define/list/list} The list instance.
+     */
     set: function(prop, value){
         // if we are setting a single value
         if(typeof prop !== "object") {
