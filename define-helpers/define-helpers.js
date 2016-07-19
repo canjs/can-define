@@ -4,7 +4,8 @@ var isArray = require("can-util/js/is-array/is-array");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
 var CID = require("can-util/js/cid/cid");
 var each = require("can-util/js/each/each");
-
+var define = require("can-define");
+var canBatch = require("can-event/batch/batch");
 
 var hasMethod = function(obj, method){
     return obj && typeof obj == "object" && (method in obj);
@@ -14,7 +15,38 @@ var defineHelpers = {
     extendedSetup: function(props){
         assign(this, props)
     },
-
+    defineExpando: function(map, prop, value) {
+        // first check if it's already a constructor define
+        var constructorDefines = map._define.definitions;
+        if(constructorDefines && constructorDefines[prop]) {
+            return;
+        }
+        // next if it's already on this instances
+        var instanceDefines = map._instanceDefinitions;
+        if(!instanceDefines) {
+            instanceDefines = map._instanceDefinitions = {};
+        }
+        if(!instanceDefines[prop]) {
+            var defaultDefinition = map._define.defaultDefinition || {type: define.types.observable};
+            define.property(map, prop, defaultDefinition, {},{});
+            // possibly convert value to List or DefineMap
+            map._data[prop] = defaultDefinition.type ? defaultDefinition.type(value) : define.types.observable(value);
+            instanceDefines[prop] = defaultDefinition;
+            canBatch.start();
+            canBatch.trigger.call(map, {
+                type: "__keys",
+                target: map
+            });
+            if(map._data[prop] !== undefined) {
+                canBatch.trigger.call(map, {
+                    type: prop,
+                    target: map
+                },[map._data[prop], undefined]);
+            }
+            canBatch.stop();
+            return true;
+        }
+    },
     // ## getValue
 	// If `val` is an observable, calls `how` on it; otherwise
 	// returns the value of `val`.

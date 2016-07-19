@@ -330,3 +330,20 @@ QUnit.test("extending the base supports overwriting _eventSetup", function(){
     L.prototype._eventSetup = function(){};
     ok(true, "worked");
 });
+
+QUnit.test("setting expandos on a DefineList", function(){
+    var DL = DefineList.extend({
+        count: "number"
+    });
+
+    var dl = new DL();
+    dl.set({count: 5, skip: 2});
+    debugger;
+    QUnit.equal( dl.get("count"), 5, "read with .get defined") //-> 5
+    QUnit.equal( dl.count, 5, "read with . defined");
+
+    QUnit.equal( dl.get("skip"), 2, "read with .get expando");
+    QUnit.equal( dl.skip, 2, "read with . expando");
+
+    QUnit.equal( dl.get("limit"), undefined, "read with .get undefined");
+});
