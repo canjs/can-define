@@ -46,3 +46,40 @@ QUnit.test("Extended Map with empty def converts to default Observables", functi
     ok(school.teacher instanceof DefineMap, "converted to DefineMap");
 
 });
+
+QUnit.test("default 'observable' type prevents Type from working (#29)", function(){
+    var M = DefineMap.extend("M",{
+        id: "number"
+    });
+    var L = DefineList.extend("L",{
+        "*": M
+    });
+
+    var MyMap = DefineMap.extend({
+        l: L
+    });
+
+    var m = new MyMap({
+        l: [{id: 5}]
+    });
+
+    QUnit.ok( m.l[0] instanceof M, "is instance" );
+    QUnit.ok(m.l[0].id, 5, "correct props");
+});
+
+QUnit.test("inline DefineList Type", function(){
+    var M = DefineMap.extend("M",{
+        id: "number"
+    });
+
+    var MyMap = DefineMap.extend({
+        l: {Type: [M]}
+    });
+
+    var m = new MyMap({
+        l: [{id: 5}]
+    });
+
+    QUnit.ok( m.l[0] instanceof M, "is instance" );
+    QUnit.ok(m.l[0].id, 5, "correct props");
+});

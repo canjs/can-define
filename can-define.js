@@ -162,12 +162,13 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 	}
 
 	// Add type behavior to the setter.
-	if (definition.Type) {
-		setter = make.set.Type(prop, definition.Type, setter);
-	}
 	if (type) {
 		setter = make.set.type(prop, type, setter);
 	}
+	if (definition.Type) {
+		setter = make.set.Type(prop, definition.Type, setter);
+	}
+
 	// Define the property.
 	Object.defineProperty(objPrototype, prop, {
 		get: getter,
@@ -330,18 +331,9 @@ make = {
 		},
 		type: function(prop, type, set) {
 
-
 			if (typeof type === "object") {
 
-				var SubType = define.Constructor(type);
-
-				return function(newValue) {
-					if (newValue instanceof SubType) {
-						return set.call(this, newValue);
-					} else {
-						return set.call(this, new SubType(newValue));
-					}
-				};
+				return make.set.Type(prop, type, set);
 
 			} else {
 				return function(newValue) {
@@ -351,8 +343,16 @@ make = {
 		},
 		Type: function(prop, Type, set) {
 			// `type`: {foo: "string"}
-			if (typeof Type === "object") {
-				Type = define.constructor(Type);
+			if(isArray(Type) && types.DefineList) {
+				Type = types.DefineList.extend({
+					"*": Type[0]
+				});
+			} else if (typeof Type === "object") {
+				if(types.DefineMap) {
+					Type = types.DefineMap.extend(Type);
+				} else {
+					Type = define.constructor(Type);
+				}
 			}
 			return function(newValue) {
 				if (newValue instanceof Type) {
