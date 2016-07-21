@@ -3,6 +3,8 @@ require("map/map-test");
 require("define-test");
 var DefineMap = require("./map/map");
 var DefineList = require("./list/list");
+var isArray = require("can-util/js/is-array/is-array");
+var isPlainObject = require("can-util/js/is-plain-object/is-plain-object")
 
 var QUnit = require("steal-qunit");
 
@@ -82,4 +84,22 @@ QUnit.test("inline DefineList Type", function(){
 
     QUnit.ok( m.l[0] instanceof M, "is instance" );
     QUnit.ok(m.l[0].id, 5, "correct props");
+});
+
+QUnit.test("recursively `get`s (#31)", function(){
+    var M = DefineMap.extend("M",{
+        id: "number"
+    });
+
+    var MyMap = DefineMap.extend({
+        l: {Type: [M]}
+    });
+
+    var m = new MyMap({
+        l: [{id: 5}]
+    });
+
+    var res = m.get();
+    QUnit.ok( isArray(res.l), "is a plain array");
+    QUnit.ok( isPlainObject(res.l[0]), "plain object");
 });
