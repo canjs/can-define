@@ -154,12 +154,7 @@ var DefineList = Construct.extend("DefineList",
             Observation.add(this,""+index);
             return this[index];
         } else {
-            var arr = [];
-            each(this, function(item){
-                // TODO: look up enumerable?
-                arr.push(item);
-            });
-            return arr;
+            return defineHelpers.serialize(this, 'get', []);
         }
     },
     /**
