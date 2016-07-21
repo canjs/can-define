@@ -338,7 +338,7 @@ QUnit.test("setting expandos on a DefineList", function(){
 
     var dl = new DL();
     dl.set({count: 5, skip: 2});
-    
+
     QUnit.equal( dl.get("count"), 5, "read with .get defined") //-> 5
     QUnit.equal( dl.count, 5, "read with . defined");
 
@@ -346,4 +346,14 @@ QUnit.test("setting expandos on a DefineList", function(){
     QUnit.equal( dl.skip, 2, "read with . expando");
 
     QUnit.equal( dl.get("limit"), undefined, "read with .get undefined");
+});
+
+QUnit.test("passing a DefineList to DefineList (#33)", function(){
+    var m = new DefineList([{},{}]);
+
+    var m2 = new DefineList(m);
+    QUnit.deepEqual(m.get(), m2.get());
+    QUnit.ok(m[0] === m2[0], "index the same");
+    QUnit.ok(m[1] === m2[1], "index the same")
+
 });

@@ -86,6 +86,8 @@ var setProps = function(props, remove) {
     return this;
 }
 
+
+
 var DefineMap = Construct.extend("DefineMap",{
     setup: function(){
         if(DefineMap) {
@@ -93,7 +95,7 @@ var DefineMap = Construct.extend("DefineMap",{
             var result = define(prototype, prototype);
 
             this.prototype.setup = function(props){
-                define.setup.call(this, props, this.constructor.seal);
+                define.setup.call(this, defineHelpers.toObject(this, props,{}, DefineMap), this.constructor.seal);
             };
         }
     }
@@ -112,8 +114,7 @@ var DefineMap = Construct.extend("DefineMap",{
                 value: {}
             });
         }
-
-        define.setup.call(this, props, sealed === true);
+        define.setup.call(this, defineHelpers.toObject(this, props,{}, DefineMap), sealed === true);
     },
     /**
      * @function can-define/map/map.prototype.get get

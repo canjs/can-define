@@ -15,6 +15,16 @@ var defineHelpers = {
     extendedSetup: function(props){
         assign(this, props)
     },
+    toObject: function(map, props, where, Type){
+        if(props instanceof Type) {
+            props.each(function(value, prop){
+                where[prop] = value;
+            })
+            return where;
+        } else {
+            return props;
+        }
+    },
     defineExpando: function(map, prop, value) {
         // first check if it's already a constructor define
         var constructorDefines = map._define.definitions;

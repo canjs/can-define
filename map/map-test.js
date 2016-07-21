@@ -177,3 +177,16 @@ QUnit.test("setting nested object", function(){
     m.set({foo: {}});
     QUnit.deepEqual(m.get(), {foo: {}});
 });
+
+QUnit.test("passing a DefineMap to DefineMap (#33)", function(){
+    var MyMap = DefineMap.extend({foo: "observable"})
+    var m = new MyMap({foo: {}, bar: {}});
+    var foo = m.foo;
+    var bar = m.bar;
+
+    var m2 = new MyMap(m);
+    QUnit.deepEqual(m.get(), m2.get());
+    QUnit.ok(m.foo === m2.foo, "defined props the same");
+    QUnit.ok(m.bar === m2.bar, "expando props the same")
+
+});
