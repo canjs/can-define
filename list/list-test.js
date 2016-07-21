@@ -260,6 +260,64 @@ test("slice and join are observable by a compute (#1884)", function(){
 
 });
 
+test('list.replace', function(){
+    var firstArray = [
+        {id: 1, name: "Marshall"},
+        {id: 2, name: "Austin"},
+        {id: 3, name: "Hyrum"}
+    ];
+    var myList = new DefineList(firstArray);
+    var newArray = [
+        {id: 4, name: "Aubree"},
+        {id: 5, name: "Leah"},
+        {id: 6, name: 'Lily'}
+    ];
+    myList.replace(newArray);
+    equal(myList.length, 3);
+    equal(myList[0].name, "Aubree");
+    equal(myList[1].name, "Leah");
+    equal(myList[2].name, "Lily", "Can replace a List with an Array.");
+
+    myList.replace(firstArray);
+    equal(myList.length, 3);
+    equal(myList[0].name, "Marshall");
+    equal(myList[1].name, "Austin");
+    equal(myList[2].name, "Hyrum", "Can replace a List with another List.");
+});
+
+test('list.map', function(){
+	var myArray = [
+	    {id: 1, name: "Marshall"},
+	    {id: 2, name: "Austin"},
+	    {id: 3, name: "Hyrum"}
+    ];
+    var myList = new DefineList(myArray);
+    var newList = myList.map(function(person) {
+        person.lastName = "Thompson";
+        return person;
+    });
+	
+    equal(newList.length, 3);
+    equal(newList[0].name, "Marshall");
+    equal(newList[0].lastName, "Thompson");
+    equal(newList[1].name, "Austin");
+    equal(newList[1].lastName, "Thompson");
+    equal(newList[2].name, "Hyrum");
+    equal(newList[2].lastName, "Thompson");
+
+    var ExtendedList = DefineList.extend({
+		testMe: function(){
+			return "It Worked!";
+		}
+	});
+	var myExtendedList = new ExtendedList(myArray);
+	var newExtendedList = myExtendedList.map(function(person) {
+    person.lastName = "Thompson";
+	    return person;
+	});
+	QUnit.equal("It Worked!", newExtendedList.testMe(), 'Returns the same type of list.');
+});
+
 
 test("list defines", 6, function(){
     var Todo = function(props){

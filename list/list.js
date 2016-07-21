@@ -907,14 +907,14 @@ assign(DefineList.prototype, {
         return new this.constructor(filteredList);
     },
     map: function (callback, thisArg) {
-        var filteredList = new Define.DefineList(),
+        var mappedList = [],
             self = this;
         this.each(function(item, index, list){
             var mapped = callback.call( thisArg | self, item, index, self);
-            filteredList.push(mapped);
+            mappedList.push(mapped);
 
         });
-        return filteredList;
+        return new this.constructor(mappedList);
     }
 });
 
