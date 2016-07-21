@@ -177,3 +177,22 @@ QUnit.test("setting nested object", function(){
     m.set({foo: {}});
     QUnit.deepEqual(m.get(), {foo: {}});
 });
+
+QUnit.test("for in works (#34)", function(){
+    var MyMap = DefineMap.extend({
+        zed: "string",
+        method: function(){
+
+        }
+    });
+
+    var m = new MyMap({foo: "bar", zed: "ted"});
+    
+    for(var prop in m) {
+        if(prop === "foo" || prop === "zed") {
+            QUnit.ok(true, prop)
+        } else {
+            QUnit.ok(false, prop);
+        }
+    }
+});
