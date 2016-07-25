@@ -1,6 +1,6 @@
 {
   "name": "can-define",
-  "version": "0.7.10",
+  "version": "0.7.11",
   "description": "Like can.Map, but without the .attr method.",
   "main": "can-define.js",
   "scripts": {
