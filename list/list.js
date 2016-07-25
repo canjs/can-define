@@ -9,9 +9,7 @@ var defineHelpers = require("../define-helpers/define-helpers");
 var assign = require("can-util/js/assign/assign");
 var each = require("can-util/js/each/each");
 var isArray = require("can-util/js/is-array/is-array");
-var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
 var makeArray = require("can-util/js/make-array/make-array");
-var CID = require("can-util/js/cid/cid");
 var types = require("can-util/js/types/types");
 
 
@@ -24,13 +22,13 @@ var identity = function(x){
 var makeFilterCallback = function(props) {
     return function(item){
         for(var prop in props) {
-            if(!item[prop] === props[prop]) {
+            if(item[prop] !== props[prop]) {
                 return false;
             }
         }
         return true;
     };
-}
+};
 /** @add can-define/list/list */
 var DefineList = Construct.extend("DefineList",
 /** @static */
@@ -246,12 +244,12 @@ var DefineList = Construct.extend("DefineList",
                 if(value) {
                     this.replace(prop);
                 } else {
-                    this.splice.apply(this, [0, prop.length].concat(prop) )
+                    this.splice.apply(this, [0, prop.length].concat(prop) );
                 }
             } else {
                 each(prop, function(value, prop){
                     this.set(prop, value);
-                }, this)
+                }, this);
             }
         }
         return this;
@@ -422,7 +420,7 @@ var DefineList = Construct.extend("DefineList",
 });
 
 // Converts to an `array` of arguments.
-getArgs = function (args) {
+var getArgs = function (args) {
     return args[0] && Array.isArray(args[0]) ?
         args[0] :
         makeArray(args);
@@ -907,7 +905,7 @@ assign(DefineList.prototype, {
         return new this.constructor(filteredList);
     },
     map: function (callback, thisArg) {
-        var filteredList = new Define.DefineList(),
+        var filteredList = new DefineList(),
             self = this;
         this.each(function(item, index, list){
             var mapped = callback.call( thisArg | self, item, index, self);
@@ -950,7 +948,7 @@ DefineList.prototype.attr = function(prop, value){
     } else if(prop && typeof prop === "object") {
         return this.set.apply(this, arguments);
     } else if(arguments.length === 1) {
-        return this.get(prop)
+        return this.get(prop);
     } else {
         return this.set(prop, value);
     }
@@ -965,7 +963,7 @@ DefineList.prototype.item = function(index, value){
 DefineList.prototype.items = function(){
    console.warn("DefineList::get should should be used instead of DefineList::items");
    return this.get();
-}
+};
 
 types.DefineList = DefineList;
 types.DefaultList = DefineList;
