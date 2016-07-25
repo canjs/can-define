@@ -43,17 +43,16 @@ QUnit.test("extending", function(){
 });
 
 QUnit.test("setting not defined property", function(){
-    "use strict";
     var MyMap = DefineMap.extend({
         prop: {}
     });
     var mymap = new MyMap();
 
     try {
-        mymap.notdefined = "value"
-        ok(false, "no error")
+        mymap.notdefined = "value";
+        ok(false, "no error");
     } catch(e) {
-        ok(true, "error thrown")
+        ok(true, "error thrown");
     }
 });
 
@@ -63,7 +62,7 @@ QUnit.test("loop only through defined serializable props", function(){
         propB: {serialize: false},
         propC: {
             get: function(){
-                return propA
+                return this.propA;
             }
         }
     });
@@ -80,10 +79,10 @@ QUnit.test("get and set can setup expandos", function(){
         updater: function(newVal){
             QUnit.equal(newVal, "bar", "updated to bar");
         }
-    })
+    });
     oi.getValueAndBind();
 
-    map.set("foo","bar")
+    map.set("foo","bar");
 
 });
 
@@ -143,7 +142,7 @@ QUnit.test("serialize responds to added props", function(){
         updater: function(newVal){
             QUnit.deepEqual(newVal, {a: 1, b: 2}, "updated right");
         }
-    })
+    });
     oi.getValueAndBind();
 
     map.set({a: 1, b: 2});
@@ -164,7 +163,7 @@ QUnit.test("creating a new key doesn't cause two changes", 1, function(){
         updater: function(newVal){
             QUnit.deepEqual(newVal, {a: 1}, "updated right");
         }
-    })
+    });
     oi.getValueAndBind();
 
     map.set("a", 1);
@@ -179,14 +178,51 @@ QUnit.test("setting nested object", function(){
 });
 
 QUnit.test("passing a DefineMap to DefineMap (#33)", function(){
-    var MyMap = DefineMap.extend({foo: "observable"})
+    var MyMap = DefineMap.extend({foo: "observable"});
     var m = new MyMap({foo: {}, bar: {}});
-    var foo = m.foo;
-    var bar = m.bar;
 
     var m2 = new MyMap(m);
     QUnit.deepEqual(m.get(), m2.get());
     QUnit.ok(m.foo === m2.foo, "defined props the same");
-    QUnit.ok(m.bar === m2.bar, "expando props the same")
+    QUnit.ok(m.bar === m2.bar, "expando props the same");
+
+});
+
+QUnit.test("serialize: function works (#38)", function(){
+    var Something = DefineMap.extend({});
+
+    var MyMap = DefineMap.extend({
+        somethingRef: {
+            type: function(val){
+                return new Something({id: val});
+            },
+            serialize: function(val){
+                return val.id;
+            }
+        },
+        somethingElseRef: {
+            type: function(val){
+                return new Something({id: val});
+            },
+            serialize: false
+        }
+    });
+
+    var myMap = new MyMap({somethingRef: 2, somethingElseRef: 3});
+
+    QUnit.ok(myMap.somethingRef instanceof Something);
+    QUnit.deepEqual( myMap.serialize(), {somethingRef: 2}, "serialize: function and serialize: false works");
+
+
+    var MyMap2 = DefineMap.extend({
+        "*": {
+            serialize: function(value){
+                return ""+value;
+            }
+        }
+    });
+
+    var myMap2 = new MyMap2({foo: 1, bar: 2});
+    QUnit.deepEqual( myMap2.serialize(), {foo: "1", bar: "2"}, "serialize: function on default works");
 
 });

@@ -1,21 +1,15 @@
 var Construct = require("can-construct");
 var define = require("can-define");
 var assign = require("can-util/js/assign/assign");
-var each = require("can-util/js/each/each");
 var isArray = require("can-util/js/is-array/is-array");
-var isPlainObject = require("can-util/js/is-plain-object/is-plain-object")
+var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
 var defineHelpers = require("../define-helpers/define-helpers");
 var Observation = require("can-observation");
-var CID = require("can-util/js/cid/cid");
 var types = require("can-util/js/types/types");
 var canBatch = require("can-event/batch/batch");
 
-var make = define.make;
-
-
-
 var readWithoutObserve = Observation.ignore(function(map, prop){
-    return map[prop]
+    return map[prop];
 });
 
 var eachDefinition = function(map, cb, thisarg, definitions, observe) {
@@ -66,7 +60,7 @@ var setProps = function(props, remove) {
             curVal.attr(newVal, remove);
         }
         else if("replace" in curVal && isArray(newVal)) {
-            curVal.replace(newVal)
+            curVal.replace(newVal);
         }
         else if(curVal !== newVal) {
             self.set(prop, newVal);
@@ -84,7 +78,7 @@ var setProps = function(props, remove) {
     }
     canBatch.stop();
     return this;
-}
+};
 
 
 
@@ -92,7 +86,7 @@ var DefineMap = Construct.extend("DefineMap",{
     setup: function(){
         if(DefineMap) {
             var prototype = this.prototype;
-            var result = define(prototype, prototype);
+            define(prototype, prototype);
 
             this.prototype.setup = function(props){
                 define.setup.call(this, defineHelpers.toObject(this, props,{}, DefineMap), this.constructor.seal);
@@ -208,6 +202,6 @@ types.DefaultMap = DefineMap;
 DefineMap.prototype.toObject = function(){
     console.warn("Use DefineMap::get instead of DefineMap::toObject");
     return this.get();
-}
+};
 
 module.exports = DefineMap;
