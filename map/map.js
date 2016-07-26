@@ -7,6 +7,7 @@ var defineHelpers = require("../define-helpers/define-helpers");
 var Observation = require("can-observation");
 var types = require("can-util/js/types/types");
 var canBatch = require("can-event/batch/batch");
+var ns = require("can-util/namespace");
 
 var readWithoutObserve = Observation.ignore(function(map, prop){
     return map[prop];
@@ -204,4 +205,4 @@ DefineMap.prototype.toObject = function(){
     return this.get();
 };
 
-module.exports = DefineMap;
+module.exports = ns.DefineMap = DefineMap;

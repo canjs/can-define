@@ -18,12 +18,13 @@ var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
 var isArray = require("can-util/js/is-array/is-array");
 var types = require("can-util/js/types/types");
 var each = require("can-util/js/each/each");
+var ns = require("can-util/namespace");
 
 var behaviors, eventsProto, getPropDefineBehavior, define,
 	make, makeDefinition, replaceWith, getDefinitionsAndMethods,
 	isDefineType, getDefinitionOrMethod;
 
-module.exports = define = function(objPrototype, defines) {
+module.exports = define = ns.define = function(objPrototype, defines) {
 	// default property definitions on _data
 	var dataInitializers = {},
 		// computed property definitions on _computed
