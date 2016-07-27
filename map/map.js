@@ -258,7 +258,7 @@ var DefineMap = Construct.extend("DefineMap",{
      *
      * @option {can-define.types.propDefinition}
      *
-     * By definging a wildcard property like `"*"` on the prototype, this will supply a
+     * By defining a wildcard property like `"*"` on the prototype, this will supply a
      * default behavior for every property.  The default wildcard `"*"` definition
      * makes every property run through the "observable" [can-define.types] converter.
      * It looks like:
