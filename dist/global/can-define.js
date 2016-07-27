@@ -29,6 +29,14 @@
 		part = parts[parts.length - 1];
 		cur[part] = val;
 	};
+	var useDefault = function(mod){
+		if(!mod || !mod.__esModule) return false;
+		var esProps = { __esModule: true, "default": true };
+		for(var p in mod) {
+			if(!esProps[p]) return false;
+		}
+		return true;
+	};
 	var modules = (global.define && global.define.modules) ||
 		(global._define && global._define.modules) || {};
 	var ourDefine = global.define = function(moduleName, deps, callback){
@@ -72,6 +80,9 @@
 		// Set global exports
 		var globalExport = exports[moduleName];
 		if(globalExport && !get(globalExport)) {
+			if(useDefault(result)) {
+				result = result["default"];
+			}
 			set(globalExport, result);
 		}
 	};
@@ -96,7 +107,7 @@
 	eval("(function() { " + __$source__ + " \n }).call(__$global__);");
 }
 )
-/*can-util@3.0.0-pre.28#dom/events/events*/
+/*can-util@3.0.0-pre.31#dom/events/events*/
 define('can-util/dom/events/events', function (require, exports, module) {
     module.exports = {
         addEventListener: function () {
@@ -110,7 +121,7 @@ define('can-util/dom/events/events', function (require, exports, module) {
         }
     };
 });
-/*can-util@3.0.0-pre.28#js/cid/cid*/
+/*can-util@3.0.0-pre.31#js/cid/cid*/
 define('can-util/js/cid/cid', function (require, exports, module) {
     var cid = 0;
     module.exports = function (object, name) {
@@ -121,7 +132,7 @@ define('can-util/js/cid/cid', function (require, exports, module) {
         return object._cid;
     };
 });
-/*can-util@3.0.0-pre.28#js/is-empty-object/is-empty-object*/
+/*can-util@3.0.0-pre.31#js/is-empty-object/is-empty-object*/
 define('can-util/js/is-empty-object/is-empty-object', function (require, exports, module) {
     module.exports = function (obj) {
         for (var prop in obj) {
@@ -130,7 +141,7 @@ define('can-util/js/is-empty-object/is-empty-object', function (require, exports
         return true;
     };
 });
-/*can-util@3.0.0-pre.28#js/assign/assign*/
+/*can-util@3.0.0-pre.31#js/assign/assign*/
 define('can-util/js/assign/assign', function (require, exports, module) {
     module.exports = function (d, s) {
         for (var prop in s) {
@@ -139,7 +150,7 @@ define('can-util/js/assign/assign', function (require, exports, module) {
         return d;
     };
 });
-/*can-util@3.0.0-pre.28#js/global/global*/
+/*can-util@3.0.0-pre.31#js/global/global*/
 define('can-util/js/global/global', function (require, exports, module) {
     (function (global) {
         module.exports = function () {
@@ -149,7 +160,7 @@ define('can-util/js/global/global', function (require, exports, module) {
         return this;
     }()));
 });
-/*can-util@3.0.0-pre.28#dom/document/document*/
+/*can-util@3.0.0-pre.31#dom/document/document*/
 define('can-util/dom/document/document', function (require, exports, module) {
     (function (global) {
         var global = require('can-util/js/global/global');
@@ -164,7 +175,7 @@ define('can-util/dom/document/document', function (require, exports, module) {
         return this;
     }()));
 });
-/*can-util@3.0.0-pre.28#dom/dispatch/dispatch*/
+/*can-util@3.0.0-pre.31#dom/dispatch/dispatch*/
 define('can-util/dom/dispatch/dispatch', function (require, exports, module) {
     var assign = require('can-util/js/assign/assign');
     var _document = require('can-util/dom/document/document');
@@ -180,11 +191,11 @@ define('can-util/dom/dispatch/dispatch', function (require, exports, module) {
         return this.dispatchEvent(ev);
     };
 });
-/*can-util@3.0.0-pre.28#namespace*/
+/*can-util@3.0.0-pre.31#namespace*/
 define('can-util/namespace', function (require, exports, module) {
     module.exports = {};
 });
-/*can-util@3.0.0-pre.28#dom/data/data*/
+/*can-util@3.0.0-pre.31#dom/data/data*/
 define('can-util/dom/data/data', function (require, exports, module) {
     var isEmptyObject = require('can-util/js/is-empty-object/is-empty-object');
     var data = {};
@@ -219,7 +230,7 @@ define('can-util/dom/data/data', function (require, exports, module) {
         set: setData
     };
 });
-/*can-util@3.0.0-pre.28#dom/matches/matches*/
+/*can-util@3.0.0-pre.31#dom/matches/matches*/
 define('can-util/dom/matches/matches', function (require, exports, module) {
     var matchesMethod = function (element) {
         return element.matches || element.webkitMatchesSelector || element.webkitMatchesSelector || element.mozMatchesSelector || element.msMatchesSelector || element.oMatchesSelector;
@@ -229,7 +240,7 @@ define('can-util/dom/matches/matches', function (require, exports, module) {
         return method ? method.apply(this, arguments) : false;
     };
 });
-/*can-util@3.0.0-pre.28#js/is-array-like/is-array-like*/
+/*can-util@3.0.0-pre.31#js/is-array-like/is-array-like*/
 define('can-util/js/is-array-like/is-array-like', function (require, exports, module) {
     function isArrayLike(obj) {
         var type = typeof obj;
@@ -241,7 +252,7 @@ define('can-util/js/is-array-like/is-array-like', function (require, exports, mo
     }
     module.exports = isArrayLike;
 });
-/*can-util@3.0.0-pre.28#js/each/each*/
+/*can-util@3.0.0-pre.31#js/each/each*/
 define('can-util/js/each/each', function (require, exports, module) {
     var isArrayLike = require('can-util/js/is-array-like/is-array-like');
     var has = Object.prototype.hasOwnProperty;
@@ -267,7 +278,7 @@ define('can-util/js/each/each', function (require, exports, module) {
     }
     module.exports = each;
 });
-/*can-util@3.0.0-pre.28#dom/events/delegate/delegate*/
+/*can-util@3.0.0-pre.31#dom/events/delegate/delegate*/
 define('can-util/dom/events/delegate/delegate', function (require, exports, module) {
     var domEvents = require('can-util/dom/events/events');
     var domData = require('can-util/dom/data/data');
@@ -356,7 +367,7 @@ define('can-util/dom/events/delegate/delegate', function (require, exports, modu
         }
     };
 });
-/*can-event@3.0.0-pre.4#can-event*/
+/*can-event@3.0.0-pre.5#can-event*/
 define('can-event', function (require, exports, module) {
     var domEvents = require('can-util/dom/events/events');
     var CID = require('can-util/js/cid/cid');
@@ -510,7 +521,7 @@ define('can-event', function (require, exports, module) {
     canEvent.undelegate = canEvent.off;
     module.exports = namespace.event = canEvent;
 });
-/*can-event@3.0.0-pre.4#lifecycle/lifecycle*/
+/*can-event@3.0.0-pre.5#lifecycle/lifecycle*/
 define('can-event/lifecycle/lifecycle', function (require, exports, module) {
     var canEvent = require('can-event');
     module.exports = {
@@ -547,13 +558,13 @@ define('can-event/lifecycle/lifecycle', function (require, exports, module) {
         }
     };
 });
-/*can-util@3.0.0-pre.28#js/last/last*/
+/*can-util@3.0.0-pre.31#js/last/last*/
 define('can-util/js/last/last', function (require, exports, module) {
     module.exports = function (arr) {
         return arr && arr[arr.length - 1];
     };
 });
-/*can-event@3.0.0-pre.4#batch/batch*/
+/*can-event@3.0.0-pre.5#batch/batch*/
 define('can-event/batch/batch', function (require, exports, module) {
     var canEvent = require('can-event');
     var last = require('can-util/js/last/last');
@@ -669,7 +680,7 @@ define('can-event/batch/batch', function (require, exports, module) {
     };
     module.exports = namespace.batch = canBatch;
 });
-/*can-observation@3.0.0-pre.0#can-observation*/
+/*can-observation@3.0.0-pre.4#can-observation*/
 define('can-observation', function (require, exports, module) {
     require('can-event');
     var canBatch = require('can-event/batch/batch');
@@ -746,11 +757,15 @@ define('can-observation', function (require, exports, module) {
         updateCompute: function (batchNum) {
             if (this.bound) {
                 var oldValue = this.value;
-                this.getValueAndBind();
+                this.start();
                 this.compute.updater(this.value, oldValue, batchNum);
             }
         },
         getValueAndBind: function () {
+            console.warn('can-observation: call start instead of getValueAndBind');
+            return this.start();
+        },
+        start: function () {
             this.bound = true;
             this.oldObserved = this.newObserved || {};
             this.ignore = 0;
@@ -780,6 +795,10 @@ define('can-observation', function (require, exports, module) {
             }
         },
         teardown: function () {
+            console.warn('can-observation: call stop instead of teardown');
+            return this.stop();
+        },
+        stop: function () {
             this.bound = false;
             for (var name in this.newObserved) {
                 var ob = this.newObserved[name];
@@ -903,13 +922,13 @@ define('can-observation', function (require, exports, module) {
     canBatch._onDispatchedEvents = Observation.batchEnd;
     module.exports = namespace.Observation = Observation;
 });
-/*can-util@3.0.0-pre.28#js/is-promise/is-promise*/
+/*can-util@3.0.0-pre.31#js/is-promise/is-promise*/
 define('can-util/js/is-promise/is-promise', function (require, exports, module) {
     module.exports = function (obj) {
         return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
     };
 });
-/*can-util@3.0.0-pre.28#js/types/types*/
+/*can-util@3.0.0-pre.31#js/types/types*/
 define('can-util/js/types/types', function (require, exports, module) {
     var isPromise = require('can-util/js/is-promise/is-promise');
     var types = {
@@ -942,13 +961,13 @@ define('can-util/js/types/types', function (require, exports, module) {
     };
     module.exports = types;
 });
-/*can-util@3.0.0-pre.28#js/is-array/is-array*/
+/*can-util@3.0.0-pre.31#js/is-array/is-array*/
 define('can-util/js/is-array/is-array', function (require, exports, module) {
     module.exports = function (arr) {
         return Array.isArray(arr);
     };
 });
-/*can-util@3.0.0-pre.28#js/string/string*/
+/*can-util@3.0.0-pre.31#js/string/string*/
 define('can-util/js/string/string', function (require, exports, module) {
     var isArray = require('can-util/js/is-array/is-array');
     var strUndHash = /_|-/, strColons = /\=\=/, strWords = /([A-Z]+)([A-Z][a-z])/g, strLowUp = /([a-z\d])([A-Z])/g, strDash = /([a-z\d])([A-Z])/g, strReplacer = /\{([^\}]+)\}/g, strQuote = /"/g, strSingleQuote = /'/g, strHyphenMatch = /-+(.)?/g, strCamelMatch = /[a-z][A-Z]/g, getNext = function (obj, prop, add) {
@@ -1034,7 +1053,7 @@ define('can-util/js/string/string', function (require, exports, module) {
     };
     module.exports = string;
 });
-/*can-compute@3.0.0-pre.5#proto-compute*/
+/*can-compute@3.0.0-pre.7#proto-compute*/
 define('can-compute/proto-compute', function (require, exports, module) {
     var Observation = require('can-observation');
     var canEvent = require('can-event');
@@ -1311,7 +1330,7 @@ define('can-compute/proto-compute', function (require, exports, module) {
     };
     module.exports = exports = Compute;
 });
-/*can-compute@3.0.0-pre.5#can-compute*/
+/*can-compute@3.0.0-pre.7#can-compute*/
 define('can-compute', function (require, exports, module) {
     require('can-event');
     require('can-event/batch/batch');
@@ -1375,10 +1394,10 @@ define('can-compute', function (require, exports, module) {
     COMPUTE.temporarilyBind = Compute.temporarilyBind;
     module.exports = namespace.compute = COMPUTE;
 });
-/*can-util@3.0.0-pre.28#js/dev/dev*/
+/*can-util@3.0.0-pre.31#js/dev/dev*/
 define('can-util/js/dev/dev', function (require, exports, module) {
 });
-/*can-util@3.0.0-pre.28#js/is-plain-object/is-plain-object*/
+/*can-util@3.0.0-pre.31#js/is-plain-object/is-plain-object*/
 define('can-util/js/is-plain-object/is-plain-object', function (require, exports, module) {
     var core_hasOwn = Object.prototype.hasOwnProperty;
     function isWindow(obj) {
@@ -1820,13 +1839,6 @@ define('can-define', function (require, exports, module) {
                 }
             }
             return eventLifecycle.removeAndTeardown.apply(this, arguments);
-        },
-        props: function () {
-            var obj = {};
-            for (var prop in this) {
-                obj[prop] = this[prop];
-            }
-            return obj;
         }
     });
     eventsProto.on = eventsProto.bind = eventsProto.addEventListener;
@@ -1957,7 +1969,7 @@ define('can-define', function (require, exports, module) {
         }
     };
 });
-/*can-util@3.0.0-pre.28#js/is-function/is-function*/
+/*can-util@3.0.0-pre.31#js/is-function/is-function*/
 define('can-util/js/is-function/is-function', function (require, exports, module) {
     var isFunction = function () {
         if (typeof document !== 'undefined' && typeof document.getElementsByTagName('body') === 'function') {
@@ -1971,7 +1983,7 @@ define('can-util/js/is-function/is-function', function (require, exports, module
     }();
     module.exports = isFunction;
 });
-/*can-util@3.0.0-pre.28#js/deep-assign/deep-assign*/
+/*can-util@3.0.0-pre.31#js/deep-assign/deep-assign*/
 define('can-util/js/deep-assign/deep-assign', function (require, exports, module) {
     var isArray = require('can-util/js/is-array/is-array');
     var isFunction = require('can-util/js/is-function/is-function');
@@ -2011,7 +2023,7 @@ define('can-util/js/deep-assign/deep-assign', function (require, exports, module
     }
     module.exports = deepAssign;
 });
-/*can-util@3.0.0-pre.28#js/make-array/make-array*/
+/*can-util@3.0.0-pre.31#js/make-array/make-array*/
 define('can-util/js/make-array/make-array', function (require, exports, module) {
     var each = require('can-util/js/each/each');
     function makeArray(arr) {
@@ -2023,151 +2035,146 @@ define('can-util/js/make-array/make-array', function (require, exports, module) 
     }
     module.exports = makeArray;
 });
-/*can-construct@3.0.0-pre.6#can-construct*/
+/*can-construct@3.0.0-pre.7#can-construct*/
 define('can-construct', function (require, exports, module) {
-    (function (global) {
-        'use strict';
-        var assign = require('can-util/js/assign/assign');
-        var deepAssign = require('can-util/js/deep-assign/deep-assign');
-        var dev = require('can-util/js/dev/dev');
-        var makeArray = require('can-util/js/make-array/make-array');
-        var types = require('can-util/js/types/types');
-        var namespace = require('can-util/namespace');
-        var initializing = 0;
-        var Construct = function () {
-            if (arguments.length) {
-                return Construct.extend.apply(Construct, arguments);
-            }
-        };
-        var canGetDescriptor;
-        try {
-            Object.getOwnPropertyDescriptor({});
-            canGetDescriptor = true;
-        } catch (e) {
-            canGetDescriptor = false;
+    'use strict';
+    var assign = require('can-util/js/assign/assign');
+    var deepAssign = require('can-util/js/deep-assign/deep-assign');
+    var dev = require('can-util/js/dev/dev');
+    var makeArray = require('can-util/js/make-array/make-array');
+    var types = require('can-util/js/types/types');
+    var namespace = require('can-util/namespace');
+    var initializing = 0;
+    var Construct = function () {
+        if (arguments.length) {
+            return Construct.extend.apply(Construct, arguments);
         }
-        var getDescriptor = function (newProps, name) {
-                var descriptor = Object.getOwnPropertyDescriptor(newProps, name);
-                if (descriptor && (descriptor.get || descriptor.set)) {
-                    return descriptor;
-                }
-                return null;
-            }, inheritGetterSetter = function (newProps, oldProps, addTo) {
-                addTo = addTo || newProps;
-                var descriptor;
-                for (var name in newProps) {
-                    if (descriptor = getDescriptor(newProps, name)) {
-                        this._defineProperty(addTo, oldProps, name, descriptor);
-                    } else {
-                        Construct._overwrite(addTo, oldProps, name, newProps[name]);
-                    }
-                }
-            }, simpleInherit = function (newProps, oldProps, addTo) {
-                addTo = addTo || newProps;
-                for (var name in newProps) {
+    };
+    var canGetDescriptor;
+    try {
+        Object.getOwnPropertyDescriptor({});
+        canGetDescriptor = true;
+    } catch (e) {
+        canGetDescriptor = false;
+    }
+    var getDescriptor = function (newProps, name) {
+            var descriptor = Object.getOwnPropertyDescriptor(newProps, name);
+            if (descriptor && (descriptor.get || descriptor.set)) {
+                return descriptor;
+            }
+            return null;
+        }, inheritGetterSetter = function (newProps, oldProps, addTo) {
+            addTo = addTo || newProps;
+            var descriptor;
+            for (var name in newProps) {
+                if (descriptor = getDescriptor(newProps, name)) {
+                    this._defineProperty(addTo, oldProps, name, descriptor);
+                } else {
                     Construct._overwrite(addTo, oldProps, name, newProps[name]);
                 }
-            };
-        assign(Construct, {
-            constructorExtends: true,
-            newInstance: function () {
-                var inst = this.instance(), args;
-                if (inst.setup) {
-                    Object.defineProperty(inst, '__inSetup', {
-                        configurable: true,
-                        enumerable: false,
-                        value: true,
-                        writable: true
-                    });
-                    args = inst.setup.apply(inst, arguments);
-                    inst.__inSetup = false;
-                }
-                if (inst.init) {
-                    inst.init.apply(inst, args || arguments);
-                }
-                return inst;
-            },
-            _inherit: canGetDescriptor ? inheritGetterSetter : simpleInherit,
-            _defineProperty: function (what, oldProps, propName, descriptor) {
-                Object.defineProperty(what, propName, descriptor);
-            },
-            _overwrite: function (what, oldProps, propName, val) {
-                what[propName] = val;
-            },
-            setup: function (base) {
-                this.defaults = deepAssign(true, {}, base.defaults, this.defaults);
-            },
-            instance: function () {
-                initializing = 1;
-                var inst = new this();
-                initializing = 0;
-                return inst;
-            },
-            extend: function (name, staticProperties, instanceProperties) {
-                var shortName = name, klass = staticProperties, proto = instanceProperties;
-                if (typeof shortName !== 'string') {
-                    proto = klass;
-                    klass = shortName;
-                    shortName = null;
-                }
-                if (!proto) {
-                    proto = klass;
-                    klass = null;
-                }
-                proto = proto || {};
-                var _super_class = this, _super = this.prototype, Constructor, namespace, prototype;
-                prototype = this.instance();
-                Construct._inherit(proto, _super, prototype);
-                if (shortName) {
-                } else if (klass && klass.shortName) {
-                    shortName = klass.shortName;
-                } else if (this.shortName) {
-                    shortName = this.shortName;
-                }
-                function init() {
-                    if (!initializing) {
-                        return (!this || this.constructor !== Constructor) && arguments.length && Constructor.constructorExtends ? Constructor.extend.apply(Constructor, arguments) : Constructor.newInstance.apply(Constructor, arguments);
-                    }
-                }
-                if (typeof constructorName === 'undefined') {
-                    Constructor = function () {
-                        return init.apply(this, arguments);
-                    };
-                }
-                for (var propName in _super_class) {
-                    if (_super_class.hasOwnProperty(propName)) {
-                        Constructor[propName] = _super_class[propName];
-                    }
-                }
-                Construct._inherit(klass, _super_class, Constructor);
-                assign(Constructor, {
-                    constructor: Constructor,
-                    prototype: prototype,
-                    namespace: namespace
-                });
-                if (shortName !== undefined) {
-                    Constructor.shortName = shortName;
-                }
-                Constructor.prototype.constructor = Constructor;
-                var t = [_super_class].concat(makeArray(arguments)), args = Constructor.setup.apply(Constructor, t);
-                if (Constructor.init) {
-                    Constructor.init.apply(Constructor, args || t);
-                }
-                return Constructor;
             }
-        });
-        Construct.prototype.setup = function () {
+        }, simpleInherit = function (newProps, oldProps, addTo) {
+            addTo = addTo || newProps;
+            for (var name in newProps) {
+                Construct._overwrite(addTo, oldProps, name, newProps[name]);
+            }
         };
-        Construct.prototype.init = function () {
-        };
-        var oldIsConstructor = types.isConstructor;
-        types.isConstructor = function (obj) {
-            return obj.prototype instanceof Construct || oldIsConstructor.call(null, obj);
-        };
-        module.exports = namespace.Construct = Construct;
-    }(function () {
-        return this;
-    }()));
+    assign(Construct, {
+        constructorExtends: true,
+        newInstance: function () {
+            var inst = this.instance(), args;
+            if (inst.setup) {
+                Object.defineProperty(inst, '__inSetup', {
+                    configurable: true,
+                    enumerable: false,
+                    value: true,
+                    writable: true
+                });
+                args = inst.setup.apply(inst, arguments);
+                inst.__inSetup = false;
+            }
+            if (inst.init) {
+                inst.init.apply(inst, args || arguments);
+            }
+            return inst;
+        },
+        _inherit: canGetDescriptor ? inheritGetterSetter : simpleInherit,
+        _defineProperty: function (what, oldProps, propName, descriptor) {
+            Object.defineProperty(what, propName, descriptor);
+        },
+        _overwrite: function (what, oldProps, propName, val) {
+            what[propName] = val;
+        },
+        setup: function (base) {
+            this.defaults = deepAssign(true, {}, base.defaults, this.defaults);
+        },
+        instance: function () {
+            initializing = 1;
+            var inst = new this();
+            initializing = 0;
+            return inst;
+        },
+        extend: function (name, staticProperties, instanceProperties) {
+            var shortName = name, klass = staticProperties, proto = instanceProperties;
+            if (typeof shortName !== 'string') {
+                proto = klass;
+                klass = shortName;
+                shortName = null;
+            }
+            if (!proto) {
+                proto = klass;
+                klass = null;
+            }
+            proto = proto || {};
+            var _super_class = this, _super = this.prototype, Constructor, prototype;
+            prototype = this.instance();
+            Construct._inherit(proto, _super, prototype);
+            if (shortName) {
+            } else if (klass && klass.shortName) {
+                shortName = klass.shortName;
+            } else if (this.shortName) {
+                shortName = this.shortName;
+            }
+            function init() {
+                if (!initializing) {
+                    return (!this || this.constructor !== Constructor) && arguments.length && Constructor.constructorExtends ? Constructor.extend.apply(Constructor, arguments) : Constructor.newInstance.apply(Constructor, arguments);
+                }
+            }
+            if (typeof constructorName === 'undefined') {
+                Constructor = function () {
+                    return init.apply(this, arguments);
+                };
+            }
+            for (var propName in _super_class) {
+                if (_super_class.hasOwnProperty(propName)) {
+                    Constructor[propName] = _super_class[propName];
+                }
+            }
+            Construct._inherit(klass, _super_class, Constructor);
+            assign(Constructor, {
+                constructor: Constructor,
+                prototype: prototype
+            });
+            if (shortName !== undefined) {
+                Constructor.shortName = shortName;
+            }
+            Constructor.prototype.constructor = Constructor;
+            var t = [_super_class].concat(makeArray(arguments)), args = Constructor.setup.apply(Constructor, t);
+            if (Constructor.init) {
+                Constructor.init.apply(Constructor, args || t);
+            }
+            return Constructor;
+        }
+    });
+    Construct.prototype.setup = function () {
+    };
+    Construct.prototype.init = function () {
+    };
+    var oldIsConstructor = types.isConstructor;
+    types.isConstructor = function (obj) {
+        return obj.prototype instanceof Construct || oldIsConstructor.call(null, obj);
+    };
+    module.exports = namespace.Construct = Construct;
 });
 /*can-define@0.7.11#define-helpers/define-helpers*/
 define('can-define/define-helpers/define-helpers', function (require, exports, module) {
@@ -2382,7 +2389,7 @@ define('can-define/map/map', function (require, exports, module) {
         serialize: function () {
             return defineHelpers.serialize(this, 'serialize', {});
         },
-        each: function (cb, thisarg, observe) {
+        forEach: function (cb, thisarg, observe) {
             if (observe !== false) {
                 Observation.add(this, '__keys');
             }
@@ -2413,6 +2420,7 @@ define('can-define/map/map', function (require, exports, module) {
         console.warn('Use DefineMap::get instead of DefineMap::toObject');
         return this.get();
     };
+    DefineMap.prototype.each = DefineMap.prototype.forEach;
     module.exports = ns.DefineMap = DefineMap;
 });
 /*can-define@0.7.11#list/list*/
@@ -2660,9 +2668,9 @@ define('can-define/list/list', function (require, exports, module) {
         concat: function () {
             var args = [];
             each(makeArray(arguments), function (arg, i) {
-                args[i] = arg instanceof DefineList ? arg.serialize() : arg;
+                args[i] = arg instanceof DefineList ? arg.get() : arg;
             });
-            return new this.constructor(Array.prototype.concat.apply(this.serialize(), args));
+            return new this.constructor(Array.prototype.concat.apply(this.get(), args));
         },
         forEach: function (cb, thisarg) {
             var item;
@@ -2695,12 +2703,12 @@ define('can-define/list/list', function (require, exports, module) {
             return new this.constructor(filteredList);
         },
         map: function (callback, thisArg) {
-            var filteredList = new DefineList(), self = this;
+            var mappedList = [], self = this;
             this.each(function (item, index, list) {
                 var mapped = callback.call(thisArg | self, item, index, self);
-                filteredList.push(mapped);
+                mappedList.push(mapped);
             });
-            return filteredList;
+            return new this.constructor(mappedList);
         }
     });
     for (var prop in define.eventsProto) {
