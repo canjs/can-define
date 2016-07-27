@@ -1,6 +1,7 @@
 @module {function} can-define/list/list
 @parent can-core
 @group can-define/list/list.prototype prototype
+@group can-define/list/list/events events
 @alias can.DefineList
 @inherits can.Construct
 
