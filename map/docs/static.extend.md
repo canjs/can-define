@@ -3,13 +3,15 @@
 
 @description Create a custom map type
 
-@signature `can.DefineMap.extend([name,] [static,] prototype)`
+@signature `DefineMap.extend([name,] [static,] prototype)`
 
 Extends can.DefineMap, or constructor functions derived from can.DefineMap,
 to create a new constructor function.
 
 ```js
-var Person = can.DefineMap.extend(
+var DefineMap = require("can-define/map/map");
+
+var Person = DefineMap.extend(
   "Person",
   {seal: true},
   {
@@ -34,7 +36,7 @@ me.age      //-> 0
   @param {Object} [static] Static properties that are set directly on the
   constructor function.
 
-  @param {Object<String,Function|String|can-define.types|can-define.types.propDefinition>} prototype A definition of the properties or methods on this type.
+  @param {Object<String,Function|can-define.types.propDefinition>} prototype A definition of the properties or methods on this type.
 
   If the property definition is a __plain function__, it's considered a method.
 

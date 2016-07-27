@@ -115,9 +115,40 @@ var DefineMap = Construct.extend("DefineMap",{
      * @function can-define/map/map.prototype.get get
      * @parent can-define/map/map.prototype
      *
-     * @description Get a value that was not predefined.
+     * @description Get a value or all values from a DefineMap.
+     *
+     * @signature `map.get()`
+     *
+     * Returns a plain JavaScript that contains the properties and values of the map instance.  Any property values
+     * that also have a `get` method will have their `get` method called and the resulting value will be used as
+     * the property value.  This can be used to recursively convert a map instance to an object of other plain
+     * JavaScript objects.  Cycles are supported and only create one object.
+     *
+     * `.get()` can still return other non plain JS objects like Date.
+     * Use [can-define/map/map.prototype.serialize] when a form proper for `JSON.stringify` is needed.
+     *
+     * ```js
+     * var map = new DefineMap({foo: new DefineMap({bar: "zed"})});
+     * map.get() //-> {foo: {bar: "zed"}};
+     * ```
+     *
+     *   @return {Object} A plain JavaScript `Object` that contains all the properties and values of the map instance.
      *
      * @signature `map.get(propName)`
+     *
+     * Get a single property on a DefineMap instance.  If the property is not previously defined and
+     * the object is not [can-define/map/map.seal sealed], it will be dynamically added.
+     *
+     * `.get(propName)` only should be used when reading properties that might not have been defined yet, but
+     * will be later via [can-define/map/map.prototype.set].
+     *
+     * ```js
+     * var map = new DefineMap();
+     * map.get("name") //-> undefined;
+     * ```
+     *
+     *   @param {String} propName The property name of a property that may not have been defined yet.
+     *   @return {*} The value of that property.
      */
     get: function(prop){
         if(arguments.length) {
@@ -131,11 +162,29 @@ var DefineMap = Construct.extend("DefineMap",{
      * @function can-define/map/map.prototype.set set
      * @parent can-define/map/map.prototype
      *
-     * @description Set a value that was not predefined.
+     * @description Sets multiple properties on a map instance or a property that wasn't predefined.
+     *
+     * @signature `map.set(props [,removeProps])`
+     *
+     * Assigns each value in `props` to a property on this map instance named after the
+     * corresponding key in `props`, effectively merging `props` into the Map. If `removeProps` is true, properties not in
+     * `props` will be set to `undefined`.
+     *
+     *   @param {Object} props A collection of key-value pairs to set.
+     *   If any properties already exist on the map, they will be overwritten.
+     *
+     *   @param {Boolean} [removeProps=false] Whether to set keys not present in `props` to `undefined`.
+     *
+     *   @return {can-define/map/map} The map instance for chaining.
      *
      * @signature `map.set(propName, value)`
      *
-     * @signature `map.set(props [,removeProps])`
+     * Assigns _value_ to a property on this map instance called _propName_.  This will define
+     * the property if it hasn't already been predefined.
+     *
+     *   @param {String} propName The property to set.
+     *   @param {*} value The value to assign to `propName`.
+     *   @return {can-define/map/map} This map instance, for chaining.
      */
     set: function(prop, value){
         if(typeof prop === "object") {
@@ -151,23 +200,39 @@ var DefineMap = Construct.extend("DefineMap",{
      * @function can-define/map/map.prototype.serialize serialize
      * @parent can-define/map/map.prototype
      *
-     * @description Get a value that was not predefined.
+     * @description Get a serialized representation of the map instance and its children.
      *
      * @signature `map.serialize()`
+     *
+     * Get the serialized Object form of the map.  Serialized
+     * data is typically used to send back to a server.  Use [can-define.types.serialize]
+     * to customize a property's serialized value or if the property should be added to
+     * the result or not.
+     *
+     * `undefined` serialized values are not added to the result.
+     *
+     * ```js
+     * var MyMap = DefineMap.extend({
+     *   date: {
+     *     type: "date",
+     *     serialize: function(date){
+     *       return date.getTime()
+     *     }
+     *   }
+     * });
+     *
+     * var myMap = new MyMap({date: new Date(), count: 5});
+     * myMap.serialize() //-> {date: 1469566698504, count: 5}
+     * ```
+     *
+     *   @return {Object} A JavaScript Object that can be serialized with `JSON.stringify` or other methods.
+     *
      */
     serialize: function () {
         return defineHelpers.serialize(this, 'serialize', {});
     },
 
-    /**
-     * @function can-define/map/map.prototype.each each
-     * @parent can-define/map/map.prototype
-     *
-     * @description Get a value that was not predefined.
-     *
-     * @signature `map.each()`
-     */
-    each: function(cb, thisarg, observe){
+    forEach: function(cb, thisarg, observe){
         if(observe !== false) {
             Observation.add(this, '__keys');
         }
@@ -185,6 +250,49 @@ var DefineMap = Construct.extend("DefineMap",{
 
         return this;
     },
+    /**
+     * @property {can-define.types.propDefinition} can-define/map/map.prototype.wildcard *
+     * @parent can-define/map/map.prototype
+     *
+     * @description Define default behavior for a Map instance.
+     *
+     * @option {can-define.types.propDefinition}
+     *
+     * By definging a wildcard property like `"*"` on the prototype, this will supply a
+     * default behavior for every property.  The default wildcard `"*"` definition
+     * makes every property run through the "observable" [can-define.types] converter.
+     * It looks like:
+     *
+     * ```
+     * "*": {
+     *   type: "observable"
+     * }
+     * ```
+     *
+     * Setting the wildcard is useful when every property on a
+     * map instance should behave in a particular way.  For example, for map types used
+     * with [can-route]:
+     *
+     * ```
+     * var MyMap = DefineMap.extend({
+     *   "*": {
+     *     type: "stringOrObservable"
+     *   }
+     * })
+     * ```
+     *
+     * Or if you want to turn off implicit conversion of Objects and Arrays to DefineMap and DefineLists:
+     *
+     * ```
+     * var MyMap = DefineMap.extend({
+     *   "*": {
+     *     type: "*"
+     *   }
+     * })
+     * ```
+     *
+     *
+     */
     "*": {
         type: define.types.observable
     }
@@ -204,5 +312,6 @@ DefineMap.prototype.toObject = function(){
     console.warn("Use DefineMap::get instead of DefineMap::toObject");
     return this.get();
 };
+DefineMap.prototype.each = DefineMap.prototype.forEach;
 
 module.exports = ns.DefineMap = DefineMap;

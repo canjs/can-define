@@ -2,6 +2,7 @@
 @parent can-core
 @group can-define/map/map.prototype prototype
 @group can-define/map/map.static static
+@group can-define/map/map/events events
 @alias can.DefineMap
 @inherits can.Construct
 

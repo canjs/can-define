@@ -18,7 +18,7 @@ QUnit.test("creating an instance", function(){
         QUnit.equal(index, 3);
     });
 
-    list.push("d")
+    list.push("d");
 });
 
 test('list attr changes length', function () {
@@ -43,8 +43,7 @@ test('list splice', function () {
 		1,
 		2,
 		3
-	]),
-		first = true;
+	]);
 
     l.on('add', function(ev, newVals, index){
         deepEqual(newVals, [
@@ -124,7 +123,7 @@ test('reverse triggers add/remove events (#851)', function() {
 
 	l.reverse();
 
-    deepEqual(l.get(), [3,2,1], "reversed")
+    deepEqual(l.get(), [3,2,1], "reversed");
 });
 
 test('filter', function(){
@@ -260,6 +259,64 @@ test("slice and join are observable by a compute (#1884)", function(){
 
 });
 
+test('list.replace', function(){
+    var firstArray = [
+        {id: 1, name: "Marshall"},
+        {id: 2, name: "Austin"},
+        {id: 3, name: "Hyrum"}
+    ];
+    var myList = new DefineList(firstArray);
+    var newArray = [
+        {id: 4, name: "Aubree"},
+        {id: 5, name: "Leah"},
+        {id: 6, name: 'Lily'}
+    ];
+    myList.replace(newArray);
+    equal(myList.length, 3);
+    equal(myList[0].name, "Aubree");
+    equal(myList[1].name, "Leah");
+    equal(myList[2].name, "Lily", "Can replace a List with an Array.");
+
+    myList.replace(firstArray);
+    equal(myList.length, 3);
+    equal(myList[0].name, "Marshall");
+    equal(myList[1].name, "Austin");
+    equal(myList[2].name, "Hyrum", "Can replace a List with another List.");
+});
+
+test('list.map', function(){
+	var myArray = [
+	    {id: 1, name: "Marshall"},
+	    {id: 2, name: "Austin"},
+	    {id: 3, name: "Hyrum"}
+    ];
+    var myList = new DefineList(myArray);
+    var newList = myList.map(function(person) {
+        person.lastName = "Thompson";
+        return person;
+    });
+	
+    equal(newList.length, 3);
+    equal(newList[0].name, "Marshall");
+    equal(newList[0].lastName, "Thompson");
+    equal(newList[1].name, "Austin");
+    equal(newList[1].lastName, "Thompson");
+    equal(newList[2].name, "Hyrum");
+    equal(newList[2].lastName, "Thompson");
+
+    var ExtendedList = DefineList.extend({
+		testMe: function(){
+			return "It Worked!";
+		}
+	});
+	var myExtendedList = new ExtendedList(myArray);
+	var newExtendedList = myExtendedList.map(function(person) {
+    person.lastName = "Thompson";
+	    return person;
+	});
+	QUnit.equal("It Worked!", newExtendedList.testMe(), 'Returns the same type of list.');
+});
+
 
 test("list defines", 6, function(){
     var Todo = function(props){
@@ -296,7 +353,7 @@ test("list defines", 6, function(){
 
     	destroyCompleted: function() {
     		this.completed.forEach(function(todo) {
-    			todo.destroy()
+    			todo.destroy();
     		});
     	},
     	setCompletedTo: function(value) {
@@ -324,7 +381,7 @@ test("list defines", 6, function(){
 
 QUnit.test("extending the base supports overwriting _eventSetup", function(){
     var L = DefineList.extend({});
-    var c = Object.getOwnPropertyDescriptor(DefineMap.prototype,"_eventSetup");
+    Object.getOwnPropertyDescriptor(DefineMap.prototype,"_eventSetup");
     L.prototype.arbitraryProp = true;
     ok(true,"set arbitraryProp");
     L.prototype._eventSetup = function(){};
@@ -339,7 +396,7 @@ QUnit.test("setting expandos on a DefineList", function(){
     var dl = new DL();
     dl.set({count: 5, skip: 2});
 
-    QUnit.equal( dl.get("count"), 5, "read with .get defined") //-> 5
+    QUnit.equal( dl.get("count"), 5, "read with .get defined"); //-> 5
     QUnit.equal( dl.count, 5, "read with . defined");
 
     QUnit.equal( dl.get("skip"), 2, "read with .get expando");
@@ -354,6 +411,27 @@ QUnit.test("passing a DefineList to DefineList (#33)", function(){
     var m2 = new DefineList(m);
     QUnit.deepEqual(m.get(), m2.get());
     QUnit.ok(m[0] === m2[0], "index the same");
-    QUnit.ok(m[1] === m2[1], "index the same")
+    QUnit.ok(m[1] === m2[1], "index the same");
 
+});
+
+QUnit.test("reading and setting expandos", function(){
+    var list = new DefineList();
+    var countObservation = new Observation(function(){
+        return list.get("count");
+    }, null, function(newValue){
+        QUnit.equal(newValue, 1000, "got new value");
+    });
+    countObservation.start();
+
+    list.set("count",1000);
+
+    QUnit.equal( countObservation.value, 1000);
+
+
+    var list2 = new DefineList();
+    list2.on("count", function(ev, newVal){
+        QUnit.equal(newVal, 5);
+    });
+    list2.set("count", 5);
 });
