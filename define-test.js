@@ -311,7 +311,7 @@ test("setter with no arguments and returns undefined does the default behavior, 
 
 	t.prop = false;
 
-	deepEqual(t.props(), {
+	deepEqual({foo: t.foo, prop: t.prop}, {
 		foo: "bar",
 		prop: false
 	}, "got the right props");

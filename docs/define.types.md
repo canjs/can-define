@@ -1,5 +1,5 @@
 @property {Object} can-define.types types
-@parent can-define
+@parent can-define.static
 Defines the type, initial value, and get, set, and serialize behavior for an
 observable property. All type converters leave `null` and `undefined` as is except for
 the `"boolean"` type converter.
@@ -14,3 +14,44 @@ the `"boolean"` type converter.
 @option {function} htmlbool Like `boolean`, but converts to `true` if empty string (`""`) is passed.
 @option {function} compute Allows computes to be passed and the property take on the value of the compute.
 @option {function} stringOrObservable Converts plain Objects to [can-define/map/map DefineMaps], plain Arrays to [can-define/list/list DefineLists] and everything else to strings.  This is useful for routing.
+
+@body
+
+## Use
+
+Use any of the type names on a [can-define.types.propDefinition]'s `type` or directly on the prototype of a [can-define/map/map DefineMap] or [can-define/map/map DefineList].
+
+```js
+var define = require("can-define");
+var DefineMap = require("can-define/map/map");
+
+var Animal = function(name){
+    this.name = name;
+};
+define(Animal.prototype,{
+    name: {type: "string"}
+});
+
+var Person = DefineMap.extend({
+    name: "string"
+});
+```
+
+You can also pass these functions in directly:
+
+
+```js
+var define = require("can-define");
+var DefineMap = require("can-define/map/map");
+
+var Animal = function(name){
+    this.name = name;
+};
+define(Animal.prototype,{
+    name: {type: define.type.string}
+});
+
+var Person = DefineMap.extend({
+    name: define.type.string
+});
+```
