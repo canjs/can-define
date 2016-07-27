@@ -1,32 +1,55 @@
 @function can-define.types.get get
-@parent can-define
+@parent can-define.typedefs
 
 Specify what happens when a certain property is read on a map. `get` functions
-work like a [can.compute] and automatically update themselves when a dependent
+work like a [can-compute] and automatically update themselves when a dependent
 observable value is changed.
 
 
 @signature `get( [lastSetValue] )`
 
-  Defines the behavior when a value is read on a [can.Map]. Used to provide properties that derive their value from
-  other properties of the map, or __update__ their value from
-  the changes in the value that was set.
+Defines the behavior when a property value is read on a instance. Used to provide properties that derive their value from
+other properties on the object, or the property value that was set on the object.
 
-  @param {*} [lastSetValue] The value last set by `.attr(property, value)`.  Typically, _lastSetValue_
-  should be an observable value, like a [can.compute] or promise. If it's not, it's likely
-  that a [can.Map.prototype.define.set define.set] should be used instead.
+Specify `get` like:
+
+```js
+propertyName: {
+    get: function(){ ... }
+},
+propertyName: {
+    get: function(lastSetValue) { ... }
+}
+```
+
+  @param {*} [lastSetValue] The value last set by `instance.propertyName = value`.  Typically, _lastSetValue_
+  should be an observable value, like a [can-compute] or promise. If it's not, it's likely
+  that a [can-define.types.set] should be used instead.
 
   @return {*} The value of the property.
 
-@signature `get( lastSetValue, setAttrValue(value) )`
+@signature `get( lastSetValue, setPropValue(value) )`
 
-  Asynchronously defines the behavior when a value is read on a [can.Map]. Used to provide property values that
-  are available asynchronously.
+Asynchronously defines the behavior when a value is read on an instance. Used to provide property values that
+are available asynchronously.
 
-  @param {*} lastSetValue The value last set by `.attr(property, value)`.
+Only observed properties (via [can-event.on], [can-event.addEventListener], etc) will be passed the `setPropValue` function.  It will be `undefined` if the value is not observed. This is for memory safety.
 
-  @param {function(*)} setAttrValue(value) Updates the value of the property. This can be called
+Specify `get` like:
+
+```js
+propertyName: {
+  get: function(lastSetValue, setPropValue){ ... }
+}
+```
+
+  @param {*} lastSetValue The value last set by `instance.propertyName = value`.
+
+  @param {function(*)|undefined} setPropValue(value) Updates the value of the property. This can be called
   multiple times if needed.
+
+  @return {*} The value of the property before `setPropValue` is called.  Or a value for unobserved property reads
+  to return.
 
 @body
 
@@ -46,7 +69,7 @@ from some other properties on the map.
 Whenever a getter is provided, it is wrapped in a [can.compute], which ensures
 that whenever its dependent properties change, a change event will fire for this property also.
 
-```
+```js
 var Person = DefineMap.extend({
     first: "string",
     last: "string",
@@ -68,37 +91,36 @@ p.on("fullName", function(ev, newVal){
 p.first = "Lincoln";
 ```
 
-## Asyncronous virtual properties
+## Asynchronous virtual properties
 
 Often, a virtual property's value only becomes available after some period of time.  For example,
 given a `personId`, one might want to retrieve a related person:
 
-```
-var AppState = can.Map.extend({
-  define: {
+```js
+var AppState = DefineMap.extend({
+    personId: "number",
     person: {
-      get: function(lastSetValue, setAttrValue){
-        Person.findOne({id: this.attr("personId")})
+        get: function(lastSetValue, setPropValue){
+          Person.get({id: this.personId})
         	.then(function(person){
-        		setAttrValue(person);
+        		setPropValue(person);
         	});
-      }
+        }
     }
-  }
 });
 ```
 
-Asyncronous properties should be bound to before reading their value.  If
+Asynchronous properties should be bound to before reading their value.  If
 they are not bound to, the `get` function will be called each time.
 
-The following example will make multiple `Person.findOne` requests:
+The following example will make multiple `Person.get` requests:
 
 ```
 var state = new AppState({personId: 5});
-state.attr("person") //-> undefined
+state.person //-> undefined
 
 // called sometime later ...
-state.attr("person") //-> undefined
+state.person //-> undefined
 ```
 
 However, by binding, the compute only reruns the `get` function once `personId` changes:
@@ -106,28 +128,27 @@ However, by binding, the compute only reruns the `get` function once `personId` 
 ```
 var state = new AppState({personId: 5});
 
-state.bind("person", function(){})
+state.on("person", function(){})
 
-state.attr("person") //-> undefined
+state.person //-> undefined
 
 // called sometime later
-state.attr("person") //-> Person<{id: 5}>
+state.person //-> Person<{id: 5}>
 ```
 
-A template like [can.stache] will automatically bind for you, so you can pass
+A template like [can-stache] will automatically bind for you, so you can pass
 `state` to the template like the following without binding:
 
 ```
-var template = can.stache("<span>{{person.fullName}}</span>");
+var template = stache("<span>{{person.fullName}}</span>");
 var state = new AppState({});
 var frag = template(state);
 
-state.attr("personId",5);
+state.personId = 5;
 frag.childNodes[0].innerHTML //=> ""
 
 // sometime later
 frag.childNodes[0].innerHTML //=> "Lincoln Meyer"
-
 ```
 
 The magic tags are updated as `personId`, `person`, and `fullName` change.
@@ -136,58 +157,54 @@ The magic tags are updated as `personId`, `person`, and `fullName` change.
 ## Properties values that change with their _internal_ set value
 
 A getter can be used to derive a value from a set value. A getter's
-`lastSetValue` argument is the last value set by [can.Map::attr].
+`lastSetValue` argument is the last value set by `instance.propertyName = value`.
 
 For example, a property might be set to a compute, but when read, provides the value
 of the compute.
 
 ```
-var MyMap = can.Map.extend({
-  define: {
+var MyMap = DefineMap.extend({
     value: {
-      get: function( lastSetValue ){
-        return lastSetValue();
-      }
+        get: function( lastSetValue ){
+            return lastSetValue();
+        }
     }
-  }
 });
 
 var map = new MyMap();
-var compute = can.compute(1);
-map.attr("value", compute);
+var compute = compute(1);
+map.value = compute;
 
-map.attr("value") //-> 1
+map.value //-> 1
 compute(2);
-map.attr("value") //-> 2
+map.value //-> 2
 ```
 
 This technique should only be used when the `lastSetValue` is some form of
 observable, that when it changes, can update the `getter` value.
 
-For simple conversions, [can.Map.prototype.define.set] or [can.Map.prototype.define.type] should be used.
+For simple conversions, [can-define.types.set] or [can-define.types.type] should be used.
 
 ## Updating the virtual property value
 
-It's very common (and better performing) to update the virtual property value
+It's common to update virtual property values
 instead of replacing it.
 
-The following example creates an empty `locationIds` [can.List] when a new
+The following example creates an empty `locationIds` [can-define/list/list] when a new
 instance of `Store` is created.  However, as `locations` change,
-the [can.List] will be updated with the `id`s of the `locations`.
+the [can-define/list/list] will be updated with the `id`s of the `locations`.
 
 
 ```
-var Store = can.Map.extend({
-	define: {
-		locationIds: {
-			Value: can.List,
-			get: function(initialValue){
-				var ids = [];
-				this.attr('locations').each(function(location){
-					ids.push(location.attr("id"));
-				});
-				return initialValue.replace(ids);
-			}
+var Store = DefineMap.extend({
+    locations: DefineList,
+	locationIds: {
+		Value: DefineList,
+		get: function(initialValue){
+			var ids = this.locations.map(function(location){
+				ids.push(location.id);
+			});
+			return initialValue.replace(ids);
 		}
 	}
 });

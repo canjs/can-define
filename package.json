@@ -1,6 +1,6 @@
 {
   "name": "can-define",
-  "version": "0.7.10",
+  "version": "0.7.11",
   "description": "Like can.Map, but without the .attr method.",
   "main": "can-define.js",
   "scripts": {
@@ -34,7 +34,7 @@
     "can-compute": "^3.0.0-pre.5",
     "can-construct": "^3.0.0-pre.3",
     "can-event": "^3.0.0-pre.2",
-    "can-observation": "^3.0.0-pre.0",
+    "can-observation": "^3.0.0-pre.4",
     "can-util": "^3.0.0-pre.13"
   },
   "devDependencies": {

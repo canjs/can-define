@@ -1,25 +1,23 @@
 
-var make = require("can-define").make;
-var isArray = require("can-util/js/is-array/is-array");
-var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
+var assign = require("can-util/js/assign/assign");
 var CID = require("can-util/js/cid/cid");
-var each = require("can-util/js/each/each");
 var define = require("can-define");
 var canBatch = require("can-event/batch/batch");
 
+
 var hasMethod = function(obj, method){
-    return obj && typeof obj == "object" && (method in obj);
-}
+    return obj && typeof obj === "object" && (method in obj);
+};
 
 var defineHelpers = {
     extendedSetup: function(props){
-        assign(this, props)
+        assign(this, props);
     },
     toObject: function(map, props, where, Type){
         if(props instanceof Type) {
             props.each(function(value, prop){
                 where[prop] = value;
-            })
+            });
             return where;
         } else {
             return props;
@@ -61,7 +59,20 @@ var defineHelpers = {
 	// If `val` is an observable, calls `how` on it; otherwise
 	// returns the value of `val`.
 	getValue: function(map, name, val, how){
-		if( hasMethod(val, how) ) {
+        // check if there's a serialize
+        if(how === "serialize") {
+            var constructorDefinitions = map._define.definitions;
+            var propDef = constructorDefinitions[name];
+            if(propDef && typeof propDef.serialize === "function") {
+                return propDef.serialize.call(map, val, name);
+            }
+            var defaultDefinition = map._define.defaultDefinition;
+            if(defaultDefinition && typeof defaultDefinition.serialize === "function") {
+                return defaultDefinition.serialize.call(map, val, name);
+            }
+        }
+
+        if( hasMethod(val, how) ) {
 			return val[how]();
 		} else {
 			return val;

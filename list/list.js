@@ -9,9 +9,7 @@ var defineHelpers = require("../define-helpers/define-helpers");
 var assign = require("can-util/js/assign/assign");
 var each = require("can-util/js/each/each");
 var isArray = require("can-util/js/is-array/is-array");
-var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
 var makeArray = require("can-util/js/make-array/make-array");
-var CID = require("can-util/js/cid/cid");
 var types = require("can-util/js/types/types");
 
 
@@ -24,13 +22,13 @@ var identity = function(x){
 var makeFilterCallback = function(props) {
     return function(item){
         for(var prop in props) {
-            if(!item[prop] === props[prop]) {
+            if(item[prop] !== props[prop]) {
                 return false;
             }
         }
         return true;
     };
-}
+};
 /** @add can-define/list/list */
 var DefineList = Construct.extend("DefineList",
 /** @static */
@@ -108,9 +106,30 @@ var DefineList = Construct.extend("DefineList",
      * @function can-define/list/list.prototype.get get
      * @parent can-define/list/list.prototype
      *
+     * Gets an item or all items from a DefineList.
+     *
+     * @signature `list.get()`
+     *
+     * Returns the list converted into a plain JS array. Any items that also have a
+     * `get` method will have their `get` method called and the resulting value will be used as item value.
+     *
+     * This can be used to recursively convert a list instance to an Array of other plain JavaScript objects. Cycles are supported and only create one object.
+     *
+     * `get()` can still return other non-plain JS objects like Dates.
+     * Use [can-define/map/map.prototype.serialize] when a form proper for `JSON.stringify` is needed.
+     *
+     * ```js
+     * var list = new DefineList(["A","B"]);
+     * list.get() //-> ["A","B"]
+     * ```
+     *
+     *   @return {Array} A plain JavaScript `Array` that contains each item in the list.
+     *
      * @signature `list.get(index)`
      *
-     * Gets the item at `index`.
+     * Gets the item at `index`. `list.get(index)` should be used instead of
+     * `list[index]` if the list's items are going to be updated via [can-define/list/list.prototype.set list.set(index, value)]
+     * (as opposed to [can-define/list/list.prototype.splice] which is the better way).
      *
      * ```js
      * var list = new DefineList(["A","B"]);
@@ -121,22 +140,9 @@ var DefineList = Construct.extend("DefineList",
      *
      *   @return {*} The value at index.
      *
-     * @signature `list.get()`
-     *
-     * Returns the list converted into a plain JS array.
-     *
-     * ```js
-     * var list = new DefineList(["A","B"]);
-     * list.get() //-> ["A","B"]
-     * ```
-     *
-     *   @param {Number} index A numeric position in the list.
-     *
-     *   @return {*} The value at index.
-     *
      * @signature `list.get(prop)`
      *
-     * Gets the property at `prop` if it migth not have already been defined.
+     * Gets the property at `prop` if it might not have already been defined.
      *
      *
      * ```js
@@ -147,7 +153,7 @@ var DefineList = Construct.extend("DefineList",
      *
      *   @param {String} prop A property on the list.
      *
-     *   @return {*} The value at index.
+     *   @return {*} The value at `prop`.
      */
     get: function(index){
         if(arguments.length) {
@@ -246,12 +252,12 @@ var DefineList = Construct.extend("DefineList",
                 if(value) {
                     this.replace(prop);
                 } else {
-                    this.splice.apply(this, [0, prop.length].concat(prop) )
+                    this.splice.apply(this, [0, prop.length].concat(prop) );
                 }
             } else {
                 each(prop, function(value, prop){
                     this.set(prop, value);
-                }, this)
+                }, this);
             }
         }
         return this;
@@ -268,45 +274,6 @@ var DefineList = Construct.extend("DefineList",
             callback(this[i], i);
         }
     },
-
-    /**
-     * @function can-define/list/list.prototype.each each
-     * @parent can-define/list/list.prototype
-     *
-     * @description Call a function on each element of a DefineList.
-     *
-     * @signature `list.each( callback(item, index) )`
-     *
-     * `each` iterates through the Map, calling a function
-     * for each element.
-     *
-     * @param {function(*, Number)} callback the function to call for each element
-     * The value and index of each element will be passed as the first and second
-     * arguments, respectively, to the callback. If the callback returns false,
-     * the loop will stop.
-     *
-     * @return {can.DefineList} this DefineList, for chaining
-     *
-     * @body
-     * ```
-     * var i = 0;
-     * new can.Map([1, 10, 100]).each(function(element, index) {
-     *     i += element;
-     * });
-     *
-     * i; // 111
-     *
-     * i = 0;
-     * new can.Map([1, 10, 100]).each(function(element, index) {
-     *     i += element;
-     *     if(index >= 1) {
-     *         return false;
-     *     }
-     * });
-     *
-     * i; // 11
-     * ```
-     */
     //
     /**
      * @function can-define/list/list.prototype.splice splice
@@ -328,7 +295,7 @@ var DefineList = Construct.extend("DefineList",
      * This example demonstrates how to do surgery on a list of numbers:
      *
      * ```
-     * var list = new can.DefineList([0, 1, 2, 3]);
+     * var list = new DefineList([0, 1, 2, 3]);
      *
      * // starting at index 2, remove one element and insert 'Alice' and 'Bob':
      * list.splice(2, 1, 'Alice', 'Bob');
@@ -348,7 +315,7 @@ var DefineList = Construct.extend("DefineList",
      * make it clear how `splice` causes events to be emitted:
      *
      * ```
-     * var list = new can.DefineList(['a', 'b', 'c', 'd']);
+     * var list = new DefineList(['a', 'b', 'c', 'd']);
      * list.bind('change', function(ev, attr, how, newVals, oldVals) {
      *     console.log('change: ' + attr + ', ' + how + ', ' + newVals + ', ' + oldVals);
      * });
@@ -371,7 +338,7 @@ var DefineList = Construct.extend("DefineList",
      *                                    // length: 5, ['a', 'b', 'Alice', 'Bob', 'd']
      * ```
      *
-     * More information about binding to these events can be found under [can.DefineList.attr attr].
+     * More information about binding to these events can be found under [can-define/list/list.attr attr].
      */
     splice: function (index, howMany) {
         var args = makeArray(arguments),
@@ -422,7 +389,7 @@ var DefineList = Construct.extend("DefineList",
 });
 
 // Converts to an `array` of arguments.
-getArgs = function (args) {
+var getArgs = function (args) {
     return args[0] && Array.isArray(args[0]) ?
         args[0] :
         makeArray(args);
@@ -444,7 +411,7 @@ each({
      * `push` adds elements onto the end of a DefineList here is an example:
      *
      * ```
-     * var list = new can.DefineList(['Alice']);
+     * var list = new DefineList(['Alice']);
      *
      * list.push('Bob', 'Eve');
      * list.attr(); // ['Alice', 'Bob', 'Eve']
@@ -455,7 +422,7 @@ each({
      *
      * ```
      * var names = ['Bob', 'Eve'],
-     *     list = new can.DefineList(['Alice']);
+     *     list = new DefineList(['Alice']);
      *
      * list.push.apply(list, names);
      * list.attr(); // ['Alice', 'Bob', 'Eve']
@@ -467,8 +434,8 @@ each({
      *
      * ## See also
      *
-     * `push` has a counterpart in [can.DefineList::pop pop], or you may be
-     * looking for [can.DefineList::unshift unshift] and its counterpart [can.DefineList::shift shift].
+     * `push` has a counterpart in [can-define/list/list::pop pop], or you may be
+     * looking for [can-define/list/list::unshift unshift] and its counterpart [can-define/list/list::shift shift].
      */
     push: "length",
     /**
@@ -486,7 +453,7 @@ each({
      * `unshift` adds elements to the front of the list in bulk in the order specified:
      *
      * ```
-     * var list = new can.DefineList(['Alice']);
+     * var list = new DefineList(['Alice']);
      *
      * list.unshift('Bob', 'Eve');
      * list.attr(); // ['Bob', 'Eve', 'Alice']
@@ -497,7 +464,7 @@ each({
      *
      * ```
      * var names = ['Bob', 'Eve'],
-     *     list = new can.DefineList(['Alice']);
+     *     list = new DefineList(['Alice']);
      *
      * list.unshift.apply(list, names);
      * list.attr(); // ['Bob', 'Eve', 'Alice']
@@ -509,8 +476,8 @@ each({
      *
      * ## See also
      *
-     * `unshift` has a counterpart in [can.DefineList::shift shift], or you may be
-     * looking for [can.DefineList::push push] and its counterpart [can.DefineList::pop pop].
+     * `unshift` has a counterpart in [can-define/list/list::shift shift], or you may be
+     * looking for [can-define/list/list::push push] and its counterpart [can-define/list/list::pop pop].
      */
     unshift: 0
 },
@@ -556,10 +523,10 @@ each({
      * @return {*} the element just popped off the DefineList, or `undefined` if the DefineList was empty
      *
      * @body
-     * `pop` is the opposite action from `[can.DefineList.push push]`:
+     * `pop` is the opposite action from `[can-define/list/list.push push]`:
      *
      * ```
-     * var list = new can.DefineList(['Alice', 'Bob', 'Eve']);
+     * var list = new DefineList(['Alice', 'Bob', 'Eve']);
      * list.attr(); // ['Alice', 'Bob', 'Eve']
      *
      * list.pop(); // 'Eve'
@@ -575,8 +542,8 @@ each({
      *
      * ## See also
      *
-     * `pop` has its counterpart in [can.DefineList::push push], or you may be
-     * looking for [can.DefineList::unshift unshift] and its counterpart [can.DefineList::shift shift].
+     * `pop` has its counterpart in [can-define/list/list::push push], or you may be
+     * looking for [can-define/list/list::unshift unshift] and its counterpart [can-define/list/list::shift shift].
      */
     pop: "length",
     /**
@@ -589,10 +556,10 @@ each({
      * @return {*} the element just shifted off the DefineList, or `undefined` if the DefineList is empty
      *
      * @body
-     * `shift` is the opposite action from `[can.DefineList::unshift unshift]`:
+     * `shift` is the opposite action from `[can-define/list/list::unshift unshift]`:
      *
      * ```
-     * var list = new can.DefineList(['Alice']);
+     * var list = new DefineList(['Alice']);
      *
      * list.unshift('Bob', 'Eve');
      * list.attr(); // ['Bob', 'Eve', 'Alice']
@@ -610,8 +577,8 @@ each({
      *
      * ## See also
      *
-     * `shift` has a counterpart in [can.DefineList::unshift unshift], or you may be
-     * looking for [can.DefineList::push push] and its counterpart [can.DefineList::pop pop].
+     * `shift` has a counterpart in [can-define/list/list::unshift unshift], or you may be
+     * looking for [can-define/list/list::push push] and its counterpart [can-define/list/list::pop pop].
      */
     shift: 0
 },
@@ -648,24 +615,18 @@ assign(DefineList.prototype, {
      *
      * `indexOf` finds the position of a given item in the DefineList.
      *
-     * @param {*} item the item to find
-     *
-     * @return {Number} the position of the item in the DefineList, or -1 if the item is not found.
-     *
-     * @body
      * ```
-     * var list = new can.DefineList(['Alice', 'Bob', 'Eve']);
+     * var list = new DefineList(['Alice', 'Bob', 'Eve']);
      * list.indexOf('Alice');   // 0
      * list.indexOf('Charlie'); // -1
      * ```
      *
-     * It is trivial to make a `contains`-type function using `indexOf`:
+     *   @param {*} item The item to find.
      *
-     * ```
-     * function(list, item) {
-     *     return list.indexOf(item) >= 0;
-     * }
-     * ```
+     *   @return {Number} The position of the item in the DefineList, or -1 if the item is not found.
+     *
+     * @body
+     *
      */
     indexOf: function (item, fromIndex) {
         for(var i = fromIndex || 0, len = this.length; i < len; i++) {
@@ -690,10 +651,10 @@ assign(DefineList.prototype, {
      *
      * @body
      * ```
-     * var list = new can.DefineList(['Alice', 'Bob', 'Eve']);
+     * var list = new DefineList(['Alice', 'Bob', 'Eve']);
      * list.join(', '); // 'Alice, Bob, Eve'
      *
-     * var beatles = new can.DefineList(['John', 'Paul', 'Ringo', 'George']);
+     * var beatles = new DefineList(['John', 'Paul', 'Ringo', 'George']);
      * beatles.join('&'); // 'John&Paul&Ringo&George'
      * ```
      */
@@ -709,11 +670,11 @@ assign(DefineList.prototype, {
      *
      * `reverse` reverses the elements of the DefineList in place.
      *
-     * @return {can.DefineList} the DefineList, for chaining
+     * @return {can-define/list/list} the DefineList, for chaining
      *
      * @body
      * ```
-     * var list = new can.DefineList(['Alice', 'Bob', 'Eve']);
+     * var list = new DefineList(['Alice', 'Bob', 'Eve']);
      * var reversedList = list.reverse();
      *
      * reversedList.attr(); // ['Eve', 'Bob', 'Alice'];
@@ -738,11 +699,11 @@ assign(DefineList.prototype, {
      * @param {Number} [end] the first index not to include in the copy
      * If _end_ is not supplied, `slice` will copy until the end of the list.
      *
-     * @return {can.DefineList} a new `can.DefineList` with the extracted elements
+     * @return {can-define/list/list} a new `DefineList` with the extracted elements
      *
      * @body
      * ```
-     * var list = new can.DefineList(['Alice', 'Bob', 'Charlie', 'Daniel', 'Eve']);
+     * var list = new DefineList(['Alice', 'Bob', 'Charlie', 'Daniel', 'Eve']);
      * var newList = list.slice(1, 4);
      * newList.attr(); // ['Bob', 'Charlie', 'Daniel']
      * ```
@@ -750,7 +711,7 @@ assign(DefineList.prototype, {
      * `slice` is the simplest way to copy a DefineList:
      *
      * ```
-     * var list = new can.DefineList(['Alice', 'Bob', 'Eve']);
+     * var list = new DefineList(['Alice', 'Bob', 'Eve']);
      * var copy = list.slice();
      *
      * copy.attr();   // ['Alice', 'Bob', 'Eve']
@@ -768,46 +729,65 @@ assign(DefineList.prototype, {
      * @function can-define/list/list.prototype.concat concat
      * @description Merge many collections together into a DefineList.
      * @signature `list.concat(...args)`
-     * @param {Array|can.DefineList|*} args Any number of arrays, Lists, or values to add in
+     *
+     * Returns a `DefineList` with the `list`'s items and the additional `args`.
+     *
+     * @param {Array|can-define/list/list|*} args Any number of arrays, Lists, or values to add in
      * For each parameter given, if it is an Array or a DefineList, each of its elements will be added to
      * the end of the concatenated DefineList. Otherwise, the parameter itself will be added.
      *
+     * @return {can-define/list/list} A DefineList of the same type.
+     *
      * @body
+     *
+     * ## Use
+     *
      * `concat` makes a new DefineList with the elements of the DefineList followed by the elements of the parameters.
      *
      * ```
-     * var list = new can.DefineList();
+     * var list = new DefineList();
      * var newList = list.concat(
      *     'Alice',
      *     ['Bob', 'Charlie']),
-     *     new can.DefineList(['Daniel', 'Eve']),
+     *     new DefineList(['Daniel', 'Eve']),
      *     {f: 'Francis'}
      * );
-     * newList.attr(); // ['Alice', 'Bob', 'Charlie', 'Daniel', 'Eve', {f: 'Francis'}]
+     * newList.get(); // ['Alice', 'Bob', 'Charlie', 'Daniel', 'Eve', {f: 'Francis'}]
      * ```
      */
     concat: function () {
         var args = [];
         each(makeArray(arguments), function (arg, i) {
-            args[i] = arg instanceof DefineList ? arg.serialize() : arg;
+            args[i] = arg instanceof DefineList ? arg.get() : arg;
         });
-        return new this.constructor(Array.prototype.concat.apply(this.serialize(), args));
+        return new this.constructor(Array.prototype.concat.apply(this.get(), args));
     },
 
     /**
      * @function can-define/list/list.prototype.forEach forEach
      * @description Call a function for each element of a DefineList.
      * @signature `list.forEach(callback[, thisArg])`
-     * @param {function(element, index, list)} callback a function to call with each element of the DefineList
+     *
+     * Loops through the values of the list, calling `callback` for each one until the list ends
+     * or `false` is returned.
+     *
+     * ```
+     * list.each(function(item, index, list){ ... })
+     * ```
+     *
+     * @param {function(item, index, list)} callback A function to call with each element of the DefineList
      * The three parameters that _callback_ gets passed are _element_, the element at _index_, _index_ the
      * current element of the list, and _list_ the DefineList the elements are coming from.
-     * @param {Object} [thisArg] the object to use as `this` inside the callback
-     *
+     * @param {Object} [thisArg] The object to use as `this` inside the callback.
+     * @return {can-define/list/list} The list instance.
      * @body
+     *
+     * ## Use
+     *
      * `forEach` calls a callback for each element in the DefineList.
      *
      * ```
-     * var list = new can.DefineList([1, 2, 3]);
+     * var list = new DefineList([1, 2, 3]);
      * list.forEach(function(element, index, list) {
      *     list.get(index, element * element);
      * });
@@ -829,14 +809,14 @@ assign(DefineList.prototype, {
      * @function can-define/list/list.prototype.replace replace
      * @description Replace all the elements of a DefineList.
      * @signature `list.replace(collection)`
-     * @param {Array|can.DefineList|can.Deferred} collection the collection of new elements to use
-     * If a [can.Deferred] is passed, it must resolve to an `Array` or `can.DefineList`.
+     * @param {Array|can-define/list/list|can.Deferred} collection the collection of new elements to use
+     * If a [can.Deferred] is passed, it must resolve to an `Array` or `DefineList`.
      * The elements of the list are not actually removed until the Deferred resolves.
      *
      * @body
      * `replace` replaces all the elements of this DefineList with new ones.
      *
-     * `replace` is especially useful when `can.DefineList`s are live-bound into `[can.Control]`s,
+     * `replace` is especially useful when `DefineList`s are live-bound into `[can.Control]`s,
      * and you intend to populate them with the results of a `[can.Model]` call:
      *
      * ```
@@ -861,12 +841,12 @@ assign(DefineList.prototype, {
      *
      * The differences in the events fired by `attr` and `replace` are demonstrated concretely by this example:
      * ```
-     * var attrList = new can.DefineList(['Alexis', 'Bill']);
+     * var attrList = new DefineList(['Alexis', 'Bill']);
      * attrList.bind('change', function(ev, index, how, newVals, oldVals) {
      *     console.log(index + ', ' + how + ', ' + newVals + ', ' + oldVals);
      * });
      *
-     * var replaceList = new can.DefineList(['Alexis', 'Bill']);
+     * var replaceList = new DefineList(['Alexis', 'Bill']);
      * replaceList.bind('change', function(ev, index, how, newVals, oldVals) {
      *     console.log(index + ', ' + how + ', ' + newVals + ', ' + oldVals);
      * });
@@ -950,7 +930,7 @@ DefineList.prototype.attr = function(prop, value){
     } else if(prop && typeof prop === "object") {
         return this.set.apply(this, arguments);
     } else if(arguments.length === 1) {
-        return this.get(prop)
+        return this.get(prop);
     } else {
         return this.set(prop, value);
     }
@@ -965,7 +945,7 @@ DefineList.prototype.item = function(index, value){
 DefineList.prototype.items = function(){
    console.warn("DefineList::get should should be used instead of DefineList::items");
    return this.get();
-}
+};
 
 types.DefineList = DefineList;
 types.DefaultList = DefineList;

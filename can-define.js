@@ -561,13 +561,6 @@ assign(eventsProto, {
 
 		return eventLifecycle.removeAndTeardown.apply(this, arguments);
 
-	},
-	props: function() {
-		var obj = {};
-		for (var prop in this) {
-			obj[prop] = this[prop];
-		}
-		return obj;
 	}
 });
 eventsProto.on = eventsProto.bind = eventsProto.addEventListener;
