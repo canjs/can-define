@@ -82,7 +82,7 @@ propertyName: {
     });
     ```
 
-    @option {can.Map.prototype.define.set} set A set function that specifies what should happen when a property is set. `set` is called with the result of `type` or `Type`. The following
+    @option {can-define.types.set} set A set function that specifies what should happen when a property is set. `set` is called with the result of `type` or `Type`. The following
     defines a `page` setter that updates the map's offset:
 
     ```js
@@ -111,7 +111,7 @@ propertyName: {
 
     A `get` definition makes the property __computed__ which means it will not be enumerable by default.
 
-    @option {can.Map.prototype.define.serialize} serialize Specifies the behavior of the property when [can-define/map/map::serialize serialize] is called.
+    @option {can-define.types.serialize} serialize Specifies the behavior of the property when [can-define/map/map::serialize serialize] is called.
 
     By default, serialize does not include computed values. Properties with a `get` definition
     are computed and therefore are not added to the result.  Non-computed properties values are
