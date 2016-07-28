@@ -2,8 +2,7 @@
 @parent can-define.typedefs
 
 Provides a constructor function to be used to convert any set value into an appropriate
-value.  []
-
+value.
 
 @signature `Type`
 

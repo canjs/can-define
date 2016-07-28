@@ -119,7 +119,7 @@ var DefineMap = Construct.extend("DefineMap",{
      *
      * @signature `map.get()`
      *
-     * Returns a plain JavaScript that contains the properties and values of the map instance.  Any property values
+     * Returns a plain JavaScript object that contains the properties and values of the map instance.  Any property values
      * that also have a `get` method will have their `get` method called and the resulting value will be used as
      * the property value.  This can be used to recursively convert a map instance to an object of other plain
      * JavaScript objects.  Cycles are supported and only create one object.
