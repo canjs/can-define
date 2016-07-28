@@ -38,7 +38,7 @@
     "can-util": "^3.0.0-pre.13"
   },
   "devDependencies": {
-    "can-list": "^3.0.0-pre.4",
+    "can-list": "^3.0.0-pre.6",
     "can-stache": "^3.0.0-pre.8",
     "jshint": "^2.9.1",
     "serve": "^1.4.0",

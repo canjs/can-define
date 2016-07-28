@@ -7,6 +7,7 @@ var define = require("can-define");
 
 var assign = require("can-util/js/assign/assign");
 var CID = require("can-util/js/cid/cid");
+var types = require("can-util/js/types/types");
 
 QUnit.module("can-define/list/list");
 
@@ -295,7 +296,7 @@ test('list.map', function(){
         person.lastName = "Thompson";
         return person;
     });
-	
+
     equal(newList.length, 3);
     equal(newList[0].name, "Marshall");
     equal(newList[0].lastName, "Thompson");
@@ -434,4 +435,9 @@ QUnit.test("reading and setting expandos", function(){
         QUnit.equal(newVal, 5);
     });
     list2.set("count", 5);
+});
+
+QUnit.test("is list like", function(){
+    var list = new DefineList();
+    QUnit.ok( types.isListLike(list) );
 });
