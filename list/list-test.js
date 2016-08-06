@@ -319,6 +319,107 @@ test('list.map', function(){
 });
 
 
+test('list.sort a simple list', function(){
+    var myList = new DefineList([
+	    "Marshall",
+	    "Austin",
+	    "Hyrum"
+    ]);
+
+	myList.sort();
+
+    equal(myList.length, 3);
+    equal(myList[0], "Austin");
+	equal(myList[1], "Hyrum");
+	equal(myList[2], "Marshall", "Basic list was properly sorted.");
+});
+
+test('list.sort a list of objects', function(){
+	var objList = new DefineList([
+		{id: 1, name: "Marshall"},
+		{id: 2, name: "Austin"},
+		{id: 3, name: "Hyrum"}
+	]);
+
+	objList.sort(function(a, b){
+		if (a.name < b.name) {
+			return -1;
+		} else if (a.name > b.name){
+			return 1;
+		} else {
+			return 0;
+		}
+	});
+
+	equal(objList.length, 3);
+	equal(objList[0].name, "Austin");
+	equal(objList[1].name, "Hyrum");
+	equal(objList[2].name, "Marshall", "List of objects was properly sorted.");
+});
+
+test('list.sort a list of DefineMaps', function(){
+	var Account = DefineMap.extend({
+		name: "string",
+		amount: "number",
+		slug: {
+			serialize: true,
+			get: function(){
+				return this.name.toLowerCase().replace(/ /g,'-').replace(/[^\w-]+/g,'');
+			}
+		}
+	});
+	Account.List = DefineList.extend({
+	  "*": Account,
+	  limit: "number",
+	  skip: "number",
+	  total: "number"
+	});
+
+	var accounts = new Account.List([
+		{
+			name: "Savings",
+			amount: 20.00
+		},
+		{
+			name: "Checking",
+			amount: 103.24
+		},
+		{
+			name: "Kids Savings",
+			amount: 48155.13
+		}
+	]);
+	accounts.sort(function(a, b){
+		if (a.name < b.name) {
+			return -1;
+		} else if (a.name > b.name){
+			return 1;
+		} else {
+			return 0;
+		}
+	});
+	equal(accounts.length, 3);
+	equal(accounts[0].name, "Checking");
+	equal(accounts[1].name, "Kids Savings");
+	equal(accounts[2].name, "Savings", "List of DefineMaps was properly sorted.");
+
+	// Try sorting in reverse on the dynamic `slug` property
+	accounts.sort(function(a, b){
+		if (a.slug < b.slug) {
+			return 1;
+		} else if (a.slug > b.slug){
+			return -1;
+		} else {
+			return 0;
+		}
+	});
+
+	equal(accounts.length, 3);
+	equal(accounts[0].name, "Savings");
+	equal(accounts[1].name, "Kids Savings");
+	equal(accounts[2].name, "Checking", "List of DefineMaps was properly sorted by a dynamic property.");
+});
+
 test("list defines", 6, function(){
     var Todo = function(props){
         assign(this, props);
