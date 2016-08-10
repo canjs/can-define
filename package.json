@@ -31,7 +31,7 @@
   },
   "homepage": "https://github.com/canjs/can-define",
   "dependencies": {
-    "can-compute": "^3.0.0-pre.5",
+    "can-compute": "^3.0.0-pre.10",
     "can-construct": "^3.0.0-pre.3",
     "can-event": "^3.0.0-pre.2",
     "can-observation": "^3.0.0-pre.4",

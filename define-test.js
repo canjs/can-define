@@ -171,12 +171,12 @@ QUnit.test("basic Type", function() {
 QUnit.test("type converters", function() {
 
 	var Typer = function(date, string, number, bool, htmlbool, leaveAlone) {
-		this.date = date,
-			this.string = string,
-			this.number = number,
-			this.bool = bool,
-			this.htmlbool = htmlbool,
-			this.leaveAlone = leaveAlone
+		this.date = date;
+		this.string = string;
+		this.number = number;
+		this.bool = bool;
+		this.htmlbool = htmlbool;
+		this.leaveAlone = leaveAlone;
 	};
 
 	define(Typer.prototype, {
@@ -513,8 +513,7 @@ test('default behaviors with "*" work for attributes', function() {
 		number: {}
 	});
 
-	var map = new DefaultMap(),
-		serializedMap;
+	var map = new DefaultMap();
 
 	equal(map.someNumber, '5', 'default values are not type converted anymore');
 	map.someNumber = '5';
@@ -931,7 +930,7 @@ test("Stache with single property", function() {
 	});
 	var frag = template(t);
 	equal(frag.firstChild.nodeValue, 'bar');
-	t.foo = "baz"
+	t.foo = "baz";
 	equal(frag.firstChild.nodeValue, 'baz');
 });
 
@@ -1008,8 +1007,8 @@ test("stache with double property", function() {
 	});
 
 	var nested = new NestedMap();
-	template = stache('{{test.name}}')
-	frag = template(nested);
+	var template = stache('{{test.name}}');
+	var frag = template(nested);
 	equal(frag.firstChild.nodeValue, nailedIt);
 });
 
@@ -1047,8 +1046,8 @@ test("Stache with one nested property", function() {
 	});
 
 	var nested = new NestedMap();
-	template = stache('{{examples.one.name}}');
-	frag = template(nested);
+	var template = stache('{{examples.one.name}}');
+	var frag = template(nested);
 	equal(frag.firstChild.nodeValue, nailedIt);
 });
 
@@ -1086,8 +1085,8 @@ test("Stache with two nested property", function() {
 	});
 
 	var nested = new NestedMap();
-	template = stache('{{examples.two.deep.name}}');
-	frag = template(nested);
+	var template = stache('{{examples.two.deep.name}}');
+	var frag = template(nested);
 	equal(frag.firstChild.nodeValue, nailedIt);
 });
 
@@ -1146,4 +1145,21 @@ QUnit.test("expandos are added in define.setup (#25)", function(){
 		QUnit.ok(true,"prop event called");
 	});
 	map.prop = 5;
+});
+
+QUnit.test("logs work with maps", function(){
+	var MyMap = define.Constructor({
+		first: "string",
+		last: "string"
+	});
+	var m = new MyMap({first: "J", last: "M"});
+	var fullName = compute(function(){
+		return m.first + m.last;
+	});
+
+	fullName.on("change", function(){});
+
+	var t = fullName.computeInstance.trace();
+	QUnit.equal(t.dependencies[0].obj, m);
+	QUnit.equal(t.dependencies[1].obj, m);
 });
