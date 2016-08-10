@@ -680,7 +680,7 @@ define('can-event/batch/batch', function (require, exports, module) {
     };
     module.exports = namespace.batch = canBatch;
 });
-/*can-observation@3.0.0-pre.4#can-observation*/
+/*can-observation@3.0.0-pre.6#can-observation*/
 define('can-observation', function (require, exports, module) {
     require('can-event');
     var canBatch = require('can-event/batch/batch');
@@ -698,11 +698,21 @@ define('can-observation', function (require, exports, module) {
         this.ignore = 0;
         this.inBatch = false;
         this.ready = false;
-        compute.observedInfo = this;
         this.setReady = this._setReady.bind(this);
     }
     var observationStack = [];
     assign(Observation.prototype, {
+        get: function () {
+            if (this.bound) {
+                var recordingObservation = Observation.isRecording();
+                if (recordingObservation && this.getDepth() >= recordingObservation.getDepth()) {
+                    Observation.updateUntil(this);
+                }
+                return this.value;
+            } else {
+                return this.func.call(this.context);
+            }
+        },
         getPrimaryDepth: function () {
             return this.compute._primaryDepth || 0;
         },
@@ -727,14 +737,14 @@ define('can-observation', function (require, exports, module) {
         },
         addEdge: function (objEv) {
             objEv.obj.addEventListener(objEv.event, this.onDependencyChange);
-            if (objEv.obj.observedInfo) {
-                this.childDepths[objEv.obj._cid] = objEv.obj.observedInfo.getDepth();
+            if (objEv.obj.observation) {
+                this.childDepths[objEv.obj._cid] = objEv.obj.observation.getDepth();
                 this.depth = null;
             }
         },
         removeEdge: function (objEv) {
             objEv.obj.removeEventListener(objEv.event, this.onDependencyChange);
-            if (objEv.obj.observedInfo) {
+            if (objEv.obj.observation) {
                 delete this.childDepths[objEv.obj._cid];
                 this.depth = null;
             }
@@ -807,29 +817,53 @@ define('can-observation', function (require, exports, module) {
             this.newObserved = {};
         }
     });
-    var updateOrder = [], curPrimaryDepth = Infinity, maxPrimaryDepth = 0;
-    Observation.registerUpdate = function (observeInfo, batchNum) {
-        var depth = observeInfo.getDepth() - 1;
-        var primaryDepth = observeInfo.getPrimaryDepth();
+    var updateOrder = [], curPrimaryDepth = Infinity, maxPrimaryDepth = 0, currentBatchNum;
+    Observation.registerUpdate = function (observation, batchNum) {
+        var depth = observation.getDepth() - 1;
+        var primaryDepth = observation.getPrimaryDepth();
         curPrimaryDepth = Math.min(primaryDepth, curPrimaryDepth);
         maxPrimaryDepth = Math.max(primaryDepth, maxPrimaryDepth);
         var primary = updateOrder[primaryDepth] || (updateOrder[primaryDepth] = {
-            observeInfos: [],
+            observations: [],
             current: Infinity,
             max: 0
         });
-        var objs = primary.observeInfos[depth] || (primary.observeInfos[depth] = []);
-        objs.push(observeInfo);
+        var objs = primary.observations[depth] || (primary.observations[depth] = []);
+        objs.push(observation);
         primary.current = Math.min(depth, primary.current);
         primary.max = Math.max(depth, primary.max);
     };
-    Observation.batchEnd = function (batchNum) {
+    Observation.updateUntil = function (observation) {
         var cur;
         while (true) {
             if (curPrimaryDepth <= maxPrimaryDepth) {
                 var primary = updateOrder[curPrimaryDepth];
                 if (primary && primary.current <= primary.max) {
-                    var last = primary.observeInfos[primary.current];
+                    var last = primary.observations[primary.current];
+                    if (last && (cur = last.pop())) {
+                        cur.updateCompute(currentBatchNum);
+                        if (cur === observation) {
+                            return;
+                        }
+                    } else {
+                        primary.current++;
+                    }
+                } else {
+                    curPrimaryDepth++;
+                }
+            } else {
+                return;
+            }
+        }
+    };
+    Observation.batchEnd = function (batchNum) {
+        var cur;
+        currentBatchNum = batchNum;
+        while (true) {
+            if (curPrimaryDepth <= maxPrimaryDepth) {
+                var primary = updateOrder[curPrimaryDepth];
+                if (primary && primary.current <= primary.max) {
+                    var last = primary.observations[primary.current];
                     if (last && (cur = last.pop())) {
                         cur.updateCompute(batchNum);
                     } else {
@@ -917,7 +951,8 @@ define('can-observation', function (require, exports, module) {
     };
     Observation.isRecording = function () {
         var len = observationStack.length;
-        return len && observationStack[len - 1].ignore === 0;
+        var last = len && observationStack[len - 1];
+        return last && last.ignore === 0 && last;
     };
     canBatch._onDispatchedEvents = Observation.batchEnd;
     module.exports = namespace.Observation = Observation;
@@ -1053,7 +1088,7 @@ define('can-util/js/string/string', function (require, exports, module) {
     };
     module.exports = string;
 });
-/*can-compute@3.0.0-pre.7#proto-compute*/
+/*can-compute@3.0.0-pre.10#proto-compute*/
 define('can-compute/proto-compute', function (require, exports, module) {
     var Observation = require('can-observation');
     var canEvent = require('can-event');
@@ -1105,18 +1140,19 @@ define('can-compute/proto-compute', function (require, exports, module) {
         }
     };
     var setupComputeHandlers = function (compute, func, context) {
-        var readInfo = new Observation(func, context, compute);
+        var observation = new Observation(func, context, compute);
+        compute.observation = observation;
         return {
             _on: function () {
-                readInfo.getValueAndBind();
-                compute.value = readInfo.value;
-                compute.hasDependencies = !isEmptyObject(readInfo.newObserved);
+                observation.start();
+                compute.value = observation.value;
+                compute.hasDependencies = !isEmptyObject(observation.newObserved);
             },
             _off: function () {
-                readInfo.teardown();
+                observation.stop();
             },
             getDepth: function () {
-                return readInfo.getDepth();
+                return observation.getDepth();
             }
         };
     };
@@ -1244,14 +1280,19 @@ define('can-compute/proto-compute', function (require, exports, module) {
         _off: function () {
         },
         get: function () {
-            if (Observation.isRecording() && this._canObserve !== false) {
+            var recordingObservation = Observation.isRecording();
+            if (recordingObservation && this._canObserve !== false) {
                 Observation.add(this, 'change');
                 if (!this.bound) {
                     Compute.temporarilyBind(this);
                 }
             }
             if (this.bound) {
-                return this.value;
+                if (this.observation) {
+                    return this.observation.get();
+                } else {
+                    return this.value;
+                }
             } else {
                 return this._get();
             }
@@ -1268,12 +1309,7 @@ define('can-compute/proto-compute', function (require, exports, module) {
             if (this.hasDependencies) {
                 return this._get();
             }
-            if (setVal === undefined) {
-                this.value = this._get();
-            } else {
-                this.value = setVal;
-            }
-            updateOnChange(this, this.value, old);
+            this.updater(setVal === undefined ? this._get() : setVal, old);
             return this.value;
         },
         _set: function (newVal) {
@@ -1281,6 +1317,9 @@ define('can-compute/proto-compute', function (require, exports, module) {
         },
         updater: function (newVal, oldVal, batchNum) {
             this.value = newVal;
+            if (this.observation) {
+                this.observation.value = newVal;
+            }
             updateOnChange(this, newVal, oldVal, batchNum);
         },
         toFunction: function () {
@@ -1330,7 +1369,7 @@ define('can-compute/proto-compute', function (require, exports, module) {
     };
     module.exports = exports = Compute;
 });
-/*can-compute@3.0.0-pre.7#can-compute*/
+/*can-compute@3.0.0-pre.10#can-compute*/
 define('can-compute', function (require, exports, module) {
     require('can-event');
     require('can-event/batch/batch');
@@ -1349,7 +1388,7 @@ define('can-compute', function (require, exports, module) {
         };
         var cid = CID(compute, 'compute');
         var handlerKey = '__handler' + cid;
-        compute.bind = compute.addEventListener = function (ev, handler) {
+        compute.on = compute.bind = compute.addEventListener = function (ev, handler) {
             var computeHandler = handler && handler[handlerKey];
             if (handler && !computeHandler) {
                 computeHandler = handler[handlerKey] = function () {
@@ -1358,7 +1397,7 @@ define('can-compute', function (require, exports, module) {
             }
             return addEventListener.call(internalCompute, ev, computeHandler);
         };
-        compute.unbind = compute.removeEventListener = function (ev, handler) {
+        compute.off = compute.unbind = compute.removeEventListener = function (ev, handler) {
             var computeHandler = handler && handler[handlerKey];
             if (computeHandler) {
                 delete handler[handlerKey];
@@ -1421,7 +1460,7 @@ define('can-util/js/is-plain-object/is-plain-object', function (require, exports
     }
     module.exports = isPlainObject;
 });
-/*can-define@0.7.13#can-define*/
+/*can-define@0.7.15#can-define*/
 define('can-define', function (require, exports, module) {
     'use strict';
     'format cjs';
@@ -2035,7 +2074,7 @@ define('can-util/js/make-array/make-array', function (require, exports, module) 
     }
     module.exports = makeArray;
 });
-/*can-construct@3.0.0-pre.7#can-construct*/
+/*can-construct@3.0.0-pre.8#can-construct*/
 define('can-construct', function (require, exports, module) {
     'use strict';
     var assign = require('can-util/js/assign/assign');
@@ -2176,7 +2215,7 @@ define('can-construct', function (require, exports, module) {
     };
     module.exports = namespace.Construct = Construct;
 });
-/*can-define@0.7.13#define-helpers/define-helpers*/
+/*can-define@0.7.15#define-helpers/define-helpers*/
 define('can-define/define-helpers/define-helpers', function (require, exports, module) {
     var assign = require('can-util/js/assign/assign');
     var CID = require('can-util/js/cid/cid');
@@ -2281,7 +2320,7 @@ define('can-define/define-helpers/define-helpers', function (require, exports, m
     };
     module.exports = defineHelpers;
 });
-/*can-define@0.7.13#map/map*/
+/*can-define@0.7.15#map/map*/
 define('can-define/map/map', function (require, exports, module) {
     var Construct = require('can-construct');
     var define = require('can-define');
@@ -2423,7 +2462,7 @@ define('can-define/map/map', function (require, exports, module) {
     DefineMap.prototype.each = DefineMap.prototype.forEach;
     module.exports = ns.DefineMap = DefineMap;
 });
-/*can-define@0.7.13#list/list*/
+/*can-define@0.7.15#list/list*/
 define('can-define/list/list', function (require, exports, module) {
     var Construct = require('can-construct');
     var define = require('can-define');
@@ -2730,6 +2769,10 @@ define('can-define/list/list', function (require, exports, module) {
         },
         enumerable: true
     });
+    var oldIsListLike = types.isListLike;
+    types.isListLike = function (obj) {
+        return obj instanceof DefineList || oldIsListLike.apply(this, arguments);
+    };
     DefineList.prototype.each = DefineList.prototype.forEach;
     DefineList.prototype.attr = function (prop, value) {
         console.warn('DefineMap::attr shouldn\'t be called');
