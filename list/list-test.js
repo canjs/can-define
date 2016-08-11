@@ -8,6 +8,7 @@ var define = require("can-define");
 var assign = require("can-util/js/assign/assign");
 var CID = require("can-util/js/cid/cid");
 var types = require("can-util/js/types/types");
+var stache = require("can-stache");
 
 QUnit.module("can-define/list/list");
 
@@ -318,6 +319,109 @@ test('list.map', function(){
 	QUnit.equal("It Worked!", newExtendedList.testMe(), 'Returns the same type of list.');
 });
 
+
+test('list.sort a simple list', function(){
+    var myList = new DefineList([
+	    "Marshall",
+	    "Austin",
+	    "Hyrum"
+    ]);
+
+	myList.sort();
+
+    equal(myList.length, 3);
+    equal(myList[0], "Austin");
+	equal(myList[1], "Hyrum");
+	equal(myList[2], "Marshall", "Basic list was properly sorted.");
+});
+
+test('list.sort a list of objects', function(){
+	var objList = new DefineList([
+		{id: 1, name: "Marshall"},
+		{id: 2, name: "Austin"},
+		{id: 3, name: "Hyrum"}
+	]);
+
+	objList.sort(function(a, b){
+		if (a.name < b.name) {
+			return -1;
+		} else if (a.name > b.name){
+			return 1;
+		} else {
+			return 0;
+		}
+	});
+
+	equal(objList.length, 3);
+	equal(objList[0].name, "Austin");
+	equal(objList[1].name, "Hyrum");
+	equal(objList[2].name, "Marshall", "List of objects was properly sorted.");
+});
+
+test('list.sort a list of DefineMaps', function(){
+	var Account = DefineMap.extend({
+		name: "string",
+		amount: "number",
+		slug: {
+			serialize: true,
+			get: function(){
+				return this.name.toLowerCase().replace(/ /g,'-').replace(/[^\w-]+/g,'');
+			}
+		}
+	});
+	Account.List = DefineList.extend({
+	  "*": Account,
+	  limit: "number",
+	  skip: "number",
+	  total: "number"
+	});
+
+	var accounts = new Account.List([
+		{
+			name: "Savings",
+			amount: 20.00
+		},
+		{
+			name: "Checking",
+			amount: 103.24
+		},
+		{
+			name: "Kids Savings",
+			amount: 48155.13
+		}
+	]);
+	accounts.limit = 3;
+
+	var template = stache('{{#each accounts}}{{name}},{{/each}}')({accounts: accounts});
+	equal(template.textContent, "Savings,Checking,Kids Savings,", "template rendered properly.");
+
+	accounts.sort(function(a, b){
+		if (a.name < b.name) {
+			return -1;
+		} else if (a.name > b.name){
+			return 1;
+		} else {
+			return 0;
+		}
+	});
+	equal(accounts.length, 3);
+	equal(template.textContent, "Checking,Kids Savings,Savings,", "template updated properly.");
+
+	// Try sorting in reverse on the dynamic `slug` property
+	accounts.sort(function(a, b){
+		if (a.slug < b.slug) {
+			return 1;
+		} else if (a.slug > b.slug){
+			return -1;
+		} else {
+			return 0;
+		}
+	});
+
+	equal(accounts.length, 3);
+	equal(accounts.limit, 3, "expandos still present after sorting/replacing.");
+	equal(template.textContent, "Savings,Kids Savings,Checking,", "template updated properly.");
+});
 
 test("list defines", 6, function(){
     var Todo = function(props){
