@@ -8,6 +8,7 @@ var define = require("can-define");
 var assign = require("can-util/js/assign/assign");
 var CID = require("can-util/js/cid/cid");
 var types = require("can-util/js/types/types");
+var stache = require("can-stache");
 
 QUnit.module("can-define/list/list");
 
@@ -389,6 +390,11 @@ test('list.sort a list of DefineMaps', function(){
 			amount: 48155.13
 		}
 	]);
+	accounts.limit = 3;
+
+	var template = stache('{{#each accounts}}{{name}},{{/each}}')({accounts: accounts});
+	equal(template.textContent, "Savings,Checking,Kids Savings,", "template rendered properly.");
+
 	accounts.sort(function(a, b){
 		if (a.name < b.name) {
 			return -1;
@@ -399,9 +405,7 @@ test('list.sort a list of DefineMaps', function(){
 		}
 	});
 	equal(accounts.length, 3);
-	equal(accounts[0].name, "Checking");
-	equal(accounts[1].name, "Kids Savings");
-	equal(accounts[2].name, "Savings", "List of DefineMaps was properly sorted.");
+	equal(template.textContent, "Checking,Kids Savings,Savings,", "template updated properly.");
 
 	// Try sorting in reverse on the dynamic `slug` property
 	accounts.sort(function(a, b){
@@ -415,9 +419,8 @@ test('list.sort a list of DefineMaps', function(){
 	});
 
 	equal(accounts.length, 3);
-	equal(accounts[0].name, "Savings");
-	equal(accounts[1].name, "Kids Savings");
-	equal(accounts[2].name, "Checking", "List of DefineMaps was properly sorted by a dynamic property.");
+	equal(accounts.limit, 3, "expandos still present after sorting/replacing.");
+	equal(template.textContent, "Savings,Kids Savings,Checking,", "template updated properly.");
 });
 
 test("list defines", 6, function(){

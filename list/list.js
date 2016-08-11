@@ -992,7 +992,7 @@ assign(DefineList.prototype, {
      */
     sort: function(compareFunction) {
         Array.prototype.sort.call(this, compareFunction);
-        return this;
+        return this.replace(this.get());
     }
 });
 
