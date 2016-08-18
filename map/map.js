@@ -151,7 +151,7 @@ var DefineMap = Construct.extend("DefineMap",{
      */
     get: function(prop){
         if(arguments.length) {
-            if(prop in this) {
+            if(prop in this || Object.isSealed(this)) {
                 return this[prop];
             } else {
                 Observation.add(this, prop);
