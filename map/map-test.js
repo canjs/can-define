@@ -81,7 +81,7 @@ QUnit.test("get and set can setup expandos", function(){
             QUnit.equal(newVal, "bar", "updated to bar");
         }
     });
-    oi.getValueAndBind();
+    oi.start();
 
     map.set("foo","bar");
 
@@ -144,7 +144,7 @@ QUnit.test("serialize responds to added props", function(){
             QUnit.deepEqual(newVal, {a: 1, b: 2}, "updated right");
         }
     });
-    oi.getValueAndBind();
+    oi.start();
 
     map.set({a: 1, b: 2});
 });
@@ -165,7 +165,7 @@ QUnit.test("creating a new key doesn't cause two changes", 1, function(){
             QUnit.deepEqual(newVal, {a: 1}, "updated right");
         }
     });
-    oi.getValueAndBind();
+    oi.start();
 
     map.set("a", 1);
 });
@@ -231,4 +231,15 @@ QUnit.test("serialize: function works (#38)", function(){
 QUnit.test("isMapLike", function(){
     var map = new DefineMap({});
     ok(canTypes.isMapLike(map), "is map like");
+});
+
+QUnit.test("get will not create properties", function(){
+    var method = function(){};
+    var MyMap = DefineMap.extend({
+        method: method
+    });
+    var m = new MyMap();
+    m.get("foo");
+
+    QUnit.equal(m.get("method"), method);
 });

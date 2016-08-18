@@ -136,8 +136,7 @@ var DefineMap = Construct.extend("DefineMap",{
      *
      * @signature `map.get(propName)`
      *
-     * Get a single property on a DefineMap instance.  If the property is not previously defined and
-     * the object is not [can-define/map/map.seal sealed], it will be dynamically added.
+     * Get a single property on a DefineMap instance.
      *
      * `.get(propName)` only should be used when reading properties that might not have been defined yet, but
      * will be later via [can-define/map/map.prototype.set].
@@ -152,8 +151,13 @@ var DefineMap = Construct.extend("DefineMap",{
      */
     get: function(prop){
         if(arguments.length) {
-            defineHelpers.defineExpando(this, prop);
-            return this[prop];
+            if(prop in this) {
+                return this[prop];
+            } else {
+                Observation.add(this, prop);
+                return this[prop];
+            }
+
         } else {
             return defineHelpers.serialize(this, 'get', {});
         }
