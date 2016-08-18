@@ -244,7 +244,7 @@ test("slice and join are observable by a compute (#1884)", function(){
 			deepEqual(newVal.get(), [2], "got a new DefineList");
 		}
 	});
-	sliced.getValueAndBind();
+	sliced.start();
 
 	var joined = new Observation(function(){
 		return list.join(",");
@@ -253,7 +253,7 @@ test("slice and join are observable by a compute (#1884)", function(){
 			equal(newVal, "2,3", "joined is observable");
 		}
 	});
-	joined.getValueAndBind();
+	joined.start();
 
 
 	list.shift();
