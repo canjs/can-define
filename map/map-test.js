@@ -2,7 +2,6 @@
 var QUnit = require("steal-qunit");
 var DefineMap = require("can-define/map/map");
 var Observation = require("can-observation");
-var canTypes = require("can-util/js/types/types");
 
 QUnit.module("can-define/map/map");
 
@@ -226,9 +225,4 @@ QUnit.test("serialize: function works (#38)", function(){
     var myMap2 = new MyMap2({foo: 1, bar: 2});
     QUnit.deepEqual( myMap2.serialize(), {foo: "1", bar: "2"}, "serialize: function on default works");
 
-});
-
-QUnit.test("isMapLike", function(){
-    var map = new DefineMap({});
-    ok(canTypes.isMapLike(map), "is map like");
 });
