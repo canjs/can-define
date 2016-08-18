@@ -680,7 +680,7 @@ define('can-event/batch/batch', function (require, exports, module) {
     };
     module.exports = namespace.batch = canBatch;
 });
-/*can-observation@3.0.0-pre.6#can-observation*/
+/*can-observation@3.0.0-pre.7#can-observation*/
 define('can-observation', function (require, exports, module) {
     require('can-event');
     var canBatch = require('can-event/batch/batch');
@@ -706,7 +706,7 @@ define('can-observation', function (require, exports, module) {
             if (this.bound) {
                 var recordingObservation = Observation.isRecording();
                 if (recordingObservation && this.getDepth() >= recordingObservation.getDepth()) {
-                    Observation.updateUntil(this);
+                    Observation.updateUntil(this.getPrimaryDepth(), this.getDepth());
                 }
                 return this.value;
             } else {
@@ -833,18 +833,18 @@ define('can-observation', function (require, exports, module) {
         primary.current = Math.min(depth, primary.current);
         primary.max = Math.max(depth, primary.max);
     };
-    Observation.updateUntil = function (observation) {
+    Observation.updateUntil = function (primaryDepth, depth) {
         var cur;
         while (true) {
-            if (curPrimaryDepth <= maxPrimaryDepth) {
+            if (curPrimaryDepth <= maxPrimaryDepth && curPrimaryDepth <= primaryDepth) {
                 var primary = updateOrder[curPrimaryDepth];
                 if (primary && primary.current <= primary.max) {
+                    if (primary.current > depth) {
+                        return;
+                    }
                     var last = primary.observations[primary.current];
                     if (last && (cur = last.pop())) {
                         cur.updateCompute(currentBatchNum);
-                        if (cur === observation) {
-                            return;
-                        }
                     } else {
                         primary.current++;
                     }
@@ -1460,7 +1460,7 @@ define('can-util/js/is-plain-object/is-plain-object', function (require, exports
     }
     module.exports = isPlainObject;
 });
-/*can-define@0.7.16#can-define*/
+/*can-define@0.7.17#can-define*/
 define('can-define', function (require, exports, module) {
     'use strict';
     'format cjs';
@@ -2215,7 +2215,7 @@ define('can-construct', function (require, exports, module) {
     };
     module.exports = namespace.Construct = Construct;
 });
-/*can-define@0.7.16#define-helpers/define-helpers*/
+/*can-define@0.7.17#define-helpers/define-helpers*/
 define('can-define/define-helpers/define-helpers', function (require, exports, module) {
     var assign = require('can-util/js/assign/assign');
     var CID = require('can-util/js/cid/cid');
@@ -2320,7 +2320,7 @@ define('can-define/define-helpers/define-helpers', function (require, exports, m
     };
     module.exports = defineHelpers;
 });
-/*can-define@0.7.16#map/map*/
+/*can-define@0.7.17#map/map*/
 define('can-define/map/map', function (require, exports, module) {
     var Construct = require('can-construct');
     var define = require('can-define');
@@ -2460,9 +2460,13 @@ define('can-define/map/map', function (require, exports, module) {
         return this.get();
     };
     DefineMap.prototype.each = DefineMap.prototype.forEach;
+    var oldIsMapLike = types.isMapLike;
+    types.isMapLike = function (obj) {
+        return obj instanceof DefineMap || oldIsMapLike.apply(this, arguments);
+    };
     module.exports = ns.DefineMap = DefineMap;
 });
-/*can-define@0.7.16#list/list*/
+/*can-define@0.7.17#list/list*/
 define('can-define/list/list', function (require, exports, module) {
     var Construct = require('can-construct');
     var define = require('can-define');
@@ -2748,6 +2752,10 @@ define('can-define/list/list', function (require, exports, module) {
                 mappedList.push(mapped);
             });
             return new this.constructor(mappedList);
+        },
+        sort: function (compareFunction) {
+            Array.prototype.sort.call(this, compareFunction);
+            return this.replace(this.get());
         }
     });
     for (var prop in define.eventsProto) {
