@@ -51,7 +51,7 @@ var setProps = function(props, remove) {
             }
             return;
         }
-        if( typeof curVal !== "object" ) {
+        if( typeof curVal !== "object" || curVal === null ) {
             self.set(prop, newVal);
         }
         else if( ("set" in curVal) && isPlainObject(newVal) ) {
