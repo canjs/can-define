@@ -107,7 +107,7 @@
 	eval("(function() { " + __$source__ + " \n }).call(__$global__);");
 }
 )
-/*can-util@3.0.0-pre.32#dom/events/events*/
+/*can-util@3.0.0-pre.34#dom/events/events*/
 define('can-util/dom/events/events', function (require, exports, module) {
     module.exports = {
         addEventListener: function () {
@@ -121,7 +121,7 @@ define('can-util/dom/events/events', function (require, exports, module) {
         }
     };
 });
-/*can-util@3.0.0-pre.32#js/cid/cid*/
+/*can-util@3.0.0-pre.34#js/cid/cid*/
 define('can-util/js/cid/cid', function (require, exports, module) {
     var cid = 0;
     module.exports = function (object, name) {
@@ -132,7 +132,7 @@ define('can-util/js/cid/cid', function (require, exports, module) {
         return object._cid;
     };
 });
-/*can-util@3.0.0-pre.32#js/is-empty-object/is-empty-object*/
+/*can-util@3.0.0-pre.34#js/is-empty-object/is-empty-object*/
 define('can-util/js/is-empty-object/is-empty-object', function (require, exports, module) {
     module.exports = function (obj) {
         for (var prop in obj) {
@@ -141,7 +141,7 @@ define('can-util/js/is-empty-object/is-empty-object', function (require, exports
         return true;
     };
 });
-/*can-util@3.0.0-pre.32#js/assign/assign*/
+/*can-util@3.0.0-pre.34#js/assign/assign*/
 define('can-util/js/assign/assign', function (require, exports, module) {
     module.exports = function (d, s) {
         for (var prop in s) {
@@ -150,7 +150,7 @@ define('can-util/js/assign/assign', function (require, exports, module) {
         return d;
     };
 });
-/*can-util@3.0.0-pre.32#js/global/global*/
+/*can-util@3.0.0-pre.34#js/global/global*/
 define('can-util/js/global/global', function (require, exports, module) {
     (function (global) {
         module.exports = function () {
@@ -160,7 +160,7 @@ define('can-util/js/global/global', function (require, exports, module) {
         return this;
     }()));
 });
-/*can-util@3.0.0-pre.32#dom/document/document*/
+/*can-util@3.0.0-pre.34#dom/document/document*/
 define('can-util/dom/document/document', function (require, exports, module) {
     (function (global) {
         var global = require('can-util/js/global/global');
@@ -175,7 +175,7 @@ define('can-util/dom/document/document', function (require, exports, module) {
         return this;
     }()));
 });
-/*can-util@3.0.0-pre.32#dom/dispatch/dispatch*/
+/*can-util@3.0.0-pre.34#dom/dispatch/dispatch*/
 define('can-util/dom/dispatch/dispatch', function (require, exports, module) {
     var assign = require('can-util/js/assign/assign');
     var _document = require('can-util/dom/document/document');
@@ -191,11 +191,11 @@ define('can-util/dom/dispatch/dispatch', function (require, exports, module) {
         return this.dispatchEvent(ev);
     };
 });
-/*can-util@3.0.0-pre.32#namespace*/
+/*can-util@3.0.0-pre.34#namespace*/
 define('can-util/namespace', function (require, exports, module) {
     module.exports = {};
 });
-/*can-util@3.0.0-pre.32#dom/data/data*/
+/*can-util@3.0.0-pre.34#dom/data/data*/
 define('can-util/dom/data/data', function (require, exports, module) {
     var isEmptyObject = require('can-util/js/is-empty-object/is-empty-object');
     var data = {};
@@ -230,7 +230,7 @@ define('can-util/dom/data/data', function (require, exports, module) {
         set: setData
     };
 });
-/*can-util@3.0.0-pre.32#dom/matches/matches*/
+/*can-util@3.0.0-pre.34#dom/matches/matches*/
 define('can-util/dom/matches/matches', function (require, exports, module) {
     var matchesMethod = function (element) {
         return element.matches || element.webkitMatchesSelector || element.webkitMatchesSelector || element.mozMatchesSelector || element.msMatchesSelector || element.oMatchesSelector;
@@ -240,7 +240,7 @@ define('can-util/dom/matches/matches', function (require, exports, module) {
         return method ? method.apply(this, arguments) : false;
     };
 });
-/*can-util@3.0.0-pre.32#js/is-array-like/is-array-like*/
+/*can-util@3.0.0-pre.34#js/is-array-like/is-array-like*/
 define('can-util/js/is-array-like/is-array-like', function (require, exports, module) {
     function isArrayLike(obj) {
         var type = typeof obj;
@@ -252,7 +252,7 @@ define('can-util/js/is-array-like/is-array-like', function (require, exports, mo
     }
     module.exports = isArrayLike;
 });
-/*can-util@3.0.0-pre.32#js/each/each*/
+/*can-util@3.0.0-pre.34#js/each/each*/
 define('can-util/js/each/each', function (require, exports, module) {
     var isArrayLike = require('can-util/js/is-array-like/is-array-like');
     var has = Object.prototype.hasOwnProperty;
@@ -278,7 +278,7 @@ define('can-util/js/each/each', function (require, exports, module) {
     }
     module.exports = each;
 });
-/*can-util@3.0.0-pre.32#dom/events/delegate/delegate*/
+/*can-util@3.0.0-pre.34#dom/events/delegate/delegate*/
 define('can-util/dom/events/delegate/delegate', function (require, exports, module) {
     var domEvents = require('can-util/dom/events/events');
     var domData = require('can-util/dom/data/data');
@@ -558,7 +558,7 @@ define('can-event/lifecycle/lifecycle', function (require, exports, module) {
         }
     };
 });
-/*can-util@3.0.0-pre.32#js/last/last*/
+/*can-util@3.0.0-pre.34#js/last/last*/
 define('can-util/js/last/last', function (require, exports, module) {
     module.exports = function (arr) {
         return arr && arr[arr.length - 1];
@@ -680,7 +680,7 @@ define('can-event/batch/batch', function (require, exports, module) {
     };
     module.exports = namespace.batch = canBatch;
 });
-/*can-observation@3.0.0-pre.7#can-observation*/
+/*can-observation@3.0.0-pre.8#can-observation*/
 define('can-observation', function (require, exports, module) {
     require('can-event');
     var canBatch = require('can-event/batch/batch');
@@ -957,13 +957,13 @@ define('can-observation', function (require, exports, module) {
     canBatch._onDispatchedEvents = Observation.batchEnd;
     module.exports = namespace.Observation = Observation;
 });
-/*can-util@3.0.0-pre.32#js/is-promise/is-promise*/
+/*can-util@3.0.0-pre.34#js/is-promise/is-promise*/
 define('can-util/js/is-promise/is-promise', function (require, exports, module) {
     module.exports = function (obj) {
         return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
     };
 });
-/*can-util@3.0.0-pre.32#js/types/types*/
+/*can-util@3.0.0-pre.34#js/types/types*/
 define('can-util/js/types/types', function (require, exports, module) {
     var isPromise = require('can-util/js/is-promise/is-promise');
     var types = {
@@ -992,17 +992,304 @@ define('can-util/js/types/types', function (require, exports, module) {
             return obj && obj.isComputed;
         },
         DefaultMap: null,
-        DefaultList: null
+        DefaultList: null,
+        wrapElement: function (element) {
+            return element;
+        },
+        unwrapElement: function (element) {
+            return element;
+        }
     };
     module.exports = types;
 });
-/*can-util@3.0.0-pre.32#js/is-array/is-array*/
+/*can-util@3.0.0-pre.34#js/dev/dev*/
+define('can-util/js/dev/dev', function (require, exports, module) {
+});
+/*can-observation@3.0.0-pre.8#reader/reader*/
+define('can-observation/reader/reader', function (require, exports, module) {
+    var Observation = require('can-observation');
+    var assign = require('can-util/js/assign/assign');
+    var CID = require('can-util/js/cid/cid');
+    var types = require('can-util/js/types/types');
+    var dev = require('can-util/js/dev/dev');
+    var canEvent = require('can-event');
+    var each = require('can-util/js/each/each');
+    var observeReader;
+    var isAt = function (index, reads) {
+        var prevRead = reads[index - 1];
+        return prevRead && prevRead.at;
+    };
+    var readValue = function (value, index, reads, options, state, prev) {
+        var usedValueReader;
+        do {
+            usedValueReader = false;
+            for (var i = 0, len = observeReader.valueReaders.length; i < len; i++) {
+                if (observeReader.valueReaders[i].test(value, index, reads, options)) {
+                    value = observeReader.valueReaders[i].read(value, index, reads, options, state, prev);
+                }
+            }
+        } while (usedValueReader);
+        return value;
+    };
+    var specialRead = {
+        index: true,
+        key: true,
+        event: true,
+        element: true,
+        viewModel: true
+    };
+    var checkForObservableAndNotify = function (options, state, getObserves, value, index) {
+        if (options.foundObservable && !state.foundObservable) {
+            if (Observation.trapsCount()) {
+                Observation.addAll(getObserves());
+                options.foundObservable(value, index);
+                state.foundObservable = true;
+            }
+        }
+    };
+    observeReader = {
+        read: function (parent, reads, options) {
+            options = options || {};
+            var state = { foundObservable: false };
+            var getObserves;
+            if (options.foundObservable) {
+                getObserves = Observation.trap();
+            }
+            var cur = readValue(parent, 0, reads, options, state), type, prev, readLength = reads.length, i = 0, last;
+            checkForObservableAndNotify(options, state, getObserves, parent, 0);
+            while (i < readLength) {
+                prev = cur;
+                for (var r = 0, readersLength = observeReader.propertyReaders.length; r < readersLength; r++) {
+                    var reader = observeReader.propertyReaders[r];
+                    if (reader.test(cur)) {
+                        cur = reader.read(cur, reads[i], i, options, state);
+                        break;
+                    }
+                }
+                checkForObservableAndNotify(options, state, getObserves, prev, i);
+                last = cur;
+                i = i + 1;
+                cur = readValue(cur, i, reads, options, state, prev);
+                checkForObservableAndNotify(options, state, getObserves, prev, i - 1);
+                type = typeof cur;
+                if (i < reads.length && (cur === null || type !== 'function' && type !== 'object')) {
+                    if (options.earlyExit) {
+                        options.earlyExit(prev, i - 1, cur);
+                    }
+                    return {
+                        value: undefined,
+                        parent: prev
+                    };
+                }
+            }
+            if (cur === undefined) {
+                if (options.earlyExit) {
+                    options.earlyExit(prev, i - 1);
+                }
+            }
+            return {
+                value: cur,
+                parent: prev
+            };
+        },
+        get: function (parent, reads, options) {
+            return observeReader.read(parent, observeReader.reads(reads), options || {}).value;
+        },
+        valueReadersMap: {},
+        valueReaders: [
+            {
+                name: 'function',
+                test: function (value, i, reads, options) {
+                    return types.isCallableForValue(value) && !types.isCompute(value);
+                },
+                read: function (value, i, reads, options, state, prev) {
+                    if (isAt(i, reads)) {
+                        return i === reads.length ? value.bind(prev) : value;
+                    } else if (options.callMethodsOnObservables && types.isMapLike(prev)) {
+                        return value.apply(prev, options.args || []);
+                    } else if (options.isArgument && i === reads.length) {
+                        return options.proxyMethods !== false ? value.bind(prev) : value;
+                    }
+                    return value.apply(prev, options.args || []);
+                }
+            },
+            {
+                name: 'compute',
+                test: function (value, i, reads, options) {
+                    return types.isCompute(value) && !isAt(i, reads);
+                },
+                read: function (value, i, reads, options, state) {
+                    if (options.readCompute === false && i === reads.length) {
+                        return value;
+                    }
+                    return value.get ? value.get() : value();
+                },
+                write: function (base, newVal) {
+                    if (base.set) {
+                        base.set(newVal);
+                    } else {
+                        base(newVal);
+                    }
+                }
+            }
+        ],
+        propertyReadersMap: {},
+        propertyReaders: [
+            {
+                name: 'map',
+                test: function () {
+                    return types.isMapLike.apply(this, arguments) || types.isListLike.apply(this, arguments);
+                },
+                read: function (value, prop, index, options, state) {
+                    var res = value['get' in value ? 'get' : 'attr'](prop.key);
+                    if (res !== undefined) {
+                        return res;
+                    } else {
+                        return value[prop.key];
+                    }
+                },
+                write: function (base, prop, newVal) {
+                    if (base.set) {
+                        base.set(prop, newVal);
+                    } else {
+                        base.attr(prop, newVal);
+                    }
+                }
+            },
+            {
+                name: 'promise',
+                test: function (value) {
+                    return types.isPromise(value);
+                },
+                read: function (value, prop, index, options, state) {
+                    var observeData = value.__observeData;
+                    if (!value.__observeData) {
+                        observeData = value.__observeData = {
+                            isPending: true,
+                            state: 'pending',
+                            isResolved: false,
+                            isRejected: false,
+                            value: undefined,
+                            reason: undefined
+                        };
+                        CID(observeData);
+                        assign(observeData, canEvent);
+                        value.then(function (value) {
+                            observeData.isPending = false;
+                            observeData.isResolved = true;
+                            observeData.value = value;
+                            observeData.state = 'resolved';
+                            observeData.dispatch('state', [
+                                'resolved',
+                                'pending'
+                            ]);
+                        }, function (reason) {
+                            observeData.isPending = false;
+                            observeData.isRejected = true;
+                            observeData.reason = reason;
+                            observeData.state = 'rejected';
+                            observeData.dispatch('state', [
+                                'rejected',
+                                'pending'
+                            ]);
+                        });
+                    }
+                    Observation.add(observeData, 'state');
+                    return prop.key in observeData ? observeData[prop.key] : value[prop.key];
+                }
+            },
+            {
+                name: 'object',
+                test: function () {
+                    return true;
+                },
+                read: function (value, prop) {
+                    if (value == null) {
+                        return undefined;
+                    } else {
+                        if (typeof value === 'object') {
+                            if (prop.key in value) {
+                                return value[prop.key];
+                            } else if (prop.at && specialRead[prop.key] && '@' + prop.key in value) {
+                                return value['@' + prop.key];
+                            }
+                        } else {
+                            return value[prop.key];
+                        }
+                    }
+                },
+                write: function (base, prop, newVal) {
+                    base[prop] = newVal;
+                }
+            }
+        ],
+        reads: function (key) {
+            var keys = [];
+            var last = 0;
+            var at = false;
+            if (key.charAt(0) === '@') {
+                last = 1;
+                at = true;
+            }
+            var keyToAdd = '';
+            for (var i = last; i < key.length; i++) {
+                var character = key.charAt(i);
+                if (character === '.' || character === '@') {
+                    if (key.charAt(i - 1) !== '\\') {
+                        keys.push({
+                            key: keyToAdd,
+                            at: at
+                        });
+                        at = character === '@';
+                        keyToAdd = '';
+                    } else {
+                        keyToAdd = keyToAdd.substr(0, keyToAdd.length - 1) + '.';
+                    }
+                } else {
+                    keyToAdd += character;
+                }
+            }
+            keys.push({
+                key: keyToAdd,
+                at: at
+            });
+            return keys;
+        },
+        write: function (parent, key, value, options) {
+            var keys = observeReader.reads(key);
+            var last;
+            if (keys.length > 1) {
+                last = keys.pop();
+                parent = observeReader.read(parent, keys, options).value;
+                keys.push(last);
+            } else {
+                last = keys[0];
+            }
+            if (observeReader.propertyReadersMap.map.test(parent)) {
+                observeReader.propertyReadersMap.map.write(parent, last.key, value, options);
+            } else if (observeReader.valueReadersMap.compute.test(parent[last.key], keys.length - 1, keys, options)) {
+                observeReader.valueReadersMap.compute.write(parent[last.key], value, options);
+            } else if (observeReader.propertyReadersMap.object.test(parent)) {
+                observeReader.propertyReadersMap.object.write(parent, last.key, value, options);
+            }
+        }
+    };
+    each(observeReader.propertyReaders, function (reader) {
+        observeReader.propertyReadersMap[reader.name] = reader;
+    });
+    each(observeReader.valueReaders, function (reader) {
+        observeReader.valueReadersMap[reader.name] = reader;
+    });
+    observeReader.set = observeReader.write;
+    module.exports = observeReader;
+});
+/*can-util@3.0.0-pre.34#js/is-array/is-array*/
 define('can-util/js/is-array/is-array', function (require, exports, module) {
     module.exports = function (arr) {
         return Array.isArray(arr);
     };
 });
-/*can-util@3.0.0-pre.32#js/string/string*/
+/*can-util@3.0.0-pre.34#js/string/string*/
 define('can-util/js/string/string', function (require, exports, module) {
     var isArray = require('can-util/js/is-array/is-array');
     var strUndHash = /_|-/, strColons = /\=\=/, strWords = /([A-Z]+)([A-Z][a-z])/g, strLowUp = /([a-z\d])([A-Z])/g, strDash = /([a-z\d])([A-Z])/g, strReplacer = /\{([^\}]+)\}/g, strQuote = /"/g, strSingleQuote = /'/g, strHyphenMatch = /-+(.)?/g, strCamelMatch = /[a-z][A-Z]/g, getNext = function (obj, prop, add) {
@@ -1088,12 +1375,13 @@ define('can-util/js/string/string', function (require, exports, module) {
     };
     module.exports = string;
 });
-/*can-compute@3.0.0-pre.10#proto-compute*/
+/*can-compute@3.0.0-pre.11#proto-compute*/
 define('can-compute/proto-compute', function (require, exports, module) {
     var Observation = require('can-observation');
     var canEvent = require('can-event');
     var eventLifecycle = require('can-event/lifecycle/lifecycle');
     var canBatch = require('can-event/batch/batch');
+    var observeReader = require('can-observation/reader/reader');
     var CID = require('can-util/js/cid/cid');
     var assign = require('can-util/js/assign/assign');
     var types = require('can-util/js/types/types');
@@ -1110,7 +1398,20 @@ define('can-compute/proto-compute', function (require, exports, module) {
             this._setupGetterSetterFn(args[0], args[1], args[2], args[3]);
         } else if (args[1]) {
             if (contextType === 'string') {
-                this._setupProperty(args[0], args[1], args[2]);
+                if (types.isMapLike(args[0])) {
+                    var map = args[0];
+                    var propertyName = args[1];
+                    var mapGetterSetter = function (newValue) {
+                        if (arguments.length) {
+                            observeReader.set(map, propertyName, newValue);
+                        } else {
+                            return observeReader.get(map, propertyName);
+                        }
+                    };
+                    this._setupGetterSetterFn(mapGetterSetter, args[1], args[2], args[3]);
+                } else {
+                    this._setupProperty(args[0], args[1], args[2]);
+                }
             } else if (contextType === 'function') {
                 this._setupSetter(args[0], args[1], args[2]);
             } else {
@@ -1168,30 +1469,17 @@ define('can-compute/proto-compute', function (require, exports, module) {
             assign(this, handlers);
         },
         _setupProperty: function (target, propertyName, eventName) {
-            var isObserve = types.isMapLike(target), self = this, handler;
-            if (isObserve) {
-                handler = function (ev, newVal, oldVal) {
-                    self.updater(newVal, oldVal, ev.batchNum);
-                };
-                this.hasDependencies = true;
-                this._get = function () {
-                    return target.attr(propertyName);
-                };
-                this._set = function (val) {
-                    target.attr(propertyName, val);
-                };
-            } else {
-                handler = function () {
-                    self.updater(self._get(), self.value);
-                };
-                this._get = function () {
-                    return string.getObject(propertyName, [target]);
-                };
-                this._set = function (value) {
-                    var properties = propertyName.split('.'), leafPropertyName = properties.pop(), targetProperty = string.getObject(properties.join('.'), [target]);
-                    targetProperty[leafPropertyName] = value;
-                };
-            }
+            var self = this, handler;
+            handler = function () {
+                self.updater(self._get(), self.value);
+            };
+            this._get = function () {
+                return string.getObject(propertyName, [target]);
+            };
+            this._set = function (value) {
+                var properties = propertyName.split('.'), leafPropertyName = properties.pop(), targetProperty = string.getObject(properties.join('.'), [target]);
+                targetProperty[leafPropertyName] = value;
+            };
             this._on = function (update) {
                 canEvent.addEventListener.call(target, eventName || propertyName, handler);
                 this.value = this._get();
@@ -1369,7 +1657,7 @@ define('can-compute/proto-compute', function (require, exports, module) {
     };
     module.exports = exports = Compute;
 });
-/*can-compute@3.0.0-pre.10#can-compute*/
+/*can-compute@3.0.0-pre.11#can-compute*/
 define('can-compute', function (require, exports, module) {
     require('can-event');
     require('can-event/batch/batch');
@@ -1433,10 +1721,7 @@ define('can-compute', function (require, exports, module) {
     COMPUTE.temporarilyBind = Compute.temporarilyBind;
     module.exports = namespace.compute = COMPUTE;
 });
-/*can-util@3.0.0-pre.32#js/dev/dev*/
-define('can-util/js/dev/dev', function (require, exports, module) {
-});
-/*can-util@3.0.0-pre.32#js/is-plain-object/is-plain-object*/
+/*can-util@3.0.0-pre.34#js/is-plain-object/is-plain-object*/
 define('can-util/js/is-plain-object/is-plain-object', function (require, exports, module) {
     var core_hasOwn = Object.prototype.hasOwnProperty;
     function isWindow(obj) {
@@ -1460,7 +1745,7 @@ define('can-util/js/is-plain-object/is-plain-object', function (require, exports
     }
     module.exports = isPlainObject;
 });
-/*can-define@0.7.20#can-define*/
+/*can-define@0.7.22#can-define*/
 define('can-define', function (require, exports, module) {
     'use strict';
     'format cjs';
@@ -2008,7 +2293,7 @@ define('can-define', function (require, exports, module) {
         }
     };
 });
-/*can-util@3.0.0-pre.32#js/is-function/is-function*/
+/*can-util@3.0.0-pre.34#js/is-function/is-function*/
 define('can-util/js/is-function/is-function', function (require, exports, module) {
     var isFunction = function () {
         if (typeof document !== 'undefined' && typeof document.getElementsByTagName('body') === 'function') {
@@ -2022,7 +2307,7 @@ define('can-util/js/is-function/is-function', function (require, exports, module
     }();
     module.exports = isFunction;
 });
-/*can-util@3.0.0-pre.32#js/deep-assign/deep-assign*/
+/*can-util@3.0.0-pre.34#js/deep-assign/deep-assign*/
 define('can-util/js/deep-assign/deep-assign', function (require, exports, module) {
     var isArray = require('can-util/js/is-array/is-array');
     var isFunction = require('can-util/js/is-function/is-function');
@@ -2062,7 +2347,7 @@ define('can-util/js/deep-assign/deep-assign', function (require, exports, module
     }
     module.exports = deepAssign;
 });
-/*can-util@3.0.0-pre.32#js/make-array/make-array*/
+/*can-util@3.0.0-pre.34#js/make-array/make-array*/
 define('can-util/js/make-array/make-array', function (require, exports, module) {
     var each = require('can-util/js/each/each');
     function makeArray(arr) {
@@ -2215,7 +2500,7 @@ define('can-construct', function (require, exports, module) {
     };
     module.exports = namespace.Construct = Construct;
 });
-/*can-define@0.7.20#define-helpers/define-helpers*/
+/*can-define@0.7.22#define-helpers/define-helpers*/
 define('can-define/define-helpers/define-helpers', function (require, exports, module) {
     var assign = require('can-util/js/assign/assign');
     var CID = require('can-util/js/cid/cid');
@@ -2320,7 +2605,7 @@ define('can-define/define-helpers/define-helpers', function (require, exports, m
     };
     module.exports = defineHelpers;
 });
-/*can-define@0.7.20#map/map*/
+/*can-define@0.7.22#map/map*/
 define('can-define/map/map', function (require, exports, module) {
     var Construct = require('can-construct');
     var define = require('can-define');
@@ -2361,7 +2646,7 @@ define('can-define/map/map', function (require, exports, module) {
                 }
                 return;
             }
-            if (typeof curVal !== 'object') {
+            if (typeof curVal !== 'object' || curVal === null) {
                 self.set(prop, newVal);
             } else if ('set' in curVal && isPlainObject(newVal)) {
                 curVal.set(newVal, remove);
@@ -2470,7 +2755,7 @@ define('can-define/map/map', function (require, exports, module) {
     };
     module.exports = ns.DefineMap = DefineMap;
 });
-/*can-define@0.7.20#list/list*/
+/*can-define@0.7.22#list/list*/
 define('can-define/list/list', function (require, exports, module) {
     var Construct = require('can-construct');
     var define = require('can-define');
