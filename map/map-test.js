@@ -156,6 +156,13 @@ QUnit.test("initialize an undefined property", function(){
     equal(instance.foo, "bar");
 });
 
+QUnit.test("set an already initialized null property", function(){
+  var map = new DefineMap({ foo: null });
+  map.set({ foo: null });
+
+  equal(map.foo, null);
+});
+
 QUnit.test("creating a new key doesn't cause two changes", 1, function(){
     var map = new DefineMap();
     var oi = new Observation(function(){
