@@ -1745,7 +1745,7 @@ define('can-util/js/is-plain-object/is-plain-object', function (require, exports
     }
     module.exports = isPlainObject;
 });
-/*can-define@0.7.22#can-define*/
+/*can-define@0.7.23#can-define*/
 define('can-define', function (require, exports, module) {
     'use strict';
     'format cjs';
@@ -2500,7 +2500,7 @@ define('can-construct', function (require, exports, module) {
     };
     module.exports = namespace.Construct = Construct;
 });
-/*can-define@0.7.22#define-helpers/define-helpers*/
+/*can-define@0.7.23#define-helpers/define-helpers*/
 define('can-define/define-helpers/define-helpers', function (require, exports, module) {
     var assign = require('can-util/js/assign/assign');
     var CID = require('can-util/js/cid/cid');
@@ -2605,7 +2605,7 @@ define('can-define/define-helpers/define-helpers', function (require, exports, m
     };
     module.exports = defineHelpers;
 });
-/*can-define@0.7.22#map/map*/
+/*can-define@0.7.23#map/map*/
 define('can-define/map/map', function (require, exports, module) {
     var Construct = require('can-construct');
     var define = require('can-define');
@@ -2755,7 +2755,7 @@ define('can-define/map/map', function (require, exports, module) {
     };
     module.exports = ns.DefineMap = DefineMap;
 });
-/*can-define@0.7.22#list/list*/
+/*can-define@0.7.23#list/list*/
 define('can-define/list/list', function (require, exports, module) {
     var Construct = require('can-construct');
     var define = require('can-define');
