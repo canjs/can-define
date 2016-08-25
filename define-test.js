@@ -1163,3 +1163,85 @@ QUnit.test("logs work with maps", function(){
 	QUnit.equal(t.dependencies[0].obj, m);
 	QUnit.equal(t.dependencies[1].obj, m);
 });
+
+QUnit.test('Set property with type compute', function () {
+  var MyMap = define.Constructor({
+    computeProp: {
+      type: 'compute'
+    }
+  });
+
+  var m = new MyMap();
+
+  m.computeProp = compute(0);
+  equal(m.computeProp, 0, 'Property has correct value');
+
+  m.computeProp = compute(1);
+  equal(m.computeProp, 1, 'Property has correct value');
+});
+
+QUnit.test('Compute type property can have a default value', function () {
+  var MyMap = define.Constructor({
+    computeProp: {
+      type: 'compute',
+      value: function () {
+        return 0;
+      }
+    }
+  });
+
+  var m = new MyMap();
+  equal(m.computeProp, 0, 'Property has correct value');
+
+  m.computeProp = 1;
+  equal(m.computeProp, 1, 'Property has correct value');
+});
+
+QUnit.test('Compute type property can have a default value that is a compute', function () {
+  var c = compute(0)
+  var MyMap = define.Constructor({
+    computeProp: {
+      type: 'compute',
+      value: function () {
+        return c;
+      }
+    }
+  });
+
+  var m = new MyMap();
+  equal(m.computeProp, 0, 'Property has correct value');
+
+  c(1);
+  equal(m.computeProp, 1, 'Property has correct value');
+});
+
+QUnit.test('Extensions can modify definitions', function () {
+  var oldExtensions = define.extensions;
+
+  define.behaviors.push('extended');
+
+  define.extensions = function (objPrototype, prop, definition) {
+    if (definition.extended) {
+      return {
+        value: 'extended'
+      }
+    }
+  }
+
+  var MyMap = define.Constructor({
+    foo: {
+      value: 'defined',
+      extended: true,
+    },
+    bar: {
+      value: 'defined'
+    }
+  });
+
+  var map = new MyMap();
+
+  QUnit.equal(map.foo, 'extended', 'Value was set via extension');
+  QUnit.equal(map.bar, 'defined', 'Value was set via definition');
+
+  define.extensions = oldExtensions;
+});
