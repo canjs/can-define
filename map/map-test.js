@@ -1,8 +1,10 @@
 "use strict";
 var QUnit = require("steal-qunit");
+var define = require("can-define");
 var DefineMap = require("can-define/map/map");
 var Observation = require("can-observation");
 var canTypes = require("can-util/js/types/types");
+var each = require("can-util/js/each/each");
 
 QUnit.module("can-define/map/map");
 
@@ -249,4 +251,45 @@ QUnit.test("get will not create properties", function(){
     m.get("foo");
 
     QUnit.equal(m.get("method"), method);
+});
+
+QUnit.test("Properties are enumerable", function(){
+  QUnit.expect(4);
+
+  var VM = DefineMap.extend({
+    foo: "string"
+  });
+  var vm = new VM({ foo: "bar", baz: "qux" });
+
+  var i = 0;
+  each(vm, function(value, key){
+    if(i === 0) {
+      QUnit.equal(key, "foo");
+      QUnit.equal(value, "bar");
+    } else {
+      QUnit.equal(key, "baz");
+      QUnit.equal(value, "qux");
+    }
+    i++;
+  });
+});
+
+QUnit.test("Getters are not enumerable", function(){
+  QUnit.expect(2);
+
+  var MyMap = DefineMap.extend({
+    foo: "string",
+    baz: {
+      get: function(){
+        return this.foo;
+      }
+    }
+  });
+
+  var map = new MyMap({ foo: "bar" });
+
+  each(map, function(value, key){
+    QUnit.equal(key, "foo");
+    QUnit.equal(value, "bar");
+  });
 });

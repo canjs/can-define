@@ -24,6 +24,15 @@ var behaviors, eventsProto, getPropDefineBehavior, define,
 	make, makeDefinition, replaceWith, getDefinitionsAndMethods,
 	isDefineType, getDefinitionOrMethod;
 
+var defineConfigurableAndNotEnumerable = function(obj, prop, value) {
+	Object.defineProperty(obj, prop, {
+		configurable: true,
+		enumerable: false,
+		writable: true,
+		value: value
+	});
+};
+
 module.exports = define = ns.define = function(objPrototype, defines) {
 	// default property definitions on _data
 	var dataInitializers = {},
@@ -79,6 +88,14 @@ module.exports = define = ns.define = function(objPrototype, defines) {
 		configurable: true,
 		writable: true
 	});
+
+  // Places Symbol.iterator or @@iterator on the prototype
+  // so that this can be iterated with for/of and can-util/js/each/each
+  if(!objPrototype[types.iterator]) {
+    defineConfigurableAndNotEnumerable(objPrototype, types.iterator, function(){
+      return new define.Iterator(this);
+    });
+  }
 
 	return result;
 };
@@ -569,15 +586,6 @@ eventsProto.off = eventsProto.unbind = eventsProto.removeEventListener;
 
 delete eventsProto.one;
 
-var defineConfigurableAndNotEnumerable = function(obj, prop, value) {
-	Object.defineProperty(obj, prop, {
-		configurable: true,
-		enumerable: false,
-		writable: true,
-		value: value
-	});
-};
-
 define.setup = function(props, sealed) {
 	defineConfigurableAndNotEnumerable(this, "_cid");
 	defineConfigurableAndNotEnumerable(this, "__bindEvents", {});
@@ -591,7 +599,6 @@ define.setup = function(props, sealed) {
 		if(definitions[prop]) {
 			map[prop] = value;
 		} else {
-
 			var def = define.makeSimpleGetterSetter(prop);
 			instanceDefinitions[prop] = {};
 			Object.defineProperty(map, prop, def);
@@ -633,6 +640,42 @@ define.makeSimpleGetterSetter = function(prop){
 	return simpleGetterSetters[prop];
 };
 
+define.Iterator = function(obj){
+  this.obj = obj;
+  this.definitions = Object.keys(obj._define.definitions);
+  this.instanceDefinitions = obj._instanceDefinitions ?
+    Object.keys(obj._instanceDefinitions) :
+    Object.keys(obj);
+  this.hasGet = typeof obj.get === "function";
+};
+
+define.Iterator.prototype.next = function(){
+  var key;
+  if(this.definitions.length) {
+    key = this.definitions.shift();
+
+    // Getters should not be enumerable
+    var def = this.obj._define.definitions[key];
+    if(def.get) {
+      return this.next();
+    }
+  } else if(this.instanceDefinitions.length) {
+    key = this.instanceDefinitions.shift();
+  } else {
+    return {
+      value: undefined,
+      done: true
+    };
+  }
+
+  return {
+    value: [
+      key,
+      this.hasGet ? this.obj.get(key) : this.obj[key]
+    ],
+    done: false
+  };
+};
 
 isDefineType = function(func){
 	return func && func.canDefineType === true;
