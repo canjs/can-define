@@ -107,7 +107,7 @@
 	eval("(function() { " + __$source__ + " \n }).call(__$global__);");
 }
 )
-/*can-util@3.0.0-pre.34#dom/events/events*/
+/*can-util@3.0.0-pre.35#dom/events/events*/
 define('can-util/dom/events/events', function (require, exports, module) {
     module.exports = {
         addEventListener: function () {
@@ -121,7 +121,7 @@ define('can-util/dom/events/events', function (require, exports, module) {
         }
     };
 });
-/*can-util@3.0.0-pre.34#js/cid/cid*/
+/*can-util@3.0.0-pre.35#js/cid/cid*/
 define('can-util/js/cid/cid', function (require, exports, module) {
     var cid = 0;
     module.exports = function (object, name) {
@@ -132,7 +132,7 @@ define('can-util/js/cid/cid', function (require, exports, module) {
         return object._cid;
     };
 });
-/*can-util@3.0.0-pre.34#js/is-empty-object/is-empty-object*/
+/*can-util@3.0.0-pre.35#js/is-empty-object/is-empty-object*/
 define('can-util/js/is-empty-object/is-empty-object', function (require, exports, module) {
     module.exports = function (obj) {
         for (var prop in obj) {
@@ -141,7 +141,7 @@ define('can-util/js/is-empty-object/is-empty-object', function (require, exports
         return true;
     };
 });
-/*can-util@3.0.0-pre.34#js/assign/assign*/
+/*can-util@3.0.0-pre.35#js/assign/assign*/
 define('can-util/js/assign/assign', function (require, exports, module) {
     module.exports = function (d, s) {
         for (var prop in s) {
@@ -150,7 +150,7 @@ define('can-util/js/assign/assign', function (require, exports, module) {
         return d;
     };
 });
-/*can-util@3.0.0-pre.34#js/global/global*/
+/*can-util@3.0.0-pre.35#js/global/global*/
 define('can-util/js/global/global', function (require, exports, module) {
     (function (global) {
         module.exports = function () {
@@ -160,7 +160,7 @@ define('can-util/js/global/global', function (require, exports, module) {
         return this;
     }()));
 });
-/*can-util@3.0.0-pre.34#dom/document/document*/
+/*can-util@3.0.0-pre.35#dom/document/document*/
 define('can-util/dom/document/document', function (require, exports, module) {
     (function (global) {
         var global = require('can-util/js/global/global');
@@ -175,7 +175,7 @@ define('can-util/dom/document/document', function (require, exports, module) {
         return this;
     }()));
 });
-/*can-util@3.0.0-pre.34#dom/dispatch/dispatch*/
+/*can-util@3.0.0-pre.35#dom/dispatch/dispatch*/
 define('can-util/dom/dispatch/dispatch', function (require, exports, module) {
     var assign = require('can-util/js/assign/assign');
     var _document = require('can-util/dom/document/document');
@@ -191,11 +191,11 @@ define('can-util/dom/dispatch/dispatch', function (require, exports, module) {
         return this.dispatchEvent(ev);
     };
 });
-/*can-util@3.0.0-pre.34#namespace*/
+/*can-util@3.0.0-pre.35#namespace*/
 define('can-util/namespace', function (require, exports, module) {
     module.exports = {};
 });
-/*can-util@3.0.0-pre.34#dom/data/data*/
+/*can-util@3.0.0-pre.35#dom/data/data*/
 define('can-util/dom/data/data', function (require, exports, module) {
     var isEmptyObject = require('can-util/js/is-empty-object/is-empty-object');
     var data = {};
@@ -230,7 +230,7 @@ define('can-util/dom/data/data', function (require, exports, module) {
         set: setData
     };
 });
-/*can-util@3.0.0-pre.34#dom/matches/matches*/
+/*can-util@3.0.0-pre.35#dom/matches/matches*/
 define('can-util/dom/matches/matches', function (require, exports, module) {
     var matchesMethod = function (element) {
         return element.matches || element.webkitMatchesSelector || element.webkitMatchesSelector || element.mozMatchesSelector || element.msMatchesSelector || element.oMatchesSelector;
@@ -240,7 +240,7 @@ define('can-util/dom/matches/matches', function (require, exports, module) {
         return method ? method.apply(this, arguments) : false;
     };
 });
-/*can-util@3.0.0-pre.34#js/is-array-like/is-array-like*/
+/*can-util@3.0.0-pre.35#js/is-array-like/is-array-like*/
 define('can-util/js/is-array-like/is-array-like', function (require, exports, module) {
     function isArrayLike(obj) {
         var type = typeof obj;
@@ -252,10 +252,65 @@ define('can-util/js/is-array-like/is-array-like', function (require, exports, mo
     }
     module.exports = isArrayLike;
 });
-/*can-util@3.0.0-pre.34#js/each/each*/
+/*can-util@3.0.0-pre.35#js/is-promise/is-promise*/
+define('can-util/js/is-promise/is-promise', function (require, exports, module) {
+    module.exports = function (obj) {
+        return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
+    };
+});
+/*can-util@3.0.0-pre.35#js/types/types*/
+define('can-util/js/types/types', function (require, exports, module) {
+    var isPromise = require('can-util/js/is-promise/is-promise');
+    var types = {
+        isMapLike: function () {
+            return false;
+        },
+        isListLike: function () {
+            return false;
+        },
+        isPromise: function (obj) {
+            return isPromise(obj);
+        },
+        isConstructor: function (func) {
+            if (typeof func !== 'function') {
+                return false;
+            }
+            for (var prop in func.prototype) {
+                return true;
+            }
+            return false;
+        },
+        isCallableForValue: function (obj) {
+            return typeof obj === 'function' && !types.isConstructor(obj);
+        },
+        isCompute: function (obj) {
+            return obj && obj.isComputed;
+        },
+        iterator: typeof Symbol === 'function' && Symbol.iterator || '@@iterator',
+        DefaultMap: null,
+        DefaultList: null,
+        wrapElement: function (element) {
+            return element;
+        },
+        unwrapElement: function (element) {
+            return element;
+        }
+    };
+    module.exports = types;
+});
+/*can-util@3.0.0-pre.35#js/is-iterable/is-iterable*/
+define('can-util/js/is-iterable/is-iterable', function (require, exports, module) {
+    var types = require('can-util/js/types/types');
+    module.exports = function (obj) {
+        return obj && !!obj[types.iterator];
+    };
+});
+/*can-util@3.0.0-pre.35#js/each/each*/
 define('can-util/js/each/each', function (require, exports, module) {
     var isArrayLike = require('can-util/js/is-array-like/is-array-like');
     var has = Object.prototype.hasOwnProperty;
+    var isIterable = require('can-util/js/is-iterable/is-iterable');
+    var types = require('can-util/js/types/types');
     function each(elements, callback, context) {
         var i = 0, key, len, item;
         if (elements) {
@@ -265,6 +320,13 @@ define('can-util/js/each/each', function (require, exports, module) {
                     if (callback.call(context || item, item, i, elements) === false) {
                         break;
                     }
+                }
+            } else if (isIterable(elements)) {
+                var iter = elements[types.iterator]();
+                var res, value;
+                while (!(res = iter.next()).done) {
+                    value = res.value;
+                    callback.call(context || elements, Array.isArray(value) ? value[1] : value, value[0]);
                 }
             } else if (typeof elements === 'object') {
                 for (key in elements) {
@@ -278,7 +340,7 @@ define('can-util/js/each/each', function (require, exports, module) {
     }
     module.exports = each;
 });
-/*can-util@3.0.0-pre.34#dom/events/delegate/delegate*/
+/*can-util@3.0.0-pre.35#dom/events/delegate/delegate*/
 define('can-util/dom/events/delegate/delegate', function (require, exports, module) {
     var domEvents = require('can-util/dom/events/events');
     var domData = require('can-util/dom/data/data');
@@ -558,7 +620,7 @@ define('can-event/lifecycle/lifecycle', function (require, exports, module) {
         }
     };
 });
-/*can-util@3.0.0-pre.34#js/last/last*/
+/*can-util@3.0.0-pre.35#js/last/last*/
 define('can-util/js/last/last', function (require, exports, module) {
     module.exports = function (arr) {
         return arr && arr[arr.length - 1];
@@ -957,52 +1019,7 @@ define('can-observation', function (require, exports, module) {
     canBatch._onDispatchedEvents = Observation.batchEnd;
     module.exports = namespace.Observation = Observation;
 });
-/*can-util@3.0.0-pre.34#js/is-promise/is-promise*/
-define('can-util/js/is-promise/is-promise', function (require, exports, module) {
-    module.exports = function (obj) {
-        return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
-    };
-});
-/*can-util@3.0.0-pre.34#js/types/types*/
-define('can-util/js/types/types', function (require, exports, module) {
-    var isPromise = require('can-util/js/is-promise/is-promise');
-    var types = {
-        isMapLike: function () {
-            return false;
-        },
-        isListLike: function () {
-            return false;
-        },
-        isPromise: function (obj) {
-            return isPromise(obj);
-        },
-        isConstructor: function (func) {
-            if (typeof func !== 'function') {
-                return false;
-            }
-            for (var prop in func.prototype) {
-                return true;
-            }
-            return false;
-        },
-        isCallableForValue: function (obj) {
-            return typeof obj === 'function' && !types.isConstructor(obj);
-        },
-        isCompute: function (obj) {
-            return obj && obj.isComputed;
-        },
-        DefaultMap: null,
-        DefaultList: null,
-        wrapElement: function (element) {
-            return element;
-        },
-        unwrapElement: function (element) {
-            return element;
-        }
-    };
-    module.exports = types;
-});
-/*can-util@3.0.0-pre.34#js/dev/dev*/
+/*can-util@3.0.0-pre.35#js/dev/dev*/
 define('can-util/js/dev/dev', function (require, exports, module) {
 });
 /*can-observation@3.0.0-pre.8#reader/reader*/
@@ -1283,13 +1300,13 @@ define('can-observation/reader/reader', function (require, exports, module) {
     observeReader.set = observeReader.write;
     module.exports = observeReader;
 });
-/*can-util@3.0.0-pre.34#js/is-array/is-array*/
+/*can-util@3.0.0-pre.35#js/is-array/is-array*/
 define('can-util/js/is-array/is-array', function (require, exports, module) {
     module.exports = function (arr) {
         return Array.isArray(arr);
     };
 });
-/*can-util@3.0.0-pre.34#js/string/string*/
+/*can-util@3.0.0-pre.35#js/string/string*/
 define('can-util/js/string/string', function (require, exports, module) {
     var isArray = require('can-util/js/is-array/is-array');
     var strUndHash = /_|-/, strColons = /\=\=/, strWords = /([A-Z]+)([A-Z][a-z])/g, strLowUp = /([a-z\d])([A-Z])/g, strDash = /([a-z\d])([A-Z])/g, strReplacer = /\{([^\}]+)\}/g, strQuote = /"/g, strSingleQuote = /'/g, strHyphenMatch = /-+(.)?/g, strCamelMatch = /[a-z][A-Z]/g, getNext = function (obj, prop, add) {
@@ -1721,7 +1738,7 @@ define('can-compute', function (require, exports, module) {
     COMPUTE.temporarilyBind = Compute.temporarilyBind;
     module.exports = namespace.compute = COMPUTE;
 });
-/*can-util@3.0.0-pre.34#js/is-plain-object/is-plain-object*/
+/*can-util@3.0.0-pre.35#js/is-plain-object/is-plain-object*/
 define('can-util/js/is-plain-object/is-plain-object', function (require, exports, module) {
     var core_hasOwn = Object.prototype.hasOwnProperty;
     function isWindow(obj) {
@@ -1745,7 +1762,7 @@ define('can-util/js/is-plain-object/is-plain-object', function (require, exports
     }
     module.exports = isPlainObject;
 });
-/*can-define@0.7.23#can-define*/
+/*can-define@0.7.24#can-define*/
 define('can-define', function (require, exports, module) {
     'use strict';
     'format cjs';
@@ -1765,6 +1782,14 @@ define('can-define', function (require, exports, module) {
     var each = require('can-util/js/each/each');
     var ns = require('can-util/namespace');
     var behaviors, eventsProto, getPropDefineBehavior, define, make, makeDefinition, replaceWith, getDefinitionsAndMethods, isDefineType, getDefinitionOrMethod;
+    var defineConfigurableAndNotEnumerable = function (obj, prop, value) {
+        Object.defineProperty(obj, prop, {
+            configurable: true,
+            enumerable: false,
+            writable: true,
+            value: value
+        });
+    };
     module.exports = define = ns.define = function (objPrototype, defines) {
         var dataInitializers = {}, computedInitializers = {};
         var result = getDefinitionsAndMethods(defines);
@@ -1801,6 +1826,11 @@ define('can-define', function (require, exports, module) {
             configurable: true,
             writable: true
         });
+        if (!objPrototype[types.iterator]) {
+            defineConfigurableAndNotEnumerable(objPrototype, types.iterator, function () {
+                return new define.Iterator(this);
+            });
+        }
         return result;
     };
     define.property = function (objPrototype, prop, definition, dataInitializers, computedInitializers) {
@@ -2168,14 +2198,6 @@ define('can-define', function (require, exports, module) {
     eventsProto.on = eventsProto.bind = eventsProto.addEventListener;
     eventsProto.off = eventsProto.unbind = eventsProto.removeEventListener;
     delete eventsProto.one;
-    var defineConfigurableAndNotEnumerable = function (obj, prop, value) {
-        Object.defineProperty(obj, prop, {
-            configurable: true,
-            enumerable: false,
-            writable: true,
-            value: value
-        });
-    };
     define.setup = function (props, sealed) {
         defineConfigurableAndNotEnumerable(this, '_cid');
         defineConfigurableAndNotEnumerable(this, '__bindEvents', {});
@@ -2216,6 +2238,36 @@ define('can-define', function (require, exports, module) {
             };
         }
         return simpleGetterSetters[prop];
+    };
+    define.Iterator = function (obj) {
+        this.obj = obj;
+        this.definitions = Object.keys(obj._define.definitions);
+        this.instanceDefinitions = obj._instanceDefinitions ? Object.keys(obj._instanceDefinitions) : Object.keys(obj);
+        this.hasGet = typeof obj.get === 'function';
+    };
+    define.Iterator.prototype.next = function () {
+        var key;
+        if (this.definitions.length) {
+            key = this.definitions.shift();
+            var def = this.obj._define.definitions[key];
+            if (def.get) {
+                return this.next();
+            }
+        } else if (this.instanceDefinitions.length) {
+            key = this.instanceDefinitions.shift();
+        } else {
+            return {
+                value: undefined,
+                done: true
+            };
+        }
+        return {
+            value: [
+                key,
+                this.hasGet ? this.obj.get(key) : this.obj[key]
+            ],
+            done: false
+        };
     };
     isDefineType = function (func) {
         return func && func.canDefineType === true;
@@ -2293,7 +2345,7 @@ define('can-define', function (require, exports, module) {
         }
     };
 });
-/*can-util@3.0.0-pre.34#js/is-function/is-function*/
+/*can-util@3.0.0-pre.35#js/is-function/is-function*/
 define('can-util/js/is-function/is-function', function (require, exports, module) {
     var isFunction = function () {
         if (typeof document !== 'undefined' && typeof document.getElementsByTagName('body') === 'function') {
@@ -2307,7 +2359,7 @@ define('can-util/js/is-function/is-function', function (require, exports, module
     }();
     module.exports = isFunction;
 });
-/*can-util@3.0.0-pre.34#js/deep-assign/deep-assign*/
+/*can-util@3.0.0-pre.35#js/deep-assign/deep-assign*/
 define('can-util/js/deep-assign/deep-assign', function (require, exports, module) {
     var isArray = require('can-util/js/is-array/is-array');
     var isFunction = require('can-util/js/is-function/is-function');
@@ -2347,7 +2399,7 @@ define('can-util/js/deep-assign/deep-assign', function (require, exports, module
     }
     module.exports = deepAssign;
 });
-/*can-util@3.0.0-pre.34#js/make-array/make-array*/
+/*can-util@3.0.0-pre.35#js/make-array/make-array*/
 define('can-util/js/make-array/make-array', function (require, exports, module) {
     var each = require('can-util/js/each/each');
     function makeArray(arr) {
@@ -2500,7 +2552,7 @@ define('can-construct', function (require, exports, module) {
     };
     module.exports = namespace.Construct = Construct;
 });
-/*can-define@0.7.23#define-helpers/define-helpers*/
+/*can-define@0.7.24#define-helpers/define-helpers*/
 define('can-define/define-helpers/define-helpers', function (require, exports, module) {
     var assign = require('can-util/js/assign/assign');
     var CID = require('can-util/js/cid/cid');
@@ -2605,7 +2657,7 @@ define('can-define/define-helpers/define-helpers', function (require, exports, m
     };
     module.exports = defineHelpers;
 });
-/*can-define@0.7.23#map/map*/
+/*can-define@0.7.24#map/map*/
 define('can-define/map/map', function (require, exports, module) {
     var Construct = require('can-construct');
     var define = require('can-define');
@@ -2755,7 +2807,7 @@ define('can-define/map/map', function (require, exports, module) {
     };
     module.exports = ns.DefineMap = DefineMap;
 });
-/*can-define@0.7.23#list/list*/
+/*can-define@0.7.24#list/list*/
 define('can-define/list/list', function (require, exports, module) {
     var Construct = require('can-construct');
     var define = require('can-define');
