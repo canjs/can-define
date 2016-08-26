@@ -4,8 +4,9 @@ var define = require("can-define");
 var stache = require("can-stache");
 var CanList = require("can-list");
 var canBatch = require("can-event/batch/batch");
-
 var isArray = require("can-util/js/is-array/is-array");
+var each = require("can-util/js/each/each");
+var types = require("can-util/js/types/types");
 
 QUnit.module("can-define");
 
@@ -1162,4 +1163,62 @@ QUnit.test("logs work with maps", function(){
 	var t = fullName.computeInstance.trace();
 	QUnit.equal(t.dependencies[0].obj, m);
 	QUnit.equal(t.dependencies[1].obj, m);
+});
+
+
+QUnit.test("Properties are enumerable", function(){
+  QUnit.expect(4);
+
+  function VM(foo) {
+    this.foo = foo;
+  }
+
+  define(VM.prototype, {
+    foo: "string"
+  });
+
+  var vm = new VM("bar");
+  vm.baz = "qux";
+
+  var i = 0;
+  each(vm, function(value, key){
+    if(i === 0) {
+      QUnit.equal(key, "foo");
+      QUnit.equal(value, "bar");
+    } else {
+      QUnit.equal(key, "baz");
+      QUnit.equal(value, "qux");
+    }
+    i++;
+  });
+});
+
+QUnit.test("Doesn't override types.iterator if already on the prototype", function(){
+  function MyMap() {}
+
+  MyMap.prototype[types.iterator] = function(){
+    var i = 0;
+    return {
+      next: function(){
+        if(i === 0) {
+          i++;
+          return { value: ["it", "worked"], done: false };
+        }
+
+        return { value: undefined, done: true };
+      }
+    };
+  };
+
+  define(MyMap.prototype, {
+    foo: "string"
+  });
+
+  var map = new MyMap();
+  map.foo = "bar";
+
+  each(map, function(value, key){
+    QUnit.equal(value, "worked");
+    QUnit.equal(key, "it");
+  });
 });
