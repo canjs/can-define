@@ -410,7 +410,8 @@ make = {
 		},
 		lastSet: function(prop) {
 			return function() {
-				return this._computed[prop].compute.computeInstance.lastSetValue.get();
+				var lastSetValue = this._computed[prop].compute.computeInstance.lastSetValue;
+				return lastSetValue && lastSetValue.get();
 			};
 		}
 	},
@@ -685,14 +686,14 @@ define.types = {
 		return true;
 	},
 	'observable': function(newVal) {
-        if(isArray(newVal) && types.DefineList) {
-            newVal = new types.DefineList(newVal);
-        }
-        else if(isPlainObject(newVal) &&  types.DefineMap) {
-            newVal = new types.DefineMap(newVal);
-        }
-        return newVal;
-    },
+				if(isArray(newVal) && types.DefineList) {
+						newVal = new types.DefineList(newVal);
+				}
+				else if(isPlainObject(newVal) &&  types.DefineMap) {
+						newVal = new types.DefineMap(newVal);
+				}
+				return newVal;
+		},
 	'stringOrObservable': function(newVal) {
 		if(isArray(newVal)) {
 			return new types.DefaultList(newVal);

@@ -1197,8 +1197,39 @@ QUnit.test('Compute type property can have a default value', function () {
   equal(m.computeProp, 1, 'Property has correct value');
 });
 
+QUnit.test('Compute type property with compute default value triggers change events when updated', function () {
+  var expected = 0;
+  var c = compute(0);
+
+  var MyMap = define.Constructor({
+    computeProp: {
+      type: 'compute',
+      value: function () {
+        return c;
+      }
+    }
+  });
+
+  var m = new MyMap();
+
+  c.bind('change', function (ev, newVal) {
+    equal(newVal, expected, 'Compute fired change event');
+  })
+
+  m.on('computeProp', function (ev, newVal) {
+    equal(newVal, expected, 'Map fired change event');
+  });
+
+  expected = 1;
+  m.computeProp = expected;
+
+  expected = 2;
+  c(expected);
+});
+
 QUnit.test('Compute type property can have a default value that is a compute', function () {
   var c = compute(0)
+
   var MyMap = define.Constructor({
     computeProp: {
       type: 'compute',
