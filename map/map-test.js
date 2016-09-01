@@ -45,6 +45,74 @@ QUnit.test("extending", function(){
     map.prop = "BAR";
 });
 
+QUnit.test("extending DefineMap constructor functions", function(){
+    var MyMap = DefineMap.extend("MyMap", { prop: {}, mymap: function(){} });
+
+    var MyMapExtended = MyMap.extend("MyMapX", { foo: {}, mymapx: function(){} });
+
+    var MyMapExtendedAgain = MyMapExtended.extend("MyMapXX", { bar: {}, mymapxx: function(){} });
+
+    var map = new MyMapExtendedAgain();
+
+    map.on("prop", function(ev, newVal, oldVal){
+        QUnit.equal(newVal, "PROP");
+        QUnit.equal(oldVal, undefined);
+    });
+    map.on("foo", function(ev, newVal, oldVal){
+        QUnit.equal(newVal, "FOO");
+        QUnit.equal(oldVal, undefined);
+    });
+    map.on("bar", function(ev, newVal, oldVal){
+        QUnit.equal(newVal, "BAR");
+        QUnit.equal(oldVal, undefined);
+    });
+
+    map.prop = "PROP";
+    map.foo = 'FOO';
+    map.bar = 'BAR';
+    QUnit.ok(map.mymap);
+    QUnit.ok(map.mymapx);
+    QUnit.ok(map.mymapxx);
+});
+
+QUnit.test("extending DefineMap constructor functions more than once", function(){
+    var MyMap = DefineMap.extend("MyMap", { prop: {}, mymap: function(){} });
+
+    var FirstMapExtended = MyMap.extend("FirstMapExtended", { foo: {}, firstMapExtended: function(){} });
+
+    var SecondMapExtended = MyMap.extend("SecondMapExtended", { bar: {}, secondMapExtended: function(){} });
+
+    var map1 = new FirstMapExtended();
+    var map2 = new SecondMapExtended();
+
+    map1.on("prop", function(ev, newVal, oldVal){
+        QUnit.equal(newVal, "PROP");
+        QUnit.equal(oldVal, undefined);
+    });
+    map1.on("foo", function(ev, newVal, oldVal){
+        QUnit.equal(newVal, "FOO");
+        QUnit.equal(oldVal, undefined);
+    });
+
+    map2.on("prop", function(ev, newVal, oldVal){
+        QUnit.equal(newVal, "PROP");
+        QUnit.equal(oldVal, undefined);
+    });
+    map2.on("bar", function(ev, newVal, oldVal){
+        QUnit.equal(newVal, "BAR");
+        QUnit.equal(oldVal, undefined);
+    });
+
+    map1.prop = "PROP";
+    map1.foo = 'FOO';
+    map2.prop = "PROP";
+    map2.bar = 'BAR';
+    QUnit.ok(map1.mymap);
+    QUnit.ok(map1.firstMapExtended);
+    QUnit.ok(map2.mymap);
+    QUnit.ok(map2.secondMapExtended);
+});
+
 QUnit.test("setting not defined property", function(){
     var MyMap = DefineMap.extend({
         prop: {}
