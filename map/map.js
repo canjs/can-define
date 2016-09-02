@@ -81,13 +81,11 @@ var setProps = function(props, remove) {
     return this;
 };
 
-
-
 var DefineMap = Construct.extend("DefineMap",{
-    setup: function(){
+    setup: function(base){
         if(DefineMap) {
             var prototype = this.prototype;
-            define(prototype, prototype);
+            define(prototype, prototype, base.prototype._define);
 
             this.prototype.setup = function(props){
                 define.setup.call(this, defineHelpers.toObject(this, props,{}, DefineMap), this.constructor.seal);

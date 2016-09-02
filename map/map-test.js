@@ -45,6 +45,7 @@ QUnit.test("extending", function(){
     map.prop = "BAR";
 });
 
+
 QUnit.test("setting not defined property", function(){
     var MyMap = DefineMap.extend({
         prop: {}
@@ -292,4 +293,83 @@ QUnit.test("Getters are not enumerable", function(){
     QUnit.equal(key, "foo");
     QUnit.equal(value, "bar");
   });
+});
+
+QUnit.test("extending DefineMap constructor functions (#18)", function(){
+    var AType = DefineMap.extend("AType", { aProp: {}, aMethod: function(){} });
+
+    var BType = AType.extend("BType", { bProp: {}, bMethod: function(){} });
+
+    var CType = BType.extend("CType", { cProp: {}, cMethod: function(){} });
+
+    var map = new CType();
+
+    map.on("aProp", function(ev, newVal, oldVal){
+        QUnit.equal(newVal, "PROP");
+        QUnit.equal(oldVal, undefined);
+    });
+    map.on("bProp", function(ev, newVal, oldVal){
+        QUnit.equal(newVal, "FOO");
+        QUnit.equal(oldVal, undefined);
+    });
+    map.on("cProp", function(ev, newVal, oldVal){
+        QUnit.equal(newVal, "BAR");
+        QUnit.equal(oldVal, undefined);
+    });
+
+    map.aProp = "PROP";
+    map.bProp = 'FOO';
+    map.cProp = 'BAR';
+    QUnit.ok(map.aMethod);
+    QUnit.ok(map.bMethod);
+    QUnit.ok(map.cMethod);
+});
+
+QUnit.test("extending DefineMap constructor functions more than once (#18)", function(){
+    var AType = DefineMap.extend("AType", { aProp: {}, aMethod: function(){} });
+
+    var BType = AType.extend("BType", { bProp: {}, bMethod: function(){} });
+
+    var CType = AType.extend("CType", { cProp: {}, cMethod: function(){} });
+
+    var map1 = new BType();
+    var map2 = new CType();
+
+    map1.on("aProp", function(ev, newVal, oldVal){
+        QUnit.equal(newVal, "PROP", "aProp newVal on map1");
+        QUnit.equal(oldVal, undefined);
+    });
+    map1.on("bProp", function(ev, newVal, oldVal){
+        QUnit.equal(newVal, "FOO", "bProp newVal on map1");
+        QUnit.equal(oldVal, undefined);
+    });
+
+    map2.on("aProp", function(ev, newVal, oldVal){
+        QUnit.equal(newVal, "PROP", "aProp newVal on map2");
+        QUnit.equal(oldVal, undefined);
+    });
+    map2.on("cProp", function(ev, newVal, oldVal){
+        QUnit.equal(newVal, "BAR", "cProp newVal on map2");
+        QUnit.equal(oldVal, undefined);
+    });
+
+    map1.aProp = "PROP";
+    map1.bProp = 'FOO';
+    map2.aProp = "PROP";
+    map2.cProp = 'BAR';
+    QUnit.ok(map1.aMethod, "map1 aMethod");
+    QUnit.ok(map1.bMethod);
+    QUnit.ok(map2.aMethod);
+    QUnit.ok(map2.cMethod, "map2 cMethod");
+});
+
+QUnit.test("extending DefineMap constructor functions - value (#18)", function(){
+    var AType = DefineMap.extend("AType", { aProp: {value: 1} });
+
+    var BType = AType.extend("BType", { });
+
+    var CType = BType.extend("CType",{ });
+
+    var c = new CType();
+    QUnit.equal( c.aProp , 1 ,"got initial value" );
 });
