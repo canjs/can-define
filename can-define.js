@@ -33,13 +33,23 @@ var defineConfigurableAndNotEnumerable = function(obj, prop, value) {
 	});
 };
 
-module.exports = define = ns.define = function(objPrototype, defines) {
+var simpleEach = function(map, cb){
+	for(var prop in map) {
+		if(map.hasOwnProperty(prop)) {
+			cb(map[prop], prop);
+		}
+	}
+};
+
+module.exports = define = ns.define = function(objPrototype, defines, baseDefine) {
 	// default property definitions on _data
-	var dataInitializers = {},
+	var dataInitializers = Object.create(baseDefine ? baseDefine.dataInitializers : null),
 		// computed property definitions on _computed
-		computedInitializers = {};
+		computedInitializers = Object.create(baseDefine ? baseDefine.computedInitializers : null);
 
 	var result = getDefinitionsAndMethods(defines);
+	result.dataInitializers = dataInitializers;
+	result.computedInitializers = computedInitializers;
 
 	// Goes through each property definition and creates
 	// a `getter` and `setter` function for `Object.defineProperty`.
@@ -89,13 +99,13 @@ module.exports = define = ns.define = function(objPrototype, defines) {
 		writable: true
 	});
 
-  // Places Symbol.iterator or @@iterator on the prototype
-  // so that this can be iterated with for/of and can-util/js/each/each
-  if(!objPrototype[types.iterator]) {
-    defineConfigurableAndNotEnumerable(objPrototype, types.iterator, function(){
-      return new define.Iterator(this);
-    });
-  }
+	// Places Symbol.iterator or @@iterator on the prototype
+	// so that this can be iterated with for/of and can-util/js/each/each
+	if(!objPrototype[types.iterator]) {
+		defineConfigurableAndNotEnumerable(objPrototype, types.iterator, function(){
+			return new define.Iterator(this);
+		});
+	}
 
 	return result;
 };
@@ -508,7 +518,7 @@ getDefinitionsAndMethods = function(defines) {
 		defaultDefinition = {};
 	}
 
-	canEach(defines, function(value, prop) {
+	simpleEach(defines, function(value, prop) {
 		if(prop === "constructor") {
 			methods[prop] = value;
 			return;
