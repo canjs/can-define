@@ -781,13 +781,6 @@ assign(DefineList.prototype, {
      * newList.get(); // ['Alice', 'Bob', 'Charlie', 'Daniel', 'Eve', {f: 'Francis'}]
      * ```
      */
-    // concat: function () {
-    //     var args = [];
-    //     each(makeArray(arguments), function (arg, i) {
-    //         args[i] = arg instanceof DefineList ? arg.get() : arg;
-    //     });
-    //     return new this.constructor(Array.prototype.concat.apply(this.get(), args));
-    // },
     concat: function() {
         var args = [],
           MapType = this.constructor.Map;
