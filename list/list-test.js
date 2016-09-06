@@ -613,7 +613,7 @@ QUnit.test("extending DefineList constructor functions more than once (#61)", fu
     QUnit.ok(list2.cMethod, "list2 cMethod");
 });
 
-QUnit.test("extending DefineMap constructor functions - value (#61)", function(){
+QUnit.test("extending DefineList constructor functions - value (#61)", function(){
     var AList = DefineMap.extend("AList", { aProp: {value: 1} });
 
     var BList = AList.extend("BList", { });
