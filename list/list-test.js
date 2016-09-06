@@ -545,3 +545,81 @@ QUnit.test("is list like", function(){
     var list = new DefineList();
     QUnit.ok( types.isListLike(list) );
 });
+
+QUnit.test("extending DefineList constructor functions (#61)", function(){
+  var AList = DefineList.extend('AList', { aProp: {}, aMethod: function(){} });
+  var BList = AList.extend('BList', { bProp: {}, bMethod: function(){} });
+  var CList = BList.extend('CList', { cProp: {}, cMethod: function(){} });
+
+  var list = new CList([{},{}]);
+
+  list.on("aProp", function(ev, newVal, oldVal){
+      QUnit.equal(newVal, "PROP");
+      QUnit.equal(oldVal, undefined);
+  });
+  list.on("bProp", function(ev, newVal, oldVal){
+      QUnit.equal(newVal, "FOO");
+      QUnit.equal(oldVal, undefined);
+  });
+  list.on("cProp", function(ev, newVal, oldVal){
+      QUnit.equal(newVal, "BAR");
+      QUnit.equal(oldVal, undefined);
+  });
+
+  list.aProp = "PROP";
+  list.bProp = 'FOO';
+  list.cProp = 'BAR';
+
+  QUnit.ok(list.aMethod);
+  QUnit.ok(list.bMethod);
+  QUnit.ok(list.cMethod);
+});
+
+QUnit.test("extending DefineList constructor functions more than once (#61)", function(){
+    var AList = DefineList.extend("AList", { aProp: {}, aMethod: function(){} });
+
+    var BList = AList.extend("BList", { bProp: {}, bMethod: function(){} });
+
+    var CList = AList.extend("CList", { cProp: {}, cMethod: function(){} });
+
+    var list1 = new BList([{},{}]);
+    var list2 = new CList([{},{},{}]);
+
+    list1.on("aProp", function(ev, newVal, oldVal){
+        QUnit.equal(newVal, "PROP", "aProp newVal on list1");
+        QUnit.equal(oldVal, undefined);
+    });
+    list1.on("bProp", function(ev, newVal, oldVal){
+        QUnit.equal(newVal, "FOO", "bProp newVal on list1");
+        QUnit.equal(oldVal, undefined);
+    });
+
+    list2.on("aProp", function(ev, newVal, oldVal){
+        QUnit.equal(newVal, "PROP", "aProp newVal on list2");
+        QUnit.equal(oldVal, undefined);
+    });
+    list2.on("cProp", function(ev, newVal, oldVal){
+        QUnit.equal(newVal, "BAR", "cProp newVal on list2");
+        QUnit.equal(oldVal, undefined);
+    });
+
+    list1.aProp = "PROP";
+    list1.bProp = 'FOO';
+    list2.aProp = "PROP";
+    list2.cProp = 'BAR';
+    QUnit.ok(list1.aMethod, "list1 aMethod");
+    QUnit.ok(list1.bMethod);
+    QUnit.ok(list2.aMethod);
+    QUnit.ok(list2.cMethod, "list2 cMethod");
+});
+
+QUnit.test("extending DefineMap constructor functions - value (#61)", function(){
+    var AList = DefineMap.extend("AList", { aProp: {value: 1} });
+
+    var BList = AList.extend("BList", { });
+
+    var CList = BList.extend("CList",{ });
+
+    var c = new CList([]);
+    QUnit.equal( c.aProp , 1 ,"got initial value" );
+});
