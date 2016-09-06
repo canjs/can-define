@@ -108,6 +108,22 @@ test('Array accessor methods', 11, function () {
 		}
 	});
 });
+
+test('Concated list Equals original', function() {
+	var l = new DefineList([
+			{ firstProp: "Some data" },
+			{ secondProp: "Next data" }
+		]),
+		concatenated = l.concat([
+			{ hello: "World" },
+			{ foo: "Bar" }
+		]);
+
+	ok(l[0] === concatenated[0], "They are Equal");
+	ok(l[1] === concatenated[1], "They are Equal");
+
+});
+
 test('splice removes items in IE (#562)', function () {
 	var l = new DefineList(['a']);
 	l.splice(0, 1);

@@ -781,12 +781,32 @@ assign(DefineList.prototype, {
      * newList.get(); // ['Alice', 'Bob', 'Charlie', 'Daniel', 'Eve', {f: 'Francis'}]
      * ```
      */
-    concat: function () {
-        var args = [];
-        each(makeArray(arguments), function (arg, i) {
-            args[i] = arg instanceof DefineList ? arg.get() : arg;
+    // concat: function () {
+    //     var args = [];
+    //     each(makeArray(arguments), function (arg, i) {
+    //         args[i] = arg instanceof DefineList ? arg.get() : arg;
+    //     });
+    //     return new this.constructor(Array.prototype.concat.apply(this.get(), args));
+    // },
+    concat: function() {
+        var args = [],
+          MapType = this.constructor.Map;
+
+        each(arguments, function(arg) {
+            if(types.isListLike(arg)) {
+                var arr = makeArray(arg);
+                if(arr && arr.serialize && (arr instanceof MapType)) {
+                    args.push.apply(args, new MapType(arr.serialize()));
+                } else {
+                    args.push.apply(args, arr);
+                }
+            }
+            else {
+                args.push.apply(args, arg);
+            }
         });
-        return new this.constructor(Array.prototype.concat.apply(this.get(), args));
+
+        return new this.constructor(Array.prototype.concat.apply(makeArray(this), args));
     },
 
     /**
