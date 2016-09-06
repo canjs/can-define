@@ -625,7 +625,7 @@ QUnit.test("extending DefineList constructor functions - value (#61)", function(
 });
 
 QUnit.test("'*' inheritance works (#61)", function(){
-  var Account = DefineMap.extend({
+	var Account = DefineMap.extend({
 		name: "string",
 		amount: "number",
 		slug: {
@@ -636,13 +636,13 @@ QUnit.test("'*' inheritance works (#61)", function(){
 		}
 	});
 
-  var BaseList = DefineList.extend({
-    "*": Account
-  });
+	var BaseList = DefineList.extend({
+		"*": Account
+	});
 
-  var ExtendedList = BaseList.extend({});
+	var ExtendedList = BaseList.extend({});
 
-  var xl = new ExtendedList([{}]);
+	var xl = new ExtendedList([{}]);
 
-  QUnit.ok(xl[0] instanceof Account);
+	QUnit.ok(xl[0] instanceof Account);
 });
