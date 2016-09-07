@@ -108,6 +108,48 @@ test('Array accessor methods', 11, function () {
 		}
 	});
 });
+
+test('Concatenated list items Equal original', function() {
+	var l = new DefineList([
+			{ firstProp: "Some data" },
+			{ secondProp: "Next data" }
+		]),
+		concatenated = l.concat([
+			{ hello: "World" },
+			{ foo: "Bar" }
+		]);
+
+	ok(l[0] === concatenated[0], "They are Equal");
+	ok(l[1] === concatenated[1], "They are Equal");
+
+});
+
+test('Lists with maps concatenate properly', function() {
+	var Person = DefineMap.extend();
+	var People = DefineList.extend({
+		DefineMap: Person
+	},{});
+	var Genius = Person.extend();
+	var Animal = DefineMap.extend();
+
+	var me = new Person({ name: "John" });
+	var animal = new Animal({ name: "Tak" });
+	var genius = new Genius({ name: "Einstein" });
+	var hero = { name: "Ghandi" };
+
+	var people = new People([]);
+	var specialPeople = new People([
+		genius,
+		hero
+	]);
+
+	people = people.concat([me, animal, specialPeople], specialPeople, [1, 2], 3);
+
+	ok(people.attr('length') === 8, "List length is right");
+	ok(people[0] === me, "Map in list === vars created before concat");
+	ok(people[1] instanceof Person, "Animal got serialized to Person");
+});
+
 test('splice removes items in IE (#562)', function () {
 	var l = new DefineList(['a']);
 	l.splice(0, 1);
