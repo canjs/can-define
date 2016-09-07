@@ -5,6 +5,7 @@
 var event = require("can-event");
 var eventLifecycle = require("can-event/lifecycle/lifecycle");
 var canBatch = require("can-event/batch/batch");
+var canEvent = require("can-event");
 
 var compute = require("can-compute");
 var Observation = require("can-observation");
@@ -225,7 +226,7 @@ make = {
 				compute: compute.async(defaultValue && defaultValue(), get, map),
 				count: 0,
 				handler: function(ev, newVal, oldVal) {
-					canBatch.trigger.call(map, {
+					canEvent.dispatch.call(map, {
 						type: prop,
 						target: map
 					}, [newVal, oldVal]);
@@ -251,7 +252,7 @@ make = {
 				if (newVal !== current) {
 					setData.call(this, newVal);
 
-					canBatch.trigger.call(this, {
+					canEvent.dispatch.call(this, {
 						type: prop,
 						target: this
 					}, [newVal, current]);

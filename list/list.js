@@ -1,6 +1,7 @@
 var Construct = require("can-construct");
 var define = require("can-define");
 var make = define.make;
+var canEvent = require("can-event");
 var canBatch = require("can-event/batch/batch");
 var Observation = require("can-observation");
 
@@ -78,7 +79,7 @@ var DefineList = Construct.extend("DefineList",
     __type: define.types.observable,
     _triggerChange: function (attr, how, newVal, oldVal) {
 
-        canBatch.trigger.call(this, {
+        canEvent.dispatch.call(this, {
             type: ""+attr,
             target: this
         }, [newVal, oldVal]);
@@ -90,13 +91,13 @@ var DefineList = Construct.extend("DefineList",
         if (!~(""+attr).indexOf('.') && !isNaN(index)) {
 
             if (how === 'add') {
-                canBatch.trigger.call(this, how, [newVal, index]);
-                canBatch.trigger.call(this, 'length', [this._length]);
+                canEvent.dispatch.call(this, how, [newVal, index]);
+                canEvent.dispatch.call(this, 'length', [this._length]);
             } else if (how === 'remove') {
-                canBatch.trigger.call(this, how, [oldVal, index]);
-                canBatch.trigger.call(this, 'length', [this._length]);
+                canEvent.dispatch.call(this, how, [oldVal, index]);
+                canEvent.dispatch.call(this, 'length', [this._length]);
             } else {
-                canBatch.trigger.call(this, how, [newVal, index]);
+                canEvent.dispatch.call(this, how, [newVal, index]);
             }
 
         }
