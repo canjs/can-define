@@ -1,6 +1,5 @@
 "use strict";
 var QUnit = require("steal-qunit");
-var define = require("can-define");
 var DefineMap = require("can-define/map/map");
 var Observation = require("can-observation");
 var canTypes = require("can-util/js/types/types");

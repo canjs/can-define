@@ -5,7 +5,7 @@
   "main": "can-define.js",
   "scripts": {
     "build": "node build.js",
-    "jshint": "jshint can-define.js --config",
+    "jshint": "jshint --config .jshintrc --exclude ./node_modules .",
     "preversion": "npm test && npm run build",
     "version": "git commit -am \"Update dist for release\" && git checkout -b release && git add -f dist/",
     "postversion": "git push --tags && git checkout master && git branch -D release && git push",
