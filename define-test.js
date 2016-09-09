@@ -1222,3 +1222,65 @@ QUnit.test("Doesn't override types.iterator if already on the prototype", functi
     QUnit.equal(key, "it");
   });
 });
+
+QUnit.test("nullish values are not converted for type or Type", function(assert) {
+
+	var Foo = function() {};
+
+	var MyMap = define.Constructor({
+		num: {
+			type: "number"
+		},
+		bool: {
+			type: "boolean"
+		},
+		str: {
+			type: "string"
+		},
+		date: {
+			type: "date"
+		},
+		map: {
+			Type: Foo
+		},
+		notype: {},
+		htmlbool: {
+			type: "htmlbool"
+		}
+	});
+
+	var vm = new MyMap({
+		num: 1,
+		bool: true,
+		htmlbool: "foo",
+		str: "foo",
+		date: Date.now(),
+		map: {},
+		notype: {}
+	});
+
+	// Sanity check
+	assert.equal(typeof vm.num, "number", "num is a Number");
+	assert.equal(typeof vm.bool, "boolean", "bool is a Boolean");
+	assert.equal(typeof vm.htmlbool, "boolean", "htmlbool is a Boolean");
+	assert.equal(typeof vm.str, "string", "str is a String");
+	assert.ok(vm.date instanceof Date, "date is a Date");
+	assert.ok(vm.map instanceof Foo, "map is another type");
+	assert.ok(vm.notype instanceof Object, "notype is an Object");
+
+	vm.num = null;
+	vm.bool = null;
+	vm.htmlbool = null;
+	vm.str = null;
+	vm.date = null;
+	vm.map = null;
+	vm.notype = null;
+
+	assert.equal(vm.num, null, "num is null");
+	assert.equal(vm.bool, null, "bool is null");
+	assert.equal(vm.htmlbool, false, "htmlbool is FALSE NOT NULL (this is the lone exception)");
+	assert.equal(vm.str, null, "str is null");
+	assert.equal(vm.date, null, "date is null");
+	assert.equal(vm.map, null, "map is null");
+	assert.equal(vm.map, null, "notype is null");
+});

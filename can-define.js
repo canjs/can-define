@@ -384,7 +384,7 @@ make = {
 				}
 			}
 			return function(newValue) {
-				if (newValue instanceof Type) {
+				if (newValue instanceof Type || newValue == null) {
 					return set.call(this, newValue);
 				} else {
 					return set.call(this, new Type(newValue));
@@ -711,6 +711,9 @@ define.types = {
 		return +(val);
 	},
 	'boolean': function(val) {
+		if(val == null) {
+			return val;
+		}
 		if (val === 'false' || val === '0' || !val) {
 			return false;
 		}
