@@ -794,7 +794,6 @@ assign(DefineList.prototype, {
      * ```
      */
     concat: function() {
-        debugger;
         var args = [],
           MapType = this.constructor.DefineMap;
         // Go through each of the passed `arguments` and
