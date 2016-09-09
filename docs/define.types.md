@@ -2,7 +2,7 @@
 @parent can-define.static
 Defines the type, initial value, and get, set, and serialize behavior for an
 observable property. All type converters leave `null` and `undefined` as is except for
-the `"boolean"` type converter.
+the `"htmlbool"` type converter.
 
 @option {function} observable The default type behavior. It converts plain Objects to
 [can-define/map/map DefineMaps] and plain Arrays to [can-define/list/list DefineLists]. Everything else is left as is.
