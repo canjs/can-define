@@ -809,7 +809,7 @@ test("type converters handle null and undefined in expected ways (1693)", functi
 
 	equal(t.number, undefined, "converted to number");
 
-	equal(t.boolean, false, "converted to boolean");
+	equal(t.boolean, undefined, "converted to boolean"); //Updated for canjs#2316
 
 	equal(t.htmlbool, false, "converted to htmlbool");
 
@@ -830,7 +830,7 @@ test("type converters handle null and undefined in expected ways (1693)", functi
 
 	equal(t.number, null, "converted to number");
 
-	equal(t.boolean, false, "converted to boolean");
+	equal(t.boolean, null, "converted to boolean"); //Updated for canjs#2316
 
 	equal(t.htmlbool, false, "converted to htmlbool");
 
@@ -1221,4 +1221,31 @@ QUnit.test("Doesn't override types.iterator if already on the prototype", functi
     QUnit.equal(value, "worked");
     QUnit.equal(key, "it");
   });
+});
+
+QUnit.test("nullish values are not converted for type or Type", function(assert) {
+
+	var Foo = function() {};
+
+	var MyMap = define.Constructor({
+		map: {
+			Type: Foo
+		},
+		notype: {}
+	});
+
+	var vm = new MyMap({
+		map: {},
+		notype: {}
+	});
+
+	// Sanity check
+	assert.ok(vm.map instanceof Foo, "map is another type");
+	assert.ok(vm.notype instanceof Object, "notype is an Object");
+
+	vm.map = null;
+	vm.notype = null;
+
+	assert.equal(vm.map, null, "map is null");
+	assert.equal(vm.map, null, "notype is null");
 });
