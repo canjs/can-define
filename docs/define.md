@@ -2,8 +2,9 @@
 @parent can-core
 @description Exports the `define` method that defines observable properties
 and their behavior on a prototype object.
-@group can-define.static static
-@group can-define.typedefs types
+@group can-define.static 0 static
+@group can-define.typedefs 1 types
+@group can-define.behaviors 2 behaviors
 
 @signature `define(prototype, propDefinitions)`
 

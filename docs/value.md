@@ -1,5 +1,5 @@
 @function can-define.types.value value
-@parent can-define.typedefs
+@parent can-define.behaviors
 
 Returns the default value for instances of the defined type.  The default value is defined on demand, when the property
 is read for the first time.

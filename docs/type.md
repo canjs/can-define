@@ -1,5 +1,5 @@
 @typedef {function|string} can-define.types.type type
-@parent can-define.typedefs
+@parent can-define.behaviors
 
 Converts a value set on an instance into an appropriate value.
 
