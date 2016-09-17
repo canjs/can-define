@@ -1,5 +1,5 @@
 @typedef {function|can-define.types.propDefinition|Array} can-define.types.TypeConstructor Type
-@parent can-define.typedefs
+@parent can-define.behaviors
 
 Provides a constructor function to be used to convert any set value into an appropriate
 value.

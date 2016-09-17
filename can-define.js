@@ -34,10 +34,10 @@ var defineConfigurableAndNotEnumerable = function(obj, prop, value) {
 	});
 };
 
-var simpleEach = function(map, cb){
+var eachPropertyDescriptor = function(map, cb){
 	for(var prop in map) {
 		if(map.hasOwnProperty(prop)) {
-			cb(map[prop], prop);
+			cb(prop, Object.getOwnPropertyDescriptor(map,prop));
 		}
 	}
 };
@@ -519,7 +519,15 @@ getDefinitionsAndMethods = function(defines) {
 		defaultDefinition = {};
 	}
 
-	simpleEach(defines, function(value, prop) {
+	eachPropertyDescriptor(defines, function( prop, propertyDescriptor ) {
+
+		var value;
+		if(propertyDescriptor.get || propertyDescriptor.set) {
+			value = {get: propertyDescriptor.get, set: propertyDescriptor.set};
+		} else {
+			value = propertyDescriptor.value;
+		}
+
 		if(prop === "constructor") {
 			methods[prop] = value;
 			return;

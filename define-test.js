@@ -1249,3 +1249,62 @@ QUnit.test("nullish values are not converted for type or Type", function(assert)
 	assert.equal(vm.map, null, "map is null");
 	assert.equal(vm.map, null, "notype is null");
 });
+
+
+QUnit.test("shorthand getter (#56)", function(){
+	var Person = function(first, last) {
+		this.first = first;
+		this.last = last;
+	};
+	define(Person.prototype, {
+		first: "*",
+		last: "*",
+		get fullName() {
+			return this.first + " " + this.last;
+		}
+	});
+
+	var p = new Person("Mohamed", "Cherif");
+
+	p.on("fullName", function(ev, newVal, oldVal) {
+		QUnit.equal(oldVal, "Mohamed Cherif");
+		QUnit.equal(newVal, "Justin Meyer");
+	});
+
+	equal(p.fullName, "Mohamed Cherif", "fullName initialized right");
+
+	canBatch.start();
+	p.first = "Justin";
+	p.last = "Meyer";
+	canBatch.stop();
+});
+
+QUnit.test("shorthand getter setter (#56)", function(){
+	var Person = function(first, last) {
+		this.first = first;
+		this.last = last;
+	};
+	define(Person.prototype, {
+		first: "*",
+		last: "*",
+		get fullName() {
+			return this.first + " " + this.last;
+		},
+		set fullName(newVal){
+			var parts = newVal.split(" ");
+			this.first = parts[0];
+			this.last = parts[1];
+		}
+	});
+
+	var p = new Person("Mohamed", "Cherif");
+
+	p.on("fullName", function(ev, newVal, oldVal) {
+		QUnit.equal(oldVal, "Mohamed Cherif");
+		QUnit.equal(newVal, "Justin Meyer");
+	});
+
+	equal(p.fullName, "Mohamed Cherif", "fullName initialized right");
+
+	p.fullName = "Justin Meyer";
+});

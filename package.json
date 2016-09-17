@@ -33,13 +33,13 @@
   "dependencies": {
     "can-compute": "^3.0.0-pre.12",
     "can-construct": "^3.0.0-pre.3",
-    "can-event": "^3.0.0-pre.8",
+    "can-event": "^3.0.0-pre.11",
     "can-observation": "^3.0.0-pre.11",
-    "can-util": "^3.0.0-pre.35"
+    "can-util": "^3.0.0-pre.50"
   },
   "devDependencies": {
-    "can-list": "^3.0.0-pre.6",
-    "can-stache": "^3.0.0-pre.8",
+    "can-list": "^3.0.0-pre.8",
+    "can-stache": "^3.0.0-pre.20",
     "jshint": "^2.9.1",
     "serve": "^1.4.0",
     "steal": "^0.16.0",

@@ -1,5 +1,5 @@
 @function can-define.types.get get
-@parent can-define.typedefs
+@parent can-define.behaviors
 
 Specify what happens when a certain property is read on a map. `get` functions
 work like a [can-compute] and automatically update themselves when a dependent

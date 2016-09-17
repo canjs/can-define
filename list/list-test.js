@@ -145,7 +145,7 @@ test('Lists with maps concatenate properly', function() {
 
 	people = people.concat([me, animal, specialPeople], specialPeople, [1, 2], 3);
 
-	ok(people.attr('length') === 8, "List length is right");
+	ok(people.length === 8, "List length is right");
 	ok(people[0] === me, "Map in list === vars created before concat");
 	ok(people[1] instanceof Person, "Animal got serialized to Person");
 });
@@ -586,4 +586,32 @@ QUnit.test("reading and setting expandos", function(){
 QUnit.test("is list like", function(){
     var list = new DefineList();
     QUnit.ok( types.isListLike(list) );
+});
+
+QUnit.test("shorthand getter setter (#56)", function(){
+
+    var People = DefineList.extend({
+		first: "*",
+		last: "*",
+		get fullName() {
+			return this.first + " " + this.last;
+		},
+		set fullName(newVal){
+			var parts = newVal.split(" ");
+			this.first = parts[0];
+			this.last = parts[1];
+		}
+	});
+
+	var p = new People([]);
+    p.fullName = "Mohamed Cherif";
+
+	p.on("fullName", function(ev, newVal, oldVal) {
+		QUnit.equal(oldVal, "Mohamed Cherif");
+		QUnit.equal(newVal, "Justin Meyer");
+	});
+
+	equal(p.fullName, "Mohamed Cherif", "fullName initialized right");
+
+	p.fullName = "Justin Meyer";
 });

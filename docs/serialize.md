@@ -1,5 +1,5 @@
 @function can-define.types.serialize serialize
-@parent can-define.typedefs
+@parent can-define.behaviors
 
 Defines custom serialization behavior for a property.
 
