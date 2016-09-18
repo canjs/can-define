@@ -9,7 +9,7 @@ Handlers registered with [can-event] methods on `list` will be called back when
 items are removed to a list.
 
 ```
-list.on("removed", function(event, added, index){ ... });
+list.on("remove", function(event, removed, index){ ... });
 ```
 
   @param {Event} event An event object.

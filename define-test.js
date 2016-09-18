@@ -809,7 +809,7 @@ test("type converters handle null and undefined in expected ways (1693)", functi
 
 	equal(t.number, undefined, "converted to number");
 
-	equal(t.boolean, false, "converted to boolean");
+	equal(t.boolean, undefined, "converted to boolean"); //Updated for canjs#2316
 
 	equal(t.htmlbool, false, "converted to htmlbool");
 
@@ -830,7 +830,7 @@ test("type converters handle null and undefined in expected ways (1693)", functi
 
 	equal(t.number, null, "converted to number");
 
-	equal(t.boolean, false, "converted to boolean");
+	equal(t.boolean, null, "converted to boolean"); //Updated for canjs#2316
 
 	equal(t.htmlbool, false, "converted to htmlbool");
 
@@ -1221,4 +1221,90 @@ QUnit.test("Doesn't override types.iterator if already on the prototype", functi
     QUnit.equal(value, "worked");
     QUnit.equal(key, "it");
   });
+});
+
+QUnit.test("nullish values are not converted for type or Type", function(assert) {
+
+	var Foo = function() {};
+
+	var MyMap = define.Constructor({
+		map: {
+			Type: Foo
+		},
+		notype: {}
+	});
+
+	var vm = new MyMap({
+		map: {},
+		notype: {}
+	});
+
+	// Sanity check
+	assert.ok(vm.map instanceof Foo, "map is another type");
+	assert.ok(vm.notype instanceof Object, "notype is an Object");
+
+	vm.map = null;
+	vm.notype = null;
+
+	assert.equal(vm.map, null, "map is null");
+	assert.equal(vm.map, null, "notype is null");
+});
+
+
+QUnit.test("shorthand getter (#56)", function(){
+	var Person = function(first, last) {
+		this.first = first;
+		this.last = last;
+	};
+	define(Person.prototype, {
+		first: "*",
+		last: "*",
+		get fullName() {
+			return this.first + " " + this.last;
+		}
+	});
+
+	var p = new Person("Mohamed", "Cherif");
+
+	p.on("fullName", function(ev, newVal, oldVal) {
+		QUnit.equal(oldVal, "Mohamed Cherif");
+		QUnit.equal(newVal, "Justin Meyer");
+	});
+
+	equal(p.fullName, "Mohamed Cherif", "fullName initialized right");
+
+	canBatch.start();
+	p.first = "Justin";
+	p.last = "Meyer";
+	canBatch.stop();
+});
+
+QUnit.test("shorthand getter setter (#56)", function(){
+	var Person = function(first, last) {
+		this.first = first;
+		this.last = last;
+	};
+	define(Person.prototype, {
+		first: "*",
+		last: "*",
+		get fullName() {
+			return this.first + " " + this.last;
+		},
+		set fullName(newVal){
+			var parts = newVal.split(" ");
+			this.first = parts[0];
+			this.last = parts[1];
+		}
+	});
+
+	var p = new Person("Mohamed", "Cherif");
+
+	p.on("fullName", function(ev, newVal, oldVal) {
+		QUnit.equal(oldVal, "Mohamed Cherif");
+		QUnit.equal(newVal, "Justin Meyer");
+	});
+
+	equal(p.fullName, "Mohamed Cherif", "fullName initialized right");
+
+	p.fullName = "Justin Meyer";
 });

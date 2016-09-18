@@ -1,5 +1,5 @@
 @function can-define.types.get get
-@parent can-define.typedefs
+@parent can-define.behaviors
 
 Specify what happens when a certain property is read on a map. `get` functions
 work like a [can-compute] and automatically update themselves when a dependent
@@ -28,27 +28,27 @@ propertyName: {
 
   @return {*} The value of the property.
 
-@signature `get( lastSetValue, setPropValue(value) )`
+@signature `get( lastSetValue, resolve(value) )`
 
 Asynchronously defines the behavior when a value is read on an instance. Used to provide property values that
 are available asynchronously.
 
-Only observed properties (via [can-event.on], [can-event.addEventListener], etc) will be passed the `setPropValue` function.  It will be `undefined` if the value is not observed. This is for memory safety.
+Only observed properties (via [can-event.on], [can-event.addEventListener], etc) will be passed the `resolve` function.  It will be `undefined` if the value is not observed. This is for memory safety.
 
 Specify `get` like:
 
 ```js
 propertyName: {
-  get: function(lastSetValue, setPropValue){ ... }
+  get: function(lastSetValue, resolve){ ... }
 }
 ```
 
   @param {*} lastSetValue The value last set by `instance.propertyName = value`.
 
-  @param {function(*)|undefined} setPropValue(value) Updates the value of the property. This can be called
-  multiple times if needed.
+  @param {function|undefined} resolve(value) Updates the value of the property. This can be called
+  multiple times if needed. Will be `undefined` if the value is not observed.
 
-  @return {*} The value of the property before `setPropValue` is called.  Or a value for unobserved property reads
+  @return {*} The value of the property before `resolve` is called.  Or a value for unobserved property reads
   to return.
 
 @body
@@ -100,10 +100,10 @@ given a `personId`, one might want to retrieve a related person:
 var AppState = DefineMap.extend({
     personId: "number",
     person: {
-        get: function(lastSetValue, setPropValue){
+        get: function(lastSetValue, resolve){
           Person.get({id: this.personId})
         	.then(function(person){
-        		setPropValue(person);
+                       resolve(person);
         	});
         }
     }

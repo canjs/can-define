@@ -5,6 +5,7 @@
 var event = require("can-event");
 var eventLifecycle = require("can-event/lifecycle/lifecycle");
 var canBatch = require("can-event/batch/batch");
+var canEvent = require("can-event");
 
 var compute = require("can-compute");
 var Observation = require("can-observation");
@@ -33,10 +34,10 @@ var defineConfigurableAndNotEnumerable = function(obj, prop, value) {
 	});
 };
 
-var simpleEach = function(map, cb){
+var eachPropertyDescriptor = function(map, cb){
 	for(var prop in map) {
 		if(map.hasOwnProperty(prop)) {
-			cb(map[prop], prop);
+			cb(prop, Object.getOwnPropertyDescriptor(map,prop));
 		}
 	}
 };
@@ -225,7 +226,7 @@ make = {
 				compute: compute.async(defaultValue && defaultValue(), get, map),
 				count: 0,
 				handler: function(ev, newVal, oldVal) {
-					canBatch.trigger.call(map, {
+					canEvent.dispatch.call(map, {
 						type: prop,
 						target: map
 					}, [newVal, oldVal]);
@@ -251,7 +252,7 @@ make = {
 				if (newVal !== current) {
 					setData.call(this, newVal);
 
-					canBatch.trigger.call(this, {
+					canEvent.dispatch.call(this, {
 						type: prop,
 						target: this
 					}, [newVal, current]);
@@ -383,7 +384,7 @@ make = {
 				}
 			}
 			return function(newValue) {
-				if (newValue instanceof Type) {
+				if (newValue instanceof Type || newValue == null) {
 					return set.call(this, newValue);
 				} else {
 					return set.call(this, new Type(newValue));
@@ -518,7 +519,15 @@ getDefinitionsAndMethods = function(defines) {
 		defaultDefinition = {};
 	}
 
-	simpleEach(defines, function(value, prop) {
+	eachPropertyDescriptor(defines, function( prop, propertyDescriptor ) {
+
+		var value;
+		if(propertyDescriptor.get || propertyDescriptor.set) {
+			value = {get: propertyDescriptor.get, set: propertyDescriptor.set};
+		} else {
+			value = propertyDescriptor.value;
+		}
+
 		if(prop === "constructor") {
 			methods[prop] = value;
 			return;
@@ -710,6 +719,9 @@ define.types = {
 		return +(val);
 	},
 	'boolean': function(val) {
+		if(val == null) {
+			return val;
+		}
 		if (val === 'false' || val === '0' || !val) {
 			return false;
 		}

@@ -1,6 +1,5 @@
 "use strict";
 var QUnit = require("steal-qunit");
-var define = require("can-define");
 var DefineMap = require("can-define/map/map");
 var Observation = require("can-observation");
 var canTypes = require("can-util/js/types/types");
@@ -372,4 +371,31 @@ QUnit.test("extending DefineMap constructor functions - value (#18)", function()
 
     var c = new CType();
     QUnit.equal( c.aProp , 1 ,"got initial value" );
+});
+
+QUnit.test("shorthand getter setter (#56)", function(){
+
+    var Person = DefineMap.extend({
+		first: "*",
+		last: "*",
+		get fullName() {
+			return this.first + " " + this.last;
+		},
+		set fullName(newVal){
+			var parts = newVal.split(" ");
+			this.first = parts[0];
+			this.last = parts[1];
+		}
+	});
+
+	var p = new Person({first: "Mohamed", last: "Cherif"});
+
+	p.on("fullName", function(ev, newVal, oldVal) {
+		QUnit.equal(oldVal, "Mohamed Cherif");
+		QUnit.equal(newVal, "Justin Meyer");
+	});
+
+	equal(p.fullName, "Mohamed Cherif", "fullName initialized right");
+
+	p.fullName = "Justin Meyer";
 });
