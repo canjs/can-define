@@ -3,6 +3,7 @@ var assign = require("can-util/js/assign/assign");
 var CID = require("can-util/js/cid/cid");
 var define = require("can-define");
 var canBatch = require("can-event/batch/batch");
+var canEvent = require("can-event");
 
 
 var hasMethod = function(obj, method){
@@ -41,12 +42,12 @@ var defineHelpers = {
             map._data[prop] = defaultDefinition.type ? defaultDefinition.type(value) : define.types.observable(value);
             instanceDefines[prop] = defaultDefinition;
             canBatch.start();
-            canBatch.trigger.call(map, {
+            canEvent.dispatch.call(map, {
                 type: "__keys",
                 target: map
             });
             if(map._data[prop] !== undefined) {
-                canBatch.trigger.call(map, {
+                canEvent.dispatch.call(map, {
                     type: prop,
                     target: map
                 },[map._data[prop], undefined]);

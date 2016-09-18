@@ -1,9 +1,9 @@
 @function can-define.types.set set
-@parent can-define.typedefs
+@parent can-define.behaviors
 
 Specify what happens when a property value is set.
 
-@signature `set( [newVal,] [setValue] )`
+@signature `set( [newVal,] [resolve] )`
 
 A set function defines the behavior of what happens when a value is set on an
 instance. It is typically used to:
@@ -31,7 +31,7 @@ prop: {
 @param {*} [newVal] The [can-define.types.type type function] coerced value the user intends to set on the
 instance.
 
-@param {function(*)} [setValue(newValue)] A callback that can set the value of the property
+@param {function(*)} [resolve(newValue)] A callback that can set the value of the property
 asynchronously.
 
 @return {*|undefined} If a non-undefined value is returned, that value is set as
@@ -43,8 +43,8 @@ arguments the setter declares:
 
  - If the setter _does not_ specify the `newValue` argument, the property value is set to the type converted value.
  - If the setter specifies the `newValue` argument only, the attribute value will be set to `undefined`.
- - If the setter specifies both `newValue` and `setValue`, the value of the property will not be
-   updated until `setValue` is called.
+ - If the setter specifies both `newValue` and `resolve`, the value of the property will not be
+   updated until `resolve` is called.
 
 
 @body
@@ -123,12 +123,12 @@ map.prop //-> undefined
 ```
 
 With 2 arguments, `undefined` leaves the property in place.  It is expected
-that `setValue` will be called:
+that `resolve` will be called:
 
 ```js
 MyMap = DefineMap.extend({
     prop: {
-        set: function(newVal, setValue){
+        set: function(newVal, resolve){
             setVal(newVal+"d");
         }
     }

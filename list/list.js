@@ -1,6 +1,7 @@
 var Construct = require("can-construct");
 var define = require("can-define");
 var make = define.make;
+var canEvent = require("can-event");
 var canBatch = require("can-event/batch/batch");
 var Observation = require("can-observation");
 
@@ -14,6 +15,17 @@ var types = require("can-util/js/types/types");
 var ns = require("can-util/namespace");
 
 var splice = [].splice;
+
+// Function that serializes the passed arg if
+// type does not match MapType of `this` list
+// then adds to args array
+var serializeNonTypes = function(MapType, arg, args) {
+    if(arg && arg.serialize && !(arg instanceof MapType)) {
+        args.push(new MapType(arg.serialize()));
+    } else {
+        args.push(arg);
+    }
+};
 
 var identity = function(x){
     return x;
@@ -78,7 +90,7 @@ var DefineList = Construct.extend("DefineList",
     __type: define.types.observable,
     _triggerChange: function (attr, how, newVal, oldVal) {
 
-        canBatch.trigger.call(this, {
+        canEvent.dispatch.call(this, {
             type: ""+attr,
             target: this
         }, [newVal, oldVal]);
@@ -90,13 +102,13 @@ var DefineList = Construct.extend("DefineList",
         if (!~(""+attr).indexOf('.') && !isNaN(index)) {
 
             if (how === 'add') {
-                canBatch.trigger.call(this, how, [newVal, index]);
-                canBatch.trigger.call(this, 'length', [this._length]);
+                canEvent.dispatch.call(this, how, [newVal, index]);
+                canEvent.dispatch.call(this, 'length', [this._length]);
             } else if (how === 'remove') {
-                canBatch.trigger.call(this, how, [oldVal, index]);
-                canBatch.trigger.call(this, 'length', [this._length]);
+                canEvent.dispatch.call(this, how, [oldVal, index]);
+                canEvent.dispatch.call(this, 'length', [this._length]);
             } else {
-                canBatch.trigger.call(this, how, [newVal, index]);
+                canEvent.dispatch.call(this, how, [newVal, index]);
             }
 
         }
@@ -781,12 +793,32 @@ assign(DefineList.prototype, {
      * newList.get(); // ['Alice', 'Bob', 'Charlie', 'Daniel', 'Eve', {f: 'Francis'}]
      * ```
      */
-    concat: function () {
-        var args = [];
-        each(makeArray(arguments), function (arg, i) {
-            args[i] = arg instanceof DefineList ? arg.get() : arg;
+    concat: function() {
+        var args = [],
+          MapType = this.constructor.DefineMap;
+        // Go through each of the passed `arguments` and
+        // see if it is list-like, an array, or something else
+        each(arguments, function(arg) {
+            if(types.isListLike(arg) || Array.isArray(arg)) {
+                // If it is list-like we want convert to a JS array then
+                // pass each item of the array to serializeNonTypes
+                var arr = types.isListLike(arg) ? makeArray(arg) : arg;
+                each(arr, function(innerArg) {
+                    serializeNonTypes(MapType, innerArg, args);
+                });
+            }
+            else {
+                // If it is a Map, Object, or some primitive
+                // just pass arg to serializeNonTypes
+                serializeNonTypes(MapType, arg, args);
+            }
         });
-        return new this.constructor(Array.prototype.concat.apply(this.get(), args));
+
+        // We will want to make `this` list into a JS array
+        // as well (We know it should be list-like), then
+        // concat with our passed in args, then pass it to
+        // list constructor to make it back into a list
+        return new this.constructor(Array.prototype.concat.apply(makeArray(this), args));
     },
 
     /**

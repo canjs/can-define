@@ -108,6 +108,48 @@ test('Array accessor methods', 11, function () {
 		}
 	});
 });
+
+test('Concatenated list items Equal original', function() {
+	var l = new DefineList([
+			{ firstProp: "Some data" },
+			{ secondProp: "Next data" }
+		]),
+		concatenated = l.concat([
+			{ hello: "World" },
+			{ foo: "Bar" }
+		]);
+
+	ok(l[0] === concatenated[0], "They are Equal");
+	ok(l[1] === concatenated[1], "They are Equal");
+
+});
+
+test('Lists with maps concatenate properly', function() {
+	var Person = DefineMap.extend();
+	var People = DefineList.extend({
+		DefineMap: Person
+	},{});
+	var Genius = Person.extend();
+	var Animal = DefineMap.extend();
+
+	var me = new Person({ name: "John" });
+	var animal = new Animal({ name: "Tak" });
+	var genius = new Genius({ name: "Einstein" });
+	var hero = { name: "Ghandi" };
+
+	var people = new People([]);
+	var specialPeople = new People([
+		genius,
+		hero
+	]);
+
+	people = people.concat([me, animal, specialPeople], specialPeople, [1, 2], 3);
+
+	ok(people.length === 8, "List length is right");
+	ok(people[0] === me, "Map in list === vars created before concat");
+	ok(people[1] instanceof Person, "Animal got serialized to Person");
+});
+
 test('splice removes items in IE (#562)', function () {
 	var l = new DefineList(['a']);
 	l.splice(0, 1);
@@ -544,4 +586,32 @@ QUnit.test("reading and setting expandos", function(){
 QUnit.test("is list like", function(){
     var list = new DefineList();
     QUnit.ok( types.isListLike(list) );
+});
+
+QUnit.test("shorthand getter setter (#56)", function(){
+
+    var People = DefineList.extend({
+		first: "*",
+		last: "*",
+		get fullName() {
+			return this.first + " " + this.last;
+		},
+		set fullName(newVal){
+			var parts = newVal.split(" ");
+			this.first = parts[0];
+			this.last = parts[1];
+		}
+	});
+
+	var p = new People([]);
+    p.fullName = "Mohamed Cherif";
+
+	p.on("fullName", function(ev, newVal, oldVal) {
+		QUnit.equal(oldVal, "Mohamed Cherif");
+		QUnit.equal(newVal, "Justin Meyer");
+	});
+
+	equal(p.fullName, "Mohamed Cherif", "fullName initialized right");
+
+	p.fullName = "Justin Meyer";
 });

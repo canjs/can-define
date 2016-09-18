@@ -1,5 +1,5 @@
 @function can-define.types.ValueConstructor Value
-@parent can-define.typedefs
+@parent can-define.behaviors
 
 Provides a constructor function to be used to provide a default value for a property.  
 

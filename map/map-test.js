@@ -3,6 +3,7 @@ var QUnit = require("steal-qunit");
 var DefineMap = require("can-define/map/map");
 var Observation = require("can-observation");
 var canTypes = require("can-util/js/types/types");
+var each = require("can-util/js/each/each");
 
 QUnit.module("can-define/map/map");
 
@@ -42,6 +43,7 @@ QUnit.test("extending", function(){
 
     map.prop = "BAR";
 });
+
 
 QUnit.test("setting not defined property", function(){
     var MyMap = DefineMap.extend({
@@ -249,4 +251,151 @@ QUnit.test("get will not create properties", function(){
     m.get("foo");
 
     QUnit.equal(m.get("method"), method);
+});
+
+QUnit.test("Properties are enumerable", function(){
+  QUnit.expect(4);
+
+  var VM = DefineMap.extend({
+    foo: "string"
+  });
+  var vm = new VM({ foo: "bar", baz: "qux" });
+
+  var i = 0;
+  each(vm, function(value, key){
+    if(i === 0) {
+      QUnit.equal(key, "foo");
+      QUnit.equal(value, "bar");
+    } else {
+      QUnit.equal(key, "baz");
+      QUnit.equal(value, "qux");
+    }
+    i++;
+  });
+});
+
+QUnit.test("Getters are not enumerable", function(){
+  QUnit.expect(2);
+
+  var MyMap = DefineMap.extend({
+    foo: "string",
+    baz: {
+      get: function(){
+        return this.foo;
+      }
+    }
+  });
+
+  var map = new MyMap({ foo: "bar" });
+
+  each(map, function(value, key){
+    QUnit.equal(key, "foo");
+    QUnit.equal(value, "bar");
+  });
+});
+
+QUnit.test("extending DefineMap constructor functions (#18)", function(){
+    var AType = DefineMap.extend("AType", { aProp: {}, aMethod: function(){} });
+
+    var BType = AType.extend("BType", { bProp: {}, bMethod: function(){} });
+
+    var CType = BType.extend("CType", { cProp: {}, cMethod: function(){} });
+
+    var map = new CType();
+
+    map.on("aProp", function(ev, newVal, oldVal){
+        QUnit.equal(newVal, "PROP");
+        QUnit.equal(oldVal, undefined);
+    });
+    map.on("bProp", function(ev, newVal, oldVal){
+        QUnit.equal(newVal, "FOO");
+        QUnit.equal(oldVal, undefined);
+    });
+    map.on("cProp", function(ev, newVal, oldVal){
+        QUnit.equal(newVal, "BAR");
+        QUnit.equal(oldVal, undefined);
+    });
+
+    map.aProp = "PROP";
+    map.bProp = 'FOO';
+    map.cProp = 'BAR';
+    QUnit.ok(map.aMethod);
+    QUnit.ok(map.bMethod);
+    QUnit.ok(map.cMethod);
+});
+
+QUnit.test("extending DefineMap constructor functions more than once (#18)", function(){
+    var AType = DefineMap.extend("AType", { aProp: {}, aMethod: function(){} });
+
+    var BType = AType.extend("BType", { bProp: {}, bMethod: function(){} });
+
+    var CType = AType.extend("CType", { cProp: {}, cMethod: function(){} });
+
+    var map1 = new BType();
+    var map2 = new CType();
+
+    map1.on("aProp", function(ev, newVal, oldVal){
+        QUnit.equal(newVal, "PROP", "aProp newVal on map1");
+        QUnit.equal(oldVal, undefined);
+    });
+    map1.on("bProp", function(ev, newVal, oldVal){
+        QUnit.equal(newVal, "FOO", "bProp newVal on map1");
+        QUnit.equal(oldVal, undefined);
+    });
+
+    map2.on("aProp", function(ev, newVal, oldVal){
+        QUnit.equal(newVal, "PROP", "aProp newVal on map2");
+        QUnit.equal(oldVal, undefined);
+    });
+    map2.on("cProp", function(ev, newVal, oldVal){
+        QUnit.equal(newVal, "BAR", "cProp newVal on map2");
+        QUnit.equal(oldVal, undefined);
+    });
+
+    map1.aProp = "PROP";
+    map1.bProp = 'FOO';
+    map2.aProp = "PROP";
+    map2.cProp = 'BAR';
+    QUnit.ok(map1.aMethod, "map1 aMethod");
+    QUnit.ok(map1.bMethod);
+    QUnit.ok(map2.aMethod);
+    QUnit.ok(map2.cMethod, "map2 cMethod");
+});
+
+QUnit.test("extending DefineMap constructor functions - value (#18)", function(){
+    var AType = DefineMap.extend("AType", { aProp: {value: 1} });
+
+    var BType = AType.extend("BType", { });
+
+    var CType = BType.extend("CType",{ });
+
+    var c = new CType();
+    QUnit.equal( c.aProp , 1 ,"got initial value" );
+});
+
+QUnit.test("shorthand getter setter (#56)", function(){
+
+    var Person = DefineMap.extend({
+		first: "*",
+		last: "*",
+		get fullName() {
+			return this.first + " " + this.last;
+		},
+		set fullName(newVal){
+			var parts = newVal.split(" ");
+			this.first = parts[0];
+			this.last = parts[1];
+		}
+	});
+
+	var p = new Person({first: "Mohamed", last: "Cherif"});
+
+	p.on("fullName", function(ev, newVal, oldVal) {
+		QUnit.equal(oldVal, "Mohamed Cherif");
+		QUnit.equal(newVal, "Justin Meyer");
+	});
+
+	equal(p.fullName, "Mohamed Cherif", "fullName initialized right");
+
+	p.fullName = "Justin Meyer";
 });

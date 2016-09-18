@@ -5,6 +5,7 @@
 var event = require("can-event");
 var eventLifecycle = require("can-event/lifecycle/lifecycle");
 var canBatch = require("can-event/batch/batch");
+var canEvent = require("can-event");
 
 var compute = require("can-compute");
 var Observation = require("can-observation");
@@ -24,13 +25,32 @@ var eventsProto, getPropDefineBehavior, define,
 	make, makeDefinition, replaceWith, getDefinitionsAndMethods,
 	isDefineType, getDefinitionOrMethod;
 
-module.exports = define = ns.define = function(objPrototype, defines) {
+var defineConfigurableAndNotEnumerable = function(obj, prop, value) {
+	Object.defineProperty(obj, prop, {
+		configurable: true,
+		enumerable: false,
+		writable: true,
+		value: value
+	});
+};
+
+var eachPropertyDescriptor = function(map, cb){
+	for(var prop in map) {
+		if(map.hasOwnProperty(prop)) {
+			cb(prop, Object.getOwnPropertyDescriptor(map,prop));
+		}
+	}
+};
+
+module.exports = define = ns.define = function(objPrototype, defines, baseDefine) {
 	// default property definitions on _data
-	var dataInitializers = {},
+	var dataInitializers = Object.create(baseDefine ? baseDefine.dataInitializers : null),
 		// computed property definitions on _computed
-		computedInitializers = {};
+		computedInitializers = Object.create(baseDefine ? baseDefine.computedInitializers : null);
 
 	var result = getDefinitionsAndMethods(defines);
+	result.dataInitializers = dataInitializers;
+	result.computedInitializers = computedInitializers;
 
 	// Goes through each property definition and creates
 	// a `getter` and `setter` function for `Object.defineProperty`.
@@ -79,6 +99,14 @@ module.exports = define = ns.define = function(objPrototype, defines) {
 		configurable: true,
 		writable: true
 	});
+
+	// Places Symbol.iterator or @@iterator on the prototype
+	// so that this can be iterated with for/of and can-util/js/each/each
+	if(!objPrototype[types.iterator]) {
+		defineConfigurableAndNotEnumerable(objPrototype, types.iterator, function(){
+			return new define.Iterator(this);
+		});
+	}
 
 	return result;
 };
@@ -216,7 +244,7 @@ make = {
 				compute: computeFn,
 				count: 0,
 				handler: function(ev, newVal, oldVal) {
-					canBatch.trigger.call(map, {
+					canEvent.dispatch.call(map, {
 						type: prop,
 						target: map
 					}, [newVal, oldVal]);
@@ -242,7 +270,7 @@ make = {
 				if (newVal !== current) {
 					setData.call(this, newVal);
 
-					canBatch.trigger.call(this, {
+					canEvent.dispatch.call(this, {
 						type: prop,
 						target: this
 					}, [newVal, current]);
@@ -374,7 +402,7 @@ make = {
 				}
 			}
 			return function(newValue) {
-				if (newValue instanceof Type) {
+				if (newValue instanceof Type || newValue == null) {
 					return set.call(this, newValue);
 				} else {
 					return set.call(this, new Type(newValue));
@@ -514,7 +542,15 @@ getDefinitionsAndMethods = function(defines) {
 		defaultDefinition = {};
 	}
 
-	canEach(defines, function(value, prop) {
+	eachPropertyDescriptor(defines, function( prop, propertyDescriptor ) {
+
+		var value;
+		if(propertyDescriptor.get || propertyDescriptor.set) {
+			value = {get: propertyDescriptor.get, set: propertyDescriptor.set};
+		} else {
+			value = propertyDescriptor.value;
+		}
+
 		if(prop === "constructor") {
 			methods[prop] = value;
 			return;
@@ -592,15 +628,6 @@ eventsProto.off = eventsProto.unbind = eventsProto.removeEventListener;
 
 delete eventsProto.one;
 
-var defineConfigurableAndNotEnumerable = function(obj, prop, value) {
-	Object.defineProperty(obj, prop, {
-		configurable: true,
-		enumerable: false,
-		writable: true,
-		value: value
-	});
-};
-
 define.setup = function(props, sealed) {
 	defineConfigurableAndNotEnumerable(this, "_cid");
 	defineConfigurableAndNotEnumerable(this, "__bindEvents", {});
@@ -614,7 +641,6 @@ define.setup = function(props, sealed) {
 		if(definitions[prop]) {
 			map[prop] = value;
 		} else {
-
 			var def = define.makeSimpleGetterSetter(prop);
 			instanceDefinitions[prop] = {};
 			Object.defineProperty(map, prop, def);
@@ -656,6 +682,42 @@ define.makeSimpleGetterSetter = function(prop){
 	return simpleGetterSetters[prop];
 };
 
+define.Iterator = function(obj){
+  this.obj = obj;
+  this.definitions = Object.keys(obj._define.definitions);
+  this.instanceDefinitions = obj._instanceDefinitions ?
+    Object.keys(obj._instanceDefinitions) :
+    Object.keys(obj);
+  this.hasGet = typeof obj.get === "function";
+};
+
+define.Iterator.prototype.next = function(){
+  var key;
+  if(this.definitions.length) {
+    key = this.definitions.shift();
+
+    // Getters should not be enumerable
+    var def = this.obj._define.definitions[key];
+    if(def.get) {
+      return this.next();
+    }
+  } else if(this.instanceDefinitions.length) {
+    key = this.instanceDefinitions.shift();
+  } else {
+    return {
+      value: undefined,
+      done: true
+    };
+  }
+
+  return {
+    value: [
+      key,
+      this.hasGet ? this.obj.get(key) : this.obj[key]
+    ],
+    done: false
+  };
+};
 
 isDefineType = function(func){
 	return func && func.canDefineType === true;
@@ -680,6 +742,9 @@ define.types = {
 		return +(val);
 	},
 	'boolean': function(val) {
+		if(val == null) {
+			return val;
+		}
 		if (val === 'false' || val === '0' || !val) {
 			return false;
 		}
