@@ -1,6 +1,6 @@
 var bitDocs = require("bit-docs");
 var path = require("path");
-var readmeGenerate = require("bit-docs-generate-readme")
+var readmeGenerate = require("bit-docs-generate-readme");
 
 bitDocs(
     path.join(__dirname, "package.json"),
@@ -15,4 +15,4 @@ bitDocs(
         setTimeout(function(){
             throw e;
         }, 1);
-    })
+    });

@@ -4,7 +4,7 @@ require("define-test");
 var DefineMap = require("./map/map");
 var DefineList = require("./list/list");
 var isArray = require("can-util/js/is-array/is-array");
-var isPlainObject = require("can-util/js/is-plain-object/is-plain-object")
+var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
 
 var QUnit = require("steal-qunit");
 
