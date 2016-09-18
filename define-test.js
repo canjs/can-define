@@ -312,7 +312,10 @@ test("setter with no arguments and returns undefined does the default behavior, 
 
 	t.prop = false;
 
-	deepEqual({foo: t.foo, prop: t.prop}, {
+	deepEqual({
+		foo: t.foo,
+		prop: t.prop
+	}, {
 		foo: "bar",
 		prop: false
 	}, "got the right props");
@@ -1137,90 +1140,213 @@ QUnit.test('default type is setable', function() {
 	QUnit.ok(p.last === '2', typeof p.last);
 });
 
-QUnit.test("expandos are added in define.setup (#25)", function(){
-	var MyMap = define.Constructor({
-	});
+QUnit.test("expandos are added in define.setup (#25)", function() {
+	var MyMap = define.Constructor({});
 
-	var map = new MyMap({prop: 4});
-	map.on("prop", function(){
-		QUnit.ok(true,"prop event called");
+	var map = new MyMap({
+		prop: 4
+	});
+	map.on("prop", function() {
+		QUnit.ok(true, "prop event called");
 	});
 	map.prop = 5;
 });
 
-QUnit.test("logs work with maps", function(){
+QUnit.test("logs work with maps", function() {
 	var MyMap = define.Constructor({
 		first: "string",
 		last: "string"
 	});
-	var m = new MyMap({first: "J", last: "M"});
-	var fullName = compute(function(){
+	var m = new MyMap({
+		first: "J",
+		last: "M"
+	});
+	var fullName = compute(function() {
 		return m.first + m.last;
 	});
 
-	fullName.on("change", function(){});
+	fullName.on("change", function() {});
 
 	var t = fullName.computeInstance.trace();
 	QUnit.equal(t.dependencies[0].obj, m);
 	QUnit.equal(t.dependencies[1].obj, m);
 });
 
+QUnit.test('Set property with type compute', function() {
+	var MyMap = define.Constructor({
+		computeProp: {
+			type: 'compute'
+		}
+	});
 
-QUnit.test("Properties are enumerable", function(){
-  QUnit.expect(4);
+	var m = new MyMap();
 
-  function VM(foo) {
-    this.foo = foo;
-  }
+	m.computeProp = compute(0);
+	equal(m.computeProp, 0, 'Property has correct value');
 
-  define(VM.prototype, {
-    foo: "string"
-  });
-
-  var vm = new VM("bar");
-  vm.baz = "qux";
-
-  var i = 0;
-  each(vm, function(value, key){
-    if(i === 0) {
-      QUnit.equal(key, "foo");
-      QUnit.equal(value, "bar");
-    } else {
-      QUnit.equal(key, "baz");
-      QUnit.equal(value, "qux");
-    }
-    i++;
-  });
+	m.computeProp = compute(1);
+	equal(m.computeProp, 1, 'Property has correct value');
 });
 
-QUnit.test("Doesn't override types.iterator if already on the prototype", function(){
-  function MyMap() {}
+QUnit.test('Compute type property can have a default value', function() {
+	var MyMap = define.Constructor({
+		computeProp: {
+			type: 'compute',
+			value: function() {
+				return 0;
+			}
+		}
+	});
 
-  MyMap.prototype[types.iterator] = function(){
-    var i = 0;
-    return {
-      next: function(){
-        if(i === 0) {
-          i++;
-          return { value: ["it", "worked"], done: false };
-        }
+	var m = new MyMap();
+	equal(m.computeProp, 0, 'Property has correct value');
 
-        return { value: undefined, done: true };
-      }
-    };
-  };
+	m.computeProp = 1;
+	equal(m.computeProp, 1, 'Property has correct value');
+});
 
-  define(MyMap.prototype, {
-    foo: "string"
-  });
+QUnit.test('Compute type property with compute default value triggers change events when updated', function() {
+	var expected = 0;
+	var c = compute(0);
 
-  var map = new MyMap();
-  map.foo = "bar";
+	var MyMap = define.Constructor({
+		computeProp: {
+			type: 'compute',
+			value: function() {
+				return c;
+			}
+		}
+	});
 
-  each(map, function(value, key){
-    QUnit.equal(value, "worked");
-    QUnit.equal(key, "it");
-  });
+	var m = new MyMap();
+
+	c.bind('change', function(ev, newVal) {
+		equal(newVal, expected, 'Compute fired change event');
+	});
+
+	m.on('computeProp', function(ev, newVal) {
+		equal(newVal, expected, 'Map fired change event');
+	});
+
+	expected = 1;
+	m.computeProp = expected;
+
+	expected = 2;
+	c(expected);
+});
+
+QUnit.test('Compute type property can have a default value that is a compute', function() {
+	var c = compute(0);
+
+	var MyMap = define.Constructor({
+		computeProp: {
+			type: 'compute',
+			value: function() {
+				return c;
+			}
+		}
+	});
+
+	var m = new MyMap();
+	equal(m.computeProp, 0, 'Property has correct value');
+
+	c(1);
+	equal(m.computeProp, 1, 'Property has correct value');
+});
+
+QUnit.test('Extensions can modify definitions', function() {
+	var oldExtensions = define.extensions;
+
+	define.behaviors.push('extended');
+
+	define.extensions = function(objPrototype, prop, definition) {
+		if (definition.extended) {
+			return {
+				value: 'extended'
+			};
+		}
+	};
+
+	var MyMap = define.Constructor({
+		foo: {
+			value: 'defined',
+			extended: true,
+		},
+		bar: {
+			value: 'defined'
+		}
+	});
+
+	var map = new MyMap();
+
+	QUnit.equal(map.foo, 'extended', 'Value was set via extension');
+	QUnit.equal(map.bar, 'defined', 'Value was set via definition');
+
+	define.extensions = oldExtensions;
+});
+
+
+QUnit.test("Properties are enumerable", function() {
+	QUnit.expect(4);
+
+	function VM(foo) {
+		this.foo = foo;
+	}
+
+	define(VM.prototype, {
+		foo: "string"
+	});
+
+	var vm = new VM("bar");
+	vm.baz = "qux";
+
+	var i = 0;
+	each(vm, function(value, key) {
+		if (i === 0) {
+			QUnit.equal(key, "foo");
+			QUnit.equal(value, "bar");
+		} else {
+			QUnit.equal(key, "baz");
+			QUnit.equal(value, "qux");
+		}
+		i++;
+	});
+});
+
+QUnit.test("Doesn't override types.iterator if already on the prototype", function() {
+	function MyMap() {}
+
+	MyMap.prototype[types.iterator] = function() {
+		var i = 0;
+		return {
+			next: function() {
+				if (i === 0) {
+					i++;
+					return {
+						value: ["it", "worked"],
+						done: false
+					};
+				}
+
+				return {
+					value: undefined,
+					done: true
+				};
+			}
+		};
+	};
+
+	define(MyMap.prototype, {
+		foo: "string"
+	});
+
+	var map = new MyMap();
+	map.foo = "bar";
+
+	each(map, function(value, key) {
+		QUnit.equal(value, "worked");
+		QUnit.equal(key, "it");
+	});
 });
 
 QUnit.test("nullish values are not converted for type or Type", function(assert) {
@@ -1251,7 +1377,7 @@ QUnit.test("nullish values are not converted for type or Type", function(assert)
 });
 
 
-QUnit.test("shorthand getter (#56)", function(){
+QUnit.test("shorthand getter (#56)", function() {
 	var Person = function(first, last) {
 		this.first = first;
 		this.last = last;
@@ -1279,7 +1405,7 @@ QUnit.test("shorthand getter (#56)", function(){
 	canBatch.stop();
 });
 
-QUnit.test("shorthand getter setter (#56)", function(){
+QUnit.test("shorthand getter setter (#56)", function() {
 	var Person = function(first, last) {
 		this.first = first;
 		this.last = last;
@@ -1290,7 +1416,7 @@ QUnit.test("shorthand getter setter (#56)", function(){
 		get fullName() {
 			return this.first + " " + this.last;
 		},
-		set fullName(newVal){
+		set fullName(newVal) {
 			var parts = newVal.split(" ");
 			this.first = parts[0];
 			this.last = parts[1];

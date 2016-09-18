@@ -21,7 +21,7 @@ var types = require("can-util/js/types/types");
 var each = require("can-util/js/each/each");
 var ns = require("can-util/namespace");
 
-var behaviors, eventsProto, getPropDefineBehavior, define,
+var eventsProto, getPropDefineBehavior, define,
 	make, makeDefinition, replaceWith, getDefinitionsAndMethods,
 	isDefineType, getDefinitionOrMethod;
 
@@ -111,7 +111,14 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 	return result;
 };
 
+define.extensions = function () {};
+
 define.property = function(objPrototype, prop, definition, dataInitializers, computedInitializers) {
+	var propertyDefinition = define.extensions.apply(this, arguments);
+
+	if (propertyDefinition) {
+		definition = propertyDefinition;
+	}
 
 	var type = definition.type;
 	delete definition.type;
@@ -219,11 +226,22 @@ define.Constructor = function(defines) {
 // A bunch of helper functions that are used to create various behaviors.
 make = {
 	// Returns a function that creates the `_computed` prop.
-	compute: function(prop, get, defaultValue) {
+	compute: function(prop, get, defaultValueFn) {
 		return function() {
-			var map = this;
+			var map = this,
+				defaultValue = defaultValueFn && defaultValueFn.call(this),
+				computeFn;
+
+			if (defaultValue) {
+				computeFn = defaultValue.isComputed ?
+					defaultValue :
+					compute.async(defaultValue, get, map);
+			} else {
+				computeFn = compute.async(defaultValue, get, map);
+			}
+
 			return {
-				compute: compute.async(defaultValue && defaultValue(), get, map),
+				compute: computeFn,
 				count: 0,
 				handler: function(ev, newVal, oldVal) {
 					canEvent.dispatch.call(map, {
@@ -420,7 +438,8 @@ make = {
 		},
 		lastSet: function(prop) {
 			return function() {
-				return this._computed[prop].compute.computeInstance.lastSetValue.get();
+				var lastSetValue = this._computed[prop].compute.computeInstance.lastSetValue;
+				return lastSetValue && lastSetValue.get();
 			};
 		}
 	},
@@ -456,7 +475,7 @@ make = {
 	}
 };
 
-behaviors = ["get", "set", "value", "Value", "type", "Type", "serialize"];
+define.behaviors = ["get", "set", "value", "Value", "type", "Type", "serialize"];
 
 // gets a behavior for a definition or from the defaultDefinition
 getPropDefineBehavior = function(behaviorName, prop, def, defaultDefinition) {
@@ -469,11 +488,15 @@ getPropDefineBehavior = function(behaviorName, prop, def, defaultDefinition) {
 // makes a full definition, using the defaultDefinition
 makeDefinition = function(prop, def, defaultDefinition) {
 	var definition = {};
-	behaviors.forEach(function(behavior) {
+	define.behaviors.forEach(function(behavior) {
 		var behaviorDef = getPropDefineBehavior(behavior, prop, def, defaultDefinition);
 		if (behaviorDef !== undefined) {
 			if(behavior === "type" && typeof behaviorDef === "string") {
 				behaviorDef = define.types[behaviorDef];
+				if(typeof behaviorDef === "object") {
+					assign(definition, behaviorDef);
+					behaviorDef = behaviorDef[behavior];
+				}
 			}
 			definition[behavior] = behaviorDef;
 		}
@@ -728,14 +751,14 @@ define.types = {
 		return true;
 	},
 	'observable': function(newVal) {
-        if(isArray(newVal) && types.DefineList) {
-            newVal = new types.DefineList(newVal);
-        }
-        else if(isPlainObject(newVal) &&  types.DefineMap) {
-            newVal = new types.DefineMap(newVal);
-        }
-        return newVal;
-    },
+				if(isArray(newVal) && types.DefineList) {
+						newVal = new types.DefineList(newVal);
+				}
+				else if(isPlainObject(newVal) &&  types.DefineMap) {
+						newVal = new types.DefineMap(newVal);
+				}
+				return newVal;
+		},
 	'stringOrObservable': function(newVal) {
 		if(isArray(newVal)) {
 			return new types.DefaultList(newVal);
