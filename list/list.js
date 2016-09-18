@@ -45,13 +45,13 @@ var makeFilterCallback = function(props) {
 var DefineList = Construct.extend("DefineList",
 /** @static */
 {
-    setup: function(){
+    setup: function(base){
         if(DefineList) {
             // remove "*" because it means something else
             var prototype = this.prototype;
             var itemsDefinition = prototype["*"];
             delete prototype["*"];
-            define(prototype,  prototype);
+            define(prototype,  prototype, base.prototype._define);
             if(itemsDefinition) {
                 prototype["*"] = itemsDefinition;
                 itemsDefinition = define.getDefinitionOrMethod("*", itemsDefinition, {});
