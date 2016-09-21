@@ -399,3 +399,16 @@ QUnit.test("shorthand getter setter (#56)", function(){
 
 	p.fullName = "Justin Meyer";
 });
+
+QUnit.test('compute props can be set to null or undefined (#2372)', function() {
+	var VM = DefineMap.extend({
+		computeProp: {
+			type: 'compute'
+		}
+	});
+
+	var vmNull = new VM({computeProp: null});
+	QUnit.equal(vmNull.get('computeProp'), null, 'computeProp is null, no error thrown');
+	var vmUndef = new VM({computeProp: undefined});
+	QUnit.equal(vmUndef.get('computeProp'), undefined, 'computeProp is undefined, no error thrown');
+});
