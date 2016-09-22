@@ -89,8 +89,8 @@ var DefineList = Construct.extend("DefineList",
     },
     __type: define.types.observable,
     _triggerChange: function (attr, how, newVal, oldVal) {
-
-        canEvent.dispatch.call(this, {
+		
+    	canEvent.dispatch.call(this, {
             type: ""+attr,
             target: this
         }, [newVal, oldVal]);
@@ -100,19 +100,23 @@ var DefineList = Construct.extend("DefineList",
 
         // Make sure this is not nested and not an expando
         if (!~(""+attr).indexOf('.') && !isNaN(index)) {
-
+			
             if (how === 'add') {
-                canEvent.dispatch.call(this, how, [newVal, index]);
+				canEvent.dispatch.call(this, how, [newVal, index]);
                 canEvent.dispatch.call(this, 'length', [this._length]);
+				if (this["*"] && typeof this["*"].added === 'function') {
+					this["*"].added(newVal, index);
+				}
             } else if (how === 'remove') {
                 canEvent.dispatch.call(this, how, [oldVal, index]);
                 canEvent.dispatch.call(this, 'length', [this._length]);
+				if (this["*"] && typeof this["*"].removed === 'function') {
+					this["*"].removed(oldVal, index);
+				}
             } else {
                 canEvent.dispatch.call(this, how, [newVal, index]);
             }
-
         }
-
     },
     /**
      * @function can-define/list/list.prototype.get get

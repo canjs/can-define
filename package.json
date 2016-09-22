@@ -33,7 +33,7 @@
   "dependencies": {
     "can-compute": "^3.0.0-pre.12",
     "can-construct": "^3.0.0-pre.3",
-    "can-event": "^3.0.0-pre.11",
+    "can-event": "^3.0.0-pre.14",
     "can-observation": "^3.0.0-pre.11",
     "can-util": "^3.0.0-pre.50"
   },

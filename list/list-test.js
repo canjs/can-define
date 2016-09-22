@@ -717,3 +717,54 @@ QUnit.test("shorthand getter setter (#56)", function(){
 
 	p.fullName = "Justin Meyer";
 });
+
+QUnit.test("added and removed are called after items are added/removed (#14)", function() {
+
+	var Person = DefineMap.extend({
+		id: "number",
+		name: "string"
+	});
+
+	var addedFuncCalled, removedFuncCalled;
+
+	var People = DefineList.extend({
+		"*": {
+			// has to happen before the `add` events are triggered
+			added: function(items, index){
+				addedFuncCalled = true;
+				ok(items, "items added got passed to added");
+				ok(typeof index === 'number', "index of items was passed to added and is a number");
+				ok(items[0]['name'] === 'John', "Name was correct");
+			},
+			removed: function(items, index){
+				removedFuncCalled = true;
+				ok(items, "items added got passed to removed");
+				ok(typeof index === 'number', "index of items was passed to removed and is a number");
+			},
+			Type: Person
+		}
+	});
+
+	var people = new People([]);
+	var me = new Person();
+	me.name = "John";
+	me.id = "1234";
+
+	ok(!addedFuncCalled, "added function has not been called yet");
+	people.push(me);
+	ok(addedFuncCalled, "added function was called");
+	ok(!removedFuncCalled, "removed function has not been called yet");
+	people.splice(people.indexOf(me), 1);
+	ok(removedFuncCalled, "removed function was called");
+
+});
+
+
+
+
+
+
+
+
+
+

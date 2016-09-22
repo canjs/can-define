@@ -477,37 +477,38 @@ make = {
 
 define.behaviors = ["get", "set", "value", "Value", "type", "Type", "serialize"];
 
-// gets a behavior for a definition or from the defaultDefinition
-getPropDefineBehavior = function(behaviorName, prop, def, defaultDefinition) {
-	if(behaviorName in def) {
-		return def[behaviorName];
+var addDefinition = function(definition, behavior, value){
+	if(behavior === "type") {
+		var behaviorDef = value;
+		if(typeof behaviorDef === "string") {
+			behaviorDef = define.types[behaviorDef];
+			if(typeof behaviorDef === "object") {
+				assign(definition, behaviorDef);
+				behaviorDef = behaviorDef[behavior];
+			}
+		}
+		definition[behavior] = behaviorDef;
 	} else {
-		return defaultDefinition[behaviorName];
+		definition[behavior] = value;
 	}
 };
-// makes a full definition, using the defaultDefinition
+
 makeDefinition = function(prop, def, defaultDefinition) {
 	var definition = {};
-	define.behaviors.forEach(function(behavior) {
-		var behaviorDef = getPropDefineBehavior(behavior, prop, def, defaultDefinition);
-		if (behaviorDef !== undefined) {
-			if(behavior === "type" && typeof behaviorDef === "string") {
-				behaviorDef = define.types[behaviorDef];
-				if(typeof behaviorDef === "object") {
-					assign(definition, behaviorDef);
-					behaviorDef = behaviorDef[behavior];
-				}
-			}
-			definition[behavior] = behaviorDef;
+	
+	for(var behavior in defaultDefinition) {
+		if(!def[behavior]) {
+			addDefinition(definition, behavior, defaultDefinition[behavior]);
 		}
-	});
+	}
+	for(var behavior in def) {
+		addDefinition(definition, behavior, def[behavior]);
+	}
 	if( isEmptyObject(definition) ) {
 		definition.type = define.types["*"];
 	}
 	return definition;
 };
-
-
 
 getDefinitionOrMethod = function(prop, value, defaultDefinition){
 	var definition;
