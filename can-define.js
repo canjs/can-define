@@ -21,7 +21,7 @@ var types = require("can-util/js/types/types");
 var each = require("can-util/js/each/each");
 var ns = require("can-util/namespace");
 
-var eventsProto, getPropDefineBehavior, define,
+var eventsProto, define,
 	make, makeDefinition, replaceWith, getDefinitionsAndMethods,
 	isDefineType, getDefinitionOrMethod;
 
@@ -501,7 +501,7 @@ makeDefinition = function(prop, def, defaultDefinition) {
 			addDefinition(definition, behavior, defaultDefinition[behavior]);
 		}
 	}
-	for(var behavior in def) {
+	for(behavior in def) {
 		addDefinition(definition, behavior, def[behavior]);
 	}
 	if( isEmptyObject(definition) ) {

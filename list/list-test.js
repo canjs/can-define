@@ -734,7 +734,7 @@ QUnit.test("added and removed are called after items are added/removed (#14)", f
 				addedFuncCalled = true;
 				ok(items, "items added got passed to added");
 				ok(typeof index === 'number', "index of items was passed to added and is a number");
-				ok(items[0]['name'] === 'John', "Name was correct");
+				ok(items[0].name === 'John', "Name was correct");
 			},
 			removed: function(items, index){
 				removedFuncCalled = true;
