@@ -412,3 +412,18 @@ QUnit.test('compute props can be set to null or undefined (#2372)', function() {
 	var vmUndef = new VM({computeProp: undefined});
 	QUnit.equal(vmUndef.get('computeProp'), undefined, 'computeProp is undefined, no error thrown');
 });
+
+QUnit.test("Inheriting DefineMap .set doesn't work if prop is on base map (#74)", function(){
+    var Base = DefineMap.extend({
+        baseProp: "string"
+    });
+
+    var Inheriting = Base.extend();
+
+    var inherting = new Inheriting();
+
+    inherting.set("baseProp", "value");
+
+
+    QUnit.equal(inherting.baseProp,"value", "set prop");
+});
