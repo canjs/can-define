@@ -16,12 +16,24 @@ It looks like:
 }
 ```
 
-Setting the wildcard is useful when items should be converted to a particular time.
+Setting the wildcard is useful when items should be converted to a particular type.
 
 ```js
 var Person = DefineMap.extend({ ... });
 
-var People = DefineMap.extend({
+var People = DefineList.extend({
   "*": Person
+});
+```
+
+The wildcard property has optional `added` and `removed` functions that will be called after 
+an item is added or removed from the list with `this` being the list.
+
+```js
+var People = DefineList.extend({
+  "*": {
+  	added: function(itemsAdded, index) { ... },
+  	removed: function(itemsRemoved, index) { ... }
+  }
 });
 ```
