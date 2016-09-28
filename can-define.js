@@ -10,7 +10,6 @@ var canEvent = require("can-event");
 var compute = require("can-compute");
 var Observation = require("can-observation");
 
-var canEach = require("can-util/js/each/each");
 var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
 var assign = require("can-util/js/assign/assign");
 var dev = require("can-util/js/dev/dev");
@@ -54,7 +53,7 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 
 	// Goes through each property definition and creates
 	// a `getter` and `setter` function for `Object.defineProperty`.
-	canEach(result.definitions, function(definition, property){
+	each(result.definitions, function(definition, property){
 		define.property(objPrototype, property, definition, dataInitializers, computedInitializers);
 	});
 
@@ -495,15 +494,16 @@ var addDefinition = function(definition, behavior, value){
 
 makeDefinition = function(prop, def, defaultDefinition) {
 	var definition = {};
-	
-	for(var behavior in defaultDefinition) {
+
+	each(defaultDefinition, function(value, behavior) {
 		if(!def[behavior]) {
-			addDefinition(definition, behavior, defaultDefinition[behavior]);
+			addDefinition(definition, behavior, value);
 		}
-	}
-	for(behavior in def) {
-		addDefinition(definition, behavior, def[behavior]);
-	}
+	});
+	each(def, function(value, behavior) {
+		addDefinition(definition, behavior, value);
+	});
+	
 	if( isEmptyObject(definition) ) {
 		definition.type = define.types["*"];
 	}

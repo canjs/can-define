@@ -725,7 +725,7 @@ QUnit.test("added and removed are called after items are added/removed (#14)", f
 		name: "string"
 	});
 
-	var addedFuncCalled, removedFuncCalled;
+	var addedFuncCalled, removedFuncCalled, theList;
 
 	var People = DefineList.extend({
 		"*": {
@@ -735,18 +735,19 @@ QUnit.test("added and removed are called after items are added/removed (#14)", f
 				ok(items, "items added got passed to added");
 				ok(typeof index === 'number', "index of items was passed to added and is a number");
 				ok(items[0].name === 'John', "Name was correct");
-				this.outsideProp = true;
+				theList = this;
 			},
 			removed: function(items, index){
 				removedFuncCalled = true;
 				ok(items, "items added got passed to removed");
 				ok(typeof index === 'number', "index of items was passed to removed and is a number");
+				theList = this;
 			},
 			Type: Person
 		},
 		outsideProp: {
 			type: "boolean",
-			value: false
+			value: true
 		}
 	});
 
@@ -758,8 +759,12 @@ QUnit.test("added and removed are called after items are added/removed (#14)", f
 	ok(!addedFuncCalled, "added function has not been called yet");
 	people.push(me);
 	ok(addedFuncCalled, "added function was called");
+	ok(theList.outsideProp === true && theList instanceof People, 
+		"the list was passed correctly as this to added");
+	theList = null;
 	ok(!removedFuncCalled, "removed function has not been called yet");
 	people.splice(people.indexOf(me), 1);
 	ok(removedFuncCalled, "removed function was called");
-	ok(people.outsideProp, "people was passed to added");
+	ok(theList.outsideProp === true && theList instanceof People,
+		"the list was passed correctly as this to removed");
 });

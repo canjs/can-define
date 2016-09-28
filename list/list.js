@@ -101,17 +101,17 @@ var DefineList = Construct.extend("DefineList",
         // Make sure this is not nested and not an expando
         if (!~(""+attr).indexOf('.') && !isNaN(index)) {
             if (how === 'add') {
-				canEvent.dispatch.call(this, how, [newVal, index]);
-                canEvent.dispatch.call(this, 'length', [this._length]);
 				if (this["*"] && typeof this["*"].added === 'function') {
 					this["*"].added.call(this, newVal, index);
 				}
-            } else if (how === 'remove') {
-                canEvent.dispatch.call(this, how, [oldVal, index]);
+				canEvent.dispatch.call(this, how, [newVal, index]);
                 canEvent.dispatch.call(this, 'length', [this._length]);
+            } else if (how === 'remove') {
 				if (this["*"] && typeof this["*"].removed === 'function') {
 					this["*"].removed.call(this, oldVal, index);
 				}
+                canEvent.dispatch.call(this, how, [oldVal, index]);
+                canEvent.dispatch.call(this, 'length', [this._length]);
             } else {
                 canEvent.dispatch.call(this, how, [newVal, index]);
             }
