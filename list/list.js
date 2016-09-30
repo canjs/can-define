@@ -103,11 +103,12 @@ var DefineList = Construct.extend("DefineList",
 			// Make sure this is not nested and not an expando
 			if (!~("" + attr).indexOf('.') && !isNaN(index)) {
 				var defaultDefinition = this["*"];
+				var added, removed;
 				if (defaultDefinition && defaultDefinition.added) {
-					var added = defaultDefinition.added;
+					added = defaultDefinition.added;
 				}
 				if (defaultDefinition && defaultDefinition.removed) {
-					var removed = defaultDefinition.removed;
+					removed = defaultDefinition.removed;
 				}
 
 				if (how === 'add') {
