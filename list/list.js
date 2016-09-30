@@ -88,21 +88,20 @@ var DefineList = Construct.extend("DefineList",
         }
     },
     __type: define.types.observable,
-    _triggerChange: function (attr, how, newVal, oldVal) {
-    	
-    	canBatch.start();
-		
+	_triggerChange: function (attr, how, newVal, oldVal) {
+
+		canBatch.start();
+
 		canEvent.dispatch.call(this, {
 			type: ""+attr,
 			target: this
 		}, [newVal, oldVal]);
 
-        var index = +attr;
-        // `batchTrigger` direct add and remove events...
+		var index = +attr;
+		// `batchTrigger` direct add and remove events...
 
-        // Make sure this is not nested and not an expando
-        if (!~(""+attr).indexOf('.') && !isNaN(index)) {
-			
+		// Make sure this is not nested and not an expando
+		if (!~(""+attr).indexOf('.') && !isNaN(index)) {
 			var defaultDefinition = this["*"];
 			if (defaultDefinition && defaultDefinition.added) {
 				var added = defaultDefinition.added;
@@ -110,26 +109,28 @@ var DefineList = Construct.extend("DefineList",
 			if (defaultDefinition && defaultDefinition.removed) {
 				var removed = defaultDefinition.removed;
 			}
-			
-            if (how === 'add') {
+
+			if (how === 'add') {
 				if(added && typeof added === 'function') {
 					Observation.ignore(added).call(this, newVal, index);
 				}
 				canEvent.dispatch.call(this, how, [newVal, index]);
 				canEvent.dispatch.call(this, 'length', [this._length]);
-            } else if (how === 'remove') {
+			}
+			else if (how === 'remove') {
 				if(removed && typeof removed === 'function') {
 					Observation.ignore(removed).call(this, oldVal, index);
 				}
 				canEvent.dispatch.call(this, how, [oldVal, index]);
 				canEvent.dispatch.call(this, 'length', [this._length]);
-            } else {
-            	canEvent.dispatch.call(this, how, [newVal, index]);
-            }
-        }
+			}
+			else {
+				canEvent.dispatch.call(this, how, [newVal, index]);
+			}
+		}
 
 		canBatch.stop();
-    },
+	},
     /**
      * @function can-define/list/list.prototype.get get
      * @parent can-define/list/list.prototype
