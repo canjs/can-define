@@ -18,6 +18,7 @@ var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
 var isArray = require("can-util/js/is-array/is-array");
 var types = require("can-util/js/types/types");
 var each = require("can-util/js/each/each");
+var defaults = require("can-util/js/defaults/defaults");
 var ns = require("can-util/namespace");
 
 var eventsProto, define,
@@ -476,7 +477,7 @@ make = {
 
 define.behaviors = ["get", "set", "value", "Value", "type", "Type", "serialize"];
 
-var addDefinition = function(definition, behavior, value){
+var addDefinition = function(definition, behavior, value) {
 	if(behavior === "type") {
 		var behaviorDef = value;
 		if(typeof behaviorDef === "string") {
@@ -487,19 +488,17 @@ var addDefinition = function(definition, behavior, value){
 			}
 		}
 		definition[behavior] = behaviorDef;
-	} else {
+	}
+	else {
 		definition[behavior] = value;
 	}
 };
 
 makeDefinition = function(prop, def, defaultDefinition) {
 	var definition = {};
+	
+	defaults(def, defaultDefinition);
 
-	each(defaultDefinition, function(value, behavior) {
-		if(!def[behavior]) {
-			addDefinition(definition, behavior, value);
-		}
-	});
 	each(def, function(value, behavior) {
 		addDefinition(definition, behavior, value);
 	});

@@ -89,33 +89,46 @@ var DefineList = Construct.extend("DefineList",
     },
     __type: define.types.observable,
     _triggerChange: function (attr, how, newVal, oldVal) {
+    	
+    	canBatch.start();
 		
-    	canEvent.dispatch.call(this, {
-            type: ""+attr,
-            target: this
-        }, [newVal, oldVal]);
+		canEvent.dispatch.call(this, {
+			type: ""+attr,
+			target: this
+		}, [newVal, oldVal]);
 
         var index = +attr;
         // `batchTrigger` direct add and remove events...
 
         // Make sure this is not nested and not an expando
         if (!~(""+attr).indexOf('.') && !isNaN(index)) {
+			
+			var defaultDefinition = this["*"];
+			if (defaultDefinition && defaultDefinition.added) {
+				var added = defaultDefinition.added;
+			}
+			if (defaultDefinition && defaultDefinition.removed) {
+				var removed = defaultDefinition.removed;
+			}
+			
             if (how === 'add') {
-				if (this["*"] && typeof this["*"].added === 'function') {
-					this["*"].added.call(this, newVal, index);
+				if(added && typeof added === 'function') {
+					Observation.ignore(added).call(this, newVal, index);
 				}
 				canEvent.dispatch.call(this, how, [newVal, index]);
-                canEvent.dispatch.call(this, 'length', [this._length]);
+				canEvent.dispatch.call(this, 'length', [this._length]);
             } else if (how === 'remove') {
-				if (this["*"] && typeof this["*"].removed === 'function') {
-					this["*"].removed.call(this, oldVal, index);
+				if(removed && typeof removed === 'function') {
+					Observation.ignore(removed).call(this, oldVal, index);
 				}
-                canEvent.dispatch.call(this, how, [oldVal, index]);
-                canEvent.dispatch.call(this, 'length', [this._length]);
+				canEvent.dispatch.call(this, how, [oldVal, index]);
+				canEvent.dispatch.call(this, 'length', [this._length]);
             } else {
-                canEvent.dispatch.call(this, how, [newVal, index]);
+            	canEvent.dispatch.call(this, how, [newVal, index]);
             }
         }
+
+		canBatch.stop();
     },
     /**
      * @function can-define/list/list.prototype.get get

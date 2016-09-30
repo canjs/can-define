@@ -729,7 +729,6 @@ QUnit.test("added and removed are called after items are added/removed (#14)", f
 
 	var People = DefineList.extend({
 		"*": {
-			// has to happen before the `add` events are triggered
 			added: function(items, index){
 				addedFuncCalled = true;
 				ok(items, "items added got passed to added");
