@@ -48,9 +48,10 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 		// computed property definitions on _computed
 		computedInitializers = Object.create(baseDefine ? baseDefine.computedInitializers : null);
 
-	var result = getDefinitionsAndMethods(defines);
+	var result = getDefinitionsAndMethods(defines, baseDefine);
 	result.dataInitializers = dataInitializers;
 	result.computedInitializers = computedInitializers;
+
 
 	// Goes through each property definition and creates
 	// a `getter` and `setter` function for `Object.defineProperty`.
@@ -544,8 +545,9 @@ getDefinitionOrMethod = function(prop, value, defaultDefinition){
 		return value;
 	}
 };
-getDefinitionsAndMethods = function(defines) {
-	var definitions = {};
+getDefinitionsAndMethods = function(defines, baseDefines) {
+	// make it so the definitions include base definitions on the proto
+	var definitions = Object.create(baseDefines ? baseDefines.definitions : null);
 	var methods = {};
 	// first lets get a default if it exists
 	var defaults = defines["*"],
@@ -807,7 +809,7 @@ define.types = {
 
 	'compute': {
 		set: function(newValue, setVal, setErr, oldValue) {
-			if (newValue.isComputed) {
+			if (newValue && newValue.isComputed) {
 				return newValue;
 			}
 			if (oldValue && oldValue.isComputed) {
