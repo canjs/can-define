@@ -107,7 +107,7 @@ The number converter will be used to turn count into 4, and the items type conve
 When an array value is set, it is automatically converted into a DefineList. Likewise, objects are converted into DefineMap instances. This behavior can be prevented like the following:
 
 
-     locations: {type: "*"}
+     locations: {type: "any"}
 
 
 When a user tries to set this property, the resulting value will remain an array.

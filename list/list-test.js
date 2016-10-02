@@ -728,7 +728,7 @@ QUnit.test("added and removed are called after items are added/removed (#14)", f
 	var addedFuncCalled, removedFuncCalled, theList;
 
 	var People = DefineList.extend({
-		"*": {
+		"#": {
 			added: function(items, index){
 				addedFuncCalled = true;
 				ok(items, "items added got passed to added");
@@ -758,7 +758,7 @@ QUnit.test("added and removed are called after items are added/removed (#14)", f
 	ok(!addedFuncCalled, "added function has not been called yet");
 	people.push(me);
 	ok(addedFuncCalled, "added function was called");
-	ok(theList.outsideProp === true && theList instanceof People, 
+	ok(theList.outsideProp === true && theList instanceof People,
 		"the list was passed correctly as this to added");
 	theList = null;
 	ok(!removedFuncCalled, "removed function has not been called yet");
@@ -766,4 +766,37 @@ QUnit.test("added and removed are called after items are added/removed (#14)", f
 	ok(removedFuncCalled, "removed function was called");
 	ok(theList.outsideProp === true && theList instanceof People,
 		"the list was passed correctly as this to removed");
+});
+
+QUnit.test("* vs # (#78)", function(){
+
+    var MyList = DefineList.extend({
+        "*": "number",
+        "#": {
+            added: function(){
+                ok(true, "called on init");
+            },
+            removed: function(){},
+            type: "string"
+        }
+    });
+
+    var list = new MyList([1,2,3]);
+
+    QUnit.ok(list[0] === "1", "converted to string");
+    list.set("prop", "4");
+    QUnit.ok(list.prop === 4, "type converted");
+
+});
+
+QUnit.test("Array shorthand uses #", function(){
+    var MyMap = DefineMap.extend({
+        "numbers": ["number"]
+    });
+
+    var map = new MyMap({numbers: ["1","2"]});
+    QUnit.ok(map.numbers[0] === 1, "converted to number");
+
+    map.numbers.set("prop", "4");
+    QUnit.ok(map.numbers.prop === "4", "type left alone");
 });

@@ -1,13 +1,14 @@
 @property {can-define.types.propDefinition} can-define/list/list.prototype.wildcard *
 @parent can-define/list/list.prototype
 
-@description Define default behavior for items in the list.
+@description Define default behavior for all properties and items in the list. Use
+[can-define/list/list.prototype.itemsDefinition] to define the default type of items in the list.
 
 @option {can-define.types.propDefinition}
 
-By defining a wildcard property like `"*"` on the prototype, this will supply a
-default behavior for every item in the list.  The default wildcard `"*"` definition
-makes every item run through the "observable" [can-define.types] converter.
+By defining a wildcard property (`"*"`) on the prototype, this will supply a
+default behavior for every property in the list.  The default wildcard `"*"` definition
+makes every property run through the "observable" [can-define.types] converter.
 It looks like:
 
 ```js
@@ -16,24 +17,18 @@ It looks like:
 }
 ```
 
-Setting the wildcard is useful when items should be converted to a particular type.
+Setting the wildcard is useful when all properties should be converted to a particular type.
 
 ```js
-var Person = DefineMap.extend({ ... });
+var Person = DefineList.extend({ ... });
 
 var People = DefineList.extend({
-  "*": Person
+  "*": "string"
+  "#": Person
 });
-```
 
-The wildcard property has optional `added` and `removed` functions that will be called after 
-an item is added or removed from the list with `this` being the list.
+var people = new People();
 
-```js
-var People = DefineList.extend({
-  "*": {
-  	added: function(itemsAdded, index) { ... },
-  	removed: function(itemsRemoved, index) { ... }
-  }
-});
+people.set("age", 21);
+people.age //-> "21"
 ```

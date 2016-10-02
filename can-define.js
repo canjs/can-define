@@ -392,7 +392,7 @@ make = {
 			// `type`: {foo: "string"}
 			if(isArray(Type) && types.DefineList) {
 				Type = types.DefineList.extend({
-					"*": Type[0]
+					"#": Type[0]
 				});
 			} else if (typeof Type === "object") {
 				if(types.DefineMap) {
@@ -496,13 +496,24 @@ var addDefinition = function(definition, behavior, value) {
 
 makeDefinition = function(prop, def, defaultDefinition) {
 	var definition = {};
-	
-	defaults(def, defaultDefinition);
 
 	each(def, function(value, behavior) {
 		addDefinition(definition, behavior, value);
 	});
-	
+	// only add default if it doesn't exist
+	each(defaultDefinition, function(value, prop){
+		if(definition[prop] === undefined) {
+			if(prop !== "type" && prop !== "Type") {
+				definition[prop] = value;
+			}
+		}
+	});
+	// if there's no type definition, take it from the defaultDefinition
+	if(!definition.type && !definition.Type) {
+		defaults(definition, defaultDefinition);
+	}
+
+
 	if( isEmptyObject(definition) ) {
 		definition.type = define.types["*"];
 	}
@@ -520,9 +531,13 @@ getDefinitionOrMethod = function(prop, value, defaultDefinition){
 		} else if(isDefineType(value)) {
 			definition = {type: value};
 		}
-	} else if(isPlainObject(value)){
+		// or leaves as a function
+	} else if( isArray(value) ) {
+		definition = {Type: value};
+	} else if( isPlainObject(value) ){
 		definition = value;
 	}
+	
 	if(definition) {
 		return makeDefinition(prop, definition, defaultDefinition);
 	} else {

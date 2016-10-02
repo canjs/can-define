@@ -229,7 +229,7 @@ DefineMap.extend({
   propertyA: Object      -> PropertyDefinition
   propertyB: String      -> {type: String}
   propertyC: Constructor -> {Type: Constructor}
-  propertyD: [PropDefs]  -> {Type: DefineList.extend({"*": PropDefs})>}
+  propertyD: [PropDefs]  -> {Type: DefineList.extend({"#": PropDefs})>}
   get propertyE(){...}   -> {get: propertyE(){...}}
   set propertyF(){...}   -> {get: propertyF(){...}}
   method: Function

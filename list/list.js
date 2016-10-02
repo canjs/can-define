@@ -47,15 +47,12 @@ var DefineList = Construct.extend("DefineList",
 	{
 		setup: function(base) {
 			if (DefineList) {
-				// remove "*" because it means something else
+				
 				var prototype = this.prototype;
-				var itemsDefinition = prototype["*"];
-				delete prototype["*"];
-				define(prototype, prototype, base.prototype._define);
-				if (itemsDefinition) {
-					prototype["*"] = itemsDefinition;
-					itemsDefinition = define.getDefinitionOrMethod("*", itemsDefinition, {});
+				var result = define(prototype, prototype, base.prototype._define);
+				var itemsDefinition = result.definitions["#"] || result.defaultDefinition;
 
+				if (itemsDefinition) {
 					if (itemsDefinition.Type) {
 						this.prototype.__type = make.set.Type("*", itemsDefinition.Type, identity);
 					} else if (itemsDefinition.type) {
@@ -92,40 +89,33 @@ var DefineList = Construct.extend("DefineList",
 
 			canBatch.start();
 
-			canEvent.dispatch.call(this, {
-				type: "" + attr,
-				target: this
-			}, [newVal, oldVal]);
-
 			var index = +attr;
 			// `batchTrigger` direct add and remove events...
 
 			// Make sure this is not nested and not an expando
 			if (!~("" + attr).indexOf('.') && !isNaN(index)) {
-				var defaultDefinition = this["*"];
-				var added, removed;
-				if (defaultDefinition && defaultDefinition.added) {
-					added = defaultDefinition.added;
-				}
-				if (defaultDefinition && defaultDefinition.removed) {
-					removed = defaultDefinition.removed;
-				}
+				var itemsDefinition = this._define.definitions["#"];
 
 				if (how === 'add') {
-					if (added && typeof added === 'function') {
-						Observation.ignore(added).call(this, newVal, index);
+					if (itemsDefinition && typeof itemsDefinition.added === 'function') {
+						Observation.ignore(itemsDefinition.added).call(this, newVal, index);
 					}
 					canEvent.dispatch.call(this, how, [newVal, index]);
 					canEvent.dispatch.call(this, 'length', [this._length]);
 				} else if (how === 'remove') {
-					if (removed && typeof removed === 'function') {
-						Observation.ignore(removed).call(this, oldVal, index);
+					if (itemsDefinition && typeof itemsDefinition.removed === 'function') {
+						Observation.ignore(itemsDefinition.removed).call(this, oldVal, index);
 					}
 					canEvent.dispatch.call(this, how, [oldVal, index]);
 					canEvent.dispatch.call(this, 'length', [this._length]);
 				} else {
 					canEvent.dispatch.call(this, how, [newVal, index]);
 				}
+			} else {
+				canEvent.dispatch.call(this, {
+					type: "" + attr,
+					target: this
+				}, [newVal, oldVal]);
 			}
 
 			canBatch.stop();

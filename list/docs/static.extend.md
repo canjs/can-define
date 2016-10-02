@@ -14,7 +14,7 @@ var DefineList = require("can-define/list/list");
 var TodoList = DefineList.extend(
   "TodoList",
   {
-    "*": {type: {complete: "boolean", name: "string"}}
+    "#": {type: {complete: "boolean", name: "string"}}
     availableCount: "number",
     completedCount: {
       get: function(){
