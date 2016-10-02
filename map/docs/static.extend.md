@@ -1,7 +1,7 @@
 @function can-define/map/map.extend extend
 @parent can-define/map/map.static
 
-@description Create a custom map type
+@description Define a custom map type.
 
 @signature `DefineMap.extend([name,] [static,] prototype)`
 
