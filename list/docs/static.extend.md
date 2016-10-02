@@ -1,7 +1,7 @@
 @function can-define/list/list.extend extend
 @parent can-define/list/list.static
 
-@description Create a custom list type
+@description Define a custom list type.
 
 @signature `DefineList.extend([name,] [static,] prototype)`
 
@@ -14,7 +14,7 @@ var DefineList = require("can-define/list/list");
 var TodoList = DefineList.extend(
   "TodoList",
   {
-    "*": {type: {complete: "boolean", name: "string"}}
+    "#": {type: {complete: "boolean", name: "string"}}
     availableCount: "number",
     completedCount: {
       get: function(){
@@ -47,3 +47,6 @@ todos.completeCount //-> 2
   @param {Object<String,Function|can-define.types.propDefinition>} prototype A definition of the properties or methods on this type.
 
 @return {can-define/list/list} A DefineList constructor function.
+
+
+@body

@@ -8,11 +8,13 @@
 
 @description Create observable objects.
 
-@signature `new can.DefineMap([props])`
+@signature `new DefineMap([props])`
 
 Creates a new instance of DefineMap or an extended DefineMap. Then, assigns every property on `props` to the new instance.  If props are passed that are not defined already, those property definitions are created.  If the instance should be sealed, it is sealed.
 
 ```js
+var DefineMap = require("can-define/map/map");
+
 var person = new DefineMap({
   first: "Justin",
   last: "Meyer"

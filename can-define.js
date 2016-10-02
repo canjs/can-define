@@ -10,7 +10,6 @@ var canEvent = require("can-event");
 var compute = require("can-compute");
 var Observation = require("can-observation");
 
-var canEach = require("can-util/js/each/each");
 var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
 var assign = require("can-util/js/assign/assign");
 var dev = require("can-util/js/dev/dev");
@@ -19,9 +18,10 @@ var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
 var isArray = require("can-util/js/is-array/is-array");
 var types = require("can-util/js/types/types");
 var each = require("can-util/js/each/each");
+var defaults = require("can-util/js/defaults/defaults");
 var ns = require("can-util/namespace");
 
-var eventsProto, getPropDefineBehavior, define,
+var eventsProto, define,
 	make, makeDefinition, replaceWith, getDefinitionsAndMethods,
 	isDefineType, getDefinitionOrMethod;
 
@@ -55,7 +55,7 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 
 	// Goes through each property definition and creates
 	// a `getter` and `setter` function for `Object.defineProperty`.
-	canEach(result.definitions, function(definition, property){
+	each(result.definitions, function(definition, property){
 		define.property(objPrototype, property, definition, dataInitializers, computedInitializers);
 	});
 
@@ -393,7 +393,7 @@ make = {
 			// `type`: {foo: "string"}
 			if(isArray(Type) && types.DefineList) {
 				Type = types.DefineList.extend({
-					"*": Type[0]
+					"#": Type[0]
 				});
 			} else if (typeof Type === "object") {
 				if(types.DefineMap) {
@@ -478,37 +478,48 @@ make = {
 
 define.behaviors = ["get", "set", "value", "Value", "type", "Type", "serialize"];
 
-// gets a behavior for a definition or from the defaultDefinition
-getPropDefineBehavior = function(behaviorName, prop, def, defaultDefinition) {
-	if(behaviorName in def) {
-		return def[behaviorName];
-	} else {
-		return defaultDefinition[behaviorName];
+var addDefinition = function(definition, behavior, value) {
+	if(behavior === "type") {
+		var behaviorDef = value;
+		if(typeof behaviorDef === "string") {
+			behaviorDef = define.types[behaviorDef];
+			if(typeof behaviorDef === "object") {
+				assign(definition, behaviorDef);
+				behaviorDef = behaviorDef[behavior];
+			}
+		}
+		definition[behavior] = behaviorDef;
+	}
+	else {
+		definition[behavior] = value;
 	}
 };
-// makes a full definition, using the defaultDefinition
+
 makeDefinition = function(prop, def, defaultDefinition) {
 	var definition = {};
-	define.behaviors.forEach(function(behavior) {
-		var behaviorDef = getPropDefineBehavior(behavior, prop, def, defaultDefinition);
-		if (behaviorDef !== undefined) {
-			if(behavior === "type" && typeof behaviorDef === "string") {
-				behaviorDef = define.types[behaviorDef];
-				if(typeof behaviorDef === "object") {
-					assign(definition, behaviorDef);
-					behaviorDef = behaviorDef[behavior];
-				}
+
+	each(def, function(value, behavior) {
+		addDefinition(definition, behavior, value);
+	});
+	// only add default if it doesn't exist
+	each(defaultDefinition, function(value, prop){
+		if(definition[prop] === undefined) {
+			if(prop !== "type" && prop !== "Type") {
+				definition[prop] = value;
 			}
-			definition[behavior] = behaviorDef;
 		}
 	});
+	// if there's no type definition, take it from the defaultDefinition
+	if(!definition.type && !definition.Type) {
+		defaults(definition, defaultDefinition);
+	}
+
+
 	if( isEmptyObject(definition) ) {
 		definition.type = define.types["*"];
 	}
 	return definition;
 };
-
-
 
 getDefinitionOrMethod = function(prop, value, defaultDefinition){
 	var definition;
@@ -521,9 +532,13 @@ getDefinitionOrMethod = function(prop, value, defaultDefinition){
 		} else if(isDefineType(value)) {
 			definition = {type: value};
 		}
-	} else if(isPlainObject(value)){
+		// or leaves as a function
+	} else if( isArray(value) ) {
+		definition = {Type: value};
+	} else if( isPlainObject(value) ){
 		definition = value;
 	}
+	
 	if(definition) {
 		return makeDefinition(prop, definition, defaultDefinition);
 	} else {
