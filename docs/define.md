@@ -5,6 +5,7 @@ and their behavior on a prototype object.
 @group can-define.static 0 static
 @group can-define.typedefs 1 types
 @group can-define.behaviors 2 behaviors
+@package ../package.json
 
 @signature `define(prototype, propDefinitions)`
 
