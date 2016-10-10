@@ -14,7 +14,7 @@
     "release:minor": "npm version minor && npm publish",
     "release:major": "npm version major && npm publish",
     "start": "serve -p 8080",
-    "testee": "testee test.html --browsers firefox",
+    "testee": "testee test/test.html --browsers firefox",
     "test": "npm run jshint && npm run testee"
   },
   "repository": {
