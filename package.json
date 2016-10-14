@@ -31,11 +31,11 @@
   },
   "homepage": "https://github.com/canjs/can-define",
   "dependencies": {
-    "can-compute": "^3.0.0-pre.12",
-    "can-construct": "^3.0.0-pre.3",
-    "can-event": "^3.0.0-pre.14",
-    "can-observation": "^3.0.0-pre.11",
-    "can-util": "^3.0.0-pre.50"
+    "can-compute": "^3.0.0",
+    "can-construct": "^3.0.0",
+    "can-event": "^3.0.1",
+    "can-observation": "^3.0.1",
+    "can-util": "^3.0.1"
   },
   "devDependencies": {
     "can-list": "^3.0.0-pre.8",
