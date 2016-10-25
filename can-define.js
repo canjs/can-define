@@ -25,6 +25,17 @@ var eventsProto, define,
 	make, makeDefinition, replaceWith, getDefinitionsAndMethods,
 	isDefineType, getDefinitionOrMethod;
 
+var supportsSeal = (function() {
+	try {
+		var o = {};
+		Object.seal(o);
+		o.prop = true;
+		return false;
+	} catch(e) {
+		return true;
+	}
+})();
+
 var defineConfigurableAndNotEnumerable = function(obj, prop, value) {
 	Object.defineProperty(obj, prop, {
 		configurable: true,
@@ -672,11 +683,12 @@ define.setup = function(props, sealed) {
 	//!steal-remove-start
 	this._data;
 	this._computed;
-	if(sealed !== false) {
+	if(sealed !== false && supportsSeal) {
 		Object.seal(this);
 	}
 	//!steal-remove-end
 };
+define.supportsSeal = supportsSeal;
 define.replaceWith = replaceWith;
 define.eventsProto = eventsProto;
 define.defineConfigurableAndNotEnumerable = defineConfigurableAndNotEnumerable;
