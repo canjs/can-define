@@ -4,6 +4,16 @@ var DefineMap = require("can-define/map/map");
 var Observation = require("can-observation");
 var canTypes = require("can-util/js/types/types");
 var each = require("can-util/js/each/each");
+var sealWorks = (function() {
+	try {
+		var o = {};
+		Object.seal(o);
+		o.prop = true;
+		return false;
+	} catch(e) {
+		return true;
+	}
+})();
 
 QUnit.module("can-define/map/map");
 
@@ -42,21 +52,6 @@ QUnit.test("extending", function(){
     });
 
     map.prop = "BAR";
-});
-
-
-QUnit.test("setting not defined property", function(){
-    var MyMap = DefineMap.extend({
-        prop: {}
-    });
-    var mymap = new MyMap();
-
-    try {
-        mymap.notdefined = "value";
-        ok(false, "no error");
-    } catch(e) {
-        ok(true, "error thrown");
-    }
 });
 
 QUnit.test("loop only through defined serializable props", function(){
@@ -427,3 +422,19 @@ QUnit.test("Inheriting DefineMap .set doesn't work if prop is on base map (#74)"
 
     QUnit.equal(inherting.baseProp,"value", "set prop");
 });
+
+if(sealWorks) {
+	QUnit.test("setting not defined property", function(){
+	    var MyMap = DefineMap.extend({
+	        prop: {}
+	    });
+	    var mymap = new MyMap();
+
+	    try {
+	        mymap.notdefined = "value";
+	        ok(false, "no error");
+	    } catch(e) {
+	        ok(true, "error thrown");
+	    }
+	});
+}
