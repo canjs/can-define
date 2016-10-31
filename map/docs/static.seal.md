@@ -9,7 +9,7 @@ behavior of [can-define/map/map.extend extended DefineMaps]:
 
 ```js
 "use strict";
-var Person = can.DefineMap.extend({});
+var Person = DefineMap.extend({});
 var me = new Person();
 me.age = 33 //-> throws "TypeError: Can't add property age, object is not extensible"
 ```
@@ -18,7 +18,7 @@ If `false`, the object will not be sealed.  This is the default behavior of
 unextended [can-define/map/map DefineMaps].  Use [can-define/map/map.prototype.get] and [can-define/map/map.prototype.set] to get and set values:
 
 ```js
-var person = new can.DefineMap();
+var person = new DefineMap();
 person.set("first","Justin");
 person.set("last","Meyer");
 
@@ -29,7 +29,7 @@ person.get("last") //-> "Meyer"
 Set `seal` to `false` on objects that have an indeterminate number of properties:
 
 ```js
-var Style = can.DefineMap.extend({
+var Style = DefineMap.extend({
   seal: false
 },{
   cssText: {

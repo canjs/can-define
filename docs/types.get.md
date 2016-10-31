@@ -66,7 +66,7 @@ Getter methods are useful for:
 Virtual properties are properties that don't actually store any value, but derive their value
 from some other properties on the map.
 
-Whenever a getter is provided, it is wrapped in a [can.compute], which ensures
+Whenever a getter is provided, it is wrapped in a [can-compute], which ensures
 that whenever its dependent properties change, a change event will fire for this property also.
 
 ```js

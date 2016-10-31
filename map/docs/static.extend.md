@@ -5,7 +5,7 @@
 
 @signature `DefineMap.extend([name,] [static,] prototype)`
 
-Extends can.DefineMap, or constructor functions derived from can.DefineMap,
+Extends DefineMap, or constructor functions derived from DefineMap,
 to create a new constructor function.
 
 ```js
@@ -49,7 +49,7 @@ me.age      //-> 0
   me.sayHi();
   ```
 
-  If the property definition is a __string__, it's considered a `type` setting to be looked up in [can-define.types can.define.types].
+  If the property definition is a __string__, it's considered a `type` setting to be looked up in [can-define.types can-define.types].
 
   ```js
   var Person = DefineMap.extend({

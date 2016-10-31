@@ -8,11 +8,13 @@
 
 @description Create observable lists.
 
-@signature `new can.DefineList([items])`
+@signature `new DefineList([items])`
 
 Creates an instance of a DefineList or an extended DefineList with enumerated properties from `items`.
 
 ```js
+var DefineList = require("can-define/list/list");
+
 var people = new DefineList([
   { first: "Justin", last: "Meyer" },
   { first: "Paula", last: "Strozak" }
@@ -68,7 +70,7 @@ var todos = new TodoList([{complete: true}, {complete:false}]);
 todos.completed.length //-> 1
 ```
 
-Finally, DefineMap instances are observable, so you can use the [canjs/doc/can-event]
+Finally, DefineMap instances are observable, so you can use the [can-event]
 methods to listen to its [can-define/list/list/AddEvent],
 [can-define/list/list/LengthEvent], [can-define/list/list/RemoveEvent],
 and [can-define/list/list/PropertyNameEvent] events:
