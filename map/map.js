@@ -148,9 +148,10 @@ var DefineMap = Construct.extend("DefineMap",{
      *   @return {*} The value of that property.
      */
     get: function(prop){
-        if(arguments.length) {
-            if(prop in this || Object.isSealed(this)) {
-                return this[prop];
+        if(prop) {
+            var value = this[prop];
+            if(value !== undefined || prop in this || Object.isSealed(this)) {
+                return value;
             } else {
                 Observation.add(this, prop);
                 return this[prop];
