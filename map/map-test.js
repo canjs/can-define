@@ -423,7 +423,7 @@ QUnit.test("Inheriting DefineMap .set doesn't work if prop is on base map (#74)"
     QUnit.equal(inherting.baseProp,"value", "set prop");
 });
 
-if(sealWorks) {
+if(sealWorks && System.env.indexOf('production') < 0) {
 	QUnit.test("setting not defined property", function(){
 	    var MyMap = DefineMap.extend({
 	        prop: {}

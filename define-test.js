@@ -1152,25 +1152,27 @@ QUnit.test("expandos are added in define.setup (#25)", function() {
 	map.prop = 5;
 });
 
-QUnit.test("logs work with maps", function() {
-	var MyMap = define.Constructor({
-		first: "string",
-		last: "string"
-	});
-	var m = new MyMap({
-		first: "J",
-		last: "M"
-	});
-	var fullName = compute(function() {
-		return m.first + m.last;
-	});
+if (compute.prototype.trace) {
+	QUnit.test("logs work with maps", function() {
+		var MyMap = define.Constructor({
+			first: "string",
+			last: "string"
+		});
+		var m = new MyMap({
+			first: "J",
+			last: "M"
+		});
+		var fullName = compute(function() {
+			return m.first + m.last;
+		});
 
-	fullName.on("change", function() {});
+		fullName.on("change", function() {});
 
-	var t = fullName.computeInstance.trace();
-	QUnit.equal(t.dependencies[0].obj, m);
-	QUnit.equal(t.dependencies[1].obj, m);
-});
+		var t = fullName.computeInstance.trace();
+		QUnit.equal(t.dependencies[0].obj, m);
+		QUnit.equal(t.dependencies[1].obj, m);
+	});
+}
 
 QUnit.test('Set property with type compute', function() {
 	var MyMap = define.Constructor({
