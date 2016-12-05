@@ -127,8 +127,8 @@ test('Concatenated list items Equal original', function() {
 test('Lists with maps concatenate properly', function() {
 	var Person = DefineMap.extend();
 	var People = DefineList.extend({
-		DefineMap: Person
-	},{});
+		'#': Person
+	});
 	var Genius = Person.extend();
 	var Animal = DefineMap.extend();
 
