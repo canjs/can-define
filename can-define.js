@@ -64,7 +64,7 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 	// for any value that has a default value.
 	replaceWith(objPrototype, "_data", function() {
 		var map = this;
-		var data = {};
+		var data = Object.create(null);
 		for (var prop in dataInitializers) {
 			replaceWith(data, prop, dataInitializers[prop].bind(map), true);
 		}
@@ -76,7 +76,7 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 	// that will create the property's compute when read.
 	replaceWith(objPrototype, "_computed", function() {
 		var map = this;
-		var data = {};
+		var data = Object.create(null);
 		for (var prop in computedInitializers) {
 			replaceWith(data, prop, computedInitializers[prop].bind(map));
 		}
@@ -556,7 +556,7 @@ getDefinitionsAndMethods = function(defines, baseDefines) {
 		delete defines["*"];
 		defaultDefinition = getDefinitionOrMethod("*", defaults, {});
 	} else {
-		defaultDefinition = {};
+		defaultDefinition = Object.create(null);
 	}
 
 	eachPropertyDescriptor(defines, function( prop, propertyDescriptor ) {
@@ -647,12 +647,12 @@ delete eventsProto.one;
 
 define.setup = function(props, sealed) {
 	defineConfigurableAndNotEnumerable(this, "_cid");
-	defineConfigurableAndNotEnumerable(this, "__bindEvents", {});
+	defineConfigurableAndNotEnumerable(this, "__bindEvents", Object.create(null));
 	defineConfigurableAndNotEnumerable(this, "_bindings", 0);
 	/* jshint -W030 */
 	CID(this);
 	var definitions = this._define.definitions;
-	var instanceDefinitions = {};
+	var instanceDefinitions = Object.create(null);
 	var map = this;
 	each(props, function(value, prop){
 		if(definitions[prop]) {

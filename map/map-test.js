@@ -4,6 +4,7 @@ var DefineMap = require("can-define/map/map");
 var Observation = require("can-observation");
 var canTypes = require("can-util/js/types/types");
 var each = require("can-util/js/each/each");
+var assign = require("can-util/js/assign/assign");
 var sealWorks = (function() {
 	try {
 		var o = {};
@@ -368,6 +369,18 @@ QUnit.test("extending DefineMap constructor functions - value (#18)", function()
     QUnit.equal( c.aProp , 1 ,"got initial value" );
 });
 
+QUnit.test("copying DefineMap excludes constructor", function() {
+
+    var AType = DefineMap.extend("AType", { aProp: {value: 1} });
+
+    var a = new AType();
+
+    var b = assign({}, a);
+
+    QUnit.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
+    QUnit.equal(a.aProp, b.aProp, "Other values are unaffected");
+
+});
 QUnit.test("shorthand getter setter (#56)", function(){
 
     var Person = DefineMap.extend({
