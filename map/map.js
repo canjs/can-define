@@ -29,7 +29,7 @@ var eachDefinition = function(map, cb, thisarg, definitions, observe) {
 };
 
 var setProps = function(props, remove) {
-	props = assign({}, props);
+	props = defineHelpers.removeSpecialKeys(assign({}, props));
 	var prop,
 		self = this,
 		newVal;
@@ -92,7 +92,11 @@ var DefineMap = Construct.extend("DefineMap",{
 			}
 
 			this.prototype.setup = function(props){
-				define.setup.call(this, defineHelpers.toObject(this, props,{}, DefineMap), this.constructor.seal);
+				define.setup.call(
+					this, 
+					defineHelpers.removeSpecialKeys(defineHelpers.toObject(this, props,{}, DefineMap)),
+					this.constructor.seal
+				);
 			};
 		} else {
 			for(key in prototype) {
@@ -116,7 +120,11 @@ var DefineMap = Construct.extend("DefineMap",{
 				value: {}
 			});
 		}
-		define.setup.call(this, defineHelpers.toObject(this, props,{}, DefineMap), sealed === true);
+		define.setup.call(
+			this,
+			defineHelpers.removeSpecialKeys(defineHelpers.toObject(this, props,{}, DefineMap)),
+			sealed === true
+		);
 	},
 	/**
 	 * @function can-define/map/map.prototype.get get
