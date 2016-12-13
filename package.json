@@ -41,12 +41,12 @@
     "can-list": "^3.0.0-pre.8",
     "can-stache": "^3.0.0-pre.20",
     "jshint": "^2.9.1",
-    "serve": "^1.4.0",
+    "serve": "^2.0.0",
     "steal": "^0.16.0",
     "steal-qunit": "^0.1.1",
     "steal-tools": "^0.16.0",
-    "testee": "^0.2.5",
-    "bit-docs": "^0.0.5"
+    "testee": "^0.3.0",
+    "bit-docs": "^0.0.7"
   },
   "system": {
     "npmAlgorithm": "flat"
