@@ -2,7 +2,7 @@
 var QUnit = require("steal-qunit");
 var DefineMap = require("can-define/map/map");
 var Observation = require("can-observation");
-var canTypes = require("can-util/js/types/types");
+var canTypes = require("can-types");
 var each = require("can-util/js/each/each");
 var sealWorks = (function() {
 	try {

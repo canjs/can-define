@@ -6,8 +6,8 @@ var Observation = require("can-observation");
 var define = require("can-define");
 
 var assign = require("can-util/js/assign/assign");
-var CID = require("can-util/js/cid/cid");
-var types = require("can-util/js/types/types");
+var CID = require("can-cid");
+var types = require("can-types");
 var stache = require("can-stache");
 
 QUnit.module("can-define/list/list");

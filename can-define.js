@@ -13,13 +13,13 @@ var Observation = require("can-observation");
 var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
 var assign = require("can-util/js/assign/assign");
 var dev = require("can-util/js/dev/dev");
-var CID = require("can-util/js/cid/cid");
+var CID = require("can-cid");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
 var isArray = require("can-util/js/is-array/is-array");
-var types = require("can-util/js/types/types");
+var types = require("can-types");
 var each = require("can-util/js/each/each");
 var defaults = require("can-util/js/defaults/defaults");
-var ns = require("can-util/namespace");
+var ns = require("can-namespace");
 
 var eventsProto, define,
 	make, makeDefinition, replaceWith, getDefinitionsAndMethods,
