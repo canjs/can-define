@@ -11,21 +11,10 @@ var assign = require("can-util/js/assign/assign");
 var each = require("can-util/js/each/each");
 var isArray = require("can-util/js/is-array/is-array");
 var makeArray = require("can-util/js/make-array/make-array");
-var types = require("can-util/js/types/types");
-var ns = require("can-util/namespace");
+var types = require("can-types");
+var ns = require("can-namespace");
 
 var splice = [].splice;
-
-// Function that serializes the passed arg if
-// type does not match MapType of `this` list
-// then adds to args array
-var serializeNonTypes = function(MapType, arg, args) {
-	if (arg && arg.serialize && !(arg instanceof MapType)) {
-		args.push(new MapType(arg.serialize()));
-	} else {
-		args.push(arg);
-	}
-};
 
 var identity = function(x) {
 	return x;
@@ -800,24 +789,23 @@ assign(DefineList.prototype, {
 	 * ```
 	 */
 	concat: function() {
-		var args = [],
-			MapType = this.constructor.DefineMap;
+		var args = [];
 		// Go through each of the passed `arguments` and
 		// see if it is list-like, an array, or something else
 		each(arguments, function(arg) {
 			if (types.isListLike(arg) || Array.isArray(arg)) {
 				// If it is list-like we want convert to a JS array then
-				// pass each item of the array to serializeNonTypes
+				// pass each item of the array to this.__type
 				var arr = types.isListLike(arg) ? makeArray(arg) : arg;
 				each(arr, function(innerArg) {
-					serializeNonTypes(MapType, innerArg, args);
-				});
+					args.push(this.__type(innerArg));
+				}, this);
 			} else {
 				// If it is a Map, Object, or some primitive
-				// just pass arg to serializeNonTypes
-				serializeNonTypes(MapType, arg, args);
+				// just pass arg to this.__type
+				args.push(this.__type(arg));
 			}
-		});
+		}, this);
 
 		// We will want to make `this` list into a JS array
 		// as well (We know it should be list-like), then

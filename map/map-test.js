@@ -2,7 +2,7 @@
 var QUnit = require("steal-qunit");
 var DefineMap = require("can-define/map/map");
 var Observation = require("can-observation");
-var canTypes = require("can-util/js/types/types");
+var canTypes = require("can-types");
 var each = require("can-util/js/each/each");
 var sealWorks = (function() {
 	try {
@@ -423,7 +423,7 @@ QUnit.test("Inheriting DefineMap .set doesn't work if prop is on base map (#74)"
     QUnit.equal(inherting.baseProp,"value", "set prop");
 });
 
-if(sealWorks) {
+if(sealWorks && System.env.indexOf('production') < 0) {
 	QUnit.test("setting not defined property", function(){
 	    var MyMap = DefineMap.extend({
 	        prop: {}

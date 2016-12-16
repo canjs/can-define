@@ -10,7 +10,7 @@ stealTools.export({
         "+standalone": {
           modules: ["can-define", "can-define/map/map", "can-define/list/list"],
           exports: {
-            "can-util/namespace": "can"
+            "can-namespace": "can"
           }
         }
     }
