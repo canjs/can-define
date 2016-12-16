@@ -438,3 +438,39 @@ if(sealWorks && System.env.indexOf('production') < 0) {
 	    }
 	});
 }
+
+QUnit.test(".extend errors when re-defining a property (#117)", function(){
+
+	var A = DefineMap.extend("A", {
+	    foo: {
+	        type: "string",
+	        value: "blah"
+	    }
+	});
+
+
+	A.extend("B", {
+	    foo: {
+	        type: "string",
+	        value: "flub"
+	    }
+	});
+
+	var C = DefineMap.extend("C", {
+	    foo: {
+	        get: function() {
+	            return "blah";
+	        }
+	    }
+	});
+
+
+	C.extend("D", {
+	    foo: {
+	        get: function() {
+	            return "flub";
+	        }
+	    }
+	});
+	QUnit.ok(true, "extended without errors");
+});
