@@ -268,7 +268,7 @@ for(var prop in define.eventsProto) {
     Object.defineProperty(DefineMap.prototype, prop, {
         enumerable:false,
         value: define.eventsProto[prop],
-		writable: true
+        writable: true
     });
 }
 types.DefineMap = DefineMap;
