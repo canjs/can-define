@@ -19,8 +19,7 @@ QUnit.module("can-define/map/map");
 
 QUnit.test("Map is an event emitter", function (assert) {
 	var Map = DefineMap.extend({});
-	assert.ok(DefineMap.on, 'Event methods have been copied to DefineMap.');
-	assert.ok(Map.on, 'Event methods have been copied to the Map.');
+	assert.ok(Map.on, 'Map has event methods.');
 });
 
 QUnit.test("creating an instance", function(){
