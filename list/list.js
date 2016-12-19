@@ -1049,7 +1049,11 @@ assign(DefineList.prototype, {
 
 // Add necessary event methods to this object.
 for (var prop in define.eventsProto) {
-	DefineList[prop] = define.eventsProto[prop];
+	Object.defineProperty(DefineList, prop, {
+		enumerable: true,
+		value: define.eventsProto[prop],
+		writable: true
+	});
 	Object.defineProperty(DefineList.prototype, prop, {
 		enumerable: false,
 		value: define.eventsProto[prop],
