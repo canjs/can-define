@@ -260,9 +260,11 @@ var DefineMap = Construct.extend("DefineMap",{
 
 // Add necessary event methods to this object.
 for(var prop in define.eventsProto) {
+    DefineMap[prop] = define.eventsProto[prop];
     Object.defineProperty(DefineMap.prototype, prop, {
         enumerable:false,
-        value: define.eventsProto[prop]
+        value: define.eventsProto[prop],
+        writable: true
     });
 }
 types.DefineMap = DefineMap;

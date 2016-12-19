@@ -12,6 +12,13 @@ var stache = require("can-stache");
 
 QUnit.module("can-define/list/list");
 
+QUnit.test("List is an event emitter", function (assert) {
+	var Base = DefineList.extend({});
+	assert.ok(Base.on, 'Base has event methods.');
+	var List = Base.extend({});
+	assert.ok(List.on, 'List has event methods.');
+});
+
 QUnit.test("creating an instance", function(){
     var list = new DefineList(["a","b","c"]);
 

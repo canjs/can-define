@@ -17,6 +17,13 @@ var sealWorks = (function() {
 
 QUnit.module("can-define/map/map");
 
+QUnit.test("Map is an event emitter", function (assert) {
+	var Base = DefineMap.extend({});
+	assert.ok(Base.on, 'Base has event methods.');
+	var Map = Base.extend({});
+	assert.ok(Map.on, 'Map has event methods.');
+});
+
 QUnit.test("creating an instance", function(){
     var map = new DefineMap({prop: "foo"});
     map.on("prop", function(ev, newVal, oldVal){
