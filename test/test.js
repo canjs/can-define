@@ -1,8 +1,8 @@
 require("../list/list-test");
 require("../map/map-test");
 require("../define-test");
-var DefineMap = require("../map/map");
-var DefineList = require("../list/list");
+var DefineMap = require("can-define/map/map");
+var DefineList = require("can-define/list/list");
 var isArray = require("can-util/js/is-array/is-array");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
 
