@@ -6,11 +6,18 @@ var Observation = require("can-observation");
 var define = require("can-define");
 
 var assign = require("can-util/js/assign/assign");
-var CID = require("can-util/js/cid/cid");
-var types = require("can-util/js/types/types");
+var CID = require("can-cid");
+var types = require("can-types");
 var stache = require("can-stache");
 
 QUnit.module("can-define/list/list");
+
+QUnit.test("List is an event emitter", function (assert) {
+	var Base = DefineList.extend({});
+	assert.ok(Base.on, 'Base has event methods.');
+	var List = Base.extend({});
+	assert.ok(List.on, 'List has event methods.');
+});
 
 QUnit.test("creating an instance", function(){
     var list = new DefineList(["a","b","c"]);

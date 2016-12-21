@@ -1,11 +1,11 @@
 {
   "name": "can-define",
-  "version": "1.0.5",
+  "version": "1.0.10",
   "description": "Create observable objects with JS dot operator compatibility",
   "main": "can-define.js",
   "scripts": {
     "build": "node build.js",
-    "jshint": "jshint --config .jshintrc --exclude ./node_modules .",
+    "jshint": "jshint --config .jshintrc --exclude ./node_modules,./dist .",
     "preversion": "npm test && npm run build",
     "version": "git commit -am \"Update dist for release\" && git checkout -b release && git add -f dist/",
     "postversion": "git push --tags && git checkout master && git branch -D release && git push",
@@ -31,22 +31,25 @@
   },
   "homepage": "https://github.com/canjs/can-define",
   "dependencies": {
+    "can-cid": "^1.0.0",
     "can-compute": "^3.0.0",
-    "can-construct": "^3.0.0",
+    "can-construct": "^3.0.6",
     "can-event": "^3.0.1",
+    "can-namespace": "^1.0.0",
     "can-observation": "^3.0.1",
-    "can-util": "^3.0.1"
+    "can-types": "^1.0.1",
+    "can-util": "^3.1.1"
   },
   "devDependencies": {
-    "can-list": "^3.0.0-pre.8",
-    "can-stache": "^3.0.0-pre.20",
+    "can-list": "^3.0.1",
+    "can-stache": "^3.0.13",
     "jshint": "^2.9.1",
-    "serve": "^1.4.0",
+    "serve": "^2.0.0",
     "steal": "^0.16.0",
     "steal-qunit": "^0.1.1",
     "steal-tools": "^0.16.0",
-    "testee": "^0.2.5",
-    "bit-docs": "^0.0.5"
+    "testee": "^0.3.0",
+    "bit-docs": "^0.0.7"
   },
   "system": {
     "npmAlgorithm": "flat"

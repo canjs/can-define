@@ -5,9 +5,9 @@ var isArray = require("can-util/js/is-array/is-array");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
 var defineHelpers = require("../define-helpers/define-helpers");
 var Observation = require("can-observation");
-var types = require("can-util/js/types/types");
+var types = require("can-types");
 var canBatch = require("can-event/batch/batch");
-var ns = require("can-util/namespace");
+var ns = require("can-namespace");
 
 var readWithoutObserve = Observation.ignore(function(map, prop){
 	return map[prop];
@@ -277,10 +277,11 @@ var DefineMap = Construct.extend("DefineMap",{
 
 // Add necessary event methods to this object.
 for(var prop in define.eventsProto) {
-	Object.defineProperty(DefineMap.prototype, prop, {
-		enumerable:false,
-		value: define.eventsProto[prop]
-	});
+    Object.defineProperty(DefineMap.prototype, prop, {
+        enumerable:false,
+        value: define.eventsProto[prop],
+        writable: true
+    });
 }
 types.DefineMap = DefineMap;
 types.DefaultMap = DefineMap;

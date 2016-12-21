@@ -6,7 +6,7 @@ var CanList = require("can-list");
 var canBatch = require("can-event/batch/batch");
 var isArray = require("can-util/js/is-array/is-array");
 var each = require("can-util/js/each/each");
-var types = require("can-util/js/types/types");
+var types = require("can-types");
 
 QUnit.module("can-define");
 

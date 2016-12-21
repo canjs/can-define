@@ -2,7 +2,7 @@
 var QUnit = require("steal-qunit");
 var DefineMap = require("can-define/map/map");
 var Observation = require("can-observation");
-var canTypes = require("can-util/js/types/types");
+var canTypes = require("can-types");
 var each = require("can-util/js/each/each");
 var assign = require("can-util/js/assign/assign");
 var sealWorks = (function() {
@@ -17,6 +17,13 @@ var sealWorks = (function() {
 })();
 
 QUnit.module("can-define/map/map");
+
+QUnit.test("Map is an event emitter", function (assert) {
+	var Base = DefineMap.extend({});
+	assert.ok(Base.on, 'Base has event methods.');
+	var Map = Base.extend({});
+	assert.ok(Map.on, 'Map has event methods.');
+});
 
 QUnit.test("creating an instance", function(){
 	var map = new DefineMap({prop: "foo"});
@@ -497,3 +504,39 @@ if(sealWorks && System.env.indexOf('production') < 0) {
 		}
 	});
 }
+
+QUnit.test(".extend errors when re-defining a property (#117)", function(){
+
+	var A = DefineMap.extend("A", {
+	    foo: {
+	        type: "string",
+	        value: "blah"
+	    }
+	});
+
+
+	A.extend("B", {
+	    foo: {
+	        type: "string",
+	        value: "flub"
+	    }
+	});
+
+	var C = DefineMap.extend("C", {
+	    foo: {
+	        get: function() {
+	            return "blah";
+	        }
+	    }
+	});
+
+
+	C.extend("D", {
+	    foo: {
+	        get: function() {
+	            return "flub";
+	        }
+	    }
+	});
+	QUnit.ok(true, "extended without errors");
+});

@@ -11,8 +11,8 @@ var assign = require("can-util/js/assign/assign");
 var each = require("can-util/js/each/each");
 var isArray = require("can-util/js/is-array/is-array");
 var makeArray = require("can-util/js/make-array/make-array");
-var types = require("can-util/js/types/types");
-var ns = require("can-util/namespace");
+var types = require("can-types");
+var ns = require("can-namespace");
 
 var splice = [].splice;
 
@@ -1049,6 +1049,7 @@ assign(DefineList.prototype, {
 
 // Add necessary event methods to this object.
 for (var prop in define.eventsProto) {
+	DefineList[prop] = define.eventsProto[prop];
 	Object.defineProperty(DefineList.prototype, prop, {
 		enumerable: false,
 		value: define.eventsProto[prop],

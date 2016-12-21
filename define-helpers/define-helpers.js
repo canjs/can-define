@@ -1,6 +1,6 @@
 
 var assign = require("can-util/js/assign/assign");
-var CID = require("can-util/js/cid/cid");
+var CID = require("can-cid");
 var define = require("can-define");
 var canBatch = require("can-event/batch/batch");
 var canEvent = require("can-event");

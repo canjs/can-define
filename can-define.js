@@ -13,13 +13,13 @@ var Observation = require("can-observation");
 var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
 var assign = require("can-util/js/assign/assign");
 var dev = require("can-util/js/dev/dev");
-var CID = require("can-util/js/cid/cid");
+var CID = require("can-cid");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
 var isArray = require("can-util/js/is-array/is-array");
-var types = require("can-util/js/types/types");
+var types = require("can-types");
 var each = require("can-util/js/each/each");
 var defaults = require("can-util/js/defaults/defaults");
-var ns = require("can-util/namespace");
+var ns = require("can-namespace");
 
 var eventsProto, define,
 	make, makeDefinition, replaceWith, getDefinitionsAndMethods,
@@ -114,6 +114,15 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 
 define.extensions = function () {};
 
+var onlyType = function(obj){
+	for(var prop in obj) {
+		if(prop !== "type") {
+			return false;
+		}
+	}
+	return true;
+};
+
 define.property = function(objPrototype, prop, definition, dataInitializers, computedInitializers) {
 	var propertyDefinition = define.extensions.apply(this, arguments);
 
@@ -122,11 +131,9 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 	}
 
 	var type = definition.type;
-	delete definition.type;
 
 	// Special case definitions that have only `type: "*"`.
-	if (type && isEmptyObject(definition) && type === define.types["*"]) {
-		definition.type = type;
+	if (type && onlyType(definition) && type === define.types["*"]) {
 		Object.defineProperty(objPrototype, prop, {
 			get: make.get.data(prop),
 			set: make.set.events(prop, make.get.data(prop), make.set.data(prop), make.eventType.data(prop)),
@@ -538,7 +545,7 @@ getDefinitionOrMethod = function(prop, value, defaultDefinition){
 	} else if( isPlainObject(value) ){
 		definition = value;
 	}
-	
+
 	if(definition) {
 		return makeDefinition(prop, definition, defaultDefinition);
 	} else {

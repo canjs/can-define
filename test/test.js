@@ -1,20 +1,21 @@
 require("../list/list-test");
 require("../map/map-test");
 require("../define-test");
-var DefineMap = require("../map/map");
-var DefineList = require("../list/list");
+var DefineMap = require("can-define/map/map");
+var DefineList = require("can-define/list/list");
 var isArray = require("can-util/js/is-array/is-array");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
+var types = require("can-types");
 
 var QUnit = require("steal-qunit");
 
-QUnit.module("map and list combined");
+QUnit.module("can-define: map and list combined");
 
 QUnit.test("basics", function(){
     var items = new DefineMap({ people: [{name: "Justin"},{name: "Brian"}], count: 1000 });
-    QUnit.ok(items.people instanceof DefineList, "people is list");
-    QUnit.ok(items.people.item(0) instanceof DefineMap, "1st object is Map");
-    QUnit.ok(items.people.item(1) instanceof DefineMap, "2nd object is Map");
+    QUnit.ok(items.people instanceof types.DefineList, "people is list");
+    QUnit.ok(items.people.item(0) instanceof types.DefineMap, "1st object is Map");
+    QUnit.ok(items.people.item(1) instanceof types.DefineMap, "2nd object is Map");
     QUnit.equal(items.people.item(1).name, "Brian", "2nd object's name is right");
     QUnit.equal(items.count, 1000, "count is number");
 });
@@ -44,8 +45,8 @@ QUnit.test("Extended Map with empty def converts to default Observables", functi
     school.students = [{name: "J"}];
     school.teacher = {name: "M"};
 
-    ok(school.students instanceof DefineList, "converted to DefineList");
-    ok(school.teacher instanceof DefineMap, "converted to DefineMap");
+    ok(school.students instanceof types.DefineList, "converted to DefineList");
+    ok(school.teacher instanceof types.DefineMap, "converted to DefineMap");
 
 });
 
