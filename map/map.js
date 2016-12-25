@@ -54,14 +54,14 @@ var setProps = function(props, remove) {
         if( typeof curVal !== "object" || curVal === null ) {
             self.set(prop, newVal);
         }
-        else if( ("set" in curVal) && isPlainObject(newVal) ) {
+        else if( ("replace" in curVal) && isArray(newVal)) {
+            curVal.replace(newVal);
+        }        
+        else if( ("set" in curVal) && (isPlainObject(newVal) || isArray(newVal))) {
             curVal.set(newVal, remove);
         }
         else if( ("attr" in curVal) && (isPlainObject(newVal) || isArray(newVal)) ) {
             curVal.attr(newVal, remove);
-        }
-        else if("replace" in curVal && isArray(newVal)) {
-            curVal.replace(newVal);
         }
         else if(curVal !== newVal) {
             self.set(prop, newVal);

@@ -104,3 +104,14 @@ QUnit.test("recursively `get`s (#31)", function(){
     QUnit.ok( isArray(res.l), "is a plain array");
     QUnit.ok( isPlainObject(res.l[0]), "plain object");
 });
+
+QUnit.test("DefineList trigger deprecation warning when set with Map.set (#93)", 0, function(){
+	var map = new DefineMap({
+		things: [{ foo: 'bar' }]
+	});
+	map.things.attr = function(){
+		ok(false, "attr should not be called");
+	};
+
+	map.set({ things: [{ baz: 'luhrmann' }] });
+});
