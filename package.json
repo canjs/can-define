@@ -45,7 +45,7 @@
     "can-stache": "^3.0.13",
     "jshint": "^2.9.1",
     "serve": "^2.0.0",
-    "steal": "^0.16.0",
+    "steal": "^1.0.7",
     "steal-qunit": "^0.1.1",
     "steal-tools": "^0.16.0",
     "testee": "^0.3.0",
