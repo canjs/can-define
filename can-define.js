@@ -461,12 +461,20 @@ make = {
 					if (typeof value === "function") {
 						value = value.call(this);
 					}
-					return typeConvert(value);
+					value = typeConvert(value);
 				}
-				var Value = definition.Value;
-				if (Value) {
-					return typeConvert(new Value());
+				else {
+					var Value = definition.Value;
+					if (Value) {
+						value = typeConvert(new Value());
+					}
 				}
+				if(definition.set) {
+					if(definition.set.length > 0) {
+						value = definition.set.call(this, value);
+					}
+				}
+				return value;
 			};
 		},
 		data: function(prop) {

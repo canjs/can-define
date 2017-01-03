@@ -502,7 +502,7 @@ test("Value generator can read other properties", function() {
 });
 
 test('default behaviors with "*" work for attributes', function() {
-	expect(5);
+	expect(6);
 	var DefaultMap = define.Constructor({
 		'*': {
 			type: 'number',
@@ -1435,4 +1435,22 @@ QUnit.test("shorthand getter setter (#56)", function() {
 	equal(p.fullName, "Mohamed Cherif", "fullName initialized right");
 
 	p.fullName = "Justin Meyer";
+});
+
+
+QUnit.test("set and value work together (#87)", function(){
+
+	var Type = define.Constructor({
+		prop: {
+			value: 2,
+			set: function(num){
+				return num * num;
+			}
+		}
+	});
+
+	var instance = new Type();
+
+	QUnit.equal(instance.prop, 4, "used setter");
+
 });
