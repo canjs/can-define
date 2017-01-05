@@ -130,7 +130,11 @@ QUnit.test("extends sealed objects (#48)", function(){
     var map1 = new Map1({ name: "Justin" });
     try {
         map1.foo = "bar";
-        QUnit.ok(false, "map1 not sealed");
+		if (map1.foo) {
+			QUnit.ok(false, "map1 not sealed");
+		} else {
+			QUnit.ok(true, "map1 sealed - silent failure");
+		}
     } catch(ex) {
         QUnit.ok(true, "map1 sealed");
     }
@@ -139,7 +143,11 @@ QUnit.test("extends sealed objects (#48)", function(){
     var map2 = new Map2({ name: "Brian" });
     try {
         map2.foo = "bar";
-        QUnit.ok(true, "map2 not sealed");
+		if (map2.foo) {
+			QUnit.ok(true, "map2 not sealed");
+		} else {
+			QUnit.ok(false, "map2 sealed");
+		}
     } catch (ex) {
         QUnit.ok(false, "map2 sealed");
     }
@@ -148,7 +156,11 @@ QUnit.test("extends sealed objects (#48)", function(){
     var map3 = new Map3({ name: "Curtis" });
     try {
         map3.foo = "bar";
-        QUnit.ok(false, "map3 not sealed");
+		if (map3.foo) {
+			QUnit.ok(false, "map3 not sealed");
+		} else {
+			QUnit.ok(true, "map3 sealed");
+		}
     } catch (ex) {
         QUnit.ok(true, "map3 sealed");
     }
