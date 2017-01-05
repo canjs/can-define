@@ -1454,3 +1454,38 @@ QUnit.test("set and value work together (#87)", function(){
 	QUnit.equal(instance.prop, 4, "used setter");
 
 });
+
+QUnit.test("async setter is provided", 5, function(){
+	var RESOLVE;
+
+	var Type = define.Constructor({
+		prop: {
+			value: 2,
+			set: function(num, resolve){
+				resolve( num * num );
+			}
+		},
+		prop2: {
+			value: 3,
+			set: function(num, resolve){
+				RESOLVE = resolve;
+			}
+		}
+	});
+
+	var instance = new Type();
+
+	QUnit.equal(instance.prop, 4, "used async setter");
+
+
+	QUnit.equal(instance.prop2, undefined, "used async setter");
+
+	instance.on("prop2", function(ev, newVal, oldVal){
+		QUnit.equal(newVal, 9, "updated");
+		QUnit.equal(oldVal, undefined, "updated");
+	});
+	RESOLVE(9);
+
+	QUnit.equal(instance.prop2, 9, "used async setter updates after");
+
+});
