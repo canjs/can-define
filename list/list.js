@@ -1041,7 +1041,8 @@ assign(DefineList.prototype, {
 	 */
 	sort: function(compareFunction) {
 		Array.prototype.sort.call(this, compareFunction);
-		return this.replace(this.get());
+		// canEvent.dispatch.call(this, 'length', [this._length]);
+		return this; // this.replace(this);
 	}
 });
 
