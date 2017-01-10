@@ -472,7 +472,7 @@ test('list.sort a list of DefineMaps', function(){
 	equal(template.textContent, "Savings,Kids Savings,Checking,", "template updated properly.");
 });
 
-test('list.sort a list of objects without losing reference #137', function(){
+test('list.sort a list of objects without losing reference (#137)', function(){
 	var unSorted = new DefineList([{id: 3}, {id: 2}, {id: 1}]);
 	var sorted = unSorted.slice(0).sort(function(a, b) {
 		return a.id > b.id ? 1 : a.id < b.id ? -1 : 0;
