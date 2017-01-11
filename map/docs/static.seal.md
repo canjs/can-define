@@ -26,6 +26,16 @@ person.get("first") //-> "Justin"
 person.get("last") //-> "Meyer"
 ```
 
+It is also possible to extend a sealed object and unseal it:
+
+```js
+"use strict";
+var Person = DefineMap.extend({});
+var Programmer = Person.extend({seal: false}, {})
+var me = new Programmer();
+me.age = 33; // no error thrown
+```
+
 Set `seal` to `false` on objects that have an indeterminate number of properties:
 
 ```js

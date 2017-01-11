@@ -170,10 +170,14 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 		typeConvert = make.set.type(prop, type, typeConvert);
 	}
 
+	// make a setter that's going to fire of events
+	var eventsSetter = make.set.events(prop, reader, setter, make.eventType[dataProperty](prop));
+
 	// Determine a function that will provide the initial property value.
 	if ((definition.value !== undefined || definition.Value !== undefined)) {
-		getInitialValue = make.get.defaultValue(prop, definition, typeConvert);
+		getInitialValue = make.get.defaultValue(prop, definition, typeConvert, eventsSetter);
 	}
+	
 	// If property has a getter, create the compute that stores its data.
 	if (definition.get) {
 		computedInitializers[prop] = make.compute(prop, definition.get, getInitialValue);
@@ -190,19 +194,18 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 	// If there's a `get` and `set`, make the setter get the `lastSetValue` on the
 	// `get`'s compute.
 	if (definition.get && definition.set) {
+		// the compute will set off events, so we can use the basic setter
 		setter = make.set.setter(prop, definition.set, make.read.lastSet(prop), setter, true);
 	}
 	// If there's a `set` and no `get`,
 	else if (definition.set) {
-		// make a set that produces events.
-		setter = make.set.events(prop, reader, setter, make.eventType[dataProperty](prop));
-		// Add `set` functionality to the setter.
-		setter = make.set.setter(prop, definition.set, reader, setter, false);
+		// Add `set` functionality to the eventSetter.
+		setter = make.set.setter(prop, definition.set, reader, eventsSetter, false);
 	}
 	// If there's niether `set` or `get`,
 	else if (!definition.get) {
 		// make a set that produces events.
-		setter = make.set.events(prop, reader, setter, make.eventType[dataProperty](prop));
+		setter = eventsSetter;
 	}
 
 	// Add type behavior to the setter.
@@ -454,19 +457,45 @@ make = {
 	// Helpers that read the data in an observable way.
 	get: {
 		// uses the default value
-		defaultValue: function(prop, definition, typeConvert) {
+		defaultValue: function(prop, definition, typeConvert, callSetter) {
 			return function() {
 				var value = definition.value;
 				if (value !== undefined) {
 					if (typeof value === "function") {
 						value = value.call(this);
 					}
-					return typeConvert(value);
+					value = typeConvert(value);
 				}
-				var Value = definition.Value;
-				if (Value) {
-					return typeConvert(new Value());
+				else {
+					var Value = definition.Value;
+					if (Value) {
+						value = typeConvert(new Value());
+					}
 				}
+				if(definition.set) {
+					// TODO: there's almost certainly a faster way of making this happen
+					// But this is maintainable.
+
+					var VALUE;
+					var sync = true;
+
+					var setter = make.set.setter(prop, definition.set, function(){}, function(value){
+						if(sync) {
+							VALUE = value;
+						} else {
+							callSetter.call(this, value);
+						}
+					}, definition.get);
+
+					setter.call(this,value);
+					sync= false;
+
+					// VALUE will be undefined if the callback is never called.
+					return VALUE;
+
+
+				}
+				return value;
 			};
 		},
 		data: function(prop) {

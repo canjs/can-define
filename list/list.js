@@ -36,7 +36,7 @@ var DefineList = Construct.extend("DefineList",
 	{
 		setup: function(base) {
 			if (DefineList) {
-				
+
 				var prototype = this.prototype;
 				var result = define(prototype, prototype, base.prototype._define);
 				var itemsDefinition = result.definitions["#"] || result.defaultDefinition;
@@ -1040,8 +1040,16 @@ assign(DefineList.prototype, {
 	 * ```
 	 */
 	sort: function(compareFunction) {
+		var removed = Array.prototype.slice.call(this);
 		Array.prototype.sort.call(this, compareFunction);
-		return this.replace(this.get());
+		var added = Array.prototype.slice.call(this);
+
+		canBatch.start();
+		canEvent.dispatch.call(this, 'remove', [removed, 0]);
+		canEvent.dispatch.call(this, 'add', [added, 0]);
+		canEvent.dispatch.call(this, 'length', [this._length, this._length]);
+		canBatch.stop();
+		return this;
 	}
 });
 

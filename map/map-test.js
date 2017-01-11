@@ -117,6 +117,59 @@ QUnit.test("default settings on unsealed", function(){
 
 });
 
+if (!System.isEnv('production')) {
+	QUnit.test("extends sealed objects (#48)", function(){
+		var Map1 = DefineMap.extend({ seal: true }, {
+			name: {
+				get: function(curVal){
+					return "computed " + curVal;
+				}
+			}
+		});
+		var Map2 = Map1.extend({ seal: false }, {});
+		var Map3 = Map2.extend({ seal: true }, {});
+
+		var map1 = new Map1({ name: "Justin" });
+		try {
+			map1.foo = "bar";
+			if (map1.foo) {
+				QUnit.ok(false, "map1 not sealed");
+			} else {
+				QUnit.ok(true, "map1 sealed - silent failure");
+			}
+		} catch(ex) {
+			QUnit.ok(true, "map1 sealed");
+		}
+		QUnit.equal(map1.name, "computed Justin", "map1.name property is computed");
+
+		var map2 = new Map2({ name: "Brian" });
+		try {
+			map2.foo = "bar";
+			if (map2.foo) {
+				QUnit.ok(true, "map2 not sealed");
+			} else {
+				QUnit.ok(false, "map2 sealed");
+			}
+		} catch (ex) {
+			QUnit.ok(false, "map2 sealed");
+		}
+		QUnit.equal(map2.name, "computed Brian", "map2.name property is computed");
+
+		var map3 = new Map3({ name: "Curtis" });
+		try {
+			map3.foo = "bar";
+			if (map3.foo) {
+				QUnit.ok(false, "map3 not sealed");
+			} else {
+				QUnit.ok(true, "map3 sealed");
+			}
+		} catch (ex) {
+			QUnit.ok(true, "map3 sealed");
+		}
+		QUnit.equal(map3.name, "computed Curtis", "map3.name property is computed");
+	});
+}
+
 QUnit.test("get with dynamically added properties", function(){
 	var map = new DefineMap();
 	map.set("a",1);
