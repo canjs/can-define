@@ -64,7 +64,7 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 	// for any value that has a default value.
 	replaceWith(objPrototype, "_data", function() {
 		var map = this;
-		var data = Object.create(null);
+		var data = {};
 		for (var prop in dataInitializers) {
 			replaceWith(data, prop, dataInitializers[prop].bind(map), true);
 		}
