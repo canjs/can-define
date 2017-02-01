@@ -626,6 +626,10 @@ replaceWith = function(obj, prop, cb, writable) {
 	Object.defineProperty(obj, prop, {
 		configurable: true,
 		get: function() {
+			Object.defineProperty(this, prop, {
+				value: undefined,
+				writable: true
+			});
 			var value = cb.call(this, obj, prop);
 			Object.defineProperty(this, prop, {
 				value: value,
