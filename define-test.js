@@ -1494,7 +1494,7 @@ QUnit.test('setter with default value causes an infinite loop (#142)', function(
 	var A = define.Constructor({
 		val: {
 			value: 'hello',
-			set(val){ // jshint ignore:line
+			set: function(val){
 				if(this.val) {}
 				return val;
 			}
