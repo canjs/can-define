@@ -2,7 +2,7 @@
 @parent can-define/list/list.prototype
 
 @description Define default behavior for all properties and items in the list. Use
-[can-define/list/list.prototype.itemsDefinition] to define the default type of items in the list.
+[can-define/list/list.prototype.wildcardItems] to define the default type of items in the list.
 
 @option {can-define.types.propDefinition}
 
