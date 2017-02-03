@@ -83,7 +83,6 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 		return data;
 	});
 
-
 	// Add necessary event methods to this object.
 	for (var prop in eventsProto) {
 		Object.defineProperty(objPrototype, prop, {
@@ -177,7 +176,7 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 	if ((definition.value !== undefined || definition.Value !== undefined)) {
 		getInitialValue = make.get.defaultValue(prop, definition, typeConvert, eventsSetter);
 	}
-	
+
 	// If property has a getter, create the compute that stores its data.
 	if (definition.get) {
 		computedInitializers[prop] = make.compute(prop, definition.get, getInitialValue);
@@ -657,7 +656,10 @@ assign(eventsProto, {
 
 		}
 
-		return eventLifecycle.addAndSetup.apply(this, arguments);
+		var baseAddEventListener = this.__proto__.addEventListener ||
+			eventLifecycle.addAndSetup;
+
+		return baseAddEventListener.apply(this, arguments);
 	},
 
 	// ### unbind
