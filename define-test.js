@@ -4,6 +4,7 @@ var define = require("can-define");
 var stache = require("can-stache");
 var CanList = require("can-list");
 var canBatch = require("can-event/batch/batch");
+var domDispatch = require("can-util/dom/dispatch/dispatch");
 var isArray = require("can-util/js/is-array/is-array");
 var each = require("can-util/js/each/each");
 var types = require("can-types");
@@ -1503,4 +1504,24 @@ QUnit.test('setter with default value causes an infinite loop (#142)', function(
 
 	var a = new A();
 	QUnit.equal(a.val, 'hello', 'creating an instance should not cause an inifinte loop');
+});
+
+QUnit.test('Works with DOM elements', function(){
+	var el = document.createElement('div');
+	define(el, { foo: 'string' });
+
+	var events = 0;
+	el.addEventListener('foo', function(){
+		events++;
+	});
+
+	el.addEventListener('some-event', function(){
+		events++;
+	});
+
+	el.foo = 'bar';
+	QUnit.equal(events, 1, 'An event occurred');
+
+	domDispatch.call(el, "some-event");
+	QUnit.equal(events, 2, 'Another event');
 });
