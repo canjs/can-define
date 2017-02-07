@@ -56,7 +56,7 @@ var setProps = function(props, remove) {
         }
         else if( ("replace" in curVal) && isArray(newVal)) {
             curVal.replace(newVal);
-        }        
+        }
         else if( ("set" in curVal) && (isPlainObject(newVal) || isArray(newVal))) {
             curVal.set(newVal, remove);
         }
@@ -259,14 +259,9 @@ var DefineMap = Construct.extend("DefineMap",{
 });
 
 // Add necessary event methods to this object.
-for(var prop in define.eventsProto) {
-    DefineMap[prop] = define.eventsProto[prop];
-    Object.defineProperty(DefineMap.prototype, prop, {
-        enumerable:false,
-        value: define.eventsProto[prop],
-        writable: true
-    });
-}
+define.mixinEvents(DefineMap, true);
+define.mixinEvents(DefineMap.prototype);
+
 types.DefineMap = DefineMap;
 types.DefaultMap = DefineMap;
 

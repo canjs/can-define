@@ -83,15 +83,9 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 		return data;
 	});
 
-	// Add necessary event methods to this object.
-	for (var prop in eventsProto) {
-		Object.defineProperty(objPrototype, prop, {
-			enumerable: false,
-			value: eventsProto[prop],
-			configurable: true,
-			writable: true
-		});
-	}
+	// Mixin the event methods
+	define.mixinEvents(objPrototype);
+
 	// add so instance defs can be dynamically added
 	Object.defineProperty(objPrototype,"_define",{
 		enumerable: false,
@@ -280,7 +274,7 @@ make = {
 				if (newVal !== current) {
 					setData.call(this, newVal);
 
-					canEvent.dispatch.call(this, {
+					canEvent.trigger.call(this, {
 						type: prop,
 						target: this
 					}, [newVal, current]);
@@ -642,50 +636,12 @@ replaceWith = function(obj, prop, cb, writable) {
 eventsProto = assign({}, event);
 assign(eventsProto, {
 	_eventSetup: function() {},
-	_eventTeardown: function() {},
-	addEventListener: function(eventName, handler) {
-
-		var computedBinding = this._computed && this._computed[eventName];
-		if (computedBinding && computedBinding.compute) {
-			if (!computedBinding.count) {
-				computedBinding.count = 1;
-				computedBinding.compute.addEventListener("change", computedBinding.handler);
-			} else {
-				computedBinding.count++;
-			}
-
-		}
-
-		var baseAddEventListener = this.__proto__.addEventListener ||
-			eventLifecycle.addAndSetup;
-
-		return baseAddEventListener.apply(this, arguments);
-	},
-
-	// ### unbind
-	// Stops listening to an event.
-	// If this is the last listener of a computed property,
-	// stop forwarding events of the computed property to this map.
-	removeEventListener: function(eventName, handler) {
-		var computedBinding = this._computed && this._computed[eventName];
-		if (computedBinding) {
-			if (computedBinding.count === 1) {
-				computedBinding.count = 0;
-				computedBinding.compute.removeEventListener("change", computedBinding.handler);
-			} else {
-				computedBinding.count--;
-			}
-
-		}
-
-		return eventLifecycle.removeAndTeardown.apply(this, arguments);
-
-	}
+	_eventTeardown: function() {}
 });
-eventsProto.on = eventsProto.bind = eventsProto.addEventListener;
-eventsProto.off = eventsProto.unbind = eventsProto.removeEventListener;
 
 delete eventsProto.one;
+delete eventsProto.addEventListener;
+delete eventsProto.removeEventListener;
 
 define.setup = function(props, sealed) {
 	defineConfigurableAndNotEnumerable(this, "_cid");
@@ -721,6 +677,62 @@ define.setup = function(props, sealed) {
 };
 define.replaceWith = replaceWith;
 define.eventsProto = eventsProto;
+define.mixinEvents = function(objPrototype, makeEnumerable){
+	// Add necessary event methods to this object.
+	for (var prop in eventsProto) {
+		Object.defineProperty(objPrototype, prop, {
+			enumerable: !!makeEnumerable,
+			value: eventsProto[prop],
+			configurable: true,
+			writable: true
+		});
+	}
+
+	var baseAddEventListener = objPrototype.addEventListener ||
+		canEvent.addEventListener;
+	var baseRemoveEventListener = objPrototype.removeEventListener ||
+		canEvent.removeEventListener;
+
+	objPrototype.addEventListener = function(eventName, handler) {
+		var computedBinding = this._computed && this._computed[eventName];
+		if (computedBinding && computedBinding.compute) {
+			if (!computedBinding.count) {
+				computedBinding.count = 1;
+				computedBinding.compute.addEventListener("change", computedBinding.handler);
+			} else {
+				computedBinding.count++;
+			}
+		}
+
+		eventLifecycle.addAndSetup
+
+		return baseAddEventListener.apply(this, arguments);
+	};
+
+	// ### unbind
+	// Stops listening to an event.
+	// If this is the last listener of a computed property,
+	// stop forwarding events of the computed property to this map.
+	objPrototype.removeEventListener =  function(eventName, handler) {
+		var computedBinding = this._computed && this._computed[eventName];
+		if (computedBinding) {
+			if (computedBinding.count === 1) {
+				computedBinding.count = 0;
+				computedBinding.compute.removeEventListener("change", computedBinding.handler);
+			} else {
+				computedBinding.count--;
+			}
+
+		}
+
+		return baseRemoveEventListener.apply(this, arguments);
+	};
+
+	eventLifecycle(objPrototype);
+
+	objPrototype.on = objPrototype.bind = objPrototype.addEventListener;
+	objPrototype.off = objPrototype.unbind = objPrototype.removeEventListener;
+};
 define.defineConfigurableAndNotEnumerable = defineConfigurableAndNotEnumerable;
 define.make = make;
 define.getDefinitionOrMethod = getDefinitionOrMethod;
