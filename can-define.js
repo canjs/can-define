@@ -704,8 +704,6 @@ define.mixinEvents = function(objPrototype, makeEnumerable){
 			}
 		}
 
-		eventLifecycle.addAndSetup
-
 		return baseAddEventListener.apply(this, arguments);
 	};
 
