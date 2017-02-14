@@ -1510,6 +1510,10 @@ QUnit.test('Works with DOM elements', function(){
 	var el = document.createElement('div');
 	define(el, { foo: 'string' });
 
+	var fooCompute = compute(function(){
+		return el.foo;
+	});
+
 	var events = 0;
 	el.addEventListener('foo', function(){
 		events++;
@@ -1518,6 +1522,13 @@ QUnit.test('Works with DOM elements', function(){
 	el.addEventListener('some-event', function(){
 		events++;
 	});
+
+	fooCompute.on('change', function(){
+		QUnit.ok(true, "change was called");
+		QUnit.start();
+	});
+
+	QUnit.stop();
 
 	el.foo = 'bar';
 	QUnit.equal(events, 1, 'An event occurred');
