@@ -270,6 +270,7 @@ var DefineList = Construct.extend("DefineList",
 					}, this);
 				}
 			}
+			//canEvent.dispatch.call(this, 'length', [this._length]);
 			return this;
 		},
 		_items: function() {

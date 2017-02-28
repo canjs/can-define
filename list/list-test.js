@@ -815,3 +815,15 @@ QUnit.test("Array shorthand uses #", function(){
     map.numbers.set("prop", "4");
     QUnit.ok(map.numbers.prop === "4", "type left alone");
 });
+
+QUnit.test("Length event is triggered on item set", function(){
+	expect(1);
+	var l = new DefineList([1,2,3]);
+	l.on('length', function() {
+		ok(true, 'length should be called only once');
+	});
+	
+	l.set(1, 5);
+
+	deepEqual(l.get(), [1,5,3], "updated list");
+});
