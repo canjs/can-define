@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "can-list": "^3.0.1",
-    "can-stache": "^3.0.13",
+    "can-stache": "3.0.19",
     "jshint": "^2.9.1",
     "serve": "^2.0.0",
     "steal": "^1.0.7",
