@@ -32,7 +32,7 @@
   "homepage": "https://github.com/canjs/can-define",
   "dependencies": {
     "can-cid": "^1.0.0",
-    "can-compute": "^3.0.0",
+    "can-compute": "3.0.6",
     "can-construct": "^3.0.6",
     "can-event": "^3.0.1",
     "can-namespace": "^1.0.0",
