@@ -4,6 +4,7 @@ var make = define.make;
 var canEvent = require("can-event");
 var canBatch = require("can-event/batch/batch");
 var Observation = require("can-observation");
+var canLog = require("can-util/js/log/log");
 
 var defineHelpers = require("../define-helpers/define-helpers");
 
@@ -1085,7 +1086,7 @@ types.isListLike = function(obj) {
 
 DefineList.prototype.each = DefineList.prototype.forEach;
 DefineList.prototype.attr = function(prop, value) {
-	console.warn("DefineMap::attr shouldn't be called");
+	canLog.warn("DefineMap::attr shouldn't be called");
 	if (arguments.length === 0) {
 		return this.get();
 	} else if (prop && typeof prop === "object") {
@@ -1104,7 +1105,7 @@ DefineList.prototype.item = function(index, value) {
 	}
 };
 DefineList.prototype.items = function() {
-	console.warn("DefineList::get should should be used instead of DefineList::items");
+	canLog.warn("DefineList::get should should be used instead of DefineList::items");
 	return this.get();
 };
 
