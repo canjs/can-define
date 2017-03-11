@@ -1057,14 +1057,8 @@ assign(DefineList.prototype, {
 
 
 // Add necessary event methods to this object.
-for (var prop in define.eventsProto) {
-	DefineList[prop] = define.eventsProto[prop];
-	Object.defineProperty(DefineList.prototype, prop, {
-		enumerable: false,
-		value: define.eventsProto[prop],
-		writable: true
-	});
-}
+define.mixinEvents(DefineList, true);
+define.mixinEvents(DefineList.prototype);
 
 Object.defineProperty(DefineList.prototype, "length", {
 	get: function() {
