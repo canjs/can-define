@@ -4,6 +4,7 @@ var DefineMap = require("can-define/map/map");
 var Observation = require("can-observation");
 var canTypes = require("can-types");
 var each = require("can-util/js/each/each");
+var compute = require("can-compute");
 var sealWorks = (function() {
 	try {
 		var o = {};
@@ -533,4 +534,35 @@ QUnit.test(".extend errors when re-defining a property (#117)", function(){
 	    }
 	});
 	QUnit.ok(true, "extended without errors");
+});
+
+QUnit.test(".value functions should not be observable", function(){
+	var outer = new DefineMap({
+		bam: "baz"
+	});
+	
+	var ItemsVM = DefineMap.extend({
+		item: {
+			value: function(){
+				(function(){})(this.zed, outer.bam);
+				return new DefineMap({ foo: "bar" });
+			}
+		},
+		zed: "string"
+	});
+	
+	var items = new ItemsVM();
+	
+	var count = 0;
+	var itemsList = compute(function(){
+		count++;
+		return items.item;
+	});
+	
+	itemsList.on('change', function() {});
+	
+	items.item.foo = "changed";
+	items.zed = "changed";
+	
+	equal(count, 1);
 });
