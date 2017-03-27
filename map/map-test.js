@@ -31,7 +31,7 @@ QUnit.test("creating an instance", function(){
         QUnit.equal(oldVal, "foo");
     });
 
-    map.prop ="BAR";
+    map.prop = "BAR";
 });
 
 QUnit.test("creating an instance with nested prop", function(){
@@ -43,7 +43,7 @@ QUnit.test("creating an instance with nested prop", function(){
         QUnit.equal(oldVal, "Justin");
     });
 
-    map.name.first ="David";
+    map.name.first = "David";
 });
 
 
@@ -173,7 +173,7 @@ QUnit.test("get with dynamically added properties", function(){
     var map = new DefineMap();
     map.set("a",1);
     map.set("b",2);
-    QUnit.deepEqual(map.get(), {a: 1, b:2});
+    QUnit.deepEqual(map.get(), {a: 1, b: 2});
 });
 
 
@@ -181,7 +181,7 @@ QUnit.test("set multiple props", function(){
     var map = new DefineMap();
     map.set({a: 0, b: 2});
 
-    QUnit.deepEqual(map.get(), {a: 0, b:2});
+    QUnit.deepEqual(map.get(), {a: 0, b: 2});
 
     map.set({a: 2}, true);
 
@@ -208,7 +208,7 @@ QUnit.test("serialize responds to added props", function(){
 
 QUnit.test("initialize an undefined property", function(){
     var MyMap = DefineMap.extend({seal: false},{});
-    var instance = new MyMap({foo:"bar"});
+    var instance = new MyMap({foo: "bar"});
 
     equal(instance.foo, "bar");
 });
@@ -282,7 +282,7 @@ QUnit.test("serialize: function works (#38)", function(){
     var MyMap2 = DefineMap.extend({
         "*": {
             serialize: function(value){
-                return ""+value;
+                return "" + value;
             }
         }
     });
