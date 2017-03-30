@@ -114,15 +114,13 @@ QUnit.test("basic type", function() {
 	});
 
 
-
-
 	var t = new Typer();
 	deepEqual(Object.keys(t), [], "no keys");
 
 	var array = [];
 	t.arrayWithAddedItem = array;
 
-	deepEqual(array, ["item"], "updated array");
+	deepEqual(array, [ "item" ], "updated array");
 	QUnit.equal(t.arrayWithAddedItem, array, "leave value as array");
 
 	t.listWithAddedItem = [];
@@ -198,7 +196,7 @@ QUnit.test("type converters", function() {
 		},
 		leaveAlone: {
 			type: '*'
-		},
+		}
 	});
 
 	var obj = {};
@@ -426,13 +424,13 @@ test("Value generator can read other properties", function() {
 			value: "ABC"
 		},
 		numbers: {
-			value: [1, 2, 3]
+			value: [ 1, 2, 3 ]
 		},
 		definedLetters: {
 			value: 'DEF'
 		},
 		definedNumbers: {
-			value: [4, 5, 6]
+			value: [ 4, 5, 6 ]
 		},
 		generatedLetters: {
 			value: function() {
@@ -441,7 +439,7 @@ test("Value generator can read other properties", function() {
 		},
 		generatedNumbers: {
 			value: function() {
-				return new CanList([7, 8, 9]);
+				return new CanList([ 7, 8, 9 ]);
 			}
 		},
 
@@ -609,18 +607,18 @@ test('Can make an attr alias a compute (#1470)', 9, function() {
 	getMap.bind("value", function(ev, newVal, oldVal) {
 
 		switch (bindCallbacks) {
-			case 0:
-				equal(newVal, 2, "0 - bind called with new val");
-				equal(oldVal, 1, "0 - bind called with old val");
-				break;
-			case 1:
-				equal(newVal, 3, "1 - bind called with new val");
-				equal(oldVal, 2, "1 - bind called with old val");
-				break;
-			case 2:
-				equal(newVal, 4, "2 - bind called with new val");
-				equal(oldVal, 3, "2 - bind called with old val");
-				break;
+		case 0:
+			equal(newVal, 2, "0 - bind called with new val");
+			equal(oldVal, 1, "0 - bind called with old val");
+			break;
+		case 1:
+			equal(newVal, 3, "1 - bind called with new val");
+			equal(oldVal, 2, "1 - bind called with old val");
+			break;
+		case 2:
+			equal(newVal, 4, "2 - bind called with new val");
+			equal(oldVal, 3, "2 - bind called with old val");
+			break;
 		}
 
 
@@ -655,7 +653,7 @@ test('value and get (#1521)', function() {
 	var MyMap = define.Constructor({
 		data: {
 			value: function() {
-				return new CanList(['test']);
+				return new CanList([ 'test' ]);
 			}
 		},
 		size: {
@@ -684,12 +682,14 @@ test("One event on getters (#1585)", function() {
 			get: function(lastSetValue, resolve) {
 				if (lastSetValue) {
 					return lastSetValue;
-				} else if (this.personId) {
+				}
+				else if (this.personId) {
 					resolve(new Person({
 						name: "Jose",
 						id: 5
 					}));
-				} else {
+				}
+				else {
 					return null;
 				}
 			},
@@ -1272,7 +1272,7 @@ QUnit.test('Extensions can modify definitions', function() {
 	var MyMap = define.Constructor({
 		foo: {
 			value: 'defined',
-			extended: true,
+			extended: true
 		},
 		bar: {
 			value: 'defined'
@@ -1307,7 +1307,8 @@ QUnit.test("Properties are enumerable", function() {
 		if (i === 0) {
 			QUnit.equal(key, "foo");
 			QUnit.equal(value, "bar");
-		} else {
+		}
+		else {
 			QUnit.equal(key, "baz");
 			QUnit.equal(value, "qux");
 		}
@@ -1325,7 +1326,7 @@ QUnit.test("Doesn't override types.iterator if already on the prototype", functi
 				if (i === 0) {
 					i++;
 					return {
-						value: ["it", "worked"],
+						value: [ "it", "worked" ],
 						done: false
 					};
 				}
@@ -1438,12 +1439,12 @@ QUnit.test("shorthand getter setter (#56)", function() {
 });
 
 
-QUnit.test("set and value work together (#87)", function(){
+QUnit.test("set and value work together (#87)", function() {
 
 	var Type = define.Constructor({
 		prop: {
 			value: 2,
-			set: function(num){
+			set: function(num) {
 				return num * num;
 			}
 		}
@@ -1455,19 +1456,19 @@ QUnit.test("set and value work together (#87)", function(){
 
 });
 
-QUnit.test("async setter is provided", 5, function(){
+QUnit.test("async setter is provided", 5, function() {
 	var RESOLVE;
 
 	var Type = define.Constructor({
 		prop: {
 			value: 2,
-			set: function(num, resolve){
-				resolve( num * num );
+			set: function(num, resolve) {
+				resolve(num * num);
 			}
 		},
 		prop2: {
 			value: 3,
-			set: function(num, resolve){
+			set: function(num, resolve) {
 				RESOLVE = resolve;
 			}
 		}
@@ -1480,7 +1481,7 @@ QUnit.test("async setter is provided", 5, function(){
 
 	QUnit.equal(instance.prop2, undefined, "used async setter");
 
-	instance.on("prop2", function(ev, newVal, oldVal){
+	instance.on("prop2", function(ev, newVal, oldVal) {
 		QUnit.equal(newVal, 9, "updated");
 		QUnit.equal(oldVal, undefined, "updated");
 	});
@@ -1490,12 +1491,12 @@ QUnit.test("async setter is provided", 5, function(){
 
 });
 
-QUnit.test('setter with default value causes an infinite loop (#142)', function(){
+QUnit.test('setter with default value causes an infinite loop (#142)', function() {
 	var A = define.Constructor({
 		val: {
 			value: 'hello',
-			set: function(val){
-				if(this.val) {}
+			set: function(val) {
+				if (this.val) {}
 				return val;
 			}
 		}

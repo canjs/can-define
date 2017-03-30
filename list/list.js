@@ -46,7 +46,8 @@ var DefineList = Construct.extend("DefineList",
 				if (itemsDefinition) {
 					if (itemsDefinition.Type) {
 						this.prototype.__type = make.set.Type("*", itemsDefinition.Type, identity);
-					} else if (itemsDefinition.type) {
+					}
+					else if (itemsDefinition.type) {
 						this.prototype.__type = make.set.type("*", itemsDefinition.type, identity);
 					}
 				}
@@ -93,16 +94,19 @@ var DefineList = Construct.extend("DefineList",
 					}
 					canEvent.dispatch.call(this, how, [ newVal, index ]);
 					canEvent.dispatch.call(this, 'length', [ this._length ]);
-				} else if (how === 'remove') {
+				}
+				else if (how === 'remove') {
 					if (itemsDefinition && typeof itemsDefinition.removed === 'function') {
 						Observation.ignore(itemsDefinition.removed).call(this, oldVal, index);
 					}
 					canEvent.dispatch.call(this, how, [ oldVal, index ]);
 					canEvent.dispatch.call(this, 'length', [ this._length ]);
-				} else {
+				}
+				else {
 					canEvent.dispatch.call(this, how, [ newVal, index ]);
 				}
-			} else {
+			}
+			else {
 				canEvent.dispatch.call(this, {
 					type: "" + attr,
 					target: this
@@ -169,7 +173,8 @@ var DefineList = Construct.extend("DefineList",
 			if (arguments.length) {
 				Observation.add(this, "" + index);
 				return this[index];
-			} else {
+			}
+			else {
 				return defineHelpers.serialize(this, 'get', []);
 			}
 		},
@@ -251,7 +256,8 @@ var DefineList = Construct.extend("DefineList",
 						return newArr;
 					}
 					this.splice(prop, 1, value);
-				} else {
+				}
+				else {
 					var defined = defineHelpers.defineExpando(this, prop, value);
 					if (!defined) {
 						this[prop] = value;
@@ -264,10 +270,12 @@ var DefineList = Construct.extend("DefineList",
 				if (isArray(prop)) {
 					if (value) {
 						this.replace(prop);
-					} else {
+					}
+					else {
 						this.splice.apply(this, [ 0, prop.length ].concat(prop));
 					}
-				} else {
+				}
+				else {
 					each(prop, function(value, prop) {
 						this.set(prop, value);
 					}, this);
@@ -804,7 +812,8 @@ assign(DefineList.prototype, {
 				each(arr, function(innerArg) {
 					args.push(this.__type(innerArg));
 				}, this);
-			} else {
+			}
+			else {
 				// If it is a Map, Object, or some primitive
 				// just pass arg to this.__type
 				args.push(this.__type(arg));
@@ -1104,18 +1113,22 @@ DefineList.prototype.attr = function(prop, value) {
 	canLog.warn("DefineMap::attr shouldn't be called");
 	if (arguments.length === 0) {
 		return this.get();
-	} else if (prop && typeof prop === "object") {
+	}
+	else if (prop && typeof prop === "object") {
 		return this.set.apply(this, arguments);
-	} else if (arguments.length === 1) {
+	}
+	else if (arguments.length === 1) {
 		return this.get(prop);
-	} else {
+	}
+	else {
 		return this.set(prop, value);
 	}
 };
 DefineList.prototype.item = function(index, value) {
 	if (arguments.length === 1) {
 		return this.get(index);
-	} else {
+	}
+	else {
 		return this.set(index, value);
 	}
 };

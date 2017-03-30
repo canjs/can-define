@@ -4,15 +4,15 @@ var readmeGenerate = require("bit-docs-generate-readme");
 
 bitDocs(
     path.join(__dirname, "package.json"),
-    {
-        debug: true,
-        readme: {
-            apis: "./docs/apis.json"
-        },
-        generators: [readmeGenerate]
-    }).catch(function(e){
+	{
+		debug: true,
+		readme: {
+			apis: "./docs/apis.json"
+		},
+		generators: [ readmeGenerate ]
+	}).catch(function(e) {
 
-        setTimeout(function(){
-            throw e;
-        }, 1);
-    });
+		setTimeout(function() {
+			throw e;
+		}, 1);
+	});
