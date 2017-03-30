@@ -37,6 +37,15 @@ QUnit.test("creating an instance", function() {
 	map.prop = "BAR";
 });
 
+QUnit.test("Map is iterable (canjs/can-stache#68)", function(assert) {
+	var map = new DefineMap({ foo: "bar", bam: "baz" });
+	assert.ok(isIterable(map));
+
+	// for (var item of map) {
+	// 	assert.equal(item[1], map[item[0]]);
+	// }
+});
+
 QUnit.test("creating an instance with nested prop", function() {
 
 	var map = new DefineMap({ name: { first: "Justin" } });

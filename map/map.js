@@ -261,6 +261,17 @@ var DefineMap = Construct.extend("DefineMap", {
 	}
 });
 
+// Places Symbol.iterator or @@iterator on the prototype
+// so that this can be iterated with for/of and can-util/js/each/each
+Object.defineProperty(DefineMap.prototype, types.iterator, {
+	configurable: true,
+	enumerable: false,
+	writable: true,
+	value: function() {
+		return new define.Iterator(this);
+	}
+});
+
 // Add necessary event methods to this object.
 for (var prop in define.eventsProto) {
 	DefineMap[prop] = define.eventsProto[prop];
