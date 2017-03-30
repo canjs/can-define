@@ -822,7 +822,7 @@ QUnit.test("Array shorthand uses #", function() {
 	QUnit.ok(map.numbers.prop === "4", "type left alone");
 });
 
-test("replace-with-self lists are diffed properly", function() {
+test("replace-with-self lists are diffed properly (can-view-live#10)", function() {
 	var a = new DefineMap({ name: "A" });
 	var b = new DefineMap({ name: "B" });
 	var c = new DefineMap({ name: "C" });

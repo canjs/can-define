@@ -894,12 +894,14 @@ assign(DefineList.prototype, {
 	replace: function(newList) {
 		var patches = diff(this, newList);
 
+		canBatch.start();
 		for (var i = 0, len = patches.length; i < len; i++) {
 			this.splice.apply(this, [
 				patches[i].index,
 				patches[i].deleteCount
 			].concat(patches[i].insert));
 		}
+		canBatch.stop();
 
 		return this;
 	},
