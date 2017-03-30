@@ -32,6 +32,15 @@ QUnit.test("creating an instance", function() {
 	list.push("d");
 });
 
+QUnit.test("List is iterable (canjs/can-stache#68)", function(assert) {
+	var list = new DefineList([ "a", "b", "c" ]);
+	assert.ok(isIterable(list));
+
+	// let index = 0;
+	// for (var item of list) {
+	// 	assert.equal(item, list[index++]);
+	// }
+});
 test('list attr changes length', function() {
 	var l = new DefineList([
 		0,

@@ -414,6 +414,17 @@ var DefineList = Construct.extend("DefineList",
 		}
 	});
 
+// Places Symbol.iterator or @@iterator on the prototype
+// so that this can be iterated with for/of and can-util/js/each/each
+Object.defineProperty(DefineList.prototype, types.iterator, {
+	configurable: true,
+	enumerable: false,
+	writable: true,
+	value: function() {
+		return new define.Iterator(this);
+	}
+});
+
 // Converts to an `array` of arguments.
 var getArgs = function(args) {
 	return args[0] && Array.isArray(args[0]) ?
