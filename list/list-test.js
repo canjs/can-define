@@ -821,3 +821,31 @@ QUnit.test("Array shorthand uses #", function() {
 	map.numbers.set("prop", "4");
 	QUnit.ok(map.numbers.prop === "4", "type left alone");
 });
+
+test("replace-with-self lists are diffed properly", function() {
+	var a = new DefineMap({ name: "A" });
+	var b = new DefineMap({ name: "B" });
+	var c = new DefineMap({ name: "C" });
+	var d = new DefineMap({ name: "D" });
+	expect(4);
+
+	var list1 = new DefineList([ a, b ]);
+	list1.on("add", function(ev, newVals, where) {
+		throw new Error("list1 should not add.");
+	});
+	list1.on("remove", function(ev, oldVals, where) {
+		throw new Error("list1 should not remove.");
+	});
+	list1.replace([ a, b ]);
+
+	var list2 = new DefineList([ a, b, c ]);
+	list2.on("add", function(ev, newVals, where) {
+		equal(newVals.length, 1, "list2 added length");
+		equal(where, 2, "list2 added location");
+	});
+	list2.on("remove", function(ev, oldVals, where) {
+		equal(oldVals.length, 1, "list2 removed length");
+		equal(where, 2, "list2 removed location");
+	});
+	list2.replace([ a, b, d ]);
+});

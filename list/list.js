@@ -9,6 +9,7 @@ var canLog = require("can-util/js/log/log");
 var defineHelpers = require("../define-helpers/define-helpers");
 
 var assign = require("can-util/js/assign/assign");
+var diff = require("can-util/js/diff/diff");
 var each = require("can-util/js/each/each");
 var isArray = require("can-util/js/is-array/is-array");
 var makeArray = require("can-util/js/make-array/make-array");
@@ -891,7 +892,15 @@ assign(DefineList.prototype, {
 	 * `replace` causes _remove_, _add_, and _length_ events.
 	 */
 	replace: function(newList) {
-		this.splice.apply(this, [ 0, this._length ].concat(makeArray(newList || [])));
+		var patches = diff(this, newList);
+
+		for (var i = 0, len = patches.length; i < len; i++) {
+			this.splice.apply(this, [
+				patches[i].index,
+				patches[i].deleteCount
+			].concat(patches[i].insert));
+		}
+
 		return this;
 	},
 
