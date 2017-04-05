@@ -92,13 +92,11 @@ var DefineList = Construct.extend("DefineList",
 						Observation.ignore(itemsDefinition.added).call(this, newVal, index);
 					}
 					canEvent.dispatch.call(this, how, [ newVal, index ]);
-					canEvent.dispatch.call(this, 'length', [ this._length ]);
 				} else if (how === 'remove') {
 					if (itemsDefinition && typeof itemsDefinition.removed === 'function') {
 						Observation.ignore(itemsDefinition.removed).call(this, oldVal, index);
 					}
 					canEvent.dispatch.call(this, how, [ oldVal, index ]);
-					canEvent.dispatch.call(this, 'length', [ this._length ]);
 				} else {
 					canEvent.dispatch.call(this, how, [ newVal, index ]);
 				}
@@ -373,6 +371,11 @@ var DefineList = Construct.extend("DefineList",
 			if (args.length > 2) {
 				this._triggerChange("" + index, "add", added, removed);
 			}
+
+			if (added.length !== removed.length) {
+				canEvent.dispatch.call(this, 'length', [ this._length ]);
+			}
+
 			canBatch.stop();
 			return removed;
 		},
@@ -412,6 +415,7 @@ var getArgs = function(args) {
 		args[0] :
 		makeArray(args);
 };
+
 // Create `push`, `pop`, `shift`, and `unshift`
 each({
 		/**
@@ -534,8 +538,8 @@ each({
 			res = orig.apply(this, args);
 
 			if (!this.comparator || args.length) {
-
 				this._triggerChange("" + len, "add", args, undefined);
+				canEvent.dispatch.call(this, 'length', [ this._length ]);
 			}
 
 			return res;
@@ -637,6 +641,7 @@ each({
 			// `undefined` - The new values (there are none).
 			// `res` - The old, removed values (should these be unbound).
 			this._triggerChange("" + len, "remove", undefined, [ res ]);
+			canEvent.dispatch.call(this, 'length', [ this._length ]);
 
 			return res;
 		};

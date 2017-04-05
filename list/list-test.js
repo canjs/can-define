@@ -165,7 +165,7 @@ test('splice removes items in IE (#562)', function() {
 
 
 test('reverse triggers add/remove events (#851)', function() {
-	expect(5);
+	expect(3);
 	var l = new DefineList([ 1, 2, 3 ]);
 
 	l.on('add', function() {
@@ -175,7 +175,7 @@ test('reverse triggers add/remove events (#851)', function() {
 		ok(true, 'remove called');
 	});
 	l.on('length', function() {
-		ok(true, 'length should be called');
+		ok(false, 'length should not be called');
 	});
 
 	l.reverse();
@@ -848,4 +848,35 @@ test("replace-with-self lists are diffed properly (can-view-live#10)", function(
 		equal(where, 2, "list2 removed location");
 	});
 	list2.replace([ a, b, d ]);
+});
+
+QUnit.test("set >= length - triggers length event (#152)", function() {
+	var l = new DefineList([ 1, 2, 3 ]);
+	l.on('length', function() {
+		ok(true, 'length should be called only once');
+	});
+
+	expect(2);
+	l.set(3, 5);
+
+	deepEqual(l.get(), [ 1, 2, 3, 5 ], "updated list");
+});
+
+test("set < length - does not trigger length event (#150)", function() {
+	var l = new DefineList([ 1, 2, 3 ]);
+
+	l.on("add", function() {
+		ok(true, "add called");
+	});
+	l.on("remove", function() {
+		ok(true, "remove called");
+	});
+	l.on("length", function() {
+		ok(false, "length should not be called");
+	});
+
+	expect(3);
+	l.set(2, 4);
+
+	deepEqual(l.get(), [ 1, 2, 4 ], "updated list");
 });
