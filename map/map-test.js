@@ -488,6 +488,33 @@ QUnit.test("copying from .set() excludes special keys", function() {
 
 });
 
+QUnit.test("copying with assign() excludes special keys", function() {
+
+	var a = {
+		_data: {},
+		constructor: function() {},
+		_bindings: 100,
+		__bindEvents: {},
+		_cid: "object0",
+		"foo": "bar",
+		"existing": "newVal"
+	};
+
+	var b = new DefineMap({
+		"existing": "oldVal"
+	});
+	assign(b, a);
+
+	QUnit.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
+	QUnit.notEqual(a._data, b._data, "_data prop not copied");
+	QUnit.notEqual(a._bindings, b._bindings, "_bindings prop not copied");
+	QUnit.notEqual(a.__bindEvents, b.__bindEvents, "_bindEvents prop not copied");
+	QUnit.notEqual(a._cid, b._cid, "_cid prop not copied");
+	QUnit.equal(a.foo, b.foo, "New props copied");
+	QUnit.equal(a.existing, b.existing, "Existing props copied");
+
+});
+
 QUnit.test("shorthand getter setter (#56)", function(){
 
     var Person = DefineMap.extend({
