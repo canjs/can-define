@@ -8,6 +8,7 @@ var Observation = require("can-observation");
 var types = require("can-types");
 var canBatch = require("can-event/batch/batch");
 var ns = require("can-namespace");
+var canLog = require("can-util/js/log/log");
 
 var readWithoutObserve = Observation.ignore(function(map, prop){
     return map[prop];
@@ -288,7 +289,7 @@ types.DefineMap = DefineMap;
 types.DefaultMap = DefineMap;
 
 DefineMap.prototype.toObject = function(){
-    console.warn("Use DefineMap::get instead of DefineMap::toObject");
+    canLog.warn("Use DefineMap::get instead of DefineMap::toObject");
     return this.get();
 };
 DefineMap.prototype.each = DefineMap.prototype.forEach;

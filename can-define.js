@@ -175,7 +175,7 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 
 	// Determine a function that will provide the initial property value.
 	if ((definition.value !== undefined || definition.Value !== undefined)) {
-		getInitialValue = make.get.defaultValue(prop, definition, typeConvert, eventsSetter);
+		getInitialValue = Observation.ignore(make.get.defaultValue(prop, definition, typeConvert, eventsSetter));
 	}
 	
 	// If property has a getter, create the compute that stores its data.
@@ -277,14 +277,19 @@ make = {
 		},
 		events: function(prop, getCurrent, setData, eventType) {
 			return function(newVal) {
-				var current = getCurrent.call(this);
-				if (newVal !== current) {
+				if (this.__inSetup) {
 					setData.call(this, newVal);
-
-					canEvent.dispatch.call(this, {
-						type: prop,
-						target: this
-					}, [newVal, current]);
+				}
+				else {
+					var current = getCurrent.call(this);
+					if (newVal !== current) {
+						setData.call(this, newVal);
+						
+						canEvent.dispatch.call(this, {
+							type: prop,
+							target: this
+						}, [newVal, current]);
+					}
 				}
 			};
 		},
@@ -500,7 +505,10 @@ make = {
 		},
 		data: function(prop) {
 			return function() {
-				Observation.add(this, prop);
+				if (!this.__inSetup) {
+					Observation.add(this, prop);
+				}
+				
 				return this._data[prop];
 			};
 		},
@@ -626,6 +634,10 @@ replaceWith = function(obj, prop, cb, writable) {
 	Object.defineProperty(obj, prop, {
 		configurable: true,
 		get: function() {
+			Object.defineProperty(this, prop, {
+				value: undefined,
+				writable: true
+			});
 			var value = cb.call(this, obj, prop);
 			Object.defineProperty(this, prop, {
 				value: value,

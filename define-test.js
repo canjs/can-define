@@ -1489,3 +1489,18 @@ QUnit.test("async setter is provided", 5, function(){
 	QUnit.equal(instance.prop2, 9, "used async setter updates after");
 
 });
+
+QUnit.test('setter with default value causes an infinite loop (#142)', function(){
+	var A = define.Constructor({
+		val: {
+			value: 'hello',
+			set: function(val){
+				if(this.val) {}
+				return val;
+			}
+		}
+	});
+
+	var a = new A();
+	QUnit.equal(a.val, 'hello', 'creating an instance should not cause an inifinte loop');
+});
