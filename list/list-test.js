@@ -3,6 +3,7 @@ var QUnit = require("steal-qunit");
 var DefineList = require("can-define/list/list");
 var DefineMap = require("can-define/map/map");
 var Observation = require("can-observation");
+var compute = require("can-compute");
 var define = require("can-define");
 
 var assign = require("can-util/js/assign/assign");
