@@ -371,7 +371,12 @@ test('list.map', function() {
 		person.lastName = "Thompson";
 		return person;
 	});
-	QUnit.equal("It Worked!", newExtendedList.testMe(), 'Returns the same type of list.');
+	QUnit.throws(function() {
+		newExtendedList.testMe();
+	}, {
+		name: 'TypeError',
+		message: 'newExtendedList.testMe is not a function'
+	}, 'Does not return the same type of list.');
 });
 
 
