@@ -3,6 +3,7 @@ var QUnit = require("steal-qunit");
 var DefineList = require("can-define/list/list");
 var DefineMap = require("can-define/map/map");
 var Observation = require("can-observation");
+var compute = require("can-compute");
 var define = require("can-define");
 
 var assign = require("can-util/js/assign/assign");
@@ -165,7 +166,7 @@ test('splice removes items in IE (#562)', function() {
 
 
 test('reverse triggers add/remove events (#851)', function() {
-	expect(3);
+	expect(4);
 	var l = new DefineList([ 1, 2, 3 ]);
 
 	l.on('add', function() {
@@ -175,7 +176,7 @@ test('reverse triggers add/remove events (#851)', function() {
 		ok(true, 'remove called');
 	});
 	l.on('length', function() {
-		ok(false, 'length should not be called');
+		ok(true, 'length should be called');
 	});
 
 	l.reverse();
@@ -852,17 +853,24 @@ test("replace-with-self lists are diffed properly (can-view-live#10)", function(
 
 QUnit.test("set >= length - triggers length event (#152)", function() {
 	var l = new DefineList([ 1, 2, 3 ]);
-	l.on('length', function() {
-		ok(true, 'length should be called only once');
+
+	l.on("add", function() {
+		ok(true, "add called");
+	});
+	l.on("remove", function() {
+		ok(false, "remove called");
+	});
+	l.on("length", function() {
+		ok(true, "length called");
 	});
 
-	expect(2);
+	expect(3);
 	l.set(3, 5);
 
 	deepEqual(l.get(), [ 1, 2, 3, 5 ], "updated list");
 });
 
-test("set < length - does not trigger length event (#150)", function() {
+QUnit.test("set < length - triggers length event (#150)", function() {
 	var l = new DefineList([ 1, 2, 3 ]);
 
 	l.on("add", function() {
@@ -872,11 +880,33 @@ test("set < length - does not trigger length event (#150)", function() {
 		ok(true, "remove called");
 	});
 	l.on("length", function() {
-		ok(false, "length should not be called");
+		ok(true, "length called");
 	});
 
-	expect(3);
+	expect(4);
 	l.set(2, 4);
 
 	deepEqual(l.get(), [ 1, 2, 4 ], "updated list");
+});
+
+QUnit.test("set/splice are observable", function() {
+	var list = new DefineList([ 1, 2, 3, 4, 5 ]);
+
+	var count = new Observation(function() {
+		var count = 0;
+		for (var i = 0; i < list.length; i++) {
+			count += (list[i] % 2) ? 1 : 0;
+		}
+		return count;
+	}, null, {
+		updater: function() {
+			ok(true);
+		}
+	});
+	count.start();
+
+	expect(3);
+	list.set(3, 5);
+	list.set(2, 4);
+	list.splice(1, 1, 1);
 });
