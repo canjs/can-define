@@ -4,6 +4,7 @@ var DefineList = require("can-define/list/list");
 var DefineMap = require("can-define/map/map");
 var Observation = require("can-observation");
 var define = require("can-define");
+var isIterable = require("can-util/js/is-iterable/is-iterable");
 
 var assign = require("can-util/js/assign/assign");
 var CID = require("can-cid");
@@ -19,6 +20,7 @@ QUnit.test("List is an event emitter", function(assert) {
 	assert.ok(List.on, 'List has event methods.');
 });
 
+
 QUnit.test("creating an instance", function() {
 	var list = new DefineList([ "a", "b", "c" ]);
 
@@ -30,6 +32,15 @@ QUnit.test("creating an instance", function() {
 	list.push("d");
 });
 
+QUnit.test("List is iterable (canjs/can-stache#68)", function(assert) {
+	var list = new DefineList([ "a", "b", "c" ]);
+	assert.ok(isIterable(list));
+
+	// let index = 0;
+	// for (var item of list) {
+	// 	assert.equal(item, list[index++]);
+	// }
+});
 test('list attr changes length', function() {
 	var l = new DefineList([
 		0,
@@ -405,9 +416,11 @@ test('list.sort a list of objects', function() {
 	objList.sort(function(a, b) {
 		if (a.name < b.name) {
 			return -1;
-		} else if (a.name > b.name) {
+		}
+		else if (a.name > b.name) {
 			return 1;
-		} else {
+		}
+		else {
 			return 0;
 		}
 	});
@@ -458,9 +471,11 @@ test('list.sort a list of DefineMaps', function() {
 	accounts.sort(function(a, b) {
 		if (a.name < b.name) {
 			return -1;
-		} else if (a.name > b.name) {
+		}
+		else if (a.name > b.name) {
 			return 1;
-		} else {
+		}
+		else {
 			return 0;
 		}
 	});
@@ -471,9 +486,11 @@ test('list.sort a list of DefineMaps', function() {
 	accounts.sort(function(a, b) {
 		if (a.slug < b.slug) {
 			return 1;
-		} else if (a.slug > b.slug) {
+		}
+		else if (a.slug > b.slug) {
 			return -1;
-		} else {
+		}
+		else {
 			return 0;
 		}
 	});

@@ -34,10 +34,10 @@ var defineConfigurableAndNotEnumerable = function(obj, prop, value) {
 	});
 };
 
-var eachPropertyDescriptor = function(map, cb){
-	for(var prop in map) {
-		if(map.hasOwnProperty(prop)) {
-			cb(prop, Object.getOwnPropertyDescriptor(map,prop));
+var eachPropertyDescriptor = function(map, cb) {
+	for (var prop in map) {
+		if (map.hasOwnProperty(prop)) {
+			cb(prop, Object.getOwnPropertyDescriptor(map, prop));
 		}
 	}
 };
@@ -55,7 +55,7 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 
 	// Goes through each property definition and creates
 	// a `getter` and `setter` function for `Object.defineProperty`.
-	each(result.definitions, function(definition, property){
+	each(result.definitions, function(definition, property) {
 		define.property(objPrototype, property, definition, dataInitializers, computedInitializers);
 	});
 
@@ -94,7 +94,7 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 		});
 	}
 	// add so instance defs can be dynamically added
-	Object.defineProperty(objPrototype,"_define",{
+	Object.defineProperty(objPrototype, "_define", {
 		enumerable: false,
 		value: result,
 		configurable: true,
@@ -103,8 +103,8 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 
 	// Places Symbol.iterator or @@iterator on the prototype
 	// so that this can be iterated with for/of and can-util/js/each/each
-	if(!objPrototype[types.iterator]) {
-		defineConfigurableAndNotEnumerable(objPrototype, types.iterator, function(){
+	if (!objPrototype[types.iterator]) {
+		defineConfigurableAndNotEnumerable(objPrototype, types.iterator, function() {
 			return new define.Iterator(this);
 		});
 	}
@@ -112,11 +112,11 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 	return result;
 };
 
-define.extensions = function () {};
+define.extensions = function() {};
 
-var onlyType = function(obj){
-	for(var prop in obj) {
-		if(prop !== "type") {
+var onlyType = function(obj) {
+	for (var prop in obj) {
+		if (prop !== "type") {
 			return false;
 		}
 	}
@@ -177,7 +177,7 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 	if ((definition.value !== undefined || definition.Value !== undefined)) {
 		getInitialValue = Observation.ignore(make.get.defaultValue(prop, definition, typeConvert, eventsSetter));
 	}
-	
+
 	// If property has a getter, create the compute that stores its data.
 	if (definition.get) {
 		computedInitializers[prop] = make.compute(prop, definition.get, getInitialValue);
@@ -247,7 +247,8 @@ make = {
 				computeFn = defaultValue.isComputed ?
 					defaultValue :
 					compute.async(defaultValue, get, map);
-			} else {
+			}
+			else {
 				computeFn = compute.async(defaultValue, get, map);
 			}
 
@@ -258,7 +259,7 @@ make = {
 					canEvent.dispatch.call(map, {
 						type: prop,
 						target: map
-					}, [newVal, oldVal]);
+					}, [ newVal, oldVal ]);
 				}
 			};
 		};
@@ -284,11 +285,11 @@ make = {
 					var current = getCurrent.call(this);
 					if (newVal !== current) {
 						setData.call(this, newVal);
-						
+
 						canEvent.dispatch.call(this, {
 							type: prop,
 							target: this
-						}, [newVal, current]);
+						}, [ newVal, current ]);
 					}
 				}
 			};
@@ -319,7 +320,8 @@ make = {
 
 				if (setterCalled) {
 					canBatch.stop();
-				} else {
+				}
+				else {
 					if (hasGetter) {
 						// we got a return value
 						if (setValue !== undefined) {
@@ -354,7 +356,8 @@ make = {
 							canBatch.stop();
 							return;
 						}
-					} else {
+					}
+					else {
 						// we got a return value
 						if (setValue !== undefined) {
 							// if the current `set` value is returned, don't set
@@ -398,7 +401,8 @@ make = {
 
 				return make.set.Type(prop, type, set);
 
-			} else {
+			}
+			else {
 				return function(newValue) {
 					return set.call(this, type.call(this, newValue, prop));
 				};
@@ -406,21 +410,24 @@ make = {
 		},
 		Type: function(prop, Type, set) {
 			// `type`: {foo: "string"}
-			if(isArray(Type) && types.DefineList) {
+			if (isArray(Type) && types.DefineList) {
 				Type = types.DefineList.extend({
 					"#": Type[0]
 				});
-			} else if (typeof Type === "object") {
-				if(types.DefineMap) {
+			}
+			else if (typeof Type === "object") {
+				if (types.DefineMap) {
 					Type = types.DefineMap.extend(Type);
-				} else {
+				}
+				else {
 					Type = define.constructor(Type);
 				}
 			}
 			return function(newValue) {
 				if (newValue instanceof Type || newValue == null) {
 					return set.call(this, newValue);
-				} else {
+				}
+				else {
 					return set.call(this, new Type(newValue));
 				}
 			};
@@ -477,23 +484,24 @@ make = {
 						value = typeConvert(new Value());
 					}
 				}
-				if(definition.set) {
+				if (definition.set) {
 					// TODO: there's almost certainly a faster way of making this happen
 					// But this is maintainable.
 
 					var VALUE;
 					var sync = true;
 
-					var setter = make.set.setter(prop, definition.set, function(){}, function(value){
-						if(sync) {
+					var setter = make.set.setter(prop, definition.set, function() {}, function(value) {
+						if (sync) {
 							VALUE = value;
-						} else {
+						}
+						else {
 							callSetter.call(this, value);
 						}
 					}, definition.get);
 
-					setter.call(this,value);
-					sync= false;
+					setter.call(this, value);
+					sync = false;
 
 					// VALUE will be undefined if the callback is never called.
 					return VALUE;
@@ -508,7 +516,7 @@ make = {
 				if (!this.__inSetup) {
 					Observation.add(this, prop);
 				}
-				
+
 				return this._data[prop];
 			};
 		},
@@ -520,14 +528,14 @@ make = {
 	}
 };
 
-define.behaviors = ["get", "set", "value", "Value", "type", "Type", "serialize"];
+define.behaviors = [ "get", "set", "value", "Value", "type", "Type", "serialize" ];
 
 var addDefinition = function(definition, behavior, value) {
-	if(behavior === "type") {
+	if (behavior === "type") {
 		var behaviorDef = value;
-		if(typeof behaviorDef === "string") {
+		if (typeof behaviorDef === "string") {
 			behaviorDef = define.types[behaviorDef];
-			if(typeof behaviorDef === "object") {
+			if (typeof behaviorDef === "object") {
 				assign(definition, behaviorDef);
 				behaviorDef = behaviorDef[behavior];
 			}
@@ -546,46 +554,50 @@ makeDefinition = function(prop, def, defaultDefinition) {
 		addDefinition(definition, behavior, value);
 	});
 	// only add default if it doesn't exist
-	each(defaultDefinition, function(value, prop){
-		if(definition[prop] === undefined) {
-			if(prop !== "type" && prop !== "Type") {
+	each(defaultDefinition, function(value, prop) {
+		if (definition[prop] === undefined) {
+			if (prop !== "type" && prop !== "Type") {
 				definition[prop] = value;
 			}
 		}
 	});
 	// if there's no type definition, take it from the defaultDefinition
-	if(!definition.type && !definition.Type) {
+	if (!definition.type && !definition.Type) {
 		defaults(definition, defaultDefinition);
 	}
 
 
-	if( isEmptyObject(definition) ) {
+	if (isEmptyObject(definition)) {
 		definition.type = define.types["*"];
 	}
 	return definition;
 };
 
-getDefinitionOrMethod = function(prop, value, defaultDefinition){
+getDefinitionOrMethod = function(prop, value, defaultDefinition) {
 	var definition;
-	if(typeof value === "string") {
-		definition = {type: value};
+	if (typeof value === "string") {
+		definition = { type: value };
 	}
-	else if(typeof value === "function") {
-		if(types.isConstructor(value)) {
-			definition = {Type: value};
-		} else if(isDefineType(value)) {
-			definition = {type: value};
+	else if (typeof value === "function") {
+		if (types.isConstructor(value)) {
+			definition = { Type: value };
+		}
+		else if (isDefineType(value)) {
+			definition = { type: value };
 		}
 		// or leaves as a function
-	} else if( isArray(value) ) {
-		definition = {Type: value};
-	} else if( isPlainObject(value) ){
+	}
+	else if (isArray(value)) {
+		definition = { Type: value };
+	}
+	else if (isPlainObject(value)) {
 		definition = value;
 	}
 
-	if(definition) {
+	if (definition) {
 		return makeDefinition(prop, definition, defaultDefinition);
-	} else {
+	}
+	else {
 		return value;
 	}
 };
@@ -596,38 +608,42 @@ getDefinitionsAndMethods = function(defines, baseDefines) {
 	// first lets get a default if it exists
 	var defaults = defines["*"],
 		defaultDefinition;
-	if(defaults) {
+	if (defaults) {
 		delete defines["*"];
 		defaultDefinition = getDefinitionOrMethod("*", defaults, {});
-	} else {
+	}
+	else {
 		defaultDefinition = {};
 	}
 
-	eachPropertyDescriptor(defines, function( prop, propertyDescriptor ) {
+	eachPropertyDescriptor(defines, function(prop, propertyDescriptor) {
 
 		var value;
-		if(propertyDescriptor.get || propertyDescriptor.set) {
-			value = {get: propertyDescriptor.get, set: propertyDescriptor.set};
-		} else {
+		if (propertyDescriptor.get || propertyDescriptor.set) {
+			value = { get: propertyDescriptor.get, set: propertyDescriptor.set };
+		}
+		else {
 			value = propertyDescriptor.value;
 		}
 
-		if(prop === "constructor") {
+		if (prop === "constructor") {
 			methods[prop] = value;
 			return;
-		} else {
+		}
+		else {
 			var result = getDefinitionOrMethod(prop, value, defaultDefinition);
-			if(result && typeof result === "object") {
+			if (result && typeof result === "object") {
 				definitions[prop] = result;
-			} else {
+			}
+			else {
 				methods[prop] = result;
 			}
 		}
 	});
-	if(defaults) {
+	if (defaults) {
 		defines["*"] = defaults;
 	}
-	return {definitions: definitions, methods: methods, defaultDefinition: defaultDefinition};
+	return { definitions: definitions, methods: methods, defaultDefinition: defaultDefinition };
 };
 
 replaceWith = function(obj, prop, cb, writable) {
@@ -659,7 +675,8 @@ assign(eventsProto, {
 			if (!computedBinding.count) {
 				computedBinding.count = 1;
 				computedBinding.compute.addEventListener("change", computedBinding.handler);
-			} else {
+			}
+			else {
 				computedBinding.count++;
 			}
 
@@ -678,7 +695,8 @@ assign(eventsProto, {
 			if (computedBinding.count === 1) {
 				computedBinding.count = 0;
 				computedBinding.compute.removeEventListener("change", computedBinding.handler);
-			} else {
+			}
+			else {
 				computedBinding.count--;
 			}
 
@@ -702,10 +720,11 @@ define.setup = function(props, sealed) {
 	var definitions = this._define.definitions;
 	var instanceDefinitions = {};
 	var map = this;
-	each(props, function(value, prop){
-		if(definitions[prop]) {
+	each(props, function(value, prop) {
+		if (definitions[prop]) {
 			map[prop] = value;
-		} else {
+		}
+		else {
 			var def = define.makeSimpleGetterSetter(prop);
 			instanceDefinitions[prop] = {};
 			Object.defineProperty(map, prop, def);
@@ -713,14 +732,14 @@ define.setup = function(props, sealed) {
 			map[prop] = define.types.observable(value);
 		}
 	});
-	if(!isEmptyObject(instanceDefinitions)) {
+	if (!isEmptyObject(instanceDefinitions)) {
 		defineConfigurableAndNotEnumerable(this, "_instanceDefinitions", instanceDefinitions);
 	}
 	// only seal in dev mode for performance reasons.
 	//!steal-remove-start
 	this._data;
 	this._computed;
-	if(sealed !== false) {
+	if (sealed !== false) {
 		Object.seal(this);
 	}
 	//!steal-remove-end
@@ -731,14 +750,14 @@ define.defineConfigurableAndNotEnumerable = defineConfigurableAndNotEnumerable;
 define.make = make;
 define.getDefinitionOrMethod = getDefinitionOrMethod;
 var simpleGetterSetters = {};
-define.makeSimpleGetterSetter = function(prop){
-	if(!simpleGetterSetters[prop]) {
+define.makeSimpleGetterSetter = function(prop) {
+	if (!simpleGetterSetters[prop]) {
 
-		var setter = make.set.events(prop, make.get.data(prop), make.set.data(prop), make.eventType.data(prop) );
+		var setter = make.set.events(prop, make.get.data(prop), make.set.data(prop), make.eventType.data(prop));
 
 		simpleGetterSetters[prop] = {
 			get: make.get.data(prop),
-			set: function(newVal){
+			set: function(newVal) {
 				return setter.call(this, define.types.observable(newVal));
 			},
 			enumerable: true
@@ -747,44 +766,46 @@ define.makeSimpleGetterSetter = function(prop){
 	return simpleGetterSetters[prop];
 };
 
-define.Iterator = function(obj){
-  this.obj = obj;
-  this.definitions = Object.keys(obj._define.definitions);
-  this.instanceDefinitions = obj._instanceDefinitions ?
-    Object.keys(obj._instanceDefinitions) :
-    Object.keys(obj);
-  this.hasGet = typeof obj.get === "function";
+define.Iterator = function(obj) {
+	this.obj = obj;
+	this.definitions = Object.keys(obj._define.definitions);
+	this.instanceDefinitions = obj._instanceDefinitions ?
+		Object.keys(obj._instanceDefinitions) :
+		Object.keys(obj);
+	this.hasGet = typeof obj.get === "function";
 };
 
-define.Iterator.prototype.next = function(){
-  var key;
-  if(this.definitions.length) {
-    key = this.definitions.shift();
+define.Iterator.prototype.next = function() {
+	var key;
+	if (this.definitions.length) {
+		key = this.definitions.shift();
 
     // Getters should not be enumerable
-    var def = this.obj._define.definitions[key];
-    if(def.get) {
-      return this.next();
-    }
-  } else if(this.instanceDefinitions.length) {
-    key = this.instanceDefinitions.shift();
-  } else {
-    return {
-      value: undefined,
-      done: true
-    };
-  }
+		var def = this.obj._define.definitions[key];
+		if (def.get) {
+			return this.next();
+		}
+	}
+	else if (this.instanceDefinitions.length) {
+		key = this.instanceDefinitions.shift();
+	}
+	else {
+		return {
+			value: undefined,
+			done: true
+		};
+	}
 
-  return {
-    value: [
-      key,
-      this.hasGet ? this.obj.get(key) : this.obj[key]
-    ],
-    done: false
-  };
+	return {
+		value: [
+			key,
+			this.hasGet ? this.obj.get(key) : this.obj[key]
+		],
+		done: false
+	};
 };
 
-isDefineType = function(func){
+isDefineType = function(func) {
 	return func && func.canDefineType === true;
 };
 
@@ -794,9 +815,11 @@ define.types = {
 		if (type === 'string') {
 			str = Date.parse(str);
 			return isNaN(str) ? null : new Date(str);
-		} else if (type === 'number') {
+		}
+		else if (type === 'number') {
 			return new Date(str);
-		} else {
+		}
+		else {
 			return str;
 		}
 	},
@@ -807,7 +830,7 @@ define.types = {
 		return +(val);
 	},
 	'boolean': function(val) {
-		if(val == null) {
+		if (val == null) {
 			return val;
 		}
 		if (val === 'false' || val === '0' || !val) {
@@ -816,19 +839,19 @@ define.types = {
 		return true;
 	},
 	'observable': function(newVal) {
-				if(isArray(newVal) && types.DefineList) {
-						newVal = new types.DefineList(newVal);
-				}
-				else if(isPlainObject(newVal) &&  types.DefineMap) {
-						newVal = new types.DefineMap(newVal);
-				}
-				return newVal;
-		},
+		if (isArray(newVal) && types.DefineList) {
+			newVal = new types.DefineList(newVal);
+		}
+		else if (isPlainObject(newVal) &&  types.DefineMap) {
+			newVal = new types.DefineMap(newVal);
+		}
+		return newVal;
+	},
 	'stringOrObservable': function(newVal) {
-		if(isArray(newVal)) {
+		if (isArray(newVal)) {
 			return new types.DefaultList(newVal);
 		}
-		else if(isPlainObject(newVal)) {
+		else if (isPlainObject(newVal)) {
 			return new types.DefaultMap(newVal);
 		}
 		else {

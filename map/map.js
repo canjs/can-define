@@ -10,106 +10,106 @@ var canBatch = require("can-event/batch/batch");
 var ns = require("can-namespace");
 var canLog = require("can-util/js/log/log");
 
-var readWithoutObserve = Observation.ignore(function(map, prop){
-    return map[prop];
+var readWithoutObserve = Observation.ignore(function(map, prop) {
+	return map[prop];
 });
 
 var eachDefinition = function(map, cb, thisarg, definitions, observe) {
 
-    for(var prop in definitions) {
-        var definition = definitions[prop];
-        if(typeof definition !== "object" || ("serialize" in definition ? !!definition.serialize : !definition.get)) {
+	for (var prop in definitions) {
+		var definition = definitions[prop];
+		if (typeof definition !== "object" || ("serialize" in definition ? !!definition.serialize : !definition.get)) {
 
-            var item = observe === false ? readWithoutObserve(map, prop) : map[prop];
+			var item = observe === false ? readWithoutObserve(map, prop) : map[prop];
 
-            if (cb.call(thisarg || item, item, prop, map) === false) {
-                return false;
-            }
-        }
-    }
+			if (cb.call(thisarg || item, item, prop, map) === false) {
+				return false;
+			}
+		}
+	}
 };
 
 var setProps = function(props, remove) {
-    props = assign({}, props);
-    var prop,
-        self = this,
-        newVal;
+	props = assign({}, props);
+	var prop,
+		self = this,
+		newVal;
 
     // Batch all of the change events until we are done.
-    canBatch.start();
+	canBatch.start();
     // Merge current properties with the new ones.
-    this.each(function(curVal, prop) {
+	this.each(function(curVal, prop) {
         // You can not have a _cid property; abort.
-        if (prop === "_cid") {
-            return;
-        }
-        newVal = props[prop];
+		if (prop === "_cid") {
+			return;
+		}
+		newVal = props[prop];
 
         // If we are merging, remove the property if it has no value.
-        if (newVal === undefined) {
-            if (remove) {
-                self[prop] = undefined;
-            }
-            return;
-        }
-        if( typeof curVal !== "object" || curVal === null ) {
-            self.set(prop, newVal);
-        }
-        else if( ("replace" in curVal) && isArray(newVal)) {
-            curVal.replace(newVal);
-        }        
-        else if( ("set" in curVal) && (isPlainObject(newVal) || isArray(newVal))) {
-            curVal.set(newVal, remove);
-        }
-        else if( ("attr" in curVal) && (isPlainObject(newVal) || isArray(newVal)) ) {
-            curVal.attr(newVal, remove);
-        }
-        else if(curVal !== newVal) {
-            self.set(prop, newVal);
-        }
-        delete props[prop];
-    }, this, false);
+		if (newVal === undefined) {
+			if (remove) {
+				self[prop] = undefined;
+			}
+			return;
+		}
+		if (typeof curVal !== "object" || curVal === null) {
+			self.set(prop, newVal);
+		}
+		else if (("replace" in curVal) && isArray(newVal)) {
+			curVal.replace(newVal);
+		}
+		else if (("set" in curVal) && (isPlainObject(newVal) || isArray(newVal))) {
+			curVal.set(newVal, remove);
+		}
+		else if (("attr" in curVal) && (isPlainObject(newVal) || isArray(newVal))) {
+			curVal.attr(newVal, remove);
+		}
+		else if (curVal !== newVal) {
+			self.set(prop, newVal);
+		}
+		delete props[prop];
+	}, this, false);
     // Add remaining props.
-    for (prop in props) {
+	for (prop in props) {
         // Ignore _cid.
-        if (prop !== "_cid") {
-            newVal = props[prop];
-            this.set(prop, newVal);
-        }
+		if (prop !== "_cid") {
+			newVal = props[prop];
+			this.set(prop, newVal);
+		}
 
-    }
-    canBatch.stop();
-    return this;
+	}
+	canBatch.stop();
+	return this;
 };
 
-var DefineMap = Construct.extend("DefineMap",{
-    setup: function(base){
-        if(DefineMap) {
-            var prototype = this.prototype;
-            define(prototype, prototype, base.prototype._define);
+var DefineMap = Construct.extend("DefineMap", {
+	setup: function(base) {
+		if (DefineMap) {
+			var prototype = this.prototype;
+			define(prototype, prototype, base.prototype._define);
 
-            this.prototype.setup = function(props){
-                define.setup.call(this, defineHelpers.toObject(this, props,{}, DefineMap), this.constructor.seal);
-            };
-        }
-    }
-},{
+			this.prototype.setup = function(props) {
+				define.setup.call(this, defineHelpers.toObject(this, props, {}, DefineMap), this.constructor.seal);
+			};
+		}
+	}
+}, {
     // setup for only dynamic DefineMap instances
-    setup: function(props, sealed){
-        if(!this._define) {
-            Object.defineProperty(this,"_define",{
-                enumerable: false,
-                value: {
-                    definitions: {}
-                }
-            });
-            Object.defineProperty(this,"_data",{
-                enumerable: false,
-                value: {}
-            });
-        }
-        define.setup.call(this, defineHelpers.toObject(this, props,{}, DefineMap), sealed === true);
-    },
+	setup: function(props, sealed) {
+		if (!this._define) {
+			Object.defineProperty(this, "_define", {
+				enumerable: false,
+				value: {
+					definitions: {}
+				}
+			});
+			Object.defineProperty(this, "_data", {
+				enumerable: false,
+				value: {}
+			});
+		}
+		define.setup.call(this, defineHelpers.toObject(this, props, {}, DefineMap), sealed === true);
+	},
     /**
      * @function can-define/map/map.prototype.get get
      * @parent can-define/map/map.prototype
@@ -148,20 +148,22 @@ var DefineMap = Construct.extend("DefineMap",{
      *   @param {String} propName The property name of a property that may not have been defined yet.
      *   @return {*} The value of that property.
      */
-    get: function(prop){
-        if(prop) {
-            var value = this[prop];
-            if(value !== undefined || prop in this || Object.isSealed(this)) {
-                return value;
-            } else {
-                Observation.add(this, prop);
-                return this[prop];
-            }
+	get: function(prop) {
+		if (prop) {
+			var value = this[prop];
+			if (value !== undefined || prop in this || Object.isSealed(this)) {
+				return value;
+			}
+			else {
+				Observation.add(this, prop);
+				return this[prop];
+			}
 
-        } else {
-            return defineHelpers.serialize(this, 'get', {});
-        }
-    },
+		}
+		else {
+			return defineHelpers.serialize(this, 'get', {});
+		}
+	},
     /**
      * @function can-define/map/map.prototype.set set
      * @parent can-define/map/map.prototype
@@ -190,16 +192,16 @@ var DefineMap = Construct.extend("DefineMap",{
      *   @param {*} value The value to assign to `propName`.
      *   @return {can-define/map/map} This map instance, for chaining.
      */
-    set: function(prop, value){
-        if(typeof prop === "object") {
-            return setProps.call(this, prop, value);
-        }
-        var defined = defineHelpers.defineExpando(this, prop, value);
-        if(!defined) {
-            this[prop] = value;
-        }
-        return this;
-    },
+	set: function(prop, value) {
+		if (typeof prop === "object") {
+			return setProps.call(this, prop, value);
+		}
+		var defined = defineHelpers.defineExpando(this, prop, value);
+		if (!defined) {
+			this[prop] = value;
+		}
+		return this;
+	},
     /**
      * @function can-define/map/map.prototype.serialize serialize
      * @parent can-define/map/map.prototype
@@ -232,53 +234,64 @@ var DefineMap = Construct.extend("DefineMap",{
      *   @return {Object} A JavaScript Object that can be serialized with `JSON.stringify` or other methods.
      *
      */
-    serialize: function () {
-        return defineHelpers.serialize(this, 'serialize', {});
-    },
+	serialize: function() {
+		return defineHelpers.serialize(this, 'serialize', {});
+	},
 
-    forEach: function(cb, thisarg, observe){
-        if(observe !== false) {
-            Observation.add(this, '__keys');
-        }
-        var res;
-        var constructorDefinitions = this._define.definitions;
-        if(constructorDefinitions) {
-            res = eachDefinition(this, cb, thisarg, constructorDefinitions, observe);
-        }
-        if(res === false) {
-            return this;
-        }
-        if(this._instanceDefinitions) {
-            eachDefinition(this, cb, thisarg, this._instanceDefinitions, observe);
-        }
+	forEach: function(cb, thisarg, observe) {
+		if (observe !== false) {
+			Observation.add(this, '__keys');
+		}
+		var res;
+		var constructorDefinitions = this._define.definitions;
+		if (constructorDefinitions) {
+			res = eachDefinition(this, cb, thisarg, constructorDefinitions, observe);
+		}
+		if (res === false) {
+			return this;
+		}
+		if (this._instanceDefinitions) {
+			eachDefinition(this, cb, thisarg, this._instanceDefinitions, observe);
+		}
 
-        return this;
-    },
-    "*": {
-        type: define.types.observable
-    }
+		return this;
+	},
+	"*": {
+		type: define.types.observable
+	}
+});
+
+// Places Symbol.iterator or @@iterator on the prototype
+// so that this can be iterated with for/of and can-util/js/each/each
+Object.defineProperty(DefineMap.prototype, types.iterator, {
+	configurable: true,
+	enumerable: false,
+	writable: true,
+	value: function() {
+		return new define.Iterator(this);
+	}
 });
 
 // Add necessary event methods to this object.
-for(var prop in define.eventsProto) {
-    DefineMap[prop] = define.eventsProto[prop];
-    Object.defineProperty(DefineMap.prototype, prop, {
-        enumerable:false,
-        value: define.eventsProto[prop],
-        writable: true
-    });
+for (var prop in define.eventsProto) {
+	DefineMap[prop] = define.eventsProto[prop];
+	Object.defineProperty(DefineMap.prototype, prop, {
+		enumerable: false,
+		value: define.eventsProto[prop],
+		writable: true
+	});
 }
 types.DefineMap = DefineMap;
 types.DefaultMap = DefineMap;
 
-DefineMap.prototype.toObject = function(){
-    canLog.warn("Use DefineMap::get instead of DefineMap::toObject");
-    return this.get();
+DefineMap.prototype.toObject = function() {
+	canLog.warn("Use DefineMap::get instead of DefineMap::toObject");
+	return this.get();
 };
 DefineMap.prototype.each = DefineMap.prototype.forEach;
 
 var oldIsMapLike = types.isMapLike;
-types.isMapLike = function(obj){
+types.isMapLike = function(obj) {
 	return obj instanceof DefineMap || oldIsMapLike.apply(this, arguments);
 };
 
