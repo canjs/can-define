@@ -1012,7 +1012,7 @@ assign(DefineList.prototype, {
 			mappedList.push(mapped);
 
 		});
-		return new this.constructor(mappedList);
+		return new DefineList(mappedList);
 	},
 
 	/**

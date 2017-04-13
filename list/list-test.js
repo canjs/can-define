@@ -3,7 +3,6 @@ var QUnit = require("steal-qunit");
 var DefineList = require("can-define/list/list");
 var DefineMap = require("can-define/map/map");
 var Observation = require("can-observation");
-var compute = require("can-compute");
 var define = require("can-define");
 
 var assign = require("can-util/js/assign/assign");
@@ -372,7 +371,12 @@ test('list.map', function() {
 		person.lastName = "Thompson";
 		return person;
 	});
-	QUnit.equal("It Worked!", newExtendedList.testMe(), 'Returns the same type of list.');
+	QUnit.throws(function() {
+		newExtendedList.testMe();
+	}, {
+		name: 'TypeError',
+		message: 'newExtendedList.testMe is not a function'
+	}, 'Does not return the same type of list.');
 });
 
 
