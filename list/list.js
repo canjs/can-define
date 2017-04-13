@@ -372,9 +372,7 @@ var DefineList = Construct.extend("DefineList",
 				this._triggerChange("" + index, "add", added, removed);
 			}
 
-			if (added.length !== removed.length) {
-				canEvent.dispatch.call(this, 'length', [ this._length ]);
-			}
+			canEvent.dispatch.call(this, 'length', [ this._length ]);
 
 			canBatch.stop();
 			return removed;
