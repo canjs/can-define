@@ -14,7 +14,6 @@ var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
 var assign = require("can-util/js/assign/assign");
 var dev = require("can-util/js/dev/dev");
 var CID = require("can-cid");
-var CIDMap = require("can-util/js/cid-map/");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
 var isArray = require("can-util/js/is-array/is-array");
 var types = require("can-types");
@@ -25,8 +24,6 @@ var ns = require("can-namespace");
 var eventsProto, define,
 	make, makeDefinition, replaceWith, getDefinitionsAndMethods,
 	isDefineType, getDefinitionOrMethod;
-
-var bindingsMap = new CIDMap();
 
 var defineConfigurableAndNotEnumerable = function(obj, prop, value) {
 	Object.defineProperty(obj, prop, {
@@ -54,37 +51,6 @@ var eachPropertyDescriptor = function(map, cb){
 	}
 };
 
-function defineBindings(obj) {
-	Object.defineProperty(obj, "_bindings", {
-		configurable: true,
-		enumerable: false,
-		get: function() {
-			return bindingsMap.get(this) || 0;
-		},
-		set: function(count) {
-			if(typeof count === "object" && typeof count.bindings === "number") {
-				if(count.bindings > 0) {
-					bindingsMap.set(this, count.bindings);
-				} else {
-					bindingsMap["delete"](this);
-				}
-			}
-		}
-	});
-}
-
-function setBindings(obj, count) {
-	obj._bindings = { bindings: count };
-}
-
-function incrementBindings(count) {
-	/* jshint validthis: true */
-	setBindings(this, (this._bindings || 0) + count);
-}
-function decrementBindings(count) {
-	/* jshint validthis: true */
-	setBindings(this, Math.max((this._bindings || 0) - count, 0));
-}
 
 module.exports = define = ns.define = function(objPrototype, defines, baseDefine) {
 	// default property definitions on _data
@@ -741,9 +707,6 @@ define.setup = function(props, sealed) {
 	//defineConfigurableAndNotEnumerable(this, "_cid");
 	defineNotWritable(this, "__bindEvents", Object.create(null));
 	defineNotWritable(this, "constructor", this.constructor);
-	defineConfigurableAndNotEnumerable(this, "_incrementBindings", incrementBindings);
-	defineConfigurableAndNotEnumerable(this, "_decrementBindings", decrementBindings);
-	defineBindings(this, 0);
 	/* jshint -W030 */
 	CID(this);
 	defineNotWritable(this, "_cid", this._cid);
