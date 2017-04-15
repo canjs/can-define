@@ -26,7 +26,7 @@ var defineHelpers = {
 	},
 	removeSpecialKeys: function(map) {
 		if(map) {
-			["_data", "constructor", "_cid", "_bindings", "__bindEvents"].forEach(function(key) {
+			["_data", "constructor", "_cid", "__bindEvents"].forEach(function(key) {
 				delete map[key];
 			});
 		}
