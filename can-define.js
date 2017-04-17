@@ -704,7 +704,6 @@ eventsProto.off = eventsProto.unbind = eventsProto.removeEventListener;
 delete eventsProto.one;
 
 define.setup = function(props, sealed) {
-	//defineConfigurableAndNotEnumerable(this, "_cid");
 	defineNotWritable(this, "__bindEvents", Object.create(null));
 	defineNotWritable(this, "constructor", this.constructor);
 	/* jshint -W030 */
