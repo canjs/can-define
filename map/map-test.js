@@ -5,6 +5,7 @@ var Observation = require("can-observation");
 var canTypes = require("can-types");
 var each = require("can-util/js/each/each");
 var compute = require("can-compute");
+var assign = require("can-util/js/assign/assign");
 var sealWorks = (function() {
 	try {
 		var o = {};
@@ -427,6 +428,88 @@ QUnit.test("extending DefineMap constructor functions - value (#18)", function()
 
     var c = new CType();
     QUnit.equal( c.aProp , 1 ,"got initial value" );
+});
+
+QUnit.test("copying DefineMap excludes constructor", function() {
+
+	var AType = DefineMap.extend("AType", { aProp: {value: 1} });
+
+	var a = new AType();
+
+	var b = assign({}, a);
+
+	QUnit.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
+	QUnit.equal(a.aProp, b.aProp, "Other values are unaffected");
+
+});
+
+QUnit.test("cloning from non-defined map excludes special keys on setup", function() {
+
+	var a = {
+		_data: {},
+		constructor: function() {},
+		_bindEvents: {},
+		_cid: "object0",
+		"foo": "bar"
+	};
+
+	var b = new DefineMap(a);
+
+	QUnit.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
+	QUnit.notEqual(a._data, b._data, "_data prop not copied");
+	QUnit.notEqual(a._bindEvents, b._bindEvents, "_bindEvents prop not copied");
+	QUnit.notEqual(a._cid, b._cid, "_cid prop not copied");
+	QUnit.equal(a.foo, b.foo, "Other props copied");
+
+});
+
+QUnit.test("copying from .set() excludes special keys", function() {
+
+	var a = {
+		_data: {},
+		constructor: function() {},
+		_bindEvents: {},
+		_cid: "object0",
+		"foo": "bar",
+		"existing": "newVal"
+	};
+
+	var b = new DefineMap({
+		"existing": "oldVal"
+	});
+	b.set(a);
+
+	QUnit.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
+	QUnit.notEqual(a._data, b._data, "_data prop not copied");
+	QUnit.notEqual(a._bindEvents, b._bindEvents, "_bindEvents prop not copied");
+	QUnit.notEqual(a._cid, b._cid, "_cid prop not copied");
+	QUnit.equal(a.foo, b.foo, "NEw props copied");
+
+});
+
+QUnit.test("copying with assign() excludes special keys", function() {
+
+	var a = {
+		_data: {},
+		constructor: function() {},
+		__bindEvents: {},
+		_cid: "object0",
+		"foo": "bar",
+		"existing": "newVal"
+	};
+
+	var b = new DefineMap({
+		"existing": "oldVal"
+	});
+	assign(b, a);
+
+	QUnit.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
+	QUnit.notEqual(a._data, b._data, "_data prop not copied");
+	QUnit.notEqual(a.__bindEvents, b.__bindEvents, "_bindEvents prop not copied");
+	QUnit.notEqual(a._cid, b._cid, "_cid prop not copied");
+	QUnit.equal(a.foo, b.foo, "New props copied");
+	QUnit.equal(a.existing, b.existing, "Existing props copied");
+	
 });
 
 QUnit.test("shorthand getter setter (#56)", function(){

@@ -34,6 +34,15 @@ var defineConfigurableAndNotEnumerable = function(obj, prop, value) {
 	});
 };
 
+var defineNotWritable = function(obj, prop, value) {
+	Object.defineProperty(obj, prop, {
+		configurable: true,
+		enumerable: false,
+		writable: false,
+		value: value
+	});
+};
+
 var eachPropertyDescriptor = function(map, cb){
 	for(var prop in map) {
 		if(map.hasOwnProperty(prop)) {
@@ -41,6 +50,7 @@ var eachPropertyDescriptor = function(map, cb){
 		}
 	}
 };
+
 
 module.exports = define = ns.define = function(objPrototype, defines, baseDefine) {
 	// default property definitions on _data
@@ -76,7 +86,7 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 	// that will create the property's compute when read.
 	replaceWith(objPrototype, "_computed", function() {
 		var map = this;
-		var data = {};
+		var data = Object.create(null);
 		for (var prop in computedInitializers) {
 			replaceWith(data, prop, computedInitializers[prop].bind(map));
 		}
@@ -600,7 +610,7 @@ getDefinitionsAndMethods = function(defines, baseDefines) {
 		delete defines["*"];
 		defaultDefinition = getDefinitionOrMethod("*", defaults, {});
 	} else {
-		defaultDefinition = {};
+		defaultDefinition = Object.create(null);
 	}
 
 	eachPropertyDescriptor(defines, function( prop, propertyDescriptor ) {
@@ -694,13 +704,13 @@ eventsProto.off = eventsProto.unbind = eventsProto.removeEventListener;
 delete eventsProto.one;
 
 define.setup = function(props, sealed) {
-	defineConfigurableAndNotEnumerable(this, "_cid");
-	defineConfigurableAndNotEnumerable(this, "__bindEvents", {});
-	defineConfigurableAndNotEnumerable(this, "_bindings", 0);
+	defineNotWritable(this, "__bindEvents", Object.create(null));
+	defineNotWritable(this, "constructor", this.constructor);
 	/* jshint -W030 */
 	CID(this);
+	defineNotWritable(this, "_cid", this._cid);
 	var definitions = this._define.definitions;
-	var instanceDefinitions = {};
+	var instanceDefinitions = Object.create(null);
 	var map = this;
 	each(props, function(value, prop){
 		if(definitions[prop]) {

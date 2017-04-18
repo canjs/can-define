@@ -30,7 +30,7 @@ var eachDefinition = function(map, cb, thisarg, definitions, observe) {
 };
 
 var setProps = function(props, remove) {
-    props = assign({}, props);
+	props = defineHelpers.removeSpecialKeys(assign({}, props));
     var prop,
         self = this,
         newVal;
@@ -84,15 +84,28 @@ var setProps = function(props, remove) {
 
 var DefineMap = Construct.extend("DefineMap",{
     setup: function(base){
+		var key,
+			prototype = this.prototype;
         if(DefineMap) {
-            var prototype = this.prototype;
             define(prototype, prototype, base.prototype._define);
+			for(key in DefineMap.prototype) {
+				define.defineConfigurableAndNotEnumerable(prototype, key, prototype[key]);
+			}
 
             this.prototype.setup = function(props){
-                define.setup.call(this, defineHelpers.toObject(this, props,{}, DefineMap), this.constructor.seal);
+				define.setup.call(
+					this, 
+					defineHelpers.removeSpecialKeys(defineHelpers.toObject(this, props,{}, DefineMap)),
+					this.constructor.seal
+				);
             };
+		} else {
+			for(key in prototype) {
+				define.defineConfigurableAndNotEnumerable(prototype, key, prototype[key]);
         }
     }
+		define.defineConfigurableAndNotEnumerable(prototype, "constructor", this);
+	}
 },{
     // setup for only dynamic DefineMap instances
     setup: function(props, sealed){
@@ -108,7 +121,11 @@ var DefineMap = Construct.extend("DefineMap",{
                 value: {}
             });
         }
-        define.setup.call(this, defineHelpers.toObject(this, props,{}, DefineMap), sealed === true);
+		define.setup.call(
+			this,
+			defineHelpers.removeSpecialKeys(defineHelpers.toObject(this, props,{}, DefineMap)),
+			sealed === true
+		);
     },
     /**
      * @function can-define/map/map.prototype.get get
@@ -261,7 +278,7 @@ var DefineMap = Construct.extend("DefineMap",{
 
 // Add necessary event methods to this object.
 for(var prop in define.eventsProto) {
-    DefineMap[prop] = define.eventsProto[prop];
+	DefineMap[prop] = define.eventsProto[prop];
     Object.defineProperty(DefineMap.prototype, prop, {
         enumerable:false,
         value: define.eventsProto[prop],
