@@ -78,8 +78,6 @@ var DefineList = Construct.extend("DefineList",
 		__type: define.types.observable,
 		_triggerChange: function(attr, how, newVal, oldVal) {
 
-			canBatch.start();
-
 			var index = +attr;
 			// `batchTrigger` direct add and remove events...
 
@@ -107,7 +105,6 @@ var DefineList = Construct.extend("DefineList",
 				}, [ newVal, oldVal ]);
 			}
 
-			canBatch.stop();
 		},
 		/**
 		 * @function can-define/list/list.prototype.get get
@@ -413,7 +410,6 @@ var getArgs = function(args) {
 		args[0] :
 		makeArray(args);
 };
-
 // Create `push`, `pop`, `shift`, and `unshift`
 each({
 		/**
@@ -536,8 +532,10 @@ each({
 			res = orig.apply(this, args);
 
 			if (!this.comparator || args.length) {
+				canBatch.start();
 				this._triggerChange("" + len, "add", args, undefined);
 				canEvent.dispatch.call(this, 'length', [ this._length ]);
+				canBatch.stop();
 			}
 
 			return res;
@@ -638,8 +636,10 @@ each({
 			// `remove` - Items removed.
 			// `undefined` - The new values (there are none).
 			// `res` - The old, removed values (should these be unbound).
+			canBatch.start();
 			this._triggerChange("" + len, "remove", undefined, [ res ]);
 			canEvent.dispatch.call(this, 'length', [ this._length ]);
+			canBatch.stop();
 
 			return res;
 		};

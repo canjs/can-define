@@ -857,18 +857,40 @@ test("replace-with-self lists are diffed properly (can-view-live#10)", function(
 
 QUnit.test("set >= length - triggers length event (#152)", function() {
 	var l = new DefineList([ 1, 2, 3 ]);
+	var batchNum = null;
 
-	l.on("add", function() {
+	l.on("add", function(e) {
 		ok(true, "add called");
+
+		if (batchNum === null) {
+			batchNum = e.batchNum;
+		}
+		else {
+			equal(batchNum, e.batchNum, "batch numbers match");
+		}
 	});
-	l.on("remove", function() {
+	l.on("remove", function(e) {
 		ok(false, "remove called");
+
+		if (batchNum === null) {
+			batchNum = e.batchNum;
+		}
+		else {
+			equal(batchNum, e.batchNum, "batch numbers match");
+		}
 	});
-	l.on("length", function() {
+	l.on("length", function(e) {
 		ok(true, "length called");
+
+		if (batchNum === null) {
+			batchNum = e.batchNum;
+		}
+		else {
+			equal(batchNum, e.batchNum, "batch numbers match");
+		}
 	});
 
-	expect(3);
+	expect(4);
 	l.set(3, 5);
 
 	deepEqual(l.get(), [ 1, 2, 3, 5 ], "updated list");
@@ -876,18 +898,40 @@ QUnit.test("set >= length - triggers length event (#152)", function() {
 
 QUnit.test("set < length - triggers length event (#150)", function() {
 	var l = new DefineList([ 1, 2, 3 ]);
+	var batchNum = null;
 
-	l.on("add", function() {
+	l.on("add", function(e) {
 		ok(true, "add called");
+
+		if (batchNum === null) {
+			batchNum = e.batchNum;
+		}
+		else {
+			equal(batchNum, e.batchNum, "batch numbers match");
+		}
 	});
-	l.on("remove", function() {
+	l.on("remove", function(e) {
 		ok(true, "remove called");
+
+		if (batchNum === null) {
+			batchNum = e.batchNum;
+		}
+		else {
+			equal(batchNum, e.batchNum, "batch numbers match");
+		}
 	});
-	l.on("length", function() {
+	l.on("length", function(e) {
 		ok(true, "length called");
+
+		if (batchNum === null) {
+			batchNum = e.batchNum;
+		}
+		else {
+			equal(batchNum, e.batchNum, "batch numbers match");
+		}
 	});
 
-	expect(4);
+	expect(6);
 	l.set(2, 4);
 
 	deepEqual(l.get(), [ 1, 2, 4 ], "updated list");
