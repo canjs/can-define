@@ -827,7 +827,7 @@ QUnit.test("Array shorthand uses #", function() {
 	QUnit.ok(map.numbers.prop === "4", "type left alone");
 });
 
-test("replace-with-self lists are diffed properly (can-view-live#10)", function() {
+QUnit.test("replace-with-self lists are diffed properly (can-view-live#10)", function() {
 	var a = new DefineMap({ name: "A" });
 	var b = new DefineMap({ name: "B" });
 	var c = new DefineMap({ name: "C" });
@@ -853,4 +853,32 @@ test("replace-with-self lists are diffed properly (can-view-live#10)", function(
 		equal(where, 2, "list2 removed location");
 	});
 	list2.replace([ a, b, d ]);
+});
+
+QUnit.test("setting length > current (#147)", function() {
+	var list = new DefineList([ 1, 2 ]);
+
+	list.length = 5;
+
+	equal(list.length, 5);
+	equal(list.hasOwnProperty(0), true);
+	equal(list.hasOwnProperty(1), true);
+	equal(list.hasOwnProperty(2), true);
+	equal(list.hasOwnProperty(3), true);
+	equal(list.hasOwnProperty(4), true);
+	equal(list.hasOwnProperty(5), false);
+});
+
+QUnit.test("setting length < current (#147)", function() {
+	var list = new DefineList([ 1, 2, 3, 4, 5 ]);
+
+	list.length = 3;
+
+	equal(list.length, 3);
+	equal(list.hasOwnProperty(0), true);
+	equal(list.hasOwnProperty(1), true);
+	equal(list.hasOwnProperty(2), true);
+	equal(list.hasOwnProperty(3), false);
+	equal(list.hasOwnProperty(4), false);
+	equal(list.hasOwnProperty(5), false);
 });

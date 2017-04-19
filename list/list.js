@@ -1088,8 +1088,25 @@ Object.defineProperty(DefineList.prototype, "length", {
 		}
 		return this._length;
 	},
-	set: function(newVal) {
-		this._length = newVal;
+	set: function(newLength) {
+		if (newLength === this._length) {
+			return;
+		}
+
+		if (newLength > this._length - 1) {
+			for (var i = this._length; i < newLength; i++) {
+				if (!this.hasOwnProperty(i)) {
+					this[i] = undefined;
+				}
+			}
+		}
+		else {
+			for (var i = newLength; i < this._length; i++) {
+				delete this[i];
+			}
+		}
+
+		this._length = newLength;
 	},
 	enumerable: true
 });
