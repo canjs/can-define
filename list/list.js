@@ -71,6 +71,7 @@ var DefineList = Construct.extend("DefineList",
 			}
 			define.setup.call(this, {}, false);
 			this._length = 0;
+			this._inProcessing = false;
 			if (items) {
 				this.splice.apply(this, [ 0, 0 ].concat(defineHelpers.toObject(this, items, [], DefineList)));
 			}
@@ -363,7 +364,9 @@ var DefineList = Construct.extend("DefineList",
 				howMany = args[1] = this._length - index;
 			}
 
+			this._inProcessing = true;
 			var removed = splice.apply(this, args);
+			this._inProcessing = false;
 
 			canBatch.start();
 			if (howMany > 0) {
@@ -531,7 +534,9 @@ each({
 			}
 
 			// Call the original method.
+			this._inProcessing = true;
 			res = orig.apply(this, args);
+			this._inProcessing = false;
 
 			if (!this.comparator || args.length) {
 
@@ -619,6 +624,7 @@ each({
 },
 	// Creates a `remove` type method
 	function(where, name) {
+		var orig = [][name];
 		DefineList.prototype[name] = function() {
 			if (!this._length) {
 				// For shift and pop, we just return undefined without
@@ -627,9 +633,13 @@ each({
 			}
 
 			var args = getArgs(arguments),
-				len = where && this._length ? this._length - 1 : 0;
+				len = where && this._length ? this._length - 1 : 0,
+				res;
 
-			var res = [][name].apply(this, args);
+			// Call the original method.
+			this._inProcessing = true;
+			res = orig.apply(this, args);
+			this._inProcessing = false;
 
 			// Create a change where the args are
 			// `len` - Where these items were removed.
@@ -1088,25 +1098,23 @@ Object.defineProperty(DefineList.prototype, "length", {
 		}
 		return this._length;
 	},
-	set: function(newLength) {
-		if (newLength === this._length) {
+	set: function(newVal) {
+		if (newVal === this._length) {
 			return;
 		}
 
-		if (newLength > this._length - 1) {
-			for (var i = this._length; i < newLength; i++) {
-				if (!this.hasOwnProperty(i)) {
-					this[i] = undefined;
-				}
-			}
-		}
-		else {
-			for (var i = newLength; i < this._length; i++) {
-				delete this[i];
-			}
+		if (this._inProcessing) {
+			this._length = newVal;
+			return;
 		}
 
-		this._length = newLength;
+		if (newVal > this._length - 1) {
+			var newArr = new Array(newVal - this._length);
+			this.push.apply(this, newArr);
+		}
+		else {
+			this.splice(newVal);
+		}
 	},
 	enumerable: true
 });
