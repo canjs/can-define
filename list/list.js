@@ -17,6 +17,7 @@ var types = require("can-types");
 var ns = require("can-namespace");
 
 var splice = [].splice;
+var runningNative = false;
 
 var identity = function(x) {
 	return x;
@@ -71,7 +72,6 @@ var DefineList = Construct.extend("DefineList",
 			}
 			define.setup.call(this, {}, false);
 			this._length = 0;
-			this._inProcessing = false;
 			if (items) {
 				this.splice.apply(this, [ 0, 0 ].concat(defineHelpers.toObject(this, items, [], DefineList)));
 			}
@@ -364,9 +364,9 @@ var DefineList = Construct.extend("DefineList",
 				howMany = args[1] = this._length - index;
 			}
 
-			this._inProcessing = true;
+			runningNative = true;
 			var removed = splice.apply(this, args);
-			this._inProcessing = false;
+			runningNative = false;
 
 			canBatch.start();
 			if (howMany > 0) {
@@ -534,9 +534,9 @@ each({
 			}
 
 			// Call the original method.
-			this._inProcessing = true;
+			runningNative = true;
 			res = orig.apply(this, args);
-			this._inProcessing = false;
+			runningNative = false;
 
 			if (!this.comparator || args.length) {
 
@@ -637,9 +637,9 @@ each({
 				res;
 
 			// Call the original method.
-			this._inProcessing = true;
+			runningNative = true;
 			res = orig.apply(this, args);
-			this._inProcessing = false;
+			runningNative = false;
 
 			// Create a change where the args are
 			// `len` - Where these items were removed.
@@ -1099,12 +1099,12 @@ Object.defineProperty(DefineList.prototype, "length", {
 		return this._length;
 	},
 	set: function(newVal) {
-		if (newVal === this._length) {
+		if (runningNative) {
+			this._length = newVal;
 			return;
 		}
 
-		if (this._inProcessing) {
-			this._length = newVal;
+		if (newVal === this._length) {
 			return;
 		}
 
