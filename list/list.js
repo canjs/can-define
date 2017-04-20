@@ -917,7 +917,7 @@ assign(DefineList.prototype, {
 	 *
 	 * ```
 	 * var names = new DefineList(["alice","adam","zack","zeffer"]);
-	 * var aNames = list.filter(function(name){
+	 * var aNames = names.filter(function(name){
 	 *   return name[0] === "a"
 	 * });
 	 * aNames //-> DefineList["alice","adam"]
