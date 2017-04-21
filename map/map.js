@@ -110,7 +110,7 @@ var DefineMap = Construct.extend("DefineMap",{
 	keys: function (map) {
 		var keys = [], definitions = map._define.definitions;
 		for (var keyName in definitions) {
-			if (definitions[keyName]['serialize']) {
+			if (definitions[keyName].serialize) {
 				keys.push(keyName);
 			}
 		}
