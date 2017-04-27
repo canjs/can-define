@@ -17,6 +17,7 @@ var types = require("can-types");
 var ns = require("can-namespace");
 
 var splice = [].splice;
+var runningNative = false;
 
 var identity = function(x) {
 	return x;
@@ -363,7 +364,9 @@ var DefineList = Construct.extend("DefineList",
 				howMany = args[1] = this._length - index;
 			}
 
+			runningNative = true;
 			var removed = splice.apply(this, args);
+			runningNative = false;
 
 			canBatch.start();
 			if (howMany > 0) {
@@ -531,7 +534,9 @@ each({
 			}
 
 			// Call the original method.
+			runningNative = true;
 			res = orig.apply(this, args);
+			runningNative = false;
 
 			if (!this.comparator || args.length) {
 
@@ -619,6 +624,7 @@ each({
 },
 	// Creates a `remove` type method
 	function(where, name) {
+		var orig = [][name];
 		DefineList.prototype[name] = function() {
 			if (!this._length) {
 				// For shift and pop, we just return undefined without
@@ -627,9 +633,13 @@ each({
 			}
 
 			var args = getArgs(arguments),
-				len = where && this._length ? this._length - 1 : 0;
+				len = where && this._length ? this._length - 1 : 0,
+				res;
 
-			var res = [][name].apply(this, args);
+			// Call the original method.
+			runningNative = true;
+			res = orig.apply(this, args);
+			runningNative = false;
 
 			// Create a change where the args are
 			// `len` - Where these items were removed.
@@ -1089,7 +1099,22 @@ Object.defineProperty(DefineList.prototype, "length", {
 		return this._length;
 	},
 	set: function(newVal) {
-		this._length = newVal;
+		if (runningNative) {
+			this._length = newVal;
+			return;
+		}
+
+		if (newVal === this._length) {
+			return;
+		}
+
+		if (newVal > this._length - 1) {
+			var newArr = new Array(newVal - this._length);
+			this.push.apply(this, newArr);
+		}
+		else {
+			this.splice(newVal);
+		}
 	},
 	enumerable: true
 });
