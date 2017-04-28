@@ -1142,8 +1142,8 @@ DefineList.prototype[canSymbol.iterator] = function() {
 				done: index >= this.length
 			};
 		}.bind(this)
-	}
-}
+	};
+};
 
 types.DefineList = DefineList;
 types.DefaultList = DefineList;
