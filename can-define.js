@@ -2,7 +2,6 @@
 "format cjs";
 
 
-var event = require("can-event");
 var eventLifecycle = require("can-event/lifecycle/lifecycle");
 var canBatch = require("can-event/batch/batch");
 var canEvent = require("can-event");
@@ -20,6 +19,7 @@ var types = require("can-types");
 var each = require("can-util/js/each/each");
 var defaults = require("can-util/js/defaults/defaults");
 var ns = require("can-namespace");
+var canSymbol = require("can-symbol");
 
 var eventsProto, define,
 	make, makeDefinition, replaceWith, getDefinitionsAndMethods,
@@ -118,7 +118,7 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 			return new define.Iterator(this);
 		});
 	}
-
+	
 	return result;
 };
 
@@ -658,7 +658,7 @@ replaceWith = function(obj, prop, cb, writable) {
 	});
 };
 
-eventsProto = assign({}, event);
+eventsProto = assign({}, canEvent);
 assign(eventsProto, {
 	_eventSetup: function() {},
 	_eventTeardown: function() {},
@@ -668,6 +668,7 @@ assign(eventsProto, {
 		if (computedBinding && computedBinding.compute) {
 			if (!computedBinding.count) {
 				computedBinding.count = 1;
+				// TODO use canReflect.onValue when can-compute supports reflection
 				computedBinding.compute.addEventListener("change", computedBinding.handler);
 			} else {
 				computedBinding.count++;
@@ -687,6 +688,7 @@ assign(eventsProto, {
 		if (computedBinding) {
 			if (computedBinding.count === 1) {
 				computedBinding.count = 0;
+				// TODO use canReflect.offValue when can-compute supports reflection
 				computedBinding.compute.removeEventListener("change", computedBinding.handler);
 			} else {
 				computedBinding.count--;
@@ -698,8 +700,8 @@ assign(eventsProto, {
 
 	}
 });
-eventsProto.on = eventsProto.bind = eventsProto.addEventListener;
-eventsProto.off = eventsProto.unbind = eventsProto.removeEventListener;
+eventsProto.on = eventsProto.bind = eventsProto[canSymbol.for("can.onKeyValue")] = eventsProto.addEventListener;
+eventsProto.off = eventsProto.unbind = eventsProto[canSymbol.for("can.offKeyValue")] = eventsProto.removeEventListener;
 
 delete eventsProto.one;
 

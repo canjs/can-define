@@ -11,10 +11,11 @@ var defineHelpers = require("../define-helpers/define-helpers");
 var assign = require("can-util/js/assign/assign");
 var diff = require("can-util/js/diff/diff");
 var each = require("can-util/js/each/each");
-var isArray = require("can-util/js/is-array/is-array");
 var makeArray = require("can-util/js/make-array/make-array");
 var types = require("can-types");
 var ns = require("can-namespace");
+var canReflect = require("can-reflect");
+var canSymbol = require("can-symbol");
 
 var splice = [].splice;
 
@@ -261,15 +262,15 @@ var DefineList = Construct.extend("DefineList",
 			}
 			// otherwise we are setting multiple
 			else {
-				if (isArray(prop)) {
+				if (canReflect.isListLike(prop)) {
 					if (value) {
-						this.replace(prop);
+						canReflect.setValue(this, prop);
 					} else {
 						this.splice.apply(this, [ 0, prop.length ].concat(prop));
 					}
 				} else {
-					each(prop, function(value, prop) {
-						this.set(prop, value);
+					canReflect.eachKey(prop, function(value, prop) {
+						canReflect.setKeyValue(this, prop, value);
 					}, this);
 				}
 			}
@@ -797,11 +798,11 @@ assign(DefineList.prototype, {
 		// Go through each of the passed `arguments` and
 		// see if it is list-like, an array, or something else
 		each(arguments, function(arg) {
-			if (types.isListLike(arg) || Array.isArray(arg)) {
+			if (canReflect.isListLike(arg)) {
 				// If it is list-like we want convert to a JS array then
 				// pass each item of the array to this.__type
-				var arr = types.isListLike(arg) ? makeArray(arg) : arg;
-				each(arr, function(innerArg) {
+				var arr = canReflect.isListLike(arg) ? makeArray(arg) : arg;
+				canReflect.eachIndex(arr, function(innerArg) {
 					args.push(this.__type(innerArg));
 				}, this);
 			} else {
@@ -857,8 +858,8 @@ assign(DefineList.prototype, {
 	forEach: function(cb, thisarg) {
 		var item;
 		for (var i = 0, len = this.length; i < len; i++) {
-			item = this.get(i);
-			if (cb.call(thisarg || item, item, i, this) === false) {
+			item = canReflect.getKeyValue(this, i);
+			if (canReflect.call(cb, thisarg || item, item, i, this) === false) {
 				break;
 			}
 		}
@@ -959,8 +960,8 @@ assign(DefineList.prototype, {
 		if (typeof callback === "object") {
 			callback = makeFilterCallback(callback);
 		}
-		this.each(function(item, index, list) {
-			filtered = callback.call(thisArg | self, item, index, self);
+		canReflect.eachIndex(this, function(item, index, list) {
+			filtered = canReflect.call(callback, thisArg | self, item, index, self);
 			if (filtered) {
 				filteredList.push(item);
 			}
@@ -1004,8 +1005,8 @@ assign(DefineList.prototype, {
 	map: function(callback, thisArg) {
 		var mappedList = [],
 			self = this;
-		this.each(function(item, index, list) {
-			var mapped = callback.call(thisArg | self, item, index, self);
+		canReflect.eachIndex(this, function(item, index, list) {
+			var mapped = canReflect.call(callback, thisArg | self, item, index, self);
 			mappedList.push(mapped);
 
 		});
@@ -1103,13 +1104,13 @@ DefineList.prototype.each = DefineList.prototype.forEach;
 DefineList.prototype.attr = function(prop, value) {
 	canLog.warn("DefineMap::attr shouldn't be called");
 	if (arguments.length === 0) {
-		return this.get();
+		return canReflect.getValue(this);
 	} else if (prop && typeof prop === "object") {
-		return this.set.apply(this, arguments);
+		return canReflect.setValue.apply(this, arguments);
 	} else if (arguments.length === 1) {
-		return this.get(prop);
+		return canReflect.getKeyValue(this, prop);
 	} else {
-		return this.set(prop, value);
+		return canReflect.setKeyValue(this, prop, value);
 	}
 };
 DefineList.prototype.item = function(index, value) {
@@ -1123,6 +1124,26 @@ DefineList.prototype.items = function() {
 	canLog.warn("DefineList::get should should be used instead of DefineList::items");
 	return this.get();
 };
+
+DefineList.prototype[canSymbol.for("can.getKeyValue")] = DefineList.prototype.get;
+DefineList.prototype[canSymbol.for("can.setKeyValue")] = DefineList.prototype.set;
+DefineList.prototype[canSymbol.for("can.getValue")] = DefineList.prototype.get;
+DefineList.prototype[canSymbol.for("can.setValue")] = DefineList.prototype.replace;
+DefineList.prototype[canSymbol.for("can.isMapLike")] = true;
+DefineList.prototype[canSymbol.for("can.isListLike")] = true;
+DefineList.prototype[canSymbol.for("can.isValueLike")] = true;
+DefineList.prototype[canSymbol.iterator] = function() {
+	var index = -1;
+	return {
+		next: function() {
+			index++;
+			return {
+				value: this[index],
+				done: index >= this.length
+			};
+		}.bind(this)
+	}
+}
 
 types.DefineList = DefineList;
 types.DefaultList = DefineList;
