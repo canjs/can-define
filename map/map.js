@@ -105,6 +105,16 @@ var DefineMap = Construct.extend("DefineMap",{
         }
     }
 		define.defineConfigurableAndNotEnumerable(prototype, "constructor", this);
+	},
+
+	keys: function (map) {
+		var keys = [], definitions = map._define.definitions;
+		for (var keyName in definitions) {
+			if (definitions[keyName].serialize) {
+				keys.push(keyName);
+			}
+		}
+		return keys;
 	}
 },{
     // setup for only dynamic DefineMap instances

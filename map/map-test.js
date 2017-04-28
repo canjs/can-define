@@ -649,3 +649,26 @@ QUnit.test(".value functions should not be observable", function(){
 	
 	equal(count, 1);
 });
+
+QUnit.test("DefineMap.keys returns serialize: true properties (#174)", function () {
+	var Foo = DefineMap.extend({
+		first: "string",
+		last: "string",
+		fullName: {
+			get: function () {
+				return this.first + this.last;
+			},
+			serialize: true
+		},
+		greeting: {
+			get: function () {
+				return "hello " + this.fullName();
+			}
+		}
+	});
+	var foo = new Foo();
+
+	var keys = DefineMap.keys(foo);
+
+	QUnit.equal(keys[0], "fullName", "DefineMap.keys returns only serialize: true properties");
+});
