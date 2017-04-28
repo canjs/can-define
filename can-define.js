@@ -288,6 +288,7 @@ make = {
 		events: function(prop, getCurrent, setData, eventType) {
 			return function(newVal) {
 				if (this.__inSetup) {
+					Observation.ignore(getCurrent).call(this);
 					setData.call(this, newVal);
 				}
 				else {
