@@ -1504,3 +1504,28 @@ QUnit.test('setter with default value causes an infinite loop (#142)', function(
 	var a = new A();
 	QUnit.equal(a.val, 'hello', 'creating an instance should not cause an inifinte loop');
 });
+
+QUnit.test('defined properties are configurable', function(){
+	var A = define.Constructor({
+		val: {
+			get: function(){
+				return "foo";
+			}
+		}
+	});
+
+	var dataInitializers = A.prototype._define.dataInitializers,
+	computedInitializers = A.prototype._define.computedInitializers;
+
+	var newDefinition = {
+		get: function(){
+			return "bar";
+		}
+	};
+
+	define.property(A.prototype, "val", newDefinition, dataInitializers,
+		computedInitializers);
+
+	var a = new A();
+	QUnit.equal(a.val, "bar", "It was redefined");
+});

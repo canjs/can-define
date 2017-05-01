@@ -147,7 +147,8 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 		Object.defineProperty(objPrototype, prop, {
 			get: make.get.data(prop),
 			set: make.set.events(prop, make.get.data(prop), make.set.data(prop), make.eventType.data(prop)),
-			enumerable: true
+			enumerable: true,
+			configurable: true
 		});
 		return;
 	}
@@ -230,7 +231,8 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 	Object.defineProperty(objPrototype, prop, {
 		get: getter,
 		set: setter,
-		enumerable: "serialize" in definition ? !!definition.serialize : !definition.get
+		enumerable: "serialize" in definition ? !!definition.serialize : !definition.get,
+		configurable: true
 	});
 };
 
