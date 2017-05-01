@@ -54,7 +54,8 @@ var eachPropertyDescriptor = function(map, cb){
 
 module.exports = define = ns.define = function(objPrototype, defines, baseDefine) {
 	// default property definitions on _data
-	var dataInitializers = Object.create(baseDefine ? baseDefine.dataInitializers : null),
+	var prop,
+		dataInitializers = Object.create(baseDefine ? baseDefine.dataInitializers : null),
 		// computed property definitions on _computed
 		computedInitializers = Object.create(baseDefine ? baseDefine.computedInitializers : null);
 
@@ -73,7 +74,7 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 	// with a `_data` object local to the instance.  It also defines getters
 	// for any value that has a default value.
 	if(objPrototype.hasOwnProperty("_data")) {
-		for (var prop in dataInitializers) {
+		for (prop in dataInitializers) {
 			replaceWith(objPrototype._data, prop, dataInitializers[prop].bind(objPrototype), true);
 		}		
 	} else {
