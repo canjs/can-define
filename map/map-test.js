@@ -700,7 +700,7 @@ QUnit.test("redefines still not allowed on sealed objects", function() {
 			quux: { value: "jeek" }
 		}, baz._define);
 	} catch(e) {
-		QUnit.ok(/object is not extensible/.test(e.message), "Sealed object throws on data property defines");
+		QUnit.ok(/object is not extensible/i.test(e.message), "Sealed object throws on data property defines");
 		QUnit.ok(!Object.getOwnPropertyDescriptor(baz, "quux"), "nothing set on object");
 		QUnit.ok(!Object.getOwnPropertyDescriptor(baz._data, "quux"), "nothing set on _data");
 	}
@@ -714,7 +714,7 @@ QUnit.test("redefines still not allowed on sealed objects", function() {
 			}
 		}, baz._define);
 	} catch(e) {
-		QUnit.ok(/object is not extensible/.test(e.message), "Sealed object throws on computed property defines");
+		QUnit.ok(/object is not extensible/i.test(e.message), "Sealed object throws on computed property defines");
 		QUnit.ok(!Object.getOwnPropertyDescriptor(baz, "plonk"), "nothing set on object");
 		QUnit.ok(!Object.getOwnPropertyDescriptor(baz._computed, "plonk"), "nothing set on _computed");
 	}

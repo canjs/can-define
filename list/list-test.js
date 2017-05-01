@@ -375,7 +375,9 @@ test('list.map', function() {
 		newExtendedList.testMe();
 	}, {
 		name: 'TypeError',
-		message: 'newExtendedList.testMe is not a function'
+		message: (navigator.userAgent.indexOf("Trident") > -1 ?
+			"Object doesn't support property or method 'testMe'" :
+			"newExtendedList.testMe is not a function")
 	}, 'Does not return the same type of list.');
 });
 
