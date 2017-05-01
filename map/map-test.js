@@ -686,3 +686,36 @@ QUnit.test("Does not attempt to redefine _data if already defined", function() {
 	QUnit.equal(baz.baz, "thud", "Old definitions still available");
 
 });
+
+QUnit.test("redefines still not allowed on sealed objects", function() {
+	QUnit.expect(6);
+	var Bar = DefineMap.extend({seal: true}, {
+		baz: { value : "thud" }
+	});
+	
+	var baz = new Bar();
+	
+	try {
+		define(baz, {
+			quux: { value: "jeek" }
+		}, baz._define);
+	} catch(e) {
+		QUnit.ok(/object is not extensible/.test(e.message), "Sealed object throws on data property defines");
+		QUnit.ok(!Object.getOwnPropertyDescriptor(baz, "quux"), "nothing set on object");
+		QUnit.ok(!Object.getOwnPropertyDescriptor(baz._data, "quux"), "nothing set on _data");
+	}
+
+	try {
+		define(baz, {
+			plonk: {
+				get: function() {
+					return "waldo";
+				}
+			}
+		}, baz._define);
+	} catch(e) {
+		QUnit.ok(/object is not extensible/.test(e.message), "Sealed object throws on computed property defines");
+		QUnit.ok(!Object.getOwnPropertyDescriptor(baz, "plonk"), "nothing set on object");
+		QUnit.ok(!Object.getOwnPropertyDescriptor(baz._computed, "plonk"), "nothing set on _computed");
+	}
+});
