@@ -1104,13 +1104,13 @@ DefineList.prototype.each = DefineList.prototype.forEach;
 DefineList.prototype.attr = function(prop, value) {
 	canLog.warn("DefineMap::attr shouldn't be called");
 	if (arguments.length === 0) {
-		return canReflect.getValue(this);
+		return this.get();
 	} else if (prop && typeof prop === "object") {
-		return canReflect.setValue.apply(this, arguments);
+		return this.set.apply(this, arguments);
 	} else if (arguments.length === 1) {
-		return canReflect.getKeyValue(this, prop);
+		return this.get(prop);
 	} else {
-		return canReflect.setKeyValue(this, prop, value);
+		return this.set(prop, value);
 	}
 };
 DefineList.prototype.item = function(index, value) {
