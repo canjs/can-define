@@ -107,7 +107,7 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 
 
 	// Add necessary event methods to this object.
-	for (var prop in eventsProto) {
+	for (prop in eventsProto) {
 		Object.defineProperty(objPrototype, prop, {
 			enumerable: false,
 			value: eventsProto[prop],
