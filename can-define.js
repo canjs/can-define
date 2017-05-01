@@ -72,26 +72,38 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 	// Places a `_data` on the prototype that when first called replaces itself
 	// with a `_data` object local to the instance.  It also defines getters
 	// for any value that has a default value.
-	replaceWith(objPrototype, "_data", function() {
-		var map = this;
-		var data = {};
+	if(objPrototype.hasOwnProperty("_data")) {
 		for (var prop in dataInitializers) {
-			replaceWith(data, prop, dataInitializers[prop].bind(map), true);
-		}
-		return data;
-	});
+			replaceWith(objPrototype._data, prop, dataInitializers[prop].bind(objPrototype), true);
+		}		
+	} else {
+		replaceWith(objPrototype, "_data", function() {
+			var map = this;
+			var data = {};
+			for (var prop in dataInitializers) {
+				replaceWith(data, prop, dataInitializers[prop].bind(map), true);
+			}
+			return data;
+		});
+	}
 
 	// Places a `_computed` on the prototype that when first called replaces itself
 	// with a `_computed` object local to the instance.  It also defines getters
 	// that will create the property's compute when read.
-	replaceWith(objPrototype, "_computed", function() {
-		var map = this;
-		var data = Object.create(null);
-		for (var prop in computedInitializers) {
-			replaceWith(data, prop, computedInitializers[prop].bind(map));
+	if(objPrototype.hasOwnProperty("_computed")) {
+		for (prop in computedInitializers) {
+			replaceWith(objPrototype._computed, prop, computedInitializers[prop].bind(objPrototype));
 		}
-		return data;
-	});
+	} else {
+		replaceWith(objPrototype, "_computed", function() {
+			var map = this;
+			var data = Object.create(null);
+			for (var prop in computedInitializers) {
+				replaceWith(data, prop, computedInitializers[prop].bind(map));
+			}
+			return data;
+		});
+	}
 
 
 	// Add necessary event methods to this object.

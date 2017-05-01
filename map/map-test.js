@@ -1,6 +1,7 @@
 "use strict";
 var QUnit = require("steal-qunit");
 var DefineMap = require("can-define/map/map");
+var define = require("can-define");
 var Observation = require("can-observation");
 var canTypes = require("can-types");
 var each = require("can-util/js/each/each");
@@ -662,4 +663,26 @@ QUnit.test(".value values are overwritten by props in DefineMap construction", f
 	});
 
 	equal(foo.bar, "quux", "Value set properly");
+});
+
+QUnit.test("Does not attempt to redefine _data if already defined", function() {
+	var Bar = DefineMap.extend({seal: false}, {
+		baz: { value : "thud" }
+	});
+	
+	var baz = new Bar();
+	
+	define(baz, {
+		quux: { value: "jeek" },
+		plonk: {
+			get: function() {
+				return "waldo";
+			}
+		}
+	}, baz._define);
+
+	QUnit.equal(baz.quux, "jeek", "New definitions successful");
+	QUnit.equal(baz.plonk, "waldo", "New computed definitions successful");
+	QUnit.equal(baz.baz, "thud", "Old definitions still available");
+
 });
