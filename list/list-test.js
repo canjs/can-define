@@ -375,7 +375,7 @@ test('list.map', function() {
 	try {
 		newExtendedList.testMe();
 	} catch(err) {
-		equal(err.message, 'newExtendedList.testMe is not a function');
+		QUnit.ok(err.message.match(/testMe/));
 	}
 });
 
