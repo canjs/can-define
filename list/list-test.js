@@ -371,14 +371,12 @@ test('list.map', function() {
 		person.lastName = "Thompson";
 		return person;
 	});
-	QUnit.throws(function() {
+
+	try {
 		newExtendedList.testMe();
-	}, {
-		name: 'TypeError',
-		message: (navigator.userAgent.indexOf("Trident") > -1 ?
-			"Object doesn't support property or method 'testMe'" :
-			"newExtendedList.testMe is not a function")
-	}, 'Does not return the same type of list.');
+	} catch(err) {
+		QUnit.ok(err.message.match(/testMe/), 'Does not return the same type of list.');
+	}
 });
 
 
