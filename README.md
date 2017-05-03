@@ -2,6 +2,8 @@
 
 # can-define
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/canjs/can-define.svg)](https://greenkeeper.io/)
+
 Add observable properties, type conversion, and getter/setter logic to your constructor prototypes.
 
 - <code>[__can-define__ function](#can-define-function)</code>
