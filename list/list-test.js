@@ -882,3 +882,95 @@ QUnit.test("setting length < current (#147)", function() {
 	equal(list.hasOwnProperty(4), false);
 	equal(list.hasOwnProperty(5), false);
 });
+
+test('every', function() {
+	var l = new DefineList([ { id: 1, name: "Bob" }, { id: 2, name: "Bob" } ]);
+
+	var allBobs = l.every(function(item) {
+		return item.name === "Bob";
+	});
+	ok(allBobs, "Every works in true case");
+	var idOne = l.every(function(item) {
+		return item.id === 1;
+	});
+	ok(!idOne, "Every works in false case");
+
+	allBobs = l.every({
+		name : "Bob"
+	});
+	ok(allBobs, "Every works in true case");
+	idOne = l.every({
+		name : "Bob",
+		id : 1
+	});
+	ok(!idOne, "Every works in false case");
+
+});
+
+test('some', function() {
+	var l = new DefineList([ { id: 1, name: "Alice" }, { id: 2, name: "Bob" } ]);
+
+	var allBobs = l.some(function(item) {
+		return item.name === "Bob";
+	});
+	ok(allBobs, "Some works in true case");
+	var idOne = l.some(function(item) {
+		return item.name === "Charlie";
+	});
+	ok(!idOne, "Some works in false case");
+
+	allBobs = l.some({
+		name : "Bob"
+	});
+	ok(allBobs, "Some works in true case");
+	idOne = l.some({
+		name : "Bob",
+		id : 1
+	});
+	ok(!idOne, "Some works in false case");
+
+});
+
+test('lastIndexOf', function() {
+	var l = new DefineList([ { id: 1, name: "Alice" }, { id: 2, name: "Bob" } ]);
+
+	var bobIdx = l.lastIndexOf(l[1]);
+	equal(bobIdx, 1, "lastIndexOf found object");
+	var charlieIdx = l.lastIndexOf({ id : 3, name: "Charlie" });
+	equal(charlieIdx, -1, "lastIndexOf not found object");
+
+	// make a new reference to [1] at [2]
+	l.push(l[1]);
+
+	bobIdx = l.lastIndexOf(l[1]);
+	equal(bobIdx, 2, "lastIndexOf found last index of duped object");
+
+});
+
+test('reduce', function() {
+	var l = new DefineList([ 
+		{ id: 1, name: "Alice", score: 10 },
+		{ id: 2, name: "Bob", score: 20 } 
+	]);
+
+	var totalScores = l.reduce(function(total, player) {
+		return total + player.score;
+	}, 0);
+
+	equal(totalScores, 30, "Reduce works over list");
+});
+
+test('reduceRight', function() {
+	var l = new DefineList([ 
+		{ id: 1, name: "Alice"},
+		{ id: 2, name: "Bob"} 
+	]);
+
+	var concatenatedNames = l.reduceRight(function(string, person) {
+		return string + person.name;
+	}, "");
+
+	equal(concatenatedNames, "BobAlice", "ReduceRight works over list");
+});
+
+
