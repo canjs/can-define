@@ -914,20 +914,22 @@ each({
 function a(fnLength, fnName) {
 	DefineList.prototype[fnName] = function() {
 		var self = this;
-		var callback = arguments[0];
-		var thisArg = arguments[fnLength - 1] || self;
+		var args = [].slice.call(arguments, 0);
+		var callback = args[0];
+		var thisArg = args[fnLength - 1] || self;
 
 		if (typeof callback === "object") {
 			callback = makeFilterCallback(callback);
 		}
 
-		arguments[0] = function() {
+		args[0] = function() {
+			var cbArgs = [].slice.call(arguments, 0);
 			// use .get(index) to ensure observation added.
 			// the arguments are (item, index) or (result, item, index)
-			arguments[fnLength - 3] = self.get(arguments[fnLength - 2]);
-			return callback.apply(thisArg, arguments);
-		}
-		var ret = Array.prototype[fnName].apply(this, arguments);
+			cbArgs[fnLength - 3] = self.get(cbArgs[fnLength - 2]);
+			return callback.apply(thisArg, cbArgs);
+		};
+		var ret = Array.prototype[fnName].apply(this, args);
 		
 		if(fnName === "map") {
 			return new DefineList(ret);
@@ -937,7 +939,7 @@ function a(fnLength, fnName) {
 		} else {
 			return ret;
 		}
-	}
+	};
 });
 
 
