@@ -53,7 +53,7 @@ var eachPropertyDescriptor = function(map, cb){
 };
 
 
-var trapSets = function(observableValue) {
+function trapSets(observableValue) {
 	return {
 		observable: observableValue,
 		lastSetValue: undefined,
@@ -68,7 +68,7 @@ var trapSets = function(observableValue) {
 				}
 			}
 		}
-	}
+	};
 }
 
 
@@ -271,13 +271,11 @@ make = {
 		return function() {
 			var map = this,
 				defaultValue = defaultValueFn && defaultValueFn.call(this),
-				computeFn,
-				valueTrap;
+				computeFn, valueTrap, computeObj;
 
 			var boundGet = function() {
 				return get.call(map, computeObj.valueTrap.lastSetValue);
-			}
-
+			};
 
 			if(get.length < 2) {
 				if(defaultValue && defaultValue.isComputed) {
@@ -299,7 +297,7 @@ make = {
 				valueTrap = trapSets(computeFn);
 			}
 
-			var computeObj = {
+			computeObj = {
 				oldValue: undefined,
 				compute: computeFn,
 				count: 0,
