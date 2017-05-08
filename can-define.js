@@ -20,6 +20,7 @@ var each = require("can-util/js/each/each");
 var defaults = require("can-util/js/defaults/defaults");
 var ns = require("can-namespace");
 var canSymbol = require("can-symbol");
+var canReflect = require("can-reflect");
 
 var eventsProto, define,
 	make, makeDefinition, replaceWith, getDefinitionsAndMethods,
@@ -50,6 +51,25 @@ var eachPropertyDescriptor = function(map, cb){
 		}
 	}
 };
+
+
+var trapSets = function(observableValue) {
+	return {
+		observable: observableValue,
+		lastSetValue: undefined,
+		setValue: function(value) {
+			this.lastSetValue = value;
+			if(this.observable) {
+				if(canSymbol.for("can.setValue") in this.observable) {
+					canReflect.setValue(this.observable, value);
+				} else {
+					//this.observable.value = this.lastSetValue;
+					this.observable.update();
+				}
+			}
+		}
+	}
+}
 
 
 module.exports = define = ns.define = function(objPrototype, defines, baseDefine) {
@@ -251,26 +271,50 @@ make = {
 		return function() {
 			var map = this,
 				defaultValue = defaultValueFn && defaultValueFn.call(this),
-				computeFn;
+				computeFn,
+				valueTrap;
 
-			if (defaultValue) {
-				computeFn = defaultValue.isComputed ?
-					defaultValue :
-					compute.async(defaultValue, get, map);
-			} else {
-				computeFn = compute.async(defaultValue, get, map);
+			var boundGet = function() {
+				return get.call(map, computeObj.valueTrap.lastSetValue);
 			}
 
-			return {
+
+			if(get.length < 2) {
+				if(defaultValue && defaultValue.isComputed) {
+					computeFn = defaultValue;
+					valueTrap = trapSets(computeFn);
+				} else {
+					computeFn = new Observation(boundGet, map);
+					valueTrap = trapSets(computeFn);
+					valueTrap.lastSetValue = defaultValue;
+				}
+			} else {
+				if (defaultValue) {
+					computeFn = defaultValue.isComputed ?
+						defaultValue :
+						compute.async(defaultValue, get, map);
+				} else {
+					computeFn = compute.async(defaultValue, get, map);
+				}
+				valueTrap = trapSets(computeFn);
+			}
+
+			var computeObj = {
+				oldValue: undefined,
 				compute: computeFn,
 				count: 0,
-				handler: function(ev, newVal, oldVal) {
+				handler: function(newVal) {
+					var oldValue = computeObj.oldValue;
+					computeObj.oldValue = newVal;
 					canEvent.dispatch.call(map, {
 						type: prop,
-						target: map
-					}, [newVal, oldVal]);
-				}
+						target: map,
+						batchNum: canBatch.batchNum
+					}, [newVal, oldValue]);
+				},
+				valueTrap: valueTrap
 			};
+			return computeObj;
 		};
 	},
 	// Set related helpers.
@@ -282,7 +326,7 @@ make = {
 		},
 		computed: function(prop) {
 			return function(val) {
-				this._computed[prop].compute(val);
+				this._computed[prop].valueTrap.setValue(val);
 			};
 		},
 		events: function(prop, getCurrent, setData, eventType) {
@@ -459,13 +503,13 @@ make = {
 		computed: function(prop) {
 			// might want to protect this
 			return function() {
-				return this._computed[prop].compute();
+				return canReflect.getValue( this._computed[prop].compute );
 			};
 		},
 		lastSet: function(prop) {
 			return function() {
-				var lastSetValue = this._computed[prop].compute.computeInstance.lastSetValue;
-				return lastSetValue && lastSetValue.get();
+				var lastSetValue = this._computed[prop].valueTrap.lastSetValue;
+				return lastSetValue;
 			};
 		}
 	},
@@ -524,7 +568,7 @@ make = {
 		},
 		computed: function(prop) {
 			return function() {
-				return this._computed[prop].compute();
+				return canReflect.getValue(this._computed[prop].compute);
 			};
 		}
 	}
@@ -669,7 +713,8 @@ assign(eventsProto, {
 			if (!computedBinding.count) {
 				computedBinding.count = 1;
 				// TODO use canReflect.onValue when can-compute supports reflection
-				computedBinding.compute.addEventListener("change", computedBinding.handler);
+				canReflect.onValue(computedBinding.compute, computedBinding.handler);
+				computedBinding.oldValue = canReflect.getValue(computedBinding.compute);
 			} else {
 				computedBinding.count++;
 			}
@@ -689,7 +734,7 @@ assign(eventsProto, {
 			if (computedBinding.count === 1) {
 				computedBinding.count = 0;
 				// TODO use canReflect.offValue when can-compute supports reflection
-				computedBinding.compute.removeEventListener("change", computedBinding.handler);
+				canReflect.offValue(computedBinding.compute, computedBinding.handler);
 			} else {
 				computedBinding.count--;
 			}
