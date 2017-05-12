@@ -675,14 +675,14 @@ each({
 	 *
 	 * @param {function(item, index, list)} callback A function to call with each element of the DefineList.
 	 * The three parameters that callback gets passed are:
-	 *    - item - the element at index.
-	 *    - index - the current element of the list.
-	 *    - list - the DefineList the elements are coming from.
+	 *    - item (*) - the element at index.
+	 *    - index (Integer) - the index of the current element of the list.
+	 *    - list (DefineList) - the `DefineList` the elements are coming from.
 	 *
-	 * The return value of `callback`, including `undefined` values are used to populated the resulting list.
+	 * The return value of `callback`, including `undefined` values are used to populate the resulting list.
 	 *
 	 * @param {Object} [thisArg] The object to use as `this` inside the callback.
-	 * @return {can-define/list/list} The list instance.
+	 * @return {can-define/list/list} a new `DefineList` with the results of the map transform.
 	 * @body
 	 *
 	 */
@@ -706,15 +706,15 @@ each({
 	 *
 	 *   @param  {function(*, Number, can-define/list/list)} callback(item, index, list) A
 	 *   function to call with each element of the DefineList. The three parameters that callback gets passed are:
-	 *    - item - the element at index.
-	 *    - index - the current element of the list.
-	 *    - list - the DefineList the elements are coming from.
+	 *    - item (*) - the element at index.
+	 *    - index (Integer) - the index of the current element of the list.
+	 *    - list (DefineList) - the `DefineList` the elements are coming from.
 	 *
 	 *   If `callback` returns a truthy result, `item` will be added to the result.  Otherwise, the `item` will be
 	 *   excluded.
 	 *
 	 *   @param  {Object}  thisArg  What `this` should be in the `callback`.
-	 *   @return {can-define/list/list} A `DefineList` of the same type.
+	 *   @return {can-define/list/list} A new instance of this `DefineList` (may be a subclass), containing the items that passed the filter.
 	 *
 	 * @signature `list.filter( props )`
 	 *
@@ -731,7 +731,7 @@ each({
 	 *
 	 *    @param  {Object}  props An object of key-value properties.  Each key and value in
 	 *    `props` must be present on an `item` for the `item` to be in the returned list.
-	 *    @return {can-define/list/list} A `DefineList` of the same type.
+	 *    @return {can-define/list/list} A new `DefineList` of the same type.
 	 */
 	"filter": 3,
 	/**
@@ -758,10 +758,10 @@ each({
 	 *
 	 * @param {function(item, index, list)} callback A function to call with each element of the DefineList.
 	 * The four parameters that callback gets passed are:
-	 * 		- current - the current aggregate value of reducing over the list -- the initial value if the first iteration
-	 *    - item - the element at index.
-	 *    - index - the current element of the list.
-	 *    - list - the DefineList the elements are coming from.
+	 *    - current (*) - the current aggregate value of reducing over the list -- the initial value if the first iteration
+	 *    - item (*) - the element at index.
+	 *    - index (Integer) - the index of the current element of the list.
+	 *    - list (DefineList) - the `DefineList` the elements are coming from.
 	 *
 	 * The return value of `callback` is passed to the next iteration as the first argument, and returned from 
 	 * `reduce` if the last iteration.
@@ -797,10 +797,10 @@ each({
 	 *
 	 * @param {function(item, index, list)} callback A function to call with each element of the DefineList.
 	 * The four parameters that callback gets passed are:
-	 * 		- current - the current aggregate value of reducing over the list -- the initial value if the first iteration
-	 *    - item - the element at index.
-	 *    - index - the current element of the list.
-	 *    - list - the DefineList the elements are coming from.
+	 *    - current (*) - the current aggregate value of reducing over the list -- the initial value if the first iteration
+	 *    - item (*) - the element at index.
+	 *    - index (Integer) - the index of the current element of the list.
+	 *    - list (DefineList) - the `DefineList` the elements are coming from.
 	 *
 	 * The return value of `callback` is passed to the next iteration as the first argument, and returned from 
 	 * `reduce` if the last iteration.
@@ -819,7 +819,7 @@ each({
 	 *
 	 * @signature `list.every( callback [,thisArg] )`
 	 *
-	 * Filters `list` based on the return values of `callback`.  If `callback` returns truthy for every element in
+	 * Tests each item in `list` by calling `callback` on it.  If `callback` returns truthy for every element in
 	 * `list`, `every` returns `true`.
 	 *
 	 * ```
@@ -832,9 +832,9 @@ each({
 	 *
 	 *   @param  {function(*, Number, can-define/list/list)} callback(item, index, list) A
 	 *   function to call with each element of the DefineList. The three parameters that callback gets passed are:
-	 *    - item - the element at index.
-	 *    - index - the current element of the list.
-	 *    - list - the DefineList the elements are coming from.
+	 *    - item (*) - the element at index.
+	 *    - index (Integer) - the index of the current element of the list.
+	 *    - list (DefineList) - the `DefineList` the elements are coming from.
 	 *
 	 *   If `callback` returns a truthy result, `every` will evaluate the callback on the next element.  Otherwise, `every`
 	 *   will return `false`.
@@ -844,7 +844,7 @@ each({
 	 *
 	 * @signature `list.every( props )`
 	 *
-	 * Filters items in `list` based on the property values in `props`.  If `props` match for every element in
+	 * Tests each item in `list` by comparing its properties to `props`.  If `props` match for every element in
 	 * `list`, `every` returns `true`.
 	 *
 	 * ```
@@ -868,7 +868,7 @@ each({
 	 *
 	 * @signature `list.some( callback [,thisArg] )`
 	 *
-	 * Filters `list` based on the return values of `callback`.  If `callback` returns truthy for some element in
+	 * Tests each item in `list` by calling `callback` on it.  If `callback` returns truthy for some element in
 	 * `list`, `some` returns `true`.
 	 *
 	 * ```
@@ -881,9 +881,9 @@ each({
 	 *
 	 *   @param  {function(*, Number, can-define/list/list)} callback(item, index, list) A
 	 *   function to call with each element of the DefineList. The three parameters that callback gets passed are:
-	 *    - item - the element at index.
-	 *    - index - the current element of the list.
-	 *    - list - the DefineList the elements are coming from.
+	 *    - item (*) - the element at index.
+	 *    - index (Integer) - the index of the current element of the list.
+	 *    - list (DefineList) - the DefineList the elements are coming from.
 	 *
 	 *   If `callback` returns a falsy result, `some` will evaluate the callback on the next element.  Otherwise, `some`
 	 *   will return `true`.
@@ -893,7 +893,7 @@ each({
 	 *
 	 * @signature `list.some( props )`
 	 *
-	 * Filters items in `list` based on the property values in `props`.  If `props` match for some element in
+	 * Tests each item in `list` by comparing its properties to `props`.  If `props` match for some element in
 	 * `list`, `some` returns `true`.
 	 *
 	 * ```
