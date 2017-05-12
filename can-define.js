@@ -19,6 +19,7 @@ var isArray = require("can-util/js/is-array/is-array");
 var types = require("can-types");
 var each = require("can-util/js/each/each");
 var defaults = require("can-util/js/defaults/defaults");
+var stringToAny = require("can-util/js/string-to-any/");
 var ns = require("can-namespace");
 
 var eventsProto, define,
@@ -859,7 +860,10 @@ define.types = {
 	 * any string, including "", is truthy.
 	 */
 	'htmlbool': function(val) {
-		return typeof val === "string" || !!val;
+		if (val === '') {
+			return true;
+		}
+		return !!stringToAny(val);
 	},
 	'*': function(val) {
 		return val;
