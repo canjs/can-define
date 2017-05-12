@@ -721,6 +721,16 @@ define.setup = function(props, sealed) {
 	var definitions = this._define.definitions;
 	var instanceDefinitions = Object.create(null);
 	var map = this;
+
+	each(definitions, function(value, prop) {
+		var parent = Object.getOwnPropertyDescriptor(map.constructor.prototype, prop);
+		Object.defineProperty(map, prop, {
+			enumerable: true,
+			get: parent.get,
+			set: parent.set
+		});
+	});
+
 	each(props, function(value, prop){
 		if(definitions[prop]) {
 			map[prop] = value;

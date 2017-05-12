@@ -509,7 +509,7 @@ QUnit.test("copying with assign() excludes special keys", function() {
 	QUnit.notEqual(a._cid, b._cid, "_cid prop not copied");
 	QUnit.equal(a.foo, b.foo, "New props copied");
 	QUnit.equal(a.existing, b.existing, "Existing props copied");
-	
+
 });
 
 QUnit.test("shorthand getter setter (#56)", function(){
@@ -623,7 +623,7 @@ QUnit.test(".value functions should not be observable", function(){
 	var outer = new DefineMap({
 		bam: "baz"
 	});
-	
+
 	var ItemsVM = DefineMap.extend({
 		item: {
 			value: function(){
@@ -633,20 +633,20 @@ QUnit.test(".value functions should not be observable", function(){
 		},
 		zed: "string"
 	});
-	
+
 	var items = new ItemsVM();
-	
+
 	var count = 0;
 	var itemsList = compute(function(){
 		count++;
 		return items.item;
 	});
-	
+
 	itemsList.on('change', function() {});
-	
+
 	items.item.foo = "changed";
 	items.zed = "changed";
-	
+
 	equal(count, 1);
 });
 
@@ -662,4 +662,19 @@ QUnit.test(".value values are overwritten by props in DefineMap construction", f
 	});
 
 	equal(foo.bar, "quux", "Value set properly");
+});
+
+QUnit.test("keys are exposed via Object.keys()", function() {
+	var Foo = DefineMap.extend({
+		bar: {
+			value: "baz"
+		}
+	});
+
+	var foo = new Foo();
+
+	QUnit.deepEqual(Object.keys(foo), [ 'bar' ], "Value set properly");
+	QUnit.equal(foo.bar, 'baz');
+	foo.bar = 'bazzz';
+	QUnit.equal(foo.bar, 'bazzz');
 });
