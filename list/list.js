@@ -652,6 +652,297 @@ each({
 		};
 	});
 
+each({
+	/**
+	 * @function can-define/list/list.prototype.map map
+	 * @description Map the values in this list to another list.
+	 *
+	 * @signature `list.map(callback[, thisArg])`
+	 *
+	 * Loops through the values of the list, calling `callback` for each one until the list
+	 * ends.  The return values of `callback` are used to populate the returned list.
+	 *
+	 * ```js
+	 * var todos = new DefineList([
+	 *   {name: "dishes", complete: false},
+	 *   {name: "lawn", complete: true}
+	 * ]);
+	 * var names = todos.map(function(todo){
+	 *   return todo.name;
+	 * });
+	 * names //-> DefineList["dishes","lawn"]
+	 * ```
+	 *
+	 * @param {function(item, index, list)} callback A function to call with each element of the DefineList.
+	 * The three parameters that callback gets passed are:
+	 *    - item (*) - the element at index.
+	 *    - index (Integer) - the index of the current element of the list.
+	 *    - list (DefineList) - the `DefineList` the elements are coming from.
+	 *
+	 * The return value of `callback`, including `undefined` values are used to populate the resulting list.
+	 *
+	 * @param {Object} [thisArg] The object to use as `this` inside the callback.
+	 * @return {can-define/list/list} a new `DefineList` with the results of the map transform.
+	 * @body
+	 *
+	 */
+	"map": 3,
+	/**
+	 * @function can-define/list/list.prototype.filter filter
+	 *
+	 * Filter a list to a new list of the matched items.
+	 *
+	 * @signature `list.filter( callback [,thisArg] )`
+	 *
+	 * Filters `list` based on the return value of `callback`.
+	 *
+	 * ```
+	 * var names = new DefineList(["alice","adam","zack","zeffer"]);
+	 * var aNames = names.filter(function(name){
+	 *   return name[0] === "a"
+	 * });
+	 * aNames //-> DefineList["alice","adam"]
+	 * ```
+	 *
+	 *   @param  {function(*, Number, can-define/list/list)} callback(item, index, list) A
+	 *   function to call with each element of the DefineList. The three parameters that callback gets passed are:
+	 *    - item (*) - the element at index.
+	 *    - index (Integer) - the index of the current element of the list.
+	 *    - list (DefineList) - the `DefineList` the elements are coming from.
+	 *
+	 *   If `callback` returns a truthy result, `item` will be added to the result.  Otherwise, the `item` will be
+	 *   excluded.
+	 *
+	 *   @param  {Object}  thisArg  What `this` should be in the `callback`.
+	 *   @return {can-define/list/list} A new instance of this `DefineList` (may be a subclass), containing the items that passed the filter.
+	 *
+	 * @signature `list.filter( props )`
+	 *
+	 * Filters items in `list` based on the property values in `props`.
+	 *
+	 * ```
+	 * var todos = new DefineList([
+	 *   {name: "dishes", complete: false},
+	 *   {name: "lawn", complete: true}
+	 * ]);
+	 * var complete = todos.filter({complete: true});
+	 * complete //-> DefineList[{name: "lawn", complete: true}]
+	 * ```
+	 *
+	 *    @param  {Object}  props An object of key-value properties.  Each key and value in
+	 *    `props` must be present on an `item` for the `item` to be in the returned list.
+	 *    @return {can-define/list/list} A new `DefineList` of the same type.
+	 */
+	"filter": 3,
+	/**
+	 * @function can-define/list/list.prototype.reduce reduce
+	 * @description Map the values in this list to a single value
+	 *
+	 * @signature `list.reduce(callback, initialValue, [, thisArg])`
+	 *
+	 * Loops through the values of the list, calling `callback` for each one until the list
+	 * ends.  The return value of `callback` is passed to the next iteration as the first argument, 
+	 * and finally returned by `reduce`.
+	 *
+	 * ```js
+	 * var todos = new DefineList([
+	 *   {name: "dishes", complete: false},
+	 *   {name: "lawn", complete: true}
+	 * ]);
+	 * var todosAsOneObject = todos.reduce(function(todos, todo){
+	 *   todos[todo.name] = todo.complete;
+	 *   return todos;
+	 * }, {});
+	 * todosAsOneObject //-> { dishes: false, lawn: true }
+	 * ```
+	 *
+	 * @param {function(item, index, list)} callback A function to call with each element of the DefineList.
+	 * The four parameters that callback gets passed are:
+	 *    - current (*) - the current aggregate value of reducing over the list -- the initial value if the first iteration
+	 *    - item (*) - the element at index.
+	 *    - index (Integer) - the index of the current element of the list.
+	 *    - list (DefineList) - the `DefineList` the elements are coming from.
+	 *
+	 * The return value of `callback` is passed to the next iteration as the first argument, and returned from 
+	 * `reduce` if the last iteration.
+	 *
+	 * @param {*} [initialValue] The initial value to use as `current` in the first iteration
+	 * @param {Object} [thisArg] The object to use as `this` inside the callback.
+	 * @return {*} The result of the final call of `callback` on the list.
+	 * @body
+	 *
+	 */
+	"reduce": 4,
+	/**
+	 * @function can-define/list/list.prototype.reduceRight reduceRight
+	 * @description Map the values in this list to a single value from right to left
+	 *
+	 * @signature `list.reduceRight(callback, initialValue, [, thisArg])`
+	 *
+	 * Loops through the values of the list in reverse order, calling `callback` for each one until the list
+	 * ends.  The return value of `callback` is passed to the next iteration as the first argument, 
+	 * and finally returned by `reduce`.
+	 *
+	 * ```js
+	 * var todos = new DefineList([
+	 *   {name: "dishes", complete: false},
+	 *   {name: "lawn", complete: true}
+	 * ]);
+	 * var todosAsOneObject = todos.reduce(function(todos, todo){
+	 *   todos[todo.name] = todo.complete;
+	 *   return todos;
+	 * }, {});
+	 * todosAsOneObject //-> { dishes: false, lawn: true }
+	 * ```
+	 *
+	 * @param {function(item, index, list)} callback A function to call with each element of the DefineList.
+	 * The four parameters that callback gets passed are:
+	 *    - current (*) - the current aggregate value of reducing over the list -- the initial value if the first iteration
+	 *    - item (*) - the element at index.
+	 *    - index (Integer) - the index of the current element of the list.
+	 *    - list (DefineList) - the `DefineList` the elements are coming from.
+	 *
+	 * The return value of `callback` is passed to the next iteration as the first argument, and returned from 
+	 * `reduce` if the last iteration.
+	 *
+	 * @param {*} [initialValue] The initial value to use as `current` in the first iteration
+	 * @param {Object} [thisArg] The object to use as `this` inside the callback.
+	 * @return {*} The result of the final call of `callback` on the list.
+	 * @body
+	 *
+	 */
+	"reduceRight": 4,
+	/**
+	 * @function can-define/list/list.prototype.every every
+	 *
+	 * Return true if every item in a list matches a predicate.
+	 *
+	 * @signature `list.every( callback [,thisArg] )`
+	 *
+	 * Tests each item in `list` by calling `callback` on it.  If `callback` returns truthy for every element in
+	 * `list`, `every` returns `true`.
+	 *
+	 * ```
+	 * var names = new DefineList(["alice","adam","zack","zeffer"]);
+	 * var aNames = names.every(function(name){
+	 *   return name[0] === "a"
+	 * });
+	 * aNames //-> false
+	 * ```
+	 *
+	 *   @param  {function(*, Number, can-define/list/list)} callback(item, index, list) A
+	 *   function to call with each element of the DefineList. The three parameters that callback gets passed are:
+	 *    - item (*) - the element at index.
+	 *    - index (Integer) - the index of the current element of the list.
+	 *    - list (DefineList) - the `DefineList` the elements are coming from.
+	 *
+	 *   If `callback` returns a truthy result, `every` will evaluate the callback on the next element.  Otherwise, `every`
+	 *   will return `false`.
+	 *
+	 *   @param  {Object}  thisArg  What `this` should be in the `callback`.
+	 *   @return {Boolean} `true` if calling the callback on every element in `list` returns a truthy value, `false` otherwise.
+	 *
+	 * @signature `list.every( props )`
+	 *
+	 * Tests each item in `list` by comparing its properties to `props`.  If `props` match for every element in
+	 * `list`, `every` returns `true`.
+	 *
+	 * ```
+	 * var todos = new DefineList([
+	 *   {name: "dishes", complete: false},
+	 *   {name: "lawn", complete: true}
+	 * ]);
+	 * var complete = todos.every({complete: true});
+	 * complete //-> false
+	 * ```
+	 *
+	 *    @param  {Object}  props An object of key-value properties.  Each key and value in
+	 *    `props` must be present on an `item` for the `item` to match.
+	 *    @return {Boolean} `true` if every element in `list` matches `props`, `false` otherwise
+	 */
+	"every": 3,
+	/**
+	 * @function can-define/list/list.prototype.some some
+	 *
+	 * Return true if at least one item in a list matches a predicate.
+	 *
+	 * @signature `list.some( callback [,thisArg] )`
+	 *
+	 * Tests each item in `list` by calling `callback` on it.  If `callback` returns truthy for some element in
+	 * `list`, `some` returns `true`.
+	 *
+	 * ```
+	 * var names = new DefineList(["alice","adam","zack","zeffer"]);
+	 * var aNames = names.some(function(name){
+	 *   return name[0] === "a"
+	 * });
+	 * aNames //-> false
+	 * ```
+	 *
+	 *   @param  {function(*, Number, can-define/list/list)} callback(item, index, list) A
+	 *   function to call with each element of the DefineList. The three parameters that callback gets passed are:
+	 *    - item (*) - the element at index.
+	 *    - index (Integer) - the index of the current element of the list.
+	 *    - list (DefineList) - the DefineList the elements are coming from.
+	 *
+	 *   If `callback` returns a falsy result, `some` will evaluate the callback on the next element.  Otherwise, `some`
+	 *   will return `true`.
+	 *
+	 *   @param  {Object}  thisArg  What `this` should be in the `callback`.
+	 *   @return {Boolean} `false` if calling the callback on some element in `list` returns a falsy value, `true` otherwise.
+	 *
+	 * @signature `list.some( props )`
+	 *
+	 * Tests each item in `list` by comparing its properties to `props`.  If `props` match for some element in
+	 * `list`, `some` returns `true`.
+	 *
+	 * ```
+	 * var todos = new DefineList([
+	 *   {name: "dishes", complete: false},
+	 *   {name: "lawn", complete: true}
+	 * ]);
+	 * var complete = todos.some({complete: true});
+	 * complete //-> false
+	 * ```
+	 *
+	 *    @param  {Object}  props An object of key-value properties.  Each key and value in
+	 *    `props` must be present on an `item` for the `item` to match.
+	 *    @return {Boolean} `false` if every element in `list` fails to match `props`, `true` otherwise
+	 */
+	"some": 3
+}, 
+function a(fnLength, fnName) {
+	DefineList.prototype[fnName] = function() {
+		var self = this;
+		var args = [].slice.call(arguments, 0);
+		var callback = args[0];
+		var thisArg = args[fnLength - 1] || self;
+
+		if (typeof callback === "object") {
+			callback = makeFilterCallback(callback);
+		}
+
+		args[0] = function() {
+			var cbArgs = [].slice.call(arguments, 0);
+			// use .get(index) to ensure observation added.
+			// the arguments are (item, index) or (result, item, index)
+			cbArgs[fnLength - 3] = self.get(cbArgs[fnLength - 2]);
+			return callback.apply(thisArg, cbArgs);
+		};
+		var ret = Array.prototype[fnName].apply(this, args);
+		
+		if(fnName === "map") {
+			return new DefineList(ret);
+		}
+		else if(fnName === "filter") {
+			return new self.constructor(ret);
+		} else {
+			return ret;
+		}
+	};
+});
+
+
 assign(DefineList.prototype, {
 	/**
 	 * @function can-define/list/list.prototype.indexOf indexOf
@@ -675,6 +966,36 @@ assign(DefineList.prototype, {
 	 */
 	indexOf: function(item, fromIndex) {
 		for (var i = fromIndex || 0, len = this.length; i < len; i++) {
+			if (this.get(i) === item) {
+				return i;
+			}
+		}
+		return -1;
+	},
+
+		/**
+	 * @function can-define/list/list.prototype.lastIndexOf lastIndexOf
+	 * @description Look for an item in a DefineList starting from the end.
+	 * @signature `list.lastIndexOf(item)`
+	 *
+	 * `lastIndexOf` finds the last position of a given item in the DefineList.
+	 *
+	 * ```
+	 * var list = new DefineList(['Alice', 'Bob', 'Alice', 'Eve']);
+	 * list.lastIndexOf('Alice');   // 2
+	 * list.lastIndexOf('Charlie'); // -1
+	 * ```
+	 *
+	 *   @param {*} item The item to find.
+	 *
+	 *   @return {Number} The position of the item in the DefineList, or -1 if the item is not found.
+	 *
+	 * @body
+	 *
+	 */
+	lastIndexOf: function(item, fromIndex) {
+		fromIndex = typeof fromIndex === "undefined" ? this.length - 1: fromIndex;
+		for (var i = fromIndex; i >= 0; i--) {
 			if (this.get(i) === item) {
 				return i;
 			}
@@ -915,113 +1236,6 @@ assign(DefineList.prototype, {
 
 		return this;
 	},
-
-	/**
-	 * @function can-define/list/list.prototype.filter filter
-	 *
-	 * Filter a list to a new list of the matched items.
-	 *
-	 * @signature `list.filter( callback [,thisArg] )`
-	 *
-	 * Filters `list` based on the return value of `callback`.
-	 *
-	 * ```
-	 * var names = new DefineList(["alice","adam","zack","zeffer"]);
-	 * var aNames = names.filter(function(name){
-	 *   return name[0] === "a"
-	 * });
-	 * aNames //-> DefineList["alice","adam"]
-	 * ```
-	 *
-	 *   @param  {function(*, Number, can-define/list/list)} callback(item, index, list) A
-	 *   function to call with each element of the DefineList. The three parameters that callback gets passed are:
-	 *    - item - the element at index.
-	 *    - index - the current element of the list.
-	 *    - list - the DefineList the elements are coming from.
-	 *
-	 *   If `callback` returns a truthy result, `item` will be added to the result.  Otherwise, the `item` will be
-	 *   excluded.
-	 *
-	 *   @param  {Object}  thisArg  What `this` should be in the `callback`.
-	 *   @return {can-define/list/list} A `DefineList` of the same type.
-	 *
-	 * @signature `list.filter( props )`
-	 *
-	 * Filters items in `list` based on the property values in `props`.
-	 *
-	 * ```
-	 * var todos = new DefineList([
-	 *   {name: "dishes", complete: false},
-	 *   {name: "lawn", complete: true}
-	 * ]);
-	 * var complete = todos.filter({complete: true});
-	 * complete //-> DefineList[{name: "lawn", complete: true}]
-	 * ```
-	 *
-	 *    @param  {Object}  props An object of key-value properties.  Each key and value in
-	 *    `props` must be present on an `item` for the `item` to be in the returned list.
-	 *    @return {can-define/list/list} A `DefineList` of the same type.
-	 */
-	filter: function(callback, thisArg) {
-		var filteredList = [],
-			self = this,
-			filtered;
-		if (typeof callback === "object") {
-			callback = makeFilterCallback(callback);
-		}
-		this.each(function(item, index, list) {
-			filtered = callback.call(thisArg | self, item, index, self);
-			if (filtered) {
-				filteredList.push(item);
-			}
-		});
-		return new this.constructor(filteredList);
-	},
-
-	/**
-	 * @function can-define/list/list.prototype.map map
-	 * @description Map the values in this list to another list.
-	 *
-	 * @signature `list.map(callback[, thisArg])`
-	 *
-	 * Loops through the values of the list, calling `callback` for each one until the list
-	 * ends.  The return values of `callback` are used to populate the returned list.
-	 *
-	 * ```js
-	 * var todos = new DefineList([
-	 *   {name: "dishes", complete: false},
-	 *   {name: "lawn", complete: true}
-	 * ]);
-	 * var names = todos.map(function(todo){
-	 *   return todo.name;
-	 * });
-	 * names //-> DefineList["dishes","lawn"]
-	 * ```
-	 *
-	 * @param {function(item, index, list)} callback A function to call with each element of the DefineList.
-	 * The three parameters that callback gets passed are:
-	 *    - item - the element at index.
-	 *    - index - the current element of the list.
-	 *    - list - the DefineList the elements are coming from.
-	 *
-	 * The return value of `callback`, including `undefined` values are used to populated the resulting list.
-	 *
-	 * @param {Object} [thisArg] The object to use as `this` inside the callback.
-	 * @return {can-define/list/list} The list instance.
-	 * @body
-	 *
-	 */
-	map: function(callback, thisArg) {
-		var mappedList = [],
-			self = this;
-		this.each(function(item, index, list) {
-			var mapped = callback.call(thisArg | self, item, index, self);
-			mappedList.push(mapped);
-
-		});
-		return new DefineList(mappedList);
-	},
-
 	/**
 	 * @function can-define/list/list.prototype.sort sort
 	 * @description Sort the properties of a list.
