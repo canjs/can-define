@@ -19,6 +19,7 @@ var isArray = require("can-util/js/is-array/is-array");
 var types = require("can-types");
 var each = require("can-util/js/each/each");
 var defaults = require("can-util/js/defaults/defaults");
+var stringToAny = require("can-util/js/string-to-any/");
 var ns = require("can-namespace");
 
 var eventsProto, define,
@@ -147,7 +148,8 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 		Object.defineProperty(objPrototype, prop, {
 			get: make.get.data(prop),
 			set: make.set.events(prop, make.get.data(prop), make.set.data(prop), make.eventType.data(prop)),
-			enumerable: true
+			enumerable: true,
+			configurable: true
 		});
 		return;
 	}
@@ -187,7 +189,7 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 	if ((definition.value !== undefined || definition.Value !== undefined)) {
 		getInitialValue = Observation.ignore(make.get.defaultValue(prop, definition, typeConvert, eventsSetter));
 	}
-	
+
 	// If property has a getter, create the compute that stores its data.
 	if (definition.get) {
 		computedInitializers[prop] = make.compute(prop, definition.get, getInitialValue);
@@ -230,7 +232,8 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 	Object.defineProperty(objPrototype, prop, {
 		get: getter,
 		set: setter,
-		enumerable: "serialize" in definition ? !!definition.serialize : !definition.get
+		enumerable: "serialize" in definition ? !!definition.serialize : !definition.get,
+		configurable: true
 	});
 };
 
@@ -294,7 +297,7 @@ make = {
 					var current = getCurrent.call(this);
 					if (newVal !== current) {
 						setData.call(this, newVal);
-						
+
 						canEvent.dispatch.call(this, {
 							type: prop,
 							target: this
@@ -518,7 +521,7 @@ make = {
 				if (!this.__inSetup) {
 					Observation.add(this, prop);
 				}
-				
+
 				return this._data[prop];
 			};
 		},
@@ -649,6 +652,13 @@ replaceWith = function(obj, prop, cb, writable) {
 				writable: true
 			});
 			var value = cb.call(this, obj, prop);
+			Object.defineProperty(this, prop, {
+				value: value,
+				writable: !!writable
+			});
+			return value;
+		},
+		set: function(value){
 			Object.defineProperty(this, prop, {
 				value: value,
 				writable: !!writable
@@ -850,7 +860,10 @@ define.types = {
 	 * any string, including "", is truthy.
 	 */
 	'htmlbool': function(val) {
-		return typeof val === "string" || !!val;
+		if (val === '') {
+			return true;
+		}
+		return !!stringToAny(val);
 	},
 	'*': function(val) {
 		return val;
