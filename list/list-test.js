@@ -165,7 +165,7 @@ test('splice removes items in IE (#562)', function() {
 
 
 test('reverse triggers add/remove events (#851)', function() {
-	expect(5);
+	expect(4);
 	var l = new DefineList([ 1, 2, 3 ]);
 
 	l.on('add', function() {
@@ -855,6 +855,110 @@ QUnit.test("replace-with-self lists are diffed properly (can-view-live#10)", fun
 	list2.replace([ a, b, d ]);
 });
 
+QUnit.test("set >= length - triggers length event (#152)", function() {
+	var l = new DefineList([ 1, 2, 3 ]);
+	var batchNum = null;
+
+	l.on("add", function(e) {
+		ok(true, "add called");
+
+		if (batchNum === null) {
+			batchNum = e.batchNum;
+		}
+		else {
+			equal(batchNum, e.batchNum, "batch numbers match");
+		}
+	});
+	l.on("remove", function(e) {
+		ok(false, "remove called");
+
+		if (batchNum === null) {
+			batchNum = e.batchNum;
+		}
+		else {
+			equal(batchNum, e.batchNum, "batch numbers match");
+		}
+	});
+	l.on("length", function(e) {
+		ok(true, "length called");
+
+		if (batchNum === null) {
+			batchNum = e.batchNum;
+		}
+		else {
+			equal(batchNum, e.batchNum, "batch numbers match");
+		}
+	});
+
+	expect(4);
+	l.set(3, 5);
+
+	deepEqual(l.get(), [ 1, 2, 3, 5 ], "updated list");
+});
+
+QUnit.test("set < length - triggers length event (#150)", function() {
+	var l = new DefineList([ 1, 2, 3 ]);
+	var batchNum = null;
+
+	l.on("add", function(e) {
+		ok(true, "add called");
+
+		if (batchNum === null) {
+			batchNum = e.batchNum;
+		}
+		else {
+			equal(batchNum, e.batchNum, "batch numbers match");
+		}
+	});
+	l.on("remove", function(e) {
+		ok(true, "remove called");
+
+		if (batchNum === null) {
+			batchNum = e.batchNum;
+		}
+		else {
+			equal(batchNum, e.batchNum, "batch numbers match");
+		}
+	});
+	l.on("length", function(e) {
+		ok(true, "length called");
+
+		if (batchNum === null) {
+			batchNum = e.batchNum;
+		}
+		else {
+			equal(batchNum, e.batchNum, "batch numbers match");
+		}
+	});
+
+	expect(6);
+	l.set(2, 4);
+
+	deepEqual(l.get(), [ 1, 2, 4 ], "updated list");
+});
+
+QUnit.test("set/splice are observable", function() {
+	var list = new DefineList([ 1, 2, 3, 4, 5 ]);
+
+	var count = new Observation(function() {
+		var count = 0;
+		for (var i = 0; i < list.length; i++) {
+			count += (list[i] % 2) ? 1 : 0;
+		}
+		return count;
+	}, null, {
+		updater: function() {
+			ok(true);
+		}
+	});
+	count.start();
+
+	expect(3);
+	list.set(3, 5);
+	list.set(2, 4);
+	list.splice(1, 1, 1);
+});
+
 QUnit.test("setting length > current (#147)", function() {
 	var list = new DefineList([ 1, 2 ]);
 
@@ -948,9 +1052,9 @@ test('lastIndexOf', function() {
 });
 
 test('reduce', function() {
-	var l = new DefineList([ 
+	var l = new DefineList([
 		{ id: 1, name: "Alice", score: 10 },
-		{ id: 2, name: "Bob", score: 20 } 
+		{ id: 2, name: "Bob", score: 20 }
 	]);
 
 	var totalScores = l.reduce(function(total, player) {
@@ -961,9 +1065,9 @@ test('reduce', function() {
 });
 
 test('reduceRight', function() {
-	var l = new DefineList([ 
+	var l = new DefineList([
 		{ id: 1, name: "Alice"},
-		{ id: 2, name: "Bob"} 
+		{ id: 2, name: "Bob"}
 	]);
 
 	var concatenatedNames = l.reduceRight(function(string, person) {
@@ -972,5 +1076,3 @@ test('reduceRight', function() {
 
 	equal(concatenatedNames, "BobAlice", "ReduceRight works over list");
 });
-
-

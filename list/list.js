@@ -79,8 +79,6 @@ var DefineList = Construct.extend("DefineList",
 		__type: define.types.observable,
 		_triggerChange: function(attr, how, newVal, oldVal) {
 
-			canBatch.start();
-
 			var index = +attr;
 			// `batchTrigger` direct add and remove events...
 
@@ -93,13 +91,11 @@ var DefineList = Construct.extend("DefineList",
 						Observation.ignore(itemsDefinition.added).call(this, newVal, index);
 					}
 					canEvent.dispatch.call(this, how, [ newVal, index ]);
-					canEvent.dispatch.call(this, 'length', [ this._length ]);
 				} else if (how === 'remove') {
 					if (itemsDefinition && typeof itemsDefinition.removed === 'function') {
 						Observation.ignore(itemsDefinition.removed).call(this, oldVal, index);
 					}
 					canEvent.dispatch.call(this, how, [ oldVal, index ]);
-					canEvent.dispatch.call(this, 'length', [ this._length ]);
 				} else {
 					canEvent.dispatch.call(this, how, [ newVal, index ]);
 				}
@@ -110,7 +106,6 @@ var DefineList = Construct.extend("DefineList",
 				}, [ newVal, oldVal ]);
 			}
 
-			canBatch.stop();
 		},
 		/**
 		 * @function can-define/list/list.prototype.get get
@@ -376,6 +371,9 @@ var DefineList = Construct.extend("DefineList",
 			if (args.length > 2) {
 				this._triggerChange("" + index, "add", added, removed);
 			}
+
+			canEvent.dispatch.call(this, 'length', [ this._length ]);
+
 			canBatch.stop();
 			return removed;
 		},
@@ -539,8 +537,10 @@ each({
 			runningNative = false;
 
 			if (!this.comparator || args.length) {
-
+				canBatch.start();
 				this._triggerChange("" + len, "add", args, undefined);
+				canEvent.dispatch.call(this, 'length', [ this._length ]);
+				canBatch.stop();
 			}
 
 			return res;
@@ -646,7 +646,10 @@ each({
 			// `remove` - Items removed.
 			// `undefined` - The new values (there are none).
 			// `res` - The old, removed values (should these be unbound).
+			canBatch.start();
 			this._triggerChange("" + len, "remove", undefined, [ res ]);
+			canEvent.dispatch.call(this, 'length', [ this._length ]);
+			canBatch.stop();
 
 			return res;
 		};
