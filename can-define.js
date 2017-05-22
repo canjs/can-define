@@ -52,12 +52,19 @@ var eachPropertyDescriptor = function(map, cb){
 	}
 };
 
-
+// #### trapSets
+// This private function creates a "value trap" to glue together
+// defined getters/setters in can-define with the observable
+// patterns in can-reflect that are hooked into elsewhere in
+// can-define.  The last set value is placed into an instance of the
+// value trap on set, so as to make it available as a source value
+// for an async getter.
 function trapSets(observableValue) {
 	return {
 		observable: observableValue,
 		lastSetValue: undefined,
 		setValue: function(value) {
+			// Hold on to this value for next time.
 			this.lastSetValue = value;
 			if(this.observable) {
 				if(canSymbol.for("can.setValue") in this.observable) {
@@ -710,7 +717,6 @@ assign(eventsProto, {
 		if (computedBinding && computedBinding.compute) {
 			if (!computedBinding.count) {
 				computedBinding.count = 1;
-				// TODO use canReflect.onValue when can-compute supports reflection
 				canReflect.onValue(computedBinding.compute, computedBinding.handler);
 				computedBinding.oldValue = canReflect.getValue(computedBinding.compute);
 			} else {
@@ -731,7 +737,6 @@ assign(eventsProto, {
 		if (computedBinding) {
 			if (computedBinding.count === 1) {
 				computedBinding.count = 0;
-				// TODO use canReflect.offValue when can-compute supports reflection
 				canReflect.offValue(computedBinding.compute, computedBinding.handler);
 			} else {
 				computedBinding.count--;

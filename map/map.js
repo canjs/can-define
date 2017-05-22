@@ -296,7 +296,7 @@ types.DefaultMap = DefineMap;
 
 DefineMap.prototype.toObject = function(){
 	canLog.warn("Use DefineMap::get instead of DefineMap::toObject");
-	return canReflect.getvalue(this);
+	return this.get();
 };
 DefineMap.prototype.each = DefineMap.prototype.forEach;
 

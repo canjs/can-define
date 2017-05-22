@@ -264,7 +264,7 @@ var DefineList = Construct.extend("DefineList",
 			else {
 				if (canReflect.isListLike(prop)) {
 					if (value) {
-						canReflect.setValue(this, prop);
+						this.replace(prop);
 					} else {
 						this.splice.apply(this, [ 0, prop.length ].concat(prop));
 					}
@@ -858,7 +858,7 @@ assign(DefineList.prototype, {
 	forEach: function(cb, thisarg) {
 		var item;
 		for (var i = 0, len = this.length; i < len; i++) {
-			item = canReflect.getKeyValue(this, i);
+			item = this.get(i);
 			if (canReflect.call(cb, thisarg || item, item, i, this) === false) {
 				break;
 			}
