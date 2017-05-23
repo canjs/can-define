@@ -801,8 +801,8 @@ assign(DefineList.prototype, {
 			if (canReflect.isListLike(arg)) {
 				// If it is list-like we want convert to a JS array then
 				// pass each item of the array to this.__type
-				var arr = canReflect.isListLike(arg) ? makeArray(arg) : arg;
-				canReflect.eachIndex(arr, function(innerArg) {
+				var arr = Array.isArray(arg) ? arg : makeArray(arg);
+				arr.forEach(function(innerArg) {
 					args.push(this.__type(innerArg));
 				}, this);
 			} else {
@@ -859,7 +859,7 @@ assign(DefineList.prototype, {
 		var item;
 		for (var i = 0, len = this.length; i < len; i++) {
 			item = this.get(i);
-			if (canReflect.call(cb, thisarg || item, item, i, this) === false) {
+			if (cb.call(thisarg || item, item, i, this) === false) {
 				break;
 			}
 		}
@@ -960,8 +960,8 @@ assign(DefineList.prototype, {
 		if (typeof callback === "object") {
 			callback = makeFilterCallback(callback);
 		}
-		canReflect.eachIndex(this, function(item, index, list) {
-			filtered = canReflect.call(callback, thisArg | self, item, index, self);
+		this.each(function(item, index, list) {
+			filtered = callback.call(thisArg | self, item, index, self);
 			if (filtered) {
 				filteredList.push(item);
 			}
@@ -1005,8 +1005,8 @@ assign(DefineList.prototype, {
 	map: function(callback, thisArg) {
 		var mappedList = [],
 			self = this;
-		canReflect.eachIndex(this, function(item, index, list) {
-			var mapped = canReflect.call(callback, thisArg | self, item, index, self);
+		this.each(function(item, index, list) {
+			var mapped = callback.call(thisArg | self, item, index, self);
 			mappedList.push(mapped);
 
 		});
