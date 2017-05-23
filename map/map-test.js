@@ -509,7 +509,7 @@ QUnit.test("copying with assign() excludes special keys", function() {
 	QUnit.notEqual(a._cid, b._cid, "_cid prop not copied");
 	QUnit.equal(a.foo, b.foo, "New props copied");
 	QUnit.equal(a.existing, b.existing, "Existing props copied");
-	
+
 });
 
 QUnit.test("shorthand getter setter (#56)", function(){
@@ -623,7 +623,7 @@ QUnit.test(".value functions should not be observable", function(){
 	var outer = new DefineMap({
 		bam: "baz"
 	});
-	
+
 	var ItemsVM = DefineMap.extend({
 		item: {
 			value: function(){
@@ -633,20 +633,20 @@ QUnit.test(".value functions should not be observable", function(){
 		},
 		zed: "string"
 	});
-	
+
 	var items = new ItemsVM();
-	
+
 	var count = 0;
 	var itemsList = compute(function(){
 		count++;
 		return items.item;
 	});
-	
+
 	itemsList.on('change', function() {});
-	
+
 	items.item.foo = "changed";
 	items.zed = "changed";
-	
+
 	equal(count, 1);
 });
 
@@ -662,4 +662,15 @@ QUnit.test(".value values are overwritten by props in DefineMap construction", f
 	});
 
 	equal(foo.bar, "quux", "Value set properly");
+});
+
+QUnit.test("date type doesn't work in safari (#203)", function(){
+	var HomeViewModel = DefineMap.extend({
+	  page: 'string',
+	  startDate: 'date'
+	});
+
+	var vm = new HomeViewModel({});
+	vm.startDate = '2017-05-22 15:30';
+	QUnit.equal(vm.startDate.getTime(), new Date('2017-05-22 15:30').getTime());
 });
