@@ -6,6 +6,7 @@ var canTypes = require("can-types");
 var each = require("can-util/js/each/each");
 var compute = require("can-compute");
 var assign = require("can-util/js/assign/assign");
+var canReflect = require("can-reflect");
 var sealWorks = (function() {
 	try {
 		var o = {};
@@ -648,4 +649,67 @@ QUnit.test(".value functions should not be observable", function(){
 	items.zed = "changed";
 	
 	equal(count, 1);
+});
+
+QUnit.test("can-reflect reflections work with DefineMap", function() {
+	var b = new DefineMap({ "foo": "bar" });
+	var c = new (DefineMap.extend({
+		"baz": {
+			get: function() {
+				return b.foo;
+			}
+		}
+	}))({ "foo": "bar", thud: "baz" });
+
+	QUnit.equal( canReflect.getKeyValue(b, "foo"), "bar", "unbound value");
+
+	var handler = function(newValue){
+		QUnit.equal(newValue, "quux", "observed new value");
+
+		// Turn off the "foo" handler but "thud" should still be bound.
+		canReflect.offKeyValue(c, "baz", handler);
+	};
+	QUnit.ok(!canReflect.isValueLike(c), "isValueLike is false");
+	QUnit.ok(canReflect.isMapLike(c), "isMapLike is true");
+	QUnit.ok(!canReflect.isListLike(c), "isListLike is false");
+
+	QUnit.ok( !canReflect.keyHasDependencies(b, "foo"), "keyHasDependencies -- false");
+
+	canReflect.onKeyValue(c, "baz", handler);
+	// Do a second binding to check that you can unbind correctly.
+	canReflect.onKeyValue(c, "thud", handler);
+	QUnit.ok( canReflect.keyHasDependencies(c, "baz"), "keyHasDependencies -- true");
+
+	b.foo = "quux";
+	c.thud = "quux";
+
+	QUnit.equal( canReflect.getKeyValue(c, "baz"), "quux", "bound value");
+	// sanity checks to ensure that handler doesn't get called again.
+	b.foo = "thud";
+	c.baz = "jeek";
+
+});
+
+QUnit.test("can-reflect setKeyValue", function(){
+	var a = new DefineMap({ "a": "b" });
+
+	canReflect.setKeyValue(a, "a", "c");
+	QUnit.equal(a.a, "c", "setKeyValue");
+});
+
+QUnit.test("can-reflect getKeyDependencies", function() { 
+	var a = new DefineMap({ "a": "a" });
+	var b = new (DefineMap.extend({
+		"a": {
+			get: function() {
+				return a.a;
+			}
+		}
+	}))();
+
+	// DefineMaps bind automatically without events, so this is already running.
+	ok(canReflect.getKeyDependencies(b, "a"), "dependencies exist");
+	ok(!canReflect.getKeyDependencies(b, "b"), "no dependencies exist for unknown value");
+	ok(canReflect.getKeyDependencies(b, "a").valueDependencies.has(b._computed.a.compute), "dependencies returned");
+
 });

@@ -9,6 +9,7 @@ var ns = require("can-namespace");
 var canLog = require("can-util/js/log/log");
 var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
+var CIDSet = require("can-util/js/cid-set/cid-set");
 
 var readWithoutObserve = Observation.ignore(function(map, prop){
 	return map[prop];
@@ -277,9 +278,21 @@ DefineMap.prototype[canSymbol.for("can.getValue")] = DefineMap.prototype.get;
 DefineMap.prototype[canSymbol.for("can.setValue")] = DefineMap.prototype.set;
 DefineMap.prototype[canSymbol.for("can.isMapLike")] = true;
 DefineMap.prototype[canSymbol.for("can.isListLike")] = false;
-DefineMap.prototype[canSymbol.for("can.isValueLike")] = true;
+DefineMap.prototype[canSymbol.for("can.isValueLike")] = false;
 DefineMap.prototype[canSymbol.iterator] = function() {
 	return new define.Iterator(this);
+};
+DefineMap.prototype[canSymbol.for("can.keyHasDependencies")] = function(key) {
+	return !!(this._computed && this._computed[key] && this._computed[key].compute);
+};
+DefineMap.prototype[canSymbol.for("can.getKeyDependencies")] = function(key) {
+	var ret;
+	if(this._computed && this._computed[key] && this._computed[key].compute) {
+		ret = {};
+		ret.valueDependencies = new CIDSet();
+		ret.valueDependencies.add(this._computed[key].compute);
+	}
+	return ret;
 };
 
 // Add necessary event methods to this object.
@@ -291,6 +304,18 @@ for(var prop in define.eventsProto) {
 		writable: true
 	});
 }
+// @@can.onKeyValue and @@can.offKeyValue are also on define.eventsProto
+//  but symbols are not enuerated in for...in loops
+if("getOwnPropertySymbols" in Object) {
+	Object.getOwnPropertySymbols(define.eventsProto).forEach(function(sym) {
+		Object.defineProperty(DefineMap.prototype, sym, {
+			enumerable:false,
+			value: define.eventsProto[sym],
+			writable: true
+		});
+	});
+}
+
 types.DefineMap = DefineMap;
 types.DefaultMap = DefineMap;
 

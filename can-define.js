@@ -21,6 +21,9 @@ var defaults = require("can-util/js/defaults/defaults");
 var ns = require("can-namespace");
 var canSymbol = require("can-symbol");
 var canReflect = require("can-reflect");
+// TODO update this to use 'can-util/js/single-reference/single-reference' once the canReflect
+//   updates from can-compute/single-reference are merged into it.
+var singleReference = require('can-compute/single-reference');
 
 var eventsProto, define,
 	make, makeDefinition, replaceWith, getDefinitionsAndMethods,
@@ -748,8 +751,20 @@ assign(eventsProto, {
 
 	}
 });
-eventsProto.on = eventsProto.bind = eventsProto[canSymbol.for("can.onKeyValue")] = eventsProto.addEventListener;
-eventsProto.off = eventsProto.unbind = eventsProto[canSymbol.for("can.offKeyValue")] = eventsProto.removeEventListener;
+eventsProto.on = eventsProto.bind = eventsProto.addEventListener;
+eventsProto.off = eventsProto.unbind = eventsProto.removeEventListener;
+canReflect.set(eventsProto, canSymbol.for("can.onKeyValue"), function(key, handler){
+	var translationHandler = function(ev, newValue, oldValue){
+		handler(newValue, oldValue);
+	};
+	singleReference.set(handler, this, translationHandler, key);
+
+	this.addEventListener(key, translationHandler);
+});
+
+canReflect.set(eventsProto, canSymbol.for("can.offKeyValue"), function(key, handler){
+	this.removeEventListener(key, singleReference.getAndDelete(handler, this, key) );
+});
 
 delete eventsProto.one;
 

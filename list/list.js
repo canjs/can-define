@@ -16,6 +16,7 @@ var types = require("can-types");
 var ns = require("can-namespace");
 var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
+var CIDSet = require("can-util/js/cid-set/cid-set");
 
 var splice = [].splice;
 
@@ -1081,6 +1082,17 @@ for (var prop in define.eventsProto) {
 		writable: true
 	});
 }
+// @@can.onKeyValue and @@can.offKeyValue are also on define.eventsProto
+//  but symbols are not enuerated in for...in loops
+if("getOwnPropertySymbols" in Object) {
+	Object.getOwnPropertySymbols(define.eventsProto).forEach(function(sym) {
+		Object.defineProperty(DefineList.prototype, sym, {
+			enumerable:false,
+			value: define.eventsProto[sym],
+			writable: true
+		});
+	});
+}
 
 Object.defineProperty(DefineList.prototype, "length", {
 	get: function() {
@@ -1131,7 +1143,7 @@ DefineList.prototype[canSymbol.for("can.getValue")] = DefineList.prototype.get;
 DefineList.prototype[canSymbol.for("can.setValue")] = DefineList.prototype.replace;
 DefineList.prototype[canSymbol.for("can.isMapLike")] = true;
 DefineList.prototype[canSymbol.for("can.isListLike")] = true;
-DefineList.prototype[canSymbol.for("can.isValueLike")] = true;
+DefineList.prototype[canSymbol.for("can.isValueLike")] = false;
 DefineList.prototype[canSymbol.iterator] = function() {
 	var index = -1;
 	return {
@@ -1143,6 +1155,24 @@ DefineList.prototype[canSymbol.iterator] = function() {
 			};
 		}.bind(this)
 	};
+};
+DefineList.prototype[canSymbol.for("can.keyHasDependencies")] = function(key) {
+	return !!(this._computed && this._computed[key] && this._computed[key].compute);
+};
+DefineList.prototype[canSymbol.for("can.getKeyDependencies")] = function(key) {
+	var ret;
+	if(this._computed && this._computed[key] && this._computed[key].compute) {
+		ret = {};
+		ret.valueDependencies = new CIDSet();
+		ret.valueDependencies.add(this._computed[key].compute);
+	}
+	return ret;
+};
+DefineList.prototype[canSymbol.for("can.onKeysAdded")] = function(handler) {
+	this[canSymbol.for("can.onKeyValue")]("add", handler);
+};
+DefineList.prototype[canSymbol.for("can.onKeysRemoved")] = function(handler) {
+	this[canSymbol.for("can.onKeyValue")]("remove", handler);
 };
 
 types.DefineList = DefineList;

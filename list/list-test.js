@@ -5,6 +5,8 @@ var DefineMap = require("can-define/map/map");
 var Observation = require("can-observation");
 var define = require("can-define");
 var compute = require("can-compute");
+var canReflect = require("can-reflect");
+var canSymbol = require("can-symbol");
 
 var assign = require("can-util/js/assign/assign");
 var CID = require("can-cid");
@@ -811,4 +813,91 @@ test("compute(DefineList, 0) works (#17)", function(assert){
 		assert.equal(newVal, 5);
 	});
 	list.set(0, 5);
+});
+
+test("works with can-reflect", 13, function(){
+	var a = new DefineMap({ foo: 4 });
+	var b = new DefineList([ "foo", "bar" ]);
+	var c;
+	QUnit.equal( canReflect.getKeyValue(b, "0"), "foo", "unbound value");
+
+	var handler = function(newValue){
+		QUnit.equal(newValue, "quux", "observed new value");
+	};
+	QUnit.ok(!canReflect.isValueLike(b), "isValueLike is false");
+	QUnit.ok(canReflect.isMapLike(b), "isMapLike is true");
+	QUnit.ok(canReflect.isListLike(b), "isListLike is false");
+
+	QUnit.ok( !canReflect.keyHasDependencies(b, "length"), "keyHasDependencies -- false");
+
+	define(c = Object.create(b), {
+		length: {
+			get: function() {
+				return a.foo;
+			}
+		}
+	});
+
+	QUnit.ok(canReflect.getKeyDependencies(c, "length"), "dependencies exist");
+	QUnit.ok(
+		canReflect.getKeyDependencies(c, "length").valueDependencies.has(c._computed.length.compute),
+		"dependencies returned"
+	);
+
+	canReflect.onKeysAdded(b, handler);
+	canReflect.onKeysRemoved(b, handler);
+	QUnit.ok(b.__bindEvents.add, "add handler added");
+	QUnit.ok(b.__bindEvents.remove, "remove handler added");
+
+	b.push("quux");
+	c.push("quux");
+	QUnit.equal( canReflect.getKeyValue(c, "length"), "4", "bound value");
+	b.pop();
+
+});
+
+QUnit.test("can-reflect setKeyValue", function(){
+	var a = new DefineMap({ "a": "b" });
+
+	canReflect.setKeyValue(a, "a", "c");
+	QUnit.equal(a.a, "c", "setKeyValue");
+});
+
+QUnit.test("can-reflect getKeyDependencies", function() { 
+	var a = new DefineMap({ foo: 4 });
+	var b = new DefineList([ "foo", "bar" ]);
+	var c;
+
+	ok(!canReflect.getKeyDependencies(b, "length"), "No dependencies before binding");
+
+	define(c = Object.create(b), {
+		length: {
+			get: function() {
+				return a.foo;
+			}
+		}
+	});
+
+	ok(canReflect.getKeyDependencies(c, "length"), "dependencies exist");
+	ok(canReflect.getKeyDependencies(c, "length").valueDependencies.has(c._computed.length.compute), "dependencies returned");
+
+});
+
+QUnit.test("registered symbols", function() { 
+	var a = new DefineMap({ "a": "a" });
+
+	ok(a[canSymbol.for("can.isMapLike")], "can.isMapLike");
+	equal(a[canSymbol.for("can.getKeyValue")]("a"), "a", "can.getKeyValue");
+	a[canSymbol.for("can.setKeyValue")]("a", "b");
+	equal(a.a, "b", "can.setKeyValue");
+
+	function handler(val) {
+		equal(val, "c", "can.onKeyValue");
+	}
+
+	a[canSymbol.for("can.onKeyValue")]("a", handler);
+	a.a = "c";
+
+	a[canSymbol.for("can.offKeyValue")]("a", handler);
+	a.a = "d"; // doesn't trigger handler
 });
