@@ -274,6 +274,10 @@ var DefineMap = Construct.extend("DefineMap",{
 });
 DefineMap.prototype[canSymbol.for("can.getKeyValue")] = DefineMap.prototype.get;
 DefineMap.prototype[canSymbol.for("can.setKeyValue")] = DefineMap.prototype.set;
+DefineMap.prototype[canSymbol.for("can.deleteKeyValue")] = function(prop) {
+	this.set(prop, undefined);	
+	return this;
+};
 DefineMap.prototype[canSymbol.for("can.getValue")] = DefineMap.prototype.get;
 DefineMap.prototype[canSymbol.for("can.setValue")] = function(prop, value) {
 	if(typeof prop === "object") {
