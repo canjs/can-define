@@ -40,15 +40,15 @@
     "can-reflect": "0.0.3",
     "can-symbol": "0.0.3",
     "can-types": "^1.0.1",
-    "can-util": "^3.1.1"
+    "can-util": "^3.5.1"
   },
   "devDependencies": {
     "jshint": "^2.9.1",
-    "serve": "^2.0.0",
+    "serve": "^5.1.4",
     "steal": "^1.0.7",
     "steal-qunit": "^1.0.0",
     "steal-tools": "^1.0.1",
-    "testee": "^0.3.0",
+    "testee": "^0.5.0",
     "bit-docs": "^0.0.7"
   },
   "bit-docs": {

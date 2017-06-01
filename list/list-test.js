@@ -166,7 +166,7 @@ test('splice removes items in IE (#562)', function() {
 
 
 test('reverse triggers add/remove events (#851)', function() {
-	expect(5);
+	expect(4);
 	var l = new DefineList([ 1, 2, 3 ]);
 
 	l.on('add', function() {
@@ -372,12 +372,12 @@ test('list.map', function() {
     person.lastName = "Thompson";
 	    return person;
 	});
-	QUnit.throws(function() {
+
+	try {
 		newExtendedList.testMe();
-	}, {
-		name: 'TypeError',
-		message: 'newExtendedList.testMe is not a function'
-	}, 'Does not return the same type of list.');
+	} catch(err) {
+		QUnit.ok(err.message.match(/testMe/));
+	}
 });
 
 
@@ -765,7 +765,7 @@ QUnit.test("Array shorthand uses #", function() {
     QUnit.ok(map.numbers.prop === "4", "type left alone");
 });
 
-test("replace-with-self lists are diffed properly (can-view-live#10)", function() {
+QUnit.test("replace-with-self lists are diffed properly (can-view-live#10)", function() {
 	var a = new DefineMap({ name: "A" });
 	var b = new DefineMap({ name: "B" });
 	var c = new DefineMap({ name: "C" });
@@ -791,6 +791,228 @@ test("replace-with-self lists are diffed properly (can-view-live#10)", function(
 		equal(where, 2, "list2 removed location");
 	});
 	list2.replace([ a, b, d ]);
+});
+
+QUnit.test("set >= length - triggers length event (#152)", function() {
+	var l = new DefineList([ 1, 2, 3 ]);
+	var batchNum = null;
+
+	l.on("add", function(e) {
+		ok(true, "add called");
+
+		if (batchNum === null) {
+			batchNum = e.batchNum;
+		}
+		else {
+			equal(batchNum, e.batchNum, "batch numbers match");
+		}
+	});
+	l.on("remove", function(e) {
+		ok(false, "remove called");
+
+		if (batchNum === null) {
+			batchNum = e.batchNum;
+		}
+		else {
+			equal(batchNum, e.batchNum, "batch numbers match");
+		}
+	});
+	l.on("length", function(e) {
+		ok(true, "length called");
+
+		if (batchNum === null) {
+			batchNum = e.batchNum;
+		}
+		else {
+			equal(batchNum, e.batchNum, "batch numbers match");
+		}
+	});
+
+	expect(4);
+	l.set(3, 5);
+
+	deepEqual(l.get(), [ 1, 2, 3, 5 ], "updated list");
+});
+
+QUnit.test("set < length - triggers length event (#150)", function() {
+	var l = new DefineList([ 1, 2, 3 ]);
+	var batchNum = null;
+
+	l.on("add", function(e) {
+		ok(true, "add called");
+
+		if (batchNum === null) {
+			batchNum = e.batchNum;
+		}
+		else {
+			equal(batchNum, e.batchNum, "batch numbers match");
+		}
+	});
+	l.on("remove", function(e) {
+		ok(true, "remove called");
+
+		if (batchNum === null) {
+			batchNum = e.batchNum;
+		}
+		else {
+			equal(batchNum, e.batchNum, "batch numbers match");
+		}
+	});
+	l.on("length", function(e) {
+		ok(true, "length called");
+
+		if (batchNum === null) {
+			batchNum = e.batchNum;
+		}
+		else {
+			equal(batchNum, e.batchNum, "batch numbers match");
+		}
+	});
+
+	expect(6);
+	l.set(2, 4);
+
+	deepEqual(l.get(), [ 1, 2, 4 ], "updated list");
+});
+
+QUnit.test("set/splice are observable", function() {
+	var list = new DefineList([ 1, 2, 3, 4, 5 ]);
+
+	var count = new Observation(function() {
+		var count = 0;
+		for (var i = 0; i < list.length; i++) {
+			count += (list[i] % 2) ? 1 : 0;
+		}
+		return count;
+	}, null, {
+		updater: function() {
+			ok(true);
+		}
+	});
+	count.start();
+
+	expect(3);
+	list.set(3, 5);
+	list.set(2, 4);
+	list.splice(1, 1, 1);
+});
+
+QUnit.test("setting length > current (#147)", function() {
+	var list = new DefineList([ 1, 2 ]);
+
+	list.length = 5;
+
+	equal(list.length, 5);
+	equal(list.hasOwnProperty(0), true);
+	equal(list.hasOwnProperty(1), true);
+	equal(list.hasOwnProperty(2), true);
+	equal(list.hasOwnProperty(3), true);
+	equal(list.hasOwnProperty(4), true);
+	equal(list.hasOwnProperty(5), false);
+});
+
+QUnit.test("setting length < current (#147)", function() {
+	var list = new DefineList([ 1, 2, 3, 4, 5 ]);
+
+	list.length = 3;
+
+	equal(list.length, 3);
+	equal(list.hasOwnProperty(0), true);
+	equal(list.hasOwnProperty(1), true);
+	equal(list.hasOwnProperty(2), true);
+	equal(list.hasOwnProperty(3), false);
+	equal(list.hasOwnProperty(4), false);
+	equal(list.hasOwnProperty(5), false);
+});
+
+test('every', function() {
+	var l = new DefineList([ { id: 1, name: "Bob" }, { id: 2, name: "Bob" } ]);
+
+	var allBobs = l.every(function(item) {
+		return item.name === "Bob";
+	});
+	ok(allBobs, "Every works in true case");
+	var idOne = l.every(function(item) {
+		return item.id === 1;
+	});
+	ok(!idOne, "Every works in false case");
+
+	allBobs = l.every({
+		name : "Bob"
+	});
+	ok(allBobs, "Every works in true case");
+	idOne = l.every({
+		name : "Bob",
+		id : 1
+	});
+	ok(!idOne, "Every works in false case");
+
+});
+
+test('some', function() {
+	var l = new DefineList([ { id: 1, name: "Alice" }, { id: 2, name: "Bob" } ]);
+
+	var allBobs = l.some(function(item) {
+		return item.name === "Bob";
+	});
+	ok(allBobs, "Some works in true case");
+	var idOne = l.some(function(item) {
+		return item.name === "Charlie";
+	});
+	ok(!idOne, "Some works in false case");
+
+	allBobs = l.some({
+		name : "Bob"
+	});
+	ok(allBobs, "Some works in true case");
+	idOne = l.some({
+		name : "Bob",
+		id : 1
+	});
+	ok(!idOne, "Some works in false case");
+
+});
+
+test('lastIndexOf', function() {
+	var l = new DefineList([ { id: 1, name: "Alice" }, { id: 2, name: "Bob" } ]);
+
+	var bobIdx = l.lastIndexOf(l[1]);
+	equal(bobIdx, 1, "lastIndexOf found object");
+	var charlieIdx = l.lastIndexOf({ id : 3, name: "Charlie" });
+	equal(charlieIdx, -1, "lastIndexOf not found object");
+
+	// make a new reference to [1] at [2]
+	l.push(l[1]);
+
+	bobIdx = l.lastIndexOf(l[1]);
+	equal(bobIdx, 2, "lastIndexOf found last index of duped object");
+
+});
+
+test('reduce', function() {
+	var l = new DefineList([
+		{ id: 1, name: "Alice", score: 10 },
+		{ id: 2, name: "Bob", score: 20 }
+	]);
+
+	var totalScores = l.reduce(function(total, player) {
+		return total + player.score;
+	}, 0);
+
+	equal(totalScores, 30, "Reduce works over list");
+});
+
+test('reduceRight', function() {
+	var l = new DefineList([
+		{ id: 1, name: "Alice"},
+		{ id: 2, name: "Bob"}
+	]);
+
+	var concatenatedNames = l.reduceRight(function(string, person) {
+		return string + person.name;
+	}, "");
+
+	equal(concatenatedNames, "BobAlice", "ReduceRight works over list");
 });
 
 test("compute(defineMap, 'property.names') works (#20)", function(){

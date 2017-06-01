@@ -190,8 +190,10 @@ var ajax = require("can-util/dom/ajax/ajax");
 
 var TodoViewModel = DefineMap.extend({
 	todoId: "number",
-	todo: function(lastSetValue, resolve){
-		ajax({url: "/todos/"+this.todoId}).then(resolve)
+	todo: {
+		get: function(lastSetValue, resolve){
+				ajax({url: "/todos/"+this.todoId}).then(resolve)
+			}
 	}
 });
 ```
