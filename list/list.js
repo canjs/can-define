@@ -1381,6 +1381,14 @@ DefineList.prototype.items = function() {
 
 DefineList.prototype[canSymbol.for("can.getKeyValue")] = DefineList.prototype.get;
 DefineList.prototype[canSymbol.for("can.setKeyValue")] = DefineList.prototype.set;
+DefineList.prototype[canSymbol.for("can.deleteKeyValue")] = function(prop) {
+	if(typeof prop === "number") {
+		this.splice(prop, 1);
+	} else {
+		this.set(prop, undefined);	
+	}
+	return this;
+};
 DefineList.prototype[canSymbol.for("can.getValue")] = DefineList.prototype.get;
 DefineList.prototype[canSymbol.for("can.setValue")] = DefineList.prototype.replace;
 DefineList.prototype[canSymbol.for("can.isMapLike")] = true;

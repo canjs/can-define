@@ -719,6 +719,7 @@ QUnit.test("can-reflect deleteKeyValue", function(){
 	QUnit.equal(a.a, undefined, "value is now undefined");
 	QUnit.ok(!("a" in a.get()), "value not included in serial");
 });
+
 QUnit.test("can-reflect getKeyDependencies", function() { 
 	var a = new DefineMap({ "a": "a" });
 	var b = new (DefineMap.extend({

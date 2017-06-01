@@ -1079,10 +1079,23 @@ test("works with can-reflect", 13, function(){
 });
 
 QUnit.test("can-reflect setKeyValue", function(){
-	var a = new DefineMap({ "a": "b" });
+	var a = new DefineList([ "a", "b" ]);
 
-	canReflect.setKeyValue(a, "a", "c");
-	QUnit.equal(a.a, "c", "setKeyValue");
+	canReflect.setKeyValue(a, 1, "c");
+	QUnit.equal(a[1], "c", "setKeyValue");
+});
+
+QUnit.test("can-reflect deleteKeyValue", function(){
+	var a = new DefineList([ "a", "b" ]);
+	a.set("foo", "bar");
+
+	canReflect.deleteKeyValue(a, 0);
+	QUnit.equal(a[1], undefined, "last value is now undefined");
+	QUnit.equal(a[0], "b", "last value is shifted down");
+
+	canReflect.deleteKeyValue(a, "foo");
+	QUnit.equal(a.foo, undefined, "value not included in serial");
+	QUnit.ok(!("foo" in a.get()), "value not included in serial");
 });
 
 QUnit.test("can-reflect getKeyDependencies", function() { 
