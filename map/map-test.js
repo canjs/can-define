@@ -6,6 +6,7 @@ var canTypes = require("can-types");
 var each = require("can-util/js/each/each");
 var compute = require("can-compute");
 var assign = require("can-util/js/assign/assign");
+var canSymbol = require("can-symbol");
 var canReflect = require("can-reflect");
 var sealWorks = (function() {
 	try {
@@ -726,4 +727,15 @@ QUnit.test("can-reflect getKeyDependencies", function() {
 	ok(!canReflect.getKeyDependencies(b, "b"), "no dependencies exist for unknown value");
 	ok(canReflect.getKeyDependencies(b, "a").valueDependencies.has(b._computed.a.compute), "dependencies returned");
 
+});
+
+QUnit.test("can-reflect setValue", function() {
+	var aData = { "a": "b" };
+	var bData = { "b": "c" };
+
+	var a = new DefineMap(aData);
+	var b = new DefineMap(bData);
+
+	a[canSymbol.for("can.setValue")](b);
+	QUnit.deepEqual(a.get(), assign(aData, bData), "when called with an object, should merge into existing object");
 });

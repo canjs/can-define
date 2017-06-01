@@ -275,7 +275,21 @@ var DefineMap = Construct.extend("DefineMap",{
 DefineMap.prototype[canSymbol.for("can.getKeyValue")] = DefineMap.prototype.get;
 DefineMap.prototype[canSymbol.for("can.setKeyValue")] = DefineMap.prototype.set;
 DefineMap.prototype[canSymbol.for("can.getValue")] = DefineMap.prototype.get;
-DefineMap.prototype[canSymbol.for("can.setValue")] = DefineMap.prototype.set;
+DefineMap.prototype[canSymbol.for("can.setValue")] = function(prop, value) {
+	if(typeof prop === "object") {
+		if (prop[canSymbol.for("can.getValue")]) {
+			this.set(canReflect.getValue(prop));
+		} else {
+			this.set(prop);
+		}
+	} else {
+		if (value[canSymbol.for("can.getValue")]) {
+			this.set(prop, canReflect.getValue(value));
+		} else {
+			this.set(prop, value);
+		}
+	}
+};
 DefineMap.prototype[canSymbol.for("can.isMapLike")] = true;
 DefineMap.prototype[canSymbol.for("can.isListLike")] = false;
 DefineMap.prototype[canSymbol.for("can.isValueLike")] = false;
