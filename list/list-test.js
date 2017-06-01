@@ -5,31 +5,33 @@ var DefineMap = require("can-define/map/map");
 var Observation = require("can-observation");
 var define = require("can-define");
 var compute = require("can-compute");
+var canReflect = require("can-reflect");
+var canSymbol = require("can-symbol");
 
 var assign = require("can-util/js/assign/assign");
 var CID = require("can-cid");
 var types = require("can-types");
 QUnit.module("can-define/list/list");
 
-QUnit.test("List is an event emitter", function (assert) {
+QUnit.test("List is an event emitter", function(assert) {
 	var Base = DefineList.extend({});
 	assert.ok(Base.on, 'Base has event methods.');
 	var List = Base.extend({});
 	assert.ok(List.on, 'List has event methods.');
 });
 
-QUnit.test("creating an instance", function(){
-    var list = new DefineList(["a","b","c"]);
+QUnit.test("creating an instance", function() {
+	var list = new DefineList([ "a", "b", "c" ]);
 
-    list.on("add", function(ev, newVals, index){
-        QUnit.deepEqual(newVals, ["d"]);
+	list.on("add", function(ev, newVals, index) {
+		QUnit.deepEqual(newVals, [ "d" ]);
         QUnit.equal(index, 3);
     });
 
     list.push("d");
 });
 
-test('list attr changes length', function () {
+test('list attr changes length', function() {
 	var l = new DefineList([
 		0,
 		1,
@@ -39,13 +41,13 @@ test('list attr changes length', function () {
 	equal(l.length, 4);
 });
 test('remove on pop', function() {
-	var l = new DefineList([0, 1, 2]);
+	var l = new DefineList([ 0, 1, 2 ]);
     l.pop();
 
 	equal(l.length, 2);
-	deepEqual(l.get(), [0, 1]);
+	deepEqual(l.get(), [ 0, 1 ]);
 });
-test('list splice', function () {
+test('list splice', function() {
 	var l = new DefineList([
 		0,
 		1,
@@ -53,7 +55,7 @@ test('list splice', function () {
 		3
 	]);
 
-    l.on('add', function(ev, newVals, index){
+	l.on('add', function(ev, newVals, index) {
         deepEqual(newVals, [
             'a',
             'b'
@@ -61,7 +63,7 @@ test('list splice', function () {
         equal(index, 1, 'adding items');
     });
 
-    l.on('remove', function(ev, oldVals, index){
+	l.on('remove', function(ev, oldVals, index) {
         deepEqual(oldVals, [
             1,
             2
@@ -79,7 +81,7 @@ test('list splice', function () {
 });
 
 
-test('Array accessor methods', 11, function () {
+test('Array accessor methods', 11, function() {
 	var l = new DefineList([
 		'a',
 		'b',
@@ -90,7 +92,7 @@ test('Array accessor methods', 11, function () {
 		concatenated = l.concat([
 			2,
 			1
-		], new DefineList([0]));
+		], new DefineList([ 0 ]));
 	ok(sliced instanceof DefineList, 'Slice is an Observable list');
 	equal(sliced.length, 1, 'Sliced off two elements');
 	equal(sliced[0], 'c', 'Single element as expected');
@@ -104,7 +106,7 @@ test('Array accessor methods', 11, function () {
 		1,
 		0
 	], 'DefineList concatenated properly');
-	l.forEach(function (letter, index) {
+	l.forEach(function(letter, index) {
 		ok(true, 'Iteration');
 		if (index === 0) {
 			equal(letter, 'a', 'First letter right');
@@ -149,15 +151,15 @@ test('Lists with maps concatenate properly', function() {
 		hero
 	]);
 
-	people = people.concat([me, animal, specialPeople], specialPeople, [1, 2], 3);
+	people = people.concat([ me, animal, specialPeople ], specialPeople, [ 1, 2 ], 3);
 
 	ok(people.length === 8, "List length is right");
 	ok(people[0] === me, "Map in list === vars created before concat");
 	ok(people[1] instanceof Person, "Animal got serialized to Person");
 });
 
-test('splice removes items in IE (#562)', function () {
-	var l = new DefineList(['a']);
+test('splice removes items in IE (#562)', function() {
+	var l = new DefineList([ 'a' ]);
 	l.splice(0, 1);
 	ok(!l.get(0), 'all props are removed');
 });
@@ -165,21 +167,27 @@ test('splice removes items in IE (#562)', function () {
 
 test('reverse triggers add/remove events (#851)', function() {
 	expect(5);
-	var l = new DefineList([1,2,3]);
+	var l = new DefineList([ 1, 2, 3 ]);
 
-	l.on('add', function() { ok(true, 'add called'); });
-	l.on('remove', function() { ok(true, 'remove called'); });
-	l.on('length', function() { ok(true, 'length should be called'); });
+	l.on('add', function() {
+		ok(true, 'add called');
+	});
+	l.on('remove', function() {
+		ok(true, 'remove called');
+	});
+	l.on('length', function() {
+		ok(true, 'length should be called');
+	});
 
 	l.reverse();
 
-    deepEqual(l.get(), [3,2,1], "reversed");
+	deepEqual(l.get(), [ 3, 2, 1 ], "reversed");
 });
 
-test('filter', function(){
-	var l = new DefineList([{id: 1, name: "John"}, {id: 2, name: "Mary"}]);
+test('filter', function() {
+	var l = new DefineList([ { id: 1, name: "John" }, { id: 2, name: "Mary" } ]);
 
-	var filtered = l.filter(function(item){
+	var filtered = l.filter(function(item) {
 		return item.name === "Mary";
 	});
 
@@ -190,7 +198,7 @@ test('filter', function(){
 });
 
 test('No Add Events if DefineList Splice adds the same items that it is removing. (#1277, #1399)', function() {
-	var list = new DefineList(["a","b"]);
+	var list = new DefineList([ "a", "b" ]);
 
 	list.bind('add', function() {
 		ok(false, 'Add callback should not be called.');
@@ -202,14 +210,14 @@ test('No Add Events if DefineList Splice adds the same items that it is removing
 
   var result = list.splice(0, 2, "a", "b");
 
-  deepEqual(result, ["a", "b"]);
+	deepEqual(result, [ "a", "b" ]);
 });
 
 test("add event always returns an array as the value (#998)", function() {
 	var list = new DefineList([]),
 		msg;
 	list.bind("add", function(ev, newElements, index) {
-		deepEqual(newElements, [4], msg);
+		deepEqual(newElements, [ 4 ], msg);
 	});
 	msg = "works on push";
 	list.push(4);
@@ -218,13 +226,13 @@ test("add event always returns an array as the value (#998)", function() {
 	list.set(0, 4);
 	list.pop();
 	msg = "works on replace()";
-	list.replace([4]);
+	list.replace([ 4 ]);
 });
 
 test("Setting with .set() out of bounds of length triggers add event with leading undefineds", function() {
-	var list = new DefineList([1]);
+	var list = new DefineList([ 1 ]);
 	list.bind("add", function(ev, newElements, index) {
-		deepEqual(newElements, [undefined, undefined, 4],
+		deepEqual(newElements, [ undefined, undefined, 4 ],
 				  "Leading undefineds are included");
 		equal(index, 1, "Index takes into account the leading undefineds from a .set()");
 	});
@@ -253,20 +261,20 @@ test('setting an index out of bounds does not create an array', function() {
 });
 
 test('splice with similar but less items works (#1606)', function() {
-	var list = new DefineList([ 'aa', 'bb', 'cc']);
+	var list = new DefineList([ 'aa', 'bb', 'cc' ]);
 
 	list.splice(0, list.length, 'aa', 'cc', 'dd');
-	deepEqual(list.get(), ['aa', 'cc', 'dd']);
+	deepEqual(list.get(), [ 'aa', 'cc', 'dd' ]);
 
 	list.splice(0, list.length, 'aa', 'cc');
-	deepEqual(list.get(), ['aa', 'cc']);
+	deepEqual(list.get(), [ 'aa', 'cc' ]);
 });
 
 test('filter returns same list type (#1744)', function() {
 	var ParentList = DefineList.extend();
 	var ChildList = ParentList.extend();
 
-	var children = new ChildList([1,2,3]);
+	var children = new ChildList([ 1, 2, 3 ]);
 
 	ok(children.filter(function() {}) instanceof ChildList);
 });
@@ -275,29 +283,29 @@ test('reverse returns the same list instance (#1744)', function() {
 	var ParentList = DefineList.extend();
 	var ChildList = ParentList.extend();
 
-	var children = new ChildList([1,2,3]);
+	var children = new ChildList([ 1, 2, 3 ]);
 	ok(children.reverse() === children);
 });
 
 
-test("slice and join are observable by a compute (#1884)", function(){
+test("slice and join are observable by a compute (#1884)", function() {
 	expect(2);
 
-	var list = new DefineList([1,2,3]);
+	var list = new DefineList([ 1, 2, 3 ]);
 
-	var sliced = new Observation(function(){
-		return list.slice(0,1);
+	var sliced = new Observation(function() {
+		return list.slice(0, 1);
 	}, null, {
-		updater: function(newVal){
-			deepEqual(newVal.get(), [2], "got a new DefineList");
+		updater: function(newVal) {
+			deepEqual(newVal.get(), [ 2 ], "got a new DefineList");
 		}
 	});
 	sliced.start();
 
-	var joined = new Observation(function(){
+	var joined = new Observation(function() {
 		return list.join(",");
 	}, null, {
-		updater: function(newVal){
+		updater: function(newVal) {
 			equal(newVal, "2,3", "joined is observable");
 		}
 	});
@@ -309,17 +317,17 @@ test("slice and join are observable by a compute (#1884)", function(){
 
 });
 
-test('list.replace', function(){
+test('list.replace', function() {
     var firstArray = [
-        {id: 1, name: "Marshall"},
-        {id: 2, name: "Austin"},
-        {id: 3, name: "Hyrum"}
+		{ id: 1, name: "Marshall" },
+		{ id: 2, name: "Austin" },
+		{ id: 3, name: "Hyrum" }
     ];
     var myList = new DefineList(firstArray);
     var newArray = [
-        {id: 4, name: "Aubree"},
-        {id: 5, name: "Leah"},
-        {id: 6, name: 'Lily'}
+		{ id: 4, name: "Aubree" },
+		{ id: 5, name: "Leah" },
+		{ id: 6, name: 'Lily' }
     ];
     myList.replace(newArray);
     equal(myList.length, 3);
@@ -334,11 +342,11 @@ test('list.replace', function(){
     equal(myList[2].name, "Hyrum", "Can replace a List with another List.");
 });
 
-test('list.map', function(){
+test('list.map', function() {
 	var myArray = [
-	    {id: 1, name: "Marshall"},
-	    {id: 2, name: "Austin"},
-	    {id: 3, name: "Hyrum"}
+		{ id: 1, name: "Marshall" },
+		{ id: 2, name: "Austin" },
+		{ id: 3, name: "Hyrum" }
     ];
     var myList = new DefineList(myArray);
     var newList = myList.map(function(person) {
@@ -355,7 +363,7 @@ test('list.map', function(){
     equal(newList[2].lastName, "Thompson");
 
     var ExtendedList = DefineList.extend({
-		testMe: function(){
+		testMe: function() {
 			return "It Worked!";
 		}
 	});
@@ -364,11 +372,16 @@ test('list.map', function(){
     person.lastName = "Thompson";
 	    return person;
 	});
-	QUnit.equal("It Worked!", newExtendedList.testMe(), 'Returns the same type of list.');
+	QUnit.throws(function() {
+		newExtendedList.testMe();
+	}, {
+		name: 'TypeError',
+		message: 'newExtendedList.testMe is not a function'
+	}, 'Does not return the same type of list.');
 });
 
 
-test('list.sort a simple list', function(){
+test('list.sort a simple list', function() {
     var myList = new DefineList([
 	    "Marshall",
 	    "Austin",
@@ -383,17 +396,17 @@ test('list.sort a simple list', function(){
 	equal(myList[2], "Marshall", "Basic list was properly sorted.");
 });
 
-test('list.sort a list of objects', function(){
+test('list.sort a list of objects', function() {
 	var objList = new DefineList([
-		{id: 1, name: "Marshall"},
-		{id: 2, name: "Austin"},
-		{id: 3, name: "Hyrum"}
+		{ id: 1, name: "Marshall" },
+		{ id: 2, name: "Austin" },
+		{ id: 3, name: "Hyrum" }
 	]);
 
-	objList.sort(function(a, b){
+	objList.sort(function(a, b) {
 		if (a.name < b.name) {
 			return -1;
-		} else if (a.name > b.name){
+		} else if (a.name > b.name) {
 			return 1;
 		} else {
 			return 0;
@@ -408,26 +421,26 @@ test('list.sort a list of objects', function(){
 
 
 
-test('list.sort a list of objects without losing reference (#137)', function(){
-	var unSorted = new DefineList([{id: 3}, {id: 2}, {id: 1}]);
+test('list.sort a list of objects without losing reference (#137)', function() {
+	var unSorted = new DefineList([ { id: 3 }, { id: 2 }, { id: 1 } ]);
 	var sorted = unSorted.slice(0).sort(function(a, b) {
-		return a.id > b.id ? 1 : a.id < b.id ? -1 : 0;
+		return a.id > b.id ? 1 : (a.id < b.id ? -1 : 0);
 	});
 	equal(unSorted[0], sorted[2], 'items should be equal');
 });
 
-test("list defines", 6, function(){
-    var Todo = function(props){
+test("list defines", 6, function() {
+	var Todo = function(props) {
         assign(this, props);
         CID(this);
     };
-    define(Todo.prototype,{
+	define(Todo.prototype, {
         completed: "boolean",
         destroyed: {
             value: false
         }
     });
-    Todo.prototype.destroy = function(){
+	Todo.prototype.destroy = function() {
         this.destroyed = true;
     };
 
@@ -461,12 +474,12 @@ test("list defines", 6, function(){
     	}
     });
 
-    var todos = new TodoList([{completed: true},{completed: false}]);
+	var todos = new TodoList([ { completed: true }, { completed: false } ]);
 
     ok(todos.item(0) instanceof Todo, "correct instance");
     equal(todos.completed.length, 1, "only one todo");
 
-    todos.on("completed", function(ev, newVal, oldVal){
+	todos.on("completed", function(ev, newVal, oldVal) {
         ok(newVal instanceof TodoList, "right type");
         equal(newVal.length, 2, "all items");
         ok(oldVal instanceof TodoList, "right type");
@@ -477,34 +490,34 @@ test("list defines", 6, function(){
 
 });
 
-QUnit.test("extending the base supports overwriting _eventSetup", function(){
+QUnit.test("extending the base supports overwriting _eventSetup", function() {
     var L = DefineList.extend({});
-    Object.getOwnPropertyDescriptor(DefineMap.prototype,"_eventSetup");
+	Object.getOwnPropertyDescriptor(DefineMap.prototype, "_eventSetup");
     L.prototype.arbitraryProp = true;
-    ok(true,"set arbitraryProp");
-    L.prototype._eventSetup = function(){};
+	ok(true, "set arbitraryProp");
+	L.prototype._eventSetup = function() {};
     ok(true, "worked");
 });
 
-QUnit.test("setting expandos on a DefineList", function(){
+QUnit.test("setting expandos on a DefineList", function() {
     var DL = DefineList.extend({
         count: "number"
     });
 
     var dl = new DL();
-    dl.set({count: 5, skip: 2});
+	dl.set({ count: 5, skip: 2 });
 
-    QUnit.equal( dl.get("count"), 5, "read with .get defined"); //-> 5
-    QUnit.equal( dl.count, 5, "read with . defined");
+	QUnit.equal(dl.get("count"), 5, "read with .get defined"); //-> 5
+	QUnit.equal(dl.count, 5, "read with . defined");
 
-    QUnit.equal( dl.get("skip"), 2, "read with .get expando");
-    QUnit.equal( dl.skip, 2, "read with . expando");
+	QUnit.equal(dl.get("skip"), 2, "read with .get expando");
+	QUnit.equal(dl.skip, 2, "read with . expando");
 
-    QUnit.equal( dl.get("limit"), undefined, "read with .get undefined");
+	QUnit.equal(dl.get("limit"), undefined, "read with .get undefined");
 });
 
-QUnit.test("passing a DefineList to DefineList (#33)", function(){
-    var m = new DefineList([{},{}]);
+QUnit.test("passing a DefineList to DefineList (#33)", function() {
+	var m = new DefineList([ {}, {} ]);
 
     var m2 = new DefineList(m);
     QUnit.deepEqual(m.get(), m2.get());
@@ -513,48 +526,48 @@ QUnit.test("passing a DefineList to DefineList (#33)", function(){
 
 });
 
-QUnit.test("reading and setting expandos", function(){
+QUnit.test("reading and setting expandos", function() {
     var list = new DefineList();
-    var countObservation = new Observation(function(){
+	var countObservation = new Observation(function() {
         return list.get("count");
-    }, null, function(newValue){
+	}, null, function(newValue) {
         QUnit.equal(newValue, 1000, "got new value");
     });
     countObservation.start();
 
-    list.set("count",1000);
+	list.set("count", 1000);
 
-    QUnit.equal( countObservation.value, 1000);
+	QUnit.equal(countObservation.value, 1000);
 
 
     var list2 = new DefineList();
-    list2.on("count", function(ev, newVal){
+	list2.on("count", function(ev, newVal) {
         QUnit.equal(newVal, 5);
     });
     list2.set("count", 5);
 });
 
-QUnit.test("is list like", function(){
+QUnit.test("is list like", function() {
     var list = new DefineList();
-    QUnit.ok( types.isListLike(list) );
+	QUnit.ok(types.isListLike(list));
 });
 
-QUnit.test("extending DefineList constructor functions (#61)", function(){
-  var AList = DefineList.extend('AList', { aProp: {}, aMethod: function(){} });
-  var BList = AList.extend('BList', { bProp: {}, bMethod: function(){} });
-  var CList = BList.extend('CList', { cProp: {}, cMethod: function(){} });
+QUnit.test("extending DefineList constructor functions (#61)", function() {
+	var AList = DefineList.extend('AList', { aProp: {}, aMethod: function() {} });
+	var BList = AList.extend('BList', { bProp: {}, bMethod: function() {} });
+	var CList = BList.extend('CList', { cProp: {}, cMethod: function() {} });
 
-  var list = new CList([{},{}]);
+	var list = new CList([ {}, {} ]);
 
-  list.on("aProp", function(ev, newVal, oldVal){
+	list.on("aProp", function(ev, newVal, oldVal) {
       QUnit.equal(newVal, "PROP");
       QUnit.equal(oldVal, undefined);
   });
-  list.on("bProp", function(ev, newVal, oldVal){
+	list.on("bProp", function(ev, newVal, oldVal) {
       QUnit.equal(newVal, "FOO");
       QUnit.equal(oldVal, undefined);
   });
-  list.on("cProp", function(ev, newVal, oldVal){
+	list.on("cProp", function(ev, newVal, oldVal) {
       QUnit.equal(newVal, "BAR");
       QUnit.equal(oldVal, undefined);
   });
@@ -568,30 +581,30 @@ QUnit.test("extending DefineList constructor functions (#61)", function(){
   QUnit.ok(list.cMethod);
 });
 
-QUnit.test("extending DefineList constructor functions more than once (#61)", function(){
-    var AList = DefineList.extend("AList", { aProp: {}, aMethod: function(){} });
+QUnit.test("extending DefineList constructor functions more than once (#61)", function() {
+	var AList = DefineList.extend("AList", { aProp: {}, aMethod: function() {} });
 
-    var BList = AList.extend("BList", { bProp: {}, bMethod: function(){} });
+	var BList = AList.extend("BList", { bProp: {}, bMethod: function() {} });
 
-    var CList = AList.extend("CList", { cProp: {}, cMethod: function(){} });
+	var CList = AList.extend("CList", { cProp: {}, cMethod: function() {} });
 
-    var list1 = new BList([{},{}]);
-    var list2 = new CList([{},{},{}]);
+	var list1 = new BList([ {}, {} ]);
+	var list2 = new CList([ {}, {}, {} ]);
 
-    list1.on("aProp", function(ev, newVal, oldVal){
+	list1.on("aProp", function(ev, newVal, oldVal) {
         QUnit.equal(newVal, "PROP", "aProp newVal on list1");
         QUnit.equal(oldVal, undefined);
     });
-    list1.on("bProp", function(ev, newVal, oldVal){
+	list1.on("bProp", function(ev, newVal, oldVal) {
         QUnit.equal(newVal, "FOO", "bProp newVal on list1");
         QUnit.equal(oldVal, undefined);
     });
 
-    list2.on("aProp", function(ev, newVal, oldVal){
+	list2.on("aProp", function(ev, newVal, oldVal) {
         QUnit.equal(newVal, "PROP", "aProp newVal on list2");
         QUnit.equal(oldVal, undefined);
     });
-    list2.on("cProp", function(ev, newVal, oldVal){
+	list2.on("cProp", function(ev, newVal, oldVal) {
         QUnit.equal(newVal, "BAR", "cProp newVal on list2");
         QUnit.equal(oldVal, undefined);
     });
@@ -606,18 +619,18 @@ QUnit.test("extending DefineList constructor functions more than once (#61)", fu
     QUnit.ok(list2.cMethod, "list2 cMethod");
 });
 
-QUnit.test("extending DefineList constructor functions - value (#61)", function(){
-    var AList = DefineList.extend("AList", { aProp: {value: 1} });
+QUnit.test("extending DefineList constructor functions - value (#61)", function() {
+	var AList = DefineList.extend("AList", { aProp: { value: 1 } });
 
     var BList = AList.extend("BList", { });
 
-    var CList = BList.extend("CList",{ });
+	var CList = BList.extend("CList", { });
 
     var c = new CList([]);
-    QUnit.equal( c.aProp , 1 ,"got initial value" );
+	QUnit.equal(c.aProp, 1, "got initial value");
 });
 
-QUnit.test("'*' inheritance works (#61)", function(){
+QUnit.test("'*' inheritance works (#61)", function() {
     var Account = DefineMap.extend({
         name: "string",
         amount: "number",
@@ -635,13 +648,13 @@ QUnit.test("'*' inheritance works (#61)", function(){
 
     var ExtendedList = BaseList.extend({});
 
-    var xl = new ExtendedList([{}]);
+	var xl = new ExtendedList([ {} ]);
 
     QUnit.ok(xl[0] instanceof Account);
 
 });
 
-QUnit.test("shorthand getter setter (#56)", function(){
+QUnit.test("shorthand getter setter (#56)", function() {
 
     var People = DefineList.extend({
 		first: "*",
@@ -649,7 +662,7 @@ QUnit.test("shorthand getter setter (#56)", function(){
 		get fullName() {
 			return this.first + " " + this.last;
 		},
-		set fullName(newVal){
+		set fullName(newVal) {
 			var parts = newVal.split(" ");
 			this.first = parts[0];
 			this.last = parts[1];
@@ -680,14 +693,14 @@ QUnit.test("added and removed are called after items are added/removed (#14)", f
 
 	var People = DefineList.extend({
 		"#": {
-			added: function(items, index){
+			added: function(items, index) {
 				addedFuncCalled = true;
 				ok(items, "items added got passed to added");
 				ok(typeof index === 'number', "index of items was passed to added and is a number");
 				ok(items[0].name === 'John', "Name was correct");
 				theList = this;
 			},
-			removed: function(items, index){
+			removed: function(items, index) {
 				removedFuncCalled = true;
 				ok(items, "items added got passed to removed");
 				ok(typeof index === 'number', "index of items was passed to removed and is a number");
@@ -719,20 +732,20 @@ QUnit.test("added and removed are called after items are added/removed (#14)", f
 		"the list was passed correctly as this to removed");
 });
 
-QUnit.test("* vs # (#78)", function(){
+QUnit.test("* vs # (#78)", function() {
 
     var MyList = DefineList.extend({
         "*": "number",
         "#": {
-            added: function(){
+			added: function() {
                 ok(true, "called on init");
             },
-            removed: function(){},
+			removed: function() {},
             type: "string"
         }
     });
 
-    var list = new MyList([1,2,3]);
+	var list = new MyList([ 1, 2, 3 ]);
 
     QUnit.ok(list[0] === "1", "converted to string");
     list.set("prop", "4");
@@ -740,16 +753,44 @@ QUnit.test("* vs # (#78)", function(){
 
 });
 
-QUnit.test("Array shorthand uses #", function(){
+QUnit.test("Array shorthand uses #", function() {
     var MyMap = DefineMap.extend({
-        "numbers": ["number"]
+		"numbers": [ "number" ]
     });
 
-    var map = new MyMap({numbers: ["1","2"]});
+	var map = new MyMap({ numbers: [ "1", "2" ] });
     QUnit.ok(map.numbers[0] === 1, "converted to number");
 
     map.numbers.set("prop", "4");
     QUnit.ok(map.numbers.prop === "4", "type left alone");
+});
+
+test("replace-with-self lists are diffed properly (can-view-live#10)", function() {
+	var a = new DefineMap({ name: "A" });
+	var b = new DefineMap({ name: "B" });
+	var c = new DefineMap({ name: "C" });
+	var d = new DefineMap({ name: "D" });
+	expect(4);
+
+	var list1 = new DefineList([ a, b ]);
+	list1.on("add", function(ev, newVals, where) {
+		throw new Error("list1 should not add.");
+	});
+	list1.on("remove", function(ev, oldVals, where) {
+		throw new Error("list1 should not remove.");
+	});
+	list1.replace([ a, b ]);
+
+	var list2 = new DefineList([ a, b, c ]);
+	list2.on("add", function(ev, newVals, where) {
+		equal(newVals.length, 1, "list2 added length");
+		equal(where, 2, "list2 added location");
+	});
+	list2.on("remove", function(ev, oldVals, where) {
+		equal(oldVals.length, 1, "list2 removed length");
+		equal(where, 2, "list2 removed location");
+	});
+	list2.replace([ a, b, d ]);
 });
 
 test("compute(defineMap, 'property.names') works (#20)", function(){
@@ -772,4 +813,91 @@ test("compute(DefineList, 0) works (#17)", function(assert){
 		assert.equal(newVal, 5);
 	});
 	list.set(0, 5);
+});
+
+test("works with can-reflect", 13, function(){
+	var a = new DefineMap({ foo: 4 });
+	var b = new DefineList([ "foo", "bar" ]);
+	var c;
+	QUnit.equal( canReflect.getKeyValue(b, "0"), "foo", "unbound value");
+
+	var handler = function(newValue){
+		QUnit.equal(newValue, "quux", "observed new value");
+	};
+	QUnit.ok(!canReflect.isValueLike(b), "isValueLike is false");
+	QUnit.ok(canReflect.isMapLike(b), "isMapLike is true");
+	QUnit.ok(canReflect.isListLike(b), "isListLike is false");
+
+	QUnit.ok( !canReflect.keyHasDependencies(b, "length"), "keyHasDependencies -- false");
+
+	define(c = Object.create(b), {
+		length: {
+			get: function() {
+				return a.foo;
+			}
+		}
+	});
+
+	QUnit.ok(canReflect.getKeyDependencies(c, "length"), "dependencies exist");
+	QUnit.ok(
+		canReflect.getKeyDependencies(c, "length").valueDependencies.has(c._computed.length.compute),
+		"dependencies returned"
+	);
+
+	canReflect.onKeysAdded(b, handler);
+	canReflect.onKeysRemoved(b, handler);
+	QUnit.ok(b.__bindEvents.add, "add handler added");
+	QUnit.ok(b.__bindEvents.remove, "remove handler added");
+
+	b.push("quux");
+	c.push("quux");
+	QUnit.equal( canReflect.getKeyValue(c, "length"), "4", "bound value");
+	b.pop();
+
+});
+
+QUnit.test("can-reflect setKeyValue", function(){
+	var a = new DefineMap({ "a": "b" });
+
+	canReflect.setKeyValue(a, "a", "c");
+	QUnit.equal(a.a, "c", "setKeyValue");
+});
+
+QUnit.test("can-reflect getKeyDependencies", function() { 
+	var a = new DefineMap({ foo: 4 });
+	var b = new DefineList([ "foo", "bar" ]);
+	var c;
+
+	ok(!canReflect.getKeyDependencies(b, "length"), "No dependencies before binding");
+
+	define(c = Object.create(b), {
+		length: {
+			get: function() {
+				return a.foo;
+			}
+		}
+	});
+
+	ok(canReflect.getKeyDependencies(c, "length"), "dependencies exist");
+	ok(canReflect.getKeyDependencies(c, "length").valueDependencies.has(c._computed.length.compute), "dependencies returned");
+
+});
+
+QUnit.test("registered symbols", function() { 
+	var a = new DefineMap({ "a": "a" });
+
+	ok(a[canSymbol.for("can.isMapLike")], "can.isMapLike");
+	equal(a[canSymbol.for("can.getKeyValue")]("a"), "a", "can.getKeyValue");
+	a[canSymbol.for("can.setKeyValue")]("a", "b");
+	equal(a.a, "b", "can.setKeyValue");
+
+	function handler(val) {
+		equal(val, "c", "can.onKeyValue");
+	}
+
+	a[canSymbol.for("can.onKeyValue")]("a", handler);
+	a.a = "c";
+
+	a[canSymbol.for("can.offKeyValue")]("a", handler);
+	a.a = "d"; // doesn't trigger handler
 });

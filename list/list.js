@@ -9,11 +9,14 @@ var canLog = require("can-util/js/log/log");
 var defineHelpers = require("../define-helpers/define-helpers");
 
 var assign = require("can-util/js/assign/assign");
+var diff = require("can-util/js/diff/diff");
 var each = require("can-util/js/each/each");
-var isArray = require("can-util/js/is-array/is-array");
 var makeArray = require("can-util/js/make-array/make-array");
 var types = require("can-types");
 var ns = require("can-namespace");
+var canReflect = require("can-reflect");
+var canSymbol = require("can-symbol");
+var CIDSet = require("can-util/js/cid-set/cid-set");
 
 var splice = [].splice;
 
@@ -71,7 +74,7 @@ var DefineList = Construct.extend("DefineList",
 			define.setup.call(this, {}, false);
 			this._length = 0;
 			if (items) {
-				this.splice.apply(this, [0, 0].concat(defineHelpers.toObject(this, items, [], DefineList)));
+				this.splice.apply(this, [ 0, 0 ].concat(defineHelpers.toObject(this, items, [], DefineList)));
 			}
 		},
 		__type: define.types.observable,
@@ -90,22 +93,22 @@ var DefineList = Construct.extend("DefineList",
 					if (itemsDefinition && typeof itemsDefinition.added === 'function') {
 						Observation.ignore(itemsDefinition.added).call(this, newVal, index);
 					}
-					canEvent.dispatch.call(this, how, [newVal, index]);
-					canEvent.dispatch.call(this, 'length', [this._length]);
+					canEvent.dispatch.call(this, how, [ newVal, index ]);
+					canEvent.dispatch.call(this, 'length', [ this._length ]);
 				} else if (how === 'remove') {
 					if (itemsDefinition && typeof itemsDefinition.removed === 'function') {
 						Observation.ignore(itemsDefinition.removed).call(this, oldVal, index);
 					}
-					canEvent.dispatch.call(this, how, [oldVal, index]);
-					canEvent.dispatch.call(this, 'length', [this._length]);
+					canEvent.dispatch.call(this, how, [ oldVal, index ]);
+					canEvent.dispatch.call(this, 'length', [ this._length ]);
 				} else {
-					canEvent.dispatch.call(this, how, [newVal, index]);
+					canEvent.dispatch.call(this, how, [ newVal, index ]);
 				}
 			} else {
 				canEvent.dispatch.call(this, {
 					type: "" + attr,
 					target: this
-				}, [newVal, oldVal]);
+				}, [ newVal, oldVal ]);
 			}
 
 			canBatch.stop();
@@ -121,7 +124,8 @@ var DefineList = Construct.extend("DefineList",
 		 * Returns the list converted into a plain JS array. Any items that also have a
 		 * `get` method will have their `get` method called and the resulting value will be used as item value.
 		 *
-		 * This can be used to recursively convert a list instance to an Array of other plain JavaScript objects. Cycles are supported and only create one object.
+		 * This can be used to recursively convert a list instance to an Array of other plain JavaScript objects.
+		 * Cycles are supported and only create one object.
 		 *
 		 * `get()` can still return other non-plain JS objects like Dates.
 		 * Use [can-define/map/map.prototype.serialize] when a form proper for `JSON.stringify` is needed.
@@ -259,15 +263,15 @@ var DefineList = Construct.extend("DefineList",
 			}
 			// otherwise we are setting multiple
 			else {
-				if (isArray(prop)) {
+				if (canReflect.isListLike(prop)) {
 					if (value) {
 						this.replace(prop);
 					} else {
-						this.splice.apply(this, [0, prop.length].concat(prop));
+						this.splice.apply(this, [ 0, prop.length ].concat(prop));
 					}
 				} else {
-					each(prop, function(value, prop) {
-						this.set(prop, value);
+					canReflect.eachKey(prop, function(value, prop) {
+						canReflect.setKeyValue(this, prop, value);
 					}, this);
 				}
 			}
@@ -285,7 +289,7 @@ var DefineList = Construct.extend("DefineList",
 				callback(this[i], i);
 			}
 		},
-		//
+
 		/**
 		 * @function can-define/list/list.prototype.splice splice
 		 * @parent can-define/list/list.prototype
@@ -374,6 +378,7 @@ var DefineList = Construct.extend("DefineList",
 			canBatch.stop();
 			return removed;
 		},
+
 		/**
 		 * @function can-define/list/list.prototype.serialize serialize
 		 * @parent can-define/list/list.prototype
@@ -461,7 +466,7 @@ each({
 		 * `push` has a counterpart in [can-define/list/list::pop pop], or you may be
 		 * looking for [can-define/list/list::unshift unshift] and its counterpart [can-define/list/list::shift shift].
 		 */
-		push: "length",
+	push: "length",
 		/**
 		 * @function can-define/list/list.prototype.unshift unshift
 		 * @description Add items to the beginning of a DefineList.
@@ -506,8 +511,8 @@ each({
 		 * `unshift` has a counterpart in [can-define/list/list::shift shift], or you may be
 		 * looking for [can-define/list/list::push push] and its counterpart [can-define/list/list::pop pop].
 		 */
-		unshift: 0
-	},
+	unshift: 0
+},
 	// Adds a method
 	// `name` - The method name.
 	// `where` - Where items in the `array` should be added.
@@ -579,7 +584,7 @@ each({
 		 * `pop` has its counterpart in [can-define/list/list::push push], or you may be
 		 * looking for [can-define/list/list::unshift unshift] and its counterpart [can-define/list/list::shift shift].
 		 */
-		pop: "length",
+	pop: "length",
 		/**
 		 * @function can-define/list/list.prototype.shift shift
 		 * @description Remove an item from the front of a list.
@@ -612,8 +617,8 @@ each({
 		 * `shift` has a counterpart in [can-define/list/list::unshift unshift], or you may be
 		 * looking for [can-define/list/list::push push] and its counterpart [can-define/list/list::pop pop].
 		 */
-		shift: 0
-	},
+	shift: 0
+},
 	// Creates a `remove` type method
 	function(where, name) {
 		DefineList.prototype[name] = function() {
@@ -633,7 +638,7 @@ each({
 			// `remove` - Items removed.
 			// `undefined` - The new values (there are none).
 			// `res` - The old, removed values (should these be unbound).
-			this._triggerChange("" + len, "remove", undefined, [res]);
+			this._triggerChange("" + len, "remove", undefined, [ res ]);
 
 			return res;
 		};
@@ -794,11 +799,11 @@ assign(DefineList.prototype, {
 		// Go through each of the passed `arguments` and
 		// see if it is list-like, an array, or something else
 		each(arguments, function(arg) {
-			if (types.isListLike(arg) || Array.isArray(arg)) {
+			if (canReflect.isListLike(arg)) {
 				// If it is list-like we want convert to a JS array then
 				// pass each item of the array to this.__type
-				var arr = types.isListLike(arg) ? makeArray(arg) : arg;
-				each(arr, function(innerArg) {
+				var arr = Array.isArray(arg) ? arg : makeArray(arg);
+				arr.forEach(function(innerArg) {
 					args.push(this.__type(innerArg));
 				}, this);
 			} else {
@@ -889,9 +894,20 @@ assign(DefineList.prototype, {
 	 * `replace` causes _remove_, _add_, and _length_ events.
 	 */
 	replace: function(newList) {
-		this.splice.apply(this, [0, this._length].concat(makeArray(newList || [])));
+		var patches = diff(this, newList);
+
+		canBatch.start();
+		for (var i = 0, len = patches.length; i < len; i++) {
+			this.splice.apply(this, [
+				patches[i].index,
+				patches[i].deleteCount
+			].concat(patches[i].insert));
+		}
+		canBatch.stop();
+
 		return this;
 	},
+
 	/**
 	 * @function can-define/list/list.prototype.filter filter
 	 *
@@ -903,7 +919,7 @@ assign(DefineList.prototype, {
 	 *
 	 * ```
 	 * var names = new DefineList(["alice","adam","zack","zeffer"]);
-	 * var aNames = list.filter(function(name){
+	 * var aNames = names.filter(function(name){
 	 *   return name[0] === "a"
 	 * });
 	 * aNames //-> DefineList["alice","adam"]
@@ -953,6 +969,7 @@ assign(DefineList.prototype, {
 		});
 		return new this.constructor(filteredList);
 	},
+
 	/**
 	 * @function can-define/list/list.prototype.map map
 	 * @description Map the values in this list to another list.
@@ -994,8 +1011,9 @@ assign(DefineList.prototype, {
 			mappedList.push(mapped);
 
 		});
-		return new this.constructor(mappedList);
+		return new DefineList(mappedList);
 	},
+
 	/**
 	 * @function can-define/list/list.prototype.sort sort
 	 * @description Sort the properties of a list.
@@ -1046,14 +1064,13 @@ assign(DefineList.prototype, {
 		var added = Array.prototype.slice.call(this);
 
 		canBatch.start();
-		canEvent.dispatch.call(this, 'remove', [removed, 0]);
-		canEvent.dispatch.call(this, 'add', [added, 0]);
-		canEvent.dispatch.call(this, 'length', [this._length, this._length]);
+		canEvent.dispatch.call(this, 'remove', [ removed, 0 ]);
+		canEvent.dispatch.call(this, 'add', [ added, 0 ]);
+		canEvent.dispatch.call(this, 'length', [ this._length, this._length ]);
 		canBatch.stop();
 		return this;
 	}
 });
-
 
 
 // Add necessary event methods to this object.
@@ -1063,6 +1080,17 @@ for (var prop in define.eventsProto) {
 		enumerable: false,
 		value: define.eventsProto[prop],
 		writable: true
+	});
+}
+// @@can.onKeyValue and @@can.offKeyValue are also on define.eventsProto
+//  but symbols are not enuerated in for...in loops
+if("getOwnPropertySymbols" in Object) {
+	Object.getOwnPropertySymbols(define.eventsProto).forEach(function(sym) {
+		Object.defineProperty(DefineList.prototype, sym, {
+			enumerable:false,
+			value: define.eventsProto[sym],
+			writable: true
+		});
 	});
 }
 
@@ -1107,6 +1135,44 @@ DefineList.prototype.item = function(index, value) {
 DefineList.prototype.items = function() {
 	canLog.warn("DefineList::get should should be used instead of DefineList::items");
 	return this.get();
+};
+
+DefineList.prototype[canSymbol.for("can.getKeyValue")] = DefineList.prototype.get;
+DefineList.prototype[canSymbol.for("can.setKeyValue")] = DefineList.prototype.set;
+DefineList.prototype[canSymbol.for("can.getValue")] = DefineList.prototype.get;
+DefineList.prototype[canSymbol.for("can.setValue")] = DefineList.prototype.replace;
+DefineList.prototype[canSymbol.for("can.isMapLike")] = true;
+DefineList.prototype[canSymbol.for("can.isListLike")] = true;
+DefineList.prototype[canSymbol.for("can.isValueLike")] = false;
+DefineList.prototype[canSymbol.iterator] = function() {
+	var index = -1;
+	return {
+		next: function() {
+			index++;
+			return {
+				value: this[index],
+				done: index >= this.length
+			};
+		}.bind(this)
+	};
+};
+DefineList.prototype[canSymbol.for("can.keyHasDependencies")] = function(key) {
+	return !!(this._computed && this._computed[key] && this._computed[key].compute);
+};
+DefineList.prototype[canSymbol.for("can.getKeyDependencies")] = function(key) {
+	var ret;
+	if(this._computed && this._computed[key] && this._computed[key].compute) {
+		ret = {};
+		ret.valueDependencies = new CIDSet();
+		ret.valueDependencies.add(this._computed[key].compute);
+	}
+	return ret;
+};
+DefineList.prototype[canSymbol.for("can.onKeysAdded")] = function(handler) {
+	this[canSymbol.for("can.onKeyValue")]("add", handler);
+};
+DefineList.prototype[canSymbol.for("can.onKeysRemoved")] = function(handler) {
+	this[canSymbol.for("can.onKeyValue")]("remove", handler);
 };
 
 types.DefineList = DefineList;

@@ -4,6 +4,9 @@ var DefineMap = require("can-define/map/map");
 var Observation = require("can-observation");
 var canTypes = require("can-types");
 var each = require("can-util/js/each/each");
+var compute = require("can-compute");
+var assign = require("can-util/js/assign/assign");
+var canReflect = require("can-reflect");
 var sealWorks = (function() {
 	try {
 		var o = {};
@@ -31,7 +34,7 @@ QUnit.test("creating an instance", function(){
         QUnit.equal(oldVal, "foo");
     });
 
-    map.prop ="BAR";
+    map.prop = "BAR";
 });
 
 QUnit.test("creating an instance with nested prop", function(){
@@ -43,7 +46,7 @@ QUnit.test("creating an instance with nested prop", function(){
         QUnit.equal(oldVal, "Justin");
     });
 
-    map.name.first ="David";
+    map.name.first = "David";
 });
 
 
@@ -173,7 +176,7 @@ QUnit.test("get with dynamically added properties", function(){
     var map = new DefineMap();
     map.set("a",1);
     map.set("b",2);
-    QUnit.deepEqual(map.get(), {a: 1, b:2});
+    QUnit.deepEqual(map.get(), {a: 1, b: 2});
 });
 
 
@@ -181,7 +184,7 @@ QUnit.test("set multiple props", function(){
     var map = new DefineMap();
     map.set({a: 0, b: 2});
 
-    QUnit.deepEqual(map.get(), {a: 0, b:2});
+    QUnit.deepEqual(map.get(), {a: 0, b: 2});
 
     map.set({a: 2}, true);
 
@@ -208,7 +211,7 @@ QUnit.test("serialize responds to added props", function(){
 
 QUnit.test("initialize an undefined property", function(){
     var MyMap = DefineMap.extend({seal: false},{});
-    var instance = new MyMap({foo:"bar"});
+    var instance = new MyMap({foo: "bar"});
 
     equal(instance.foo, "bar");
 });
@@ -282,7 +285,7 @@ QUnit.test("serialize: function works (#38)", function(){
     var MyMap2 = DefineMap.extend({
         "*": {
             serialize: function(value){
-                return ""+value;
+                return "" + value;
             }
         }
     });
@@ -428,6 +431,88 @@ QUnit.test("extending DefineMap constructor functions - value (#18)", function()
     QUnit.equal( c.aProp , 1 ,"got initial value" );
 });
 
+QUnit.test("copying DefineMap excludes constructor", function() {
+
+	var AType = DefineMap.extend("AType", { aProp: {value: 1} });
+
+	var a = new AType();
+
+	var b = assign({}, a);
+
+	QUnit.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
+	QUnit.equal(a.aProp, b.aProp, "Other values are unaffected");
+
+});
+
+QUnit.test("cloning from non-defined map excludes special keys on setup", function() {
+
+	var a = {
+		_data: {},
+		constructor: function() {},
+		_bindEvents: {},
+		_cid: "object0",
+		"foo": "bar"
+	};
+
+	var b = new DefineMap(a);
+
+	QUnit.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
+	QUnit.notEqual(a._data, b._data, "_data prop not copied");
+	QUnit.notEqual(a._bindEvents, b._bindEvents, "_bindEvents prop not copied");
+	QUnit.notEqual(a._cid, b._cid, "_cid prop not copied");
+	QUnit.equal(a.foo, b.foo, "Other props copied");
+
+});
+
+QUnit.test("copying from .set() excludes special keys", function() {
+
+	var a = {
+		_data: {},
+		constructor: function() {},
+		_bindEvents: {},
+		_cid: "object0",
+		"foo": "bar",
+		"existing": "newVal"
+	};
+
+	var b = new DefineMap({
+		"existing": "oldVal"
+	});
+	b.set(a);
+
+	QUnit.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
+	QUnit.notEqual(a._data, b._data, "_data prop not copied");
+	QUnit.notEqual(a._bindEvents, b._bindEvents, "_bindEvents prop not copied");
+	QUnit.notEqual(a._cid, b._cid, "_cid prop not copied");
+	QUnit.equal(a.foo, b.foo, "NEw props copied");
+
+});
+
+QUnit.test("copying with assign() excludes special keys", function() {
+
+	var a = {
+		_data: {},
+		constructor: function() {},
+		__bindEvents: {},
+		_cid: "object0",
+		"foo": "bar",
+		"existing": "newVal"
+	};
+
+	var b = new DefineMap({
+		"existing": "oldVal"
+	});
+	assign(b, a);
+
+	QUnit.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
+	QUnit.notEqual(a._data, b._data, "_data prop not copied");
+	QUnit.notEqual(a.__bindEvents, b.__bindEvents, "_bindEvents prop not copied");
+	QUnit.notEqual(a._cid, b._cid, "_cid prop not copied");
+	QUnit.equal(a.foo, b.foo, "New props copied");
+	QUnit.equal(a.existing, b.existing, "Existing props copied");
+	
+});
+
 QUnit.test("shorthand getter setter (#56)", function(){
 
     var Person = DefineMap.extend({
@@ -533,4 +618,98 @@ QUnit.test(".extend errors when re-defining a property (#117)", function(){
 	    }
 	});
 	QUnit.ok(true, "extended without errors");
+});
+
+QUnit.test(".value functions should not be observable", function(){
+	var outer = new DefineMap({
+		bam: "baz"
+	});
+	
+	var ItemsVM = DefineMap.extend({
+		item: {
+			value: function(){
+				(function(){})(this.zed, outer.bam);
+				return new DefineMap({ foo: "bar" });
+			}
+		},
+		zed: "string"
+	});
+	
+	var items = new ItemsVM();
+	
+	var count = 0;
+	var itemsList = compute(function(){
+		count++;
+		return items.item;
+	});
+	
+	itemsList.on('change', function() {});
+	
+	items.item.foo = "changed";
+	items.zed = "changed";
+	
+	equal(count, 1);
+});
+
+QUnit.test("can-reflect reflections work with DefineMap", function() {
+	var b = new DefineMap({ "foo": "bar" });
+	var c = new (DefineMap.extend({
+		"baz": {
+			get: function() {
+				return b.foo;
+			}
+		}
+	}))({ "foo": "bar", thud: "baz" });
+
+	QUnit.equal( canReflect.getKeyValue(b, "foo"), "bar", "unbound value");
+
+	var handler = function(newValue){
+		QUnit.equal(newValue, "quux", "observed new value");
+
+		// Turn off the "foo" handler but "thud" should still be bound.
+		canReflect.offKeyValue(c, "baz", handler);
+	};
+	QUnit.ok(!canReflect.isValueLike(c), "isValueLike is false");
+	QUnit.ok(canReflect.isMapLike(c), "isMapLike is true");
+	QUnit.ok(!canReflect.isListLike(c), "isListLike is false");
+
+	QUnit.ok( !canReflect.keyHasDependencies(b, "foo"), "keyHasDependencies -- false");
+
+	canReflect.onKeyValue(c, "baz", handler);
+	// Do a second binding to check that you can unbind correctly.
+	canReflect.onKeyValue(c, "thud", handler);
+	QUnit.ok( canReflect.keyHasDependencies(c, "baz"), "keyHasDependencies -- true");
+
+	b.foo = "quux";
+	c.thud = "quux";
+
+	QUnit.equal( canReflect.getKeyValue(c, "baz"), "quux", "bound value");
+	// sanity checks to ensure that handler doesn't get called again.
+	b.foo = "thud";
+	c.baz = "jeek";
+
+});
+
+QUnit.test("can-reflect setKeyValue", function(){
+	var a = new DefineMap({ "a": "b" });
+
+	canReflect.setKeyValue(a, "a", "c");
+	QUnit.equal(a.a, "c", "setKeyValue");
+});
+
+QUnit.test("can-reflect getKeyDependencies", function() { 
+	var a = new DefineMap({ "a": "a" });
+	var b = new (DefineMap.extend({
+		"a": {
+			get: function() {
+				return a.a;
+			}
+		}
+	}))();
+
+	// DefineMaps bind automatically without events, so this is already running.
+	ok(canReflect.getKeyDependencies(b, "a"), "dependencies exist");
+	ok(!canReflect.getKeyDependencies(b, "b"), "no dependencies exist for unknown value");
+	ok(canReflect.getKeyDependencies(b, "a").valueDependencies.has(b._computed.a.compute), "dependencies returned");
+
 });
