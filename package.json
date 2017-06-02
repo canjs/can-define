@@ -37,8 +37,8 @@
     "can-event": "^3.3.0",
     "can-namespace": "^1.0.0",
     "can-observation": "^3.2.0-pre.8",
-    "can-reflect": "0.0.3",
-    "can-symbol": "0.0.3",
+    "can-reflect": "^1.0.0-pre.1",
+    "can-symbol": "^1.0.0-pre.0",
     "can-types": "^1.0.1",
     "can-util": "^3.5.1"
   },
