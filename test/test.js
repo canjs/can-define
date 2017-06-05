@@ -67,7 +67,7 @@ QUnit.test("default 'observable' type prevents Type from working (#29)", functio
     });
 
     QUnit.ok( m.l[0] instanceof M, "is instance" );
-    QUnit.ok(m.l[0].id, 5, "correct props");
+    QUnit.ok(m.l[0].id, "5", "correct props");
 });
 
 QUnit.test("inline DefineList Type", function(){
@@ -84,7 +84,7 @@ QUnit.test("inline DefineList Type", function(){
     });
 
     QUnit.ok( m.l[0] instanceof M, "is instance" );
-    QUnit.ok(m.l[0].id, 5, "correct props");
+    QUnit.ok(m.l[0].id, "5", "correct props");
 });
 
 QUnit.test("recursively `get`s (#31)", function(){
