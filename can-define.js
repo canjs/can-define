@@ -22,9 +22,7 @@ var stringToAny = require("can-util/js/string-to-any/string-to-any");
 var ns = require("can-namespace");
 var canSymbol = require("can-symbol");
 var canReflect = require("can-reflect");
-// TODO update this to use 'can-util/js/single-reference/single-reference' once the canReflect
-//   updates from can-compute/single-reference are merged into it.
-var singleReference = require('can-compute/single-reference');
+var singleReference = require("can-util/js/single-reference/single-reference");
 
 var eventsProto, define,
 	make, makeDefinition, replaceWith, getDefinitionsAndMethods,
