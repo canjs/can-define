@@ -337,11 +337,19 @@ if("getOwnPropertySymbols" in Object) {
 types.DefineMap = DefineMap;
 types.DefaultMap = DefineMap;
 
-DefineMap.prototype.toObject = function(){
-	canLog.warn("Use DefineMap::get instead of DefineMap::toObject");
-	return this.get();
-};
-DefineMap.prototype.each = DefineMap.prototype.forEach;
+Object.defineProperty(DefineMap.prototype, "toObject", {
+	enumerable: false,
+	writable: true,
+	value: function(){
+		canLog.warn("Use DefineMap::get instead of DefineMap::toObject");
+		return this.get();
+	}
+});
+Object.defineProperty(DefineMap.prototype, "each", {
+	enumerable: false,
+	writable: true,
+	value: DefineMap.prototype.forEach
+});
 
 var oldIsMapLike = types.isMapLike;
 types.isMapLike = function(obj){

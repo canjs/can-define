@@ -1354,7 +1354,11 @@ types.isListLike = function(obj) {
 	return obj instanceof DefineList || oldIsListLike.apply(this, arguments);
 };
 
-DefineList.prototype.each = DefineList.prototype.forEach;
+Object.defineProperty(DefineList.prototype, "each", {
+	enumerable: false,
+	writable: true,
+	value: DefineList.prototype.forEach
+});
 DefineList.prototype.attr = function(prop, value) {
 	canLog.warn("DefineMap::attr shouldn't be called");
 	if (arguments.length === 0) {
