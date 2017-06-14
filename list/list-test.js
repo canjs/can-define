@@ -375,7 +375,7 @@ test('list.map', function() {
 	try {
 		newExtendedList.testMe();
 	} catch(err) {
-		QUnit.ok(err.message.match(/testMe/));
+		QUnit.ok(err.message.match(/testMe/), 'Does not return the same type of list.');
 	}
 });
 
