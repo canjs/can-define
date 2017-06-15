@@ -10,7 +10,6 @@ var canSymbol = require("can-symbol");
 
 var assign = require("can-util/js/assign/assign");
 var CID = require("can-cid");
-var types = require("can-types");
 QUnit.module("can-define/list/list");
 
 QUnit.test("List is an event emitter", function(assert) {
@@ -545,11 +544,6 @@ QUnit.test("reading and setting expandos", function() {
         QUnit.equal(newVal, 5);
     });
     list2.set("count", 5);
-});
-
-QUnit.test("is list like", function() {
-    var list = new DefineList();
-	QUnit.ok(types.isListLike(list));
 });
 
 QUnit.test("extending DefineList constructor functions (#61)", function() {

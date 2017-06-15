@@ -142,8 +142,9 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 
 	// Places Symbol.iterator or @@iterator on the prototype
 	// so that this can be iterated with for/of and can-util/js/each/each
-	if(!objPrototype[types.iterator]) {
-		defineConfigurableAndNotEnumerable(objPrototype, types.iterator, function(){
+	var iteratorSymbol = canSymbol.iterator || canSymbol.for("iterator");
+	if(!objPrototype[iteratorSymbol]) {
+		defineConfigurableAndNotEnumerable(objPrototype, iteratorSymbol, function(){
 			return new define.Iterator(this);
 		});
 	}
@@ -634,7 +635,7 @@ getDefinitionOrMethod = function(prop, value, defaultDefinition){
 		definition = {type: value};
 	}
 	else if(typeof value === "function") {
-		if(types.isConstructor(value)) {
+		if(canReflect.isConstructorLike(value)) {
 			definition = {Type: value};
 		} else if(isDefineType(value)) {
 			definition = {type: value};

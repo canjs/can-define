@@ -1349,11 +1349,6 @@ Object.defineProperty(DefineList.prototype, "length", {
 	enumerable: true
 });
 
-var oldIsListLike = types.isListLike;
-types.isListLike = function(obj) {
-	return obj instanceof DefineList || oldIsListLike.apply(this, arguments);
-};
-
 Object.defineProperty(DefineList.prototype, "each", {
 	enumerable: false,
 	writable: true,

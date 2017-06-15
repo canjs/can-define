@@ -5,7 +5,7 @@ var CanList = require("can-define/list/list");
 var canBatch = require("can-event/batch/batch");
 var isArray = require("can-util/js/is-array/is-array");
 var each = require("can-util/js/each/each");
-var types = require("can-types");
+var canSymbol = require("can-symbol");
 
 QUnit.module("can-define");
 
@@ -1143,10 +1143,10 @@ QUnit.test("Properties are enumerable", function() {
 	});
 });
 
-QUnit.test("Doesn't override types.iterator if already on the prototype", function() {
+QUnit.test("Doesn't override canSymbol.iterator if already on the prototype", function() {
 	function MyMap() {}
 
-	MyMap.prototype[types.iterator] = function() {
+	MyMap.prototype[canSymbol.iterator || canSymbol.for("iterator")] = function() {
 		var i = 0;
 		return {
 			next: function() {

@@ -351,9 +351,4 @@ Object.defineProperty(DefineMap.prototype, "each", {
 	value: DefineMap.prototype.forEach
 });
 
-var oldIsMapLike = types.isMapLike;
-types.isMapLike = function(obj){
-	return obj instanceof DefineMap || oldIsMapLike.apply(this, arguments);
-};
-
 module.exports = ns.DefineMap = DefineMap;
