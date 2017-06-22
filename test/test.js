@@ -13,6 +13,7 @@ QUnit.module("can-define: map and list combined");
 
 QUnit.test("basics", function(){
     var items = new DefineMap({ people: [{name: "Justin"},{name: "Brian"}], count: 1000 });
+
     QUnit.ok(items.people instanceof types.DefineList, "people is list");
     QUnit.ok(items.people.item(0) instanceof types.DefineMap, "1st object is Map");
     QUnit.ok(items.people.item(1) instanceof types.DefineMap, "2nd object is Map");
@@ -67,7 +68,7 @@ QUnit.test("default 'observable' type prevents Type from working (#29)", functio
     });
 
     QUnit.ok( m.l[0] instanceof M, "is instance" );
-    QUnit.ok(m.l[0].id, 5, "correct props");
+    QUnit.equal(m.l[0].id, 5, "correct props");
 });
 
 QUnit.test("inline DefineList Type", function(){
@@ -84,7 +85,7 @@ QUnit.test("inline DefineList Type", function(){
     });
 
     QUnit.ok( m.l[0] instanceof M, "is instance" );
-    QUnit.ok(m.l[0].id, 5, "correct props");
+    QUnit.equal(m.l[0].id, 5, "correct props");
 });
 
 QUnit.test("recursively `get`s (#31)", function(){
