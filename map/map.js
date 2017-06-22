@@ -323,16 +323,18 @@ for(var prop in define.eventsProto) {
 	});
 }
 // @@can.onKeyValue and @@can.offKeyValue are also on define.eventsProto
-//  but symbols are not enuerated in for...in loops
-if("getOwnPropertySymbols" in Object) {
-	Object.getOwnPropertySymbols(define.eventsProto).forEach(function(sym) {
-		Object.defineProperty(DefineMap.prototype, sym, {
-			enumerable:false,
-			value: define.eventsProto[sym],
-			writable: true
-		});
-	});
-}
+//  but symbols are not enumerated in for...in loops
+var eventsProtoSymbols = ("getOwnPropertySymbols" in Object) ?
+  Object.getOwnPropertySymbols(define.eventsProto) :
+  [canSymbol.for("can.onKeyValue"), canSymbol.for("can.offKeyValue")];
+
+eventsProtoSymbols.forEach(function(sym) {
+  Object.defineProperty(DefineMap.prototype, sym, {
+    enumerable:false,
+    value: define.eventsProto[sym],
+    writable: true
+  });
+});
 
 types.DefineMap = DefineMap;
 types.DefaultMap = DefineMap;

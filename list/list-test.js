@@ -1031,7 +1031,7 @@ test("compute(DefineList, 0) works (#17)", function(assert){
 	list.set(0, 5);
 });
 
-test("works with can-reflect", 13, function(){
+test("works with can-reflect", function(){
 	var a = new DefineMap({ foo: 4 });
 	var b = new DefineList([ "foo", "bar" ]);
 	var c;
@@ -1041,6 +1041,7 @@ test("works with can-reflect", 13, function(){
 		QUnit.equal(newValue, "quux", "observed new value");
 	};
 	QUnit.ok(!canReflect.isValueLike(b), "isValueLike is false");
+	QUnit.ok(canReflect.isObservableLike(b), "isObservableLike is true");
 	QUnit.ok(canReflect.isMapLike(b), "isMapLike is true");
 	QUnit.ok(canReflect.isListLike(b), "isListLike is false");
 

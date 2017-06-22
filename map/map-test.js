@@ -679,6 +679,7 @@ QUnit.test("can-reflect reflections work with DefineMap", function() {
 		canReflect.offKeyValue(c, "baz", handler);
 	};
 	QUnit.ok(!canReflect.isValueLike(c), "isValueLike is false");
+	QUnit.ok(canReflect.isObservableLike(c), "isObservableLike is true");
 	QUnit.ok(canReflect.isMapLike(c), "isMapLike is true");
 	QUnit.ok(!canReflect.isListLike(c), "isListLike is false");
 
