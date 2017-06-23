@@ -41,7 +41,12 @@ var defineHelpers = {
 		// next if it's already on this instances
 		var instanceDefines = map._instanceDefinitions;
 		if(!instanceDefines) {
-			instanceDefines = map._instanceDefinitions = {};
+			Object.defineProperty(map, "_instanceDefinitions", {
+				configurable: true,
+				enumerable: false,
+				value: {}
+			});
+			instanceDefines = map._instanceDefinitions;
 		}
 		if(!instanceDefines[prop]) {
 			var defaultDefinition = map._define.defaultDefinition || {type: define.types.observable};

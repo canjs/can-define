@@ -1,12 +1,11 @@
 var QUnit = require("steal-qunit");
 var compute = require("can-compute");
 var define = require("can-define");
-var stache = require("can-stache");
-var CanList = require("can-list");
+var CanList = require("can-define/list/list");
 var canBatch = require("can-event/batch/batch");
 var isArray = require("can-util/js/is-array/is-array");
 var each = require("can-util/js/each/each");
-var types = require("can-types");
+var canSymbol = require("can-symbol");
 
 QUnit.module("can-define");
 
@@ -921,178 +920,7 @@ test("Asynchronous virtual properties cause extra recomputes (#1915)", function(
 
 });
 
-test("Stache with single property", function() {
-	var Typer = define.Constructor({
-		foo: {
-			type: 'string'
-		}
-	});
 
-	var template = stache('{{foo}}');
-	var t = new Typer({
-		foo: 'bar'
-	});
-	var frag = template(t);
-	equal(frag.firstChild.nodeValue, 'bar');
-	t.foo = "baz";
-	equal(frag.firstChild.nodeValue, 'baz');
-});
-
-test("Stache with boolean property with {{#if}}", function() {
-	var nailedIt = 'Nailed it';
-	var Example = define.Constructor({
-		name: {
-			value: nailedIt
-		}
-	});
-
-	var NestedMap = define.Constructor({
-		isEnabled: {
-			value: true
-		},
-		test: {
-			Value: Example
-		},
-		examples: {
-			type: {
-				one: {
-					Value: Example
-				},
-				two: {
-					type: {
-						deep: {
-							Value: Example
-						}
-					},
-					Value: Object
-				}
-			},
-			Value: Object
-		}
-	});
-
-	var nested = new NestedMap();
-	var template = stache('{{#if isEnabled}}Enabled{{/if}}');
-	var frag = template(nested);
-	equal(frag.firstChild.nodeValue, 'Enabled');
-});
-
-test("stache with double property", function() {
-	var nailedIt = 'Nailed it';
-	var Example = define.Constructor({
-		name: {
-			value: nailedIt
-		}
-	});
-
-	var NestedMap = define.Constructor({
-		isEnabled: {
-			value: true
-		},
-		test: {
-			Value: Example
-		},
-		examples: {
-			type: {
-				one: {
-					Value: Example
-				},
-				two: {
-					type: {
-						deep: {
-							Value: Example
-						}
-					},
-					Value: Object
-				}
-			},
-			Value: Object
-		}
-	});
-
-	var nested = new NestedMap();
-	var template = stache('{{test.name}}');
-	var frag = template(nested);
-	equal(frag.firstChild.nodeValue, nailedIt);
-});
-
-test("Stache with one nested property", function() {
-	var nailedIt = 'Nailed it';
-	var Example = define.Constructor({
-		name: {
-			value: nailedIt
-		}
-	});
-
-	var NestedMap = define.Constructor({
-		isEnabled: {
-			value: true
-		},
-		test: {
-			Value: Example
-		},
-		examples: {
-			type: {
-				one: {
-					Value: Example
-				},
-				two: {
-					type: {
-						deep: {
-							Value: Example
-						}
-					},
-					Value: Object
-				}
-			},
-			Value: Object
-		}
-	});
-
-	var nested = new NestedMap();
-	var template = stache('{{examples.one.name}}');
-	var frag = template(nested);
-	equal(frag.firstChild.nodeValue, nailedIt);
-});
-
-test("Stache with two nested property", function() {
-	var nailedIt = 'Nailed it';
-	var Example = define.Constructor({
-		name: {
-			value: nailedIt
-		}
-	});
-
-	var NestedMap = define.Constructor({
-		isEnabled: {
-			value: true
-		},
-		test: {
-			Value: Example
-		},
-		examples: {
-			type: {
-				one: {
-					Value: Example
-				},
-				two: {
-					type: {
-						deep: {
-							Value: Example
-						}
-					},
-					Value: Object
-				}
-			},
-			Value: Object
-		}
-	});
-
-	var nested = new NestedMap();
-	var template = stache('{{examples.two.deep.name}}');
-	var frag = template(nested);
-	equal(frag.firstChild.nodeValue, nailedIt);
-});
 
 QUnit.test('Default values cannot be set (#8)', function() {
 	var Person = function() {};
@@ -1315,10 +1143,10 @@ QUnit.test("Properties are enumerable", function() {
 	});
 });
 
-QUnit.test("Doesn't override types.iterator if already on the prototype", function() {
+QUnit.test("Doesn't override canSymbol.iterator if already on the prototype", function() {
 	function MyMap() {}
 
-	MyMap.prototype[types.iterator] = function() {
+	MyMap.prototype[canSymbol.iterator || canSymbol.for("iterator")] = function() {
 		var i = 0;
 		return {
 			next: function() {

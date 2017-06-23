@@ -3,10 +3,11 @@ var QUnit = require("steal-qunit");
 var DefineMap = require("can-define/map/map");
 var define = require("can-define");
 var Observation = require("can-observation");
-var canTypes = require("can-types");
 var each = require("can-util/js/each/each");
 var compute = require("can-compute");
 var assign = require("can-util/js/assign/assign");
+var canSymbol = require("can-symbol");
+var canReflect = require("can-reflect");
 var sealWorks = (function() {
 	try {
 		var o = {};
@@ -293,11 +294,6 @@ QUnit.test("serialize: function works (#38)", function(){
 	var myMap2 = new MyMap2({foo: 1, bar: 2});
 	QUnit.deepEqual( myMap2.serialize(), {foo: "1", bar: "2"}, "serialize: function on default works");
 
-});
-
-QUnit.test("isMapLike", function(){
-	var map = new DefineMap({});
-	ok(canTypes.isMapLike(map), "is map like");
 });
 
 QUnit.test("get will not create properties", function(){
@@ -663,6 +659,89 @@ QUnit.test(".value values are overwritten by props in DefineMap construction", f
 	});
 
 	equal(foo.bar, "quux", "Value set properly");
+});
+
+QUnit.test("can-reflect reflections work with DefineMap", function() {
+	var b = new DefineMap({ "foo": "bar" });
+	var c = new (DefineMap.extend({
+		"baz": {
+			get: function() {
+				return b.foo;
+			}
+		}
+	}))({ "foo": "bar", thud: "baz" });
+
+	QUnit.equal( canReflect.getKeyValue(b, "foo"), "bar", "unbound value");
+
+	var handler = function(newValue){
+		QUnit.equal(newValue, "quux", "observed new value");
+
+		// Turn off the "foo" handler but "thud" should still be bound.
+		canReflect.offKeyValue(c, "baz", handler);
+	};
+	QUnit.ok(!canReflect.isValueLike(c), "isValueLike is false");
+	QUnit.ok(canReflect.isObservableLike(c), "isObservableLike is true");
+	QUnit.ok(canReflect.isMapLike(c), "isMapLike is true");
+	QUnit.ok(!canReflect.isListLike(c), "isListLike is false");
+
+	QUnit.ok( !canReflect.keyHasDependencies(b, "foo"), "keyHasDependencies -- false");
+
+	canReflect.onKeyValue(c, "baz", handler);
+	// Do a second binding to check that you can unbind correctly.
+	canReflect.onKeyValue(c, "thud", handler);
+	QUnit.ok( canReflect.keyHasDependencies(c, "baz"), "keyHasDependencies -- true");
+
+	b.foo = "quux";
+	c.thud = "quux";
+
+	QUnit.equal( canReflect.getKeyValue(c, "baz"), "quux", "bound value");
+	// sanity checks to ensure that handler doesn't get called again.
+	b.foo = "thud";
+	c.baz = "jeek";
+
+});
+
+QUnit.test("can-reflect setKeyValue", function(){
+	var a = new DefineMap({ "a": "b" });
+
+	canReflect.setKeyValue(a, "a", "c");
+	QUnit.equal(a.a, "c", "setKeyValue");
+});
+
+QUnit.test("can-reflect deleteKeyValue", function(){
+	var a = new DefineMap({ "a": "b" });
+
+	canReflect.deleteKeyValue(a, "a");
+	QUnit.equal(a.a, undefined, "value is now undefined");
+	QUnit.ok(!("a" in a.get()), "value not included in serial");
+});
+
+QUnit.test("can-reflect getKeyDependencies", function() { 
+	var a = new DefineMap({ "a": "a" });
+	var b = new (DefineMap.extend({
+		"a": {
+			get: function() {
+				return a.a;
+			}
+		}
+	}))();
+
+	// DefineMaps bind automatically without events, so this is already running.
+	ok(canReflect.getKeyDependencies(b, "a"), "dependencies exist");
+	ok(!canReflect.getKeyDependencies(b, "b"), "no dependencies exist for unknown value");
+	ok(canReflect.getKeyDependencies(b, "a").valueDependencies.has(b._computed.a.compute), "dependencies returned");
+
+});
+
+QUnit.test("can-reflect setValue", function() {
+	var aData = { "a": "b" };
+	var bData = { "b": "c" };
+
+	var a = new DefineMap(aData);
+	var b = new DefineMap(bData);
+
+	a[canSymbol.for("can.setValue")](b);
+	QUnit.deepEqual(a.get(), assign(aData, bData), "when called with an object, should merge into existing object");
 });
 
 QUnit.test("Does not attempt to redefine _data if already defined", function() {

@@ -2,7 +2,6 @@
 "format cjs";
 
 
-var event = require("can-event");
 var eventLifecycle = require("can-event/lifecycle/lifecycle");
 var canBatch = require("can-event/batch/batch");
 var canEvent = require("can-event");
@@ -21,6 +20,9 @@ var each = require("can-util/js/each/each");
 var defaults = require("can-util/js/defaults/defaults");
 var stringToAny = require("can-util/js/string-to-any/string-to-any");
 var ns = require("can-namespace");
+var canSymbol = require("can-symbol");
+var canReflect = require("can-reflect");
+var singleReference = require("can-util/js/single-reference/single-reference");
 
 var eventsProto, define,
 	make, makeDefinition, replaceWith, getDefinitionsAndMethods,
@@ -51,6 +53,32 @@ var eachPropertyDescriptor = function(map, cb){
 		}
 	}
 };
+
+// #### trapSets
+// This private function creates a "value trap" to glue together
+// defined getters/setters in can-define with the observable
+// patterns in can-reflect that are hooked into elsewhere in
+// can-define.  The last set value is placed into an instance of the
+// value trap on set, so as to make it available as a source value
+// for an async getter.
+function trapSets(observableValue) {
+	return {
+		observable: observableValue,
+		lastSetValue: undefined,
+		setValue: function(value) {
+			// Hold on to this value for next time.
+			this.lastSetValue = value;
+			if(this.observable) {
+				if(canSymbol.for("can.setValue") in this.observable) {
+					canReflect.setValue(this.observable, value);
+				} else {
+					//this.observable.value = this.lastSetValue;
+					this.observable.update();
+				}
+			}
+		}
+	};
+}
 
 
 module.exports = define = ns.define = function(objPrototype, defines, baseDefine) {
@@ -127,12 +155,13 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 
 	// Places Symbol.iterator or @@iterator on the prototype
 	// so that this can be iterated with for/of and can-util/js/each/each
-	if(!objPrototype[types.iterator]) {
-		defineConfigurableAndNotEnumerable(objPrototype, types.iterator, function(){
+	var iteratorSymbol = canSymbol.iterator || canSymbol.for("iterator");
+	if(!objPrototype[iteratorSymbol]) {
+		defineConfigurableAndNotEnumerable(objPrototype, iteratorSymbol, function(){
 			return new define.Iterator(this);
 		});
 	}
-
+	
 	return result;
 };
 
@@ -267,26 +296,48 @@ make = {
 		return function() {
 			var map = this,
 				defaultValue = defaultValueFn && defaultValueFn.call(this),
-				computeFn;
+				computeFn, valueTrap, computeObj;
 
-			if (defaultValue) {
-				computeFn = defaultValue.isComputed ?
-					defaultValue :
-					compute.async(defaultValue, get, map);
+			var boundGet = function() {
+				return get.call(map, computeObj.valueTrap.lastSetValue);
+			};
+
+			if(get.length < 2) {
+				if(defaultValue && defaultValue.isComputed) {
+					computeFn = defaultValue;
+					valueTrap = trapSets(computeFn);
+				} else {
+					computeFn = new Observation(boundGet, map);
+					valueTrap = trapSets(computeFn);
+					valueTrap.lastSetValue = defaultValue;
+				}
 			} else {
-				computeFn = compute.async(defaultValue, get, map);
+				if (defaultValue) {
+					computeFn = defaultValue.isComputed ?
+						defaultValue :
+						compute.async(defaultValue, get, map);
+				} else {
+					computeFn = compute.async(defaultValue, get, map);
+				}
+				valueTrap = trapSets(computeFn);
 			}
 
-			return {
+			computeObj = {
+				oldValue: undefined,
 				compute: computeFn,
 				count: 0,
-				handler: function(ev, newVal, oldVal) {
+				handler: function(newVal) {
+					var oldValue = computeObj.oldValue;
+					computeObj.oldValue = newVal;
 					canEvent.dispatch.call(map, {
 						type: prop,
-						target: map
-					}, [newVal, oldVal]);
-				}
+						target: map,
+						batchNum: canBatch.batchNum
+					}, [newVal, oldValue]);
+				},
+				valueTrap: valueTrap
 			};
+			return computeObj;
 		};
 	},
 	// Set related helpers.
@@ -298,7 +349,7 @@ make = {
 		},
 		computed: function(prop) {
 			return function(val) {
-				this._computed[prop].compute(val);
+				this._computed[prop].valueTrap.setValue(val);
 			};
 		},
 		events: function(prop, getCurrent, setData, eventType) {
@@ -475,13 +526,13 @@ make = {
 		computed: function(prop) {
 			// might want to protect this
 			return function() {
-				return this._computed[prop].compute();
+				return canReflect.getValue( this._computed[prop].compute );
 			};
 		},
 		lastSet: function(prop) {
 			return function() {
-				var lastSetValue = this._computed[prop].compute.computeInstance.lastSetValue;
-				return lastSetValue && lastSetValue.get();
+				var lastSetValue = this._computed[prop].valueTrap.lastSetValue;
+				return lastSetValue;
 			};
 		}
 	},
@@ -540,7 +591,7 @@ make = {
 		},
 		computed: function(prop) {
 			return function() {
-				return this._computed[prop].compute();
+				return canReflect.getValue(this._computed[prop].compute);
 			};
 		}
 	}
@@ -597,7 +648,7 @@ getDefinitionOrMethod = function(prop, value, defaultDefinition){
 		definition = {type: value};
 	}
 	else if(typeof value === "function") {
-		if(types.isConstructor(value)) {
+		if(canReflect.isConstructorLike(value)) {
 			definition = {Type: value};
 		} else if(isDefineType(value)) {
 			definition = {type: value};
@@ -681,7 +732,7 @@ replaceWith = function(obj, prop, cb, writable) {
 	});
 };
 
-eventsProto = assign({}, event);
+eventsProto = assign({}, canEvent);
 assign(eventsProto, {
 	_eventSetup: function() {},
 	_eventTeardown: function() {},
@@ -691,7 +742,8 @@ assign(eventsProto, {
 		if (computedBinding && computedBinding.compute) {
 			if (!computedBinding.count) {
 				computedBinding.count = 1;
-				computedBinding.compute.addEventListener("change", computedBinding.handler);
+				canReflect.onValue(computedBinding.compute, computedBinding.handler);
+				computedBinding.oldValue = canReflect.getValue(computedBinding.compute);
 			} else {
 				computedBinding.count++;
 			}
@@ -710,7 +762,7 @@ assign(eventsProto, {
 		if (computedBinding) {
 			if (computedBinding.count === 1) {
 				computedBinding.count = 0;
-				computedBinding.compute.removeEventListener("change", computedBinding.handler);
+				canReflect.offValue(computedBinding.compute, computedBinding.handler);
 			} else {
 				computedBinding.count--;
 			}
@@ -723,6 +775,18 @@ assign(eventsProto, {
 });
 eventsProto.on = eventsProto.bind = eventsProto.addEventListener;
 eventsProto.off = eventsProto.unbind = eventsProto.removeEventListener;
+canReflect.set(eventsProto, canSymbol.for("can.onKeyValue"), function(key, handler){
+	var translationHandler = function(ev, newValue, oldValue){
+		handler(newValue, oldValue);
+	};
+	singleReference.set(handler, this, translationHandler, key);
+
+	this.addEventListener(key, translationHandler);
+});
+
+canReflect.set(eventsProto, canSymbol.for("can.offKeyValue"), function(key, handler){
+	this.removeEventListener(key, singleReference.getAndDelete(handler, this, key) );
+});
 
 delete eventsProto.one;
 
