@@ -4,11 +4,7 @@ var CID = require("can-cid");
 var define = require("can-define");
 var canBatch = require("can-event/batch/batch");
 var canEvent = require("can-event");
-
-
-var hasMethod = function(obj, method){
-	return obj && typeof obj === "object" && (method in obj);
-};
+var canReflect = require("can-reflect");
 
 var defineHelpers = {
 	extendedSetup: function(props){
@@ -86,7 +82,7 @@ var defineHelpers = {
 			}
 		}
 
-		if( hasMethod(val, how) ) {
+		if(canReflect.isObservableLike(val)) {
 			return val[how]();
 		} else {
 			return val;
@@ -127,7 +123,7 @@ var defineHelpers = {
 				// If the value is an `object`, and has an `attr` or `serialize` function.
 
 				var result,
-					isObservable =   hasMethod(val, how),
+					isObservable = canReflect.isObservableLike(val),
 					serialized = isObservable && serializeMap[how][CID(val)];
 
 				if( serialized ) {

@@ -798,3 +798,23 @@ QUnit.test("redefines still not allowed on sealed objects", function() {
 		QUnit.ok(!Object.getOwnPropertyDescriptor(baz._computed, "plonk"), "nothing set on _computed");
 	}
 });
+
+QUnit.test("Call .get() when a nested object has its own get method", function(){
+	var Bar = DefineMap.extend({
+		request: "*"
+	});
+
+	var request = {
+		prop: 22,
+		get: function(){
+			if(arguments.length === 0) {
+				throw new Error("This function can't be called with 0 arguments");
+			}
+		}
+	};
+
+	var obj = new Bar({ request: request });
+	var data = obj.get();
+
+	QUnit.equal(data.request.prop, 22, "obj did get()");
+});
