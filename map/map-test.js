@@ -800,6 +800,10 @@ QUnit.test("redefines still not allowed on sealed objects", function() {
 });
 
 QUnit.test("Call .get() when a nested object has its own get method", function(){
+	var Bar = DefineMap.extend({
+		request: "*"
+	});
+
 	var request = {
 		prop: 22,
 		get: function(){
@@ -809,7 +813,7 @@ QUnit.test("Call .get() when a nested object has its own get method", function()
 		}
 	};
 
-	var obj = new DefineMap({ request: request });
+	var obj = new Bar({ request: request });
 	var data = obj.get();
 
 	QUnit.equal(data.request.prop, 22, "obj did get()");
