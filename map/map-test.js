@@ -506,7 +506,7 @@ QUnit.test("copying with assign() excludes special keys", function() {
 	QUnit.notEqual(a._cid, b._cid, "_cid prop not copied");
 	QUnit.equal(a.foo, b.foo, "New props copied");
 	QUnit.equal(a.existing, b.existing, "Existing props copied");
-	
+
 });
 
 QUnit.test("shorthand getter setter (#56)", function(){
@@ -620,7 +620,7 @@ QUnit.test(".value functions should not be observable", function(){
 	var outer = new DefineMap({
 		bam: "baz"
 	});
-	
+
 	var ItemsVM = DefineMap.extend({
 		item: {
 			value: function(){
@@ -630,20 +630,20 @@ QUnit.test(".value functions should not be observable", function(){
 		},
 		zed: "string"
 	});
-	
+
 	var items = new ItemsVM();
-	
+
 	var count = 0;
 	var itemsList = compute(function(){
 		count++;
 		return items.item;
 	});
-	
+
 	itemsList.on('change', function() {});
-	
+
 	items.item.foo = "changed";
 	items.zed = "changed";
-	
+
 	equal(count, 1);
 });
 
@@ -716,7 +716,7 @@ QUnit.test("can-reflect deleteKeyValue", function(){
 	QUnit.ok(!("a" in a.get()), "value not included in serial");
 });
 
-QUnit.test("can-reflect getKeyDependencies", function() { 
+QUnit.test("can-reflect getKeyDependencies", function() {
 	var a = new DefineMap({ "a": "a" });
 	var b = new (DefineMap.extend({
 		"a": {
@@ -748,9 +748,9 @@ QUnit.test("Does not attempt to redefine _data if already defined", function() {
 	var Bar = DefineMap.extend({seal: false}, {
 		baz: { value : "thud" }
 	});
-	
+
 	var baz = new Bar();
-	
+
 	define(baz, {
 		quux: { value: "jeek" },
 		plonk: {
@@ -819,4 +819,18 @@ QUnit.test("Call .get() when a nested object has its own get method", function()
 	var data = obj.get();
 
 	QUnit.equal(data.request.prop, 22, "obj did get()");
+});
+
+QUnit.test("DefineMap short-hand Type (#221)", function(){
+	var Child = DefineMap.extend('child', {
+		other: DefineMap
+	});
+
+	var c = new Child();
+	c.other = {
+		prop: 'hello'
+	};
+
+	QUnit.ok(c.other instanceof DefineMap, "is a DefineMap");
+
 });
