@@ -44,7 +44,7 @@
   },
   "devDependencies": {
     "jshint": "^2.9.1",
-    "serve": "^5.1.4",
+    "serve": "^6.0.0",
     "steal": "^1.0.7",
     "steal-qunit": "^1.0.0",
     "steal-tools": "^1.0.1",
