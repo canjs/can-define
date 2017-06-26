@@ -83,7 +83,7 @@ var defineHelpers = {
 		}
 
 		if(canReflect.isObservableLike(val)) {
-			return val[how]();
+			return canReflect.getValue(val);
 		} else {
 			return val;
 		}
@@ -121,7 +121,6 @@ var defineHelpers = {
 			// Go through each property.
 			map.each(function (val, name) {
 				// If the value is an `object`, and has an `attr` or `serialize` function.
-
 				var result,
 					isObservable = canReflect.isObservableLike(val),
 					serialized = isObservable && serializeMap[how][CID(val)];
@@ -136,8 +135,6 @@ var defineHelpers = {
 				if(result !== undefined) {
 					where[name] = result;
 				}
-
-
 			});
 
 			if(firstSerialize) {
