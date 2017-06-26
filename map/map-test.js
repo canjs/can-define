@@ -1,6 +1,7 @@
 "use strict";
 var QUnit = require("steal-qunit");
 var DefineMap = require("can-define/map/map");
+var CanMap = require("can-map");
 var define = require("can-define");
 var Observation = require("can-observation");
 var each = require("can-util/js/each/each");
@@ -833,4 +834,12 @@ QUnit.test("DefineMap short-hand Type (#221)", function(){
 
 	QUnit.ok(c.other instanceof DefineMap, "is a DefineMap");
 
+});
+
+QUnit.test(".get() works with a nested CanMap (#224)", function() {
+	var myMap = new DefineMap({
+		other: new CanMap()
+	});
+
+	QUnit.deepEqual(myMap.get(), { other: {} }, "works");
 });
