@@ -10,74 +10,19 @@ var canLog = require("can-util/js/log/log");
 var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
 var CIDSet = require("can-util/js/cid-set/cid-set");
+var CIDMap = require("can-util/js/cid-map/cid-map");
 
-var readWithoutObserve = Observation.ignore(function(map, prop){
-	return map[prop];
-});
-
-var eachDefinition = function(map, cb, thisarg, definitions, observe) {
-
+var keysForDefinition = function(definitions) {
+	var keys = [];
 	for(var prop in definitions) {
 		var definition = definitions[prop];
 		if(typeof definition !== "object" || ("serialize" in definition ? !!definition.serialize : !definition.get)) {
-
-			var item = observe === false ? readWithoutObserve(map, prop) : map[prop];
-
-			if (cb.call(thisarg || item, item, prop, map) === false) {
-				return false;
-			}
+			keys.push(prop);
 		}
 	}
+	return keys;
 };
 
-var setProps = function(props, remove) {
-	props = defineHelpers.removeSpecialKeys(assign({}, props));
-	var prop,
-		self = this,
-		newVal;
-
-	// Batch all of the change events until we are done.
-	canBatch.start();
-	// Merge current properties with the new ones.
-	canReflect.eachKey(this, function(curVal, prop) {
-	//this.each(function(curVal, prop) {
-		// You can not have a _cid property; abort.
-		if (prop === "_cid") {
-			return;
-		}
-		newVal = props[prop];
-
-		// If we are merging, remove the property if it has no value.
-		if (newVal === undefined) {
-			if (remove) {
-				self[prop] = undefined;
-			}
-			return;
-		}
-		if(canReflect.isValueLike(curVal)) {
-		//if( typeof curVal !== "object" || curVal === null ) {
-			canReflect.setKeyValue(self, prop, newVal);
-		}
-		else if( canReflect.isMapLike(curVal) || canReflect.isListLike( curVal ) ) {
-			canReflect.setValue(curVal, newVal);
-		}
-		else if(curVal !== newVal) {
-			canReflect.setKeyValue(self, prop, newVal);
-		}
-		delete props[prop];
-	}, this, false);
-	// Add remaining props.
-	for (prop in props) {
-		// Ignore _cid.
-		if (prop !== "_cid") {
-			newVal = props[prop];
-			canReflect.setKeyValue(this, prop, newVal);
-		}
-
-	}
-	canBatch.stop();
-	return this;
-};
 
 var DefineMap = Construct.extend("DefineMap",{
 	setup: function(base){
@@ -91,7 +36,7 @@ var DefineMap = Construct.extend("DefineMap",{
 
 			this.prototype.setup = function(props){
 				define.setup.call(
-					this, 
+					this,
 					defineHelpers.removeSpecialKeys(defineHelpers.toObject(this, props,{}, DefineMap)),
 					this.constructor.seal
 				);
@@ -173,7 +118,7 @@ var DefineMap = Construct.extend("DefineMap",{
 			}
 
 		} else {
-			return defineHelpers.serialize(this, 'get', {});
+			return canReflect.unwrap(this, CIDMap);
 		}
 	},
 	/**
@@ -206,7 +151,14 @@ var DefineMap = Construct.extend("DefineMap",{
 	 */
 	set: function(prop, value){
 		if(typeof prop === "object") {
-			return setProps.call(this, prop, value);
+
+			if(value === true) {
+				this[canSymbol.for("can.updateDeep")](prop);
+			} else {
+				this[canSymbol.for("can.assignDeep")](prop);
+			}
+
+			return this;
 		}
 		var defined = defineHelpers.defineExpando(this, prop, value);
 		if(!defined) {
@@ -247,27 +199,21 @@ var DefineMap = Construct.extend("DefineMap",{
 	 *
 	 */
 	serialize: function () {
-		return defineHelpers.serialize(this, 'serialize', {});
+		return canReflect.serialize(this, CIDMap);
 	},
 
-	forEach: function(cb, thisarg, observe){
-		if(observe !== false) {
-			Observation.add(this, '__keys');
-		}
-		var res;
-		var constructorDefinitions = this._define.definitions;
-		if(constructorDefinitions) {
-			res = eachDefinition(this, cb, thisarg, constructorDefinitions, observe);
-		}
-		if(res === false) {
-			return this;
-		}
-		if(this._instanceDefinitions) {
-			eachDefinition(this, cb, thisarg, this._instanceDefinitions, observe);
-		}
+	forEach: (function(){
 
-		return this;
-	},
+		var forEach = function(list, cb, thisarg){
+			return canReflect.eachKey(list, cb, thisarg);
+		},
+			noObserve = Observation.ignore(forEach);
+
+		return function(cb, thisarg, observe) {
+			return observe === false ? noObserve(this, cb, thisarg) : forEach(this, cb, thisarg);
+		};
+
+	})(),
 	"*": {
 		type: define.types.observable
 	}
@@ -275,25 +221,30 @@ var DefineMap = Construct.extend("DefineMap",{
 DefineMap.prototype[canSymbol.for("can.getKeyValue")] = DefineMap.prototype.get;
 DefineMap.prototype[canSymbol.for("can.setKeyValue")] = DefineMap.prototype.set;
 DefineMap.prototype[canSymbol.for("can.deleteKeyValue")] = function(prop) {
-	this.set(prop, undefined);	
+	this.set(prop, undefined);
 	return this;
 };
-DefineMap.prototype[canSymbol.for("can.getValue")] = DefineMap.prototype.get;
-DefineMap.prototype[canSymbol.for("can.setValue")] = function(prop, value) {
-	if(typeof prop === "object") {
-		if (prop[canSymbol.for("can.getValue")]) {
-			this.set(canReflect.getValue(prop));
-		} else {
-			this.set(prop);
-		}
-	} else {
-		if (value[canSymbol.for("can.getValue")]) {
-			this.set(prop, canReflect.getValue(value));
-		} else {
-			this.set(prop, value);
-		}
-	}
+DefineMap.prototype[canSymbol.for("can.assignDeep")] = function(source){
+	canBatch.start();
+	// TODO: we should probably just throw an error instead of cleaning
+	canReflect.assignDeepMap(this, defineHelpers.removeSpecialKeys(canReflect.assignMap({}, source)));
+	canBatch.stop();
 };
+DefineMap.prototype[canSymbol.for("can.updateDeep")] = function(source){
+	canBatch.start();
+	// TODO: we should probably just throw an error instead of cleaning
+	canReflect.updateDeepMap(this, defineHelpers.removeSpecialKeys(canReflect.assignMap({}, source)));
+	canBatch.stop();
+};
+DefineMap.prototype[canSymbol.for("can.unwrap")] = defineHelpers.reflectUnwrap;
+DefineMap.prototype[canSymbol.for("can.serialize")] = defineHelpers.reflectSerialize;
+
+
+DefineMap.prototype[canSymbol.for("can.getOwnEnumerableKeys")] = function(){
+	Observation.add(this, '__keys');
+	return keysForDefinition(this._define.definitions).concat(keysForDefinition(this._instanceDefinitions) );
+};
+
 DefineMap.prototype[canSymbol.for("can.isMapLike")] = true;
 DefineMap.prototype[canSymbol.for("can.isListLike")] = false;
 DefineMap.prototype[canSymbol.for("can.isValueLike")] = false;

@@ -68,7 +68,7 @@ var defineHelpers = {
 	// ## getValue
 	// If `val` is an observable, calls `how` on it; otherwise
 	// returns the value of `val`.
-	getValue: function(map, name, val, how){
+	/*getValue: function(map, name, val, how){
 		// check if there's a serialize
 		if(how === "serialize") {
 			var constructorDefinitions = map._define.definitions;
@@ -87,7 +87,7 @@ var defineHelpers = {
 		} else {
 			return val;
 		}
-	},
+	},*/
 	// ### mapHelpers.serialize
 	// Serializes a Map or Map.List by recursively calling the `how`
 	// method on any child objects. This is able to handle
@@ -95,7 +95,7 @@ var defineHelpers = {
 	// `map` - the map or list to serialize.
 	// `how` - the method to call recursively.
 	// `where` - the target Object or Array that becomes the serialized result.
-	serialize: (function(){
+	/*serialize: (function(){
 
 		// A temporary mapping of map cids to the serialized result.
 		var serializeMap = null;
@@ -145,6 +145,34 @@ var defineHelpers = {
 			}
 			return where;
 		};
-	})()
+	})()*/
+	reflectSerialize: function(unwrapped){
+		var constructorDefinitions = this._define.definitions;
+		var defaultDefinition = this._define.defaultDefinition;
+		this.each(function(val, name){
+			var propDef = constructorDefinitions[name];
+
+			if(propDef && typeof propDef.serialize === "function") {
+				val = propDef.serialize.call(this, val, name);
+			}
+			else if(defaultDefinition && typeof defaultDefinition.serialize === "function") {
+				val =  defaultDefinition.serialize.call(this, val, name);
+			} else {
+				val = canReflect.unwrap(val);
+			}
+			if(val !== undefined) {
+				unwrapped[name] = val;
+			}
+		}, this);
+		return unwrapped;
+	},
+	reflectUnwrap: function(unwrapped){
+		this.forEach(function(value, key){
+			if(value !== undefined) {
+				unwrapped[key] = canReflect.unwrap(value);
+			}
+		});
+		return unwrapped;
+	}
 };
 module.exports = defineHelpers;

@@ -76,6 +76,7 @@ QUnit.test("loop only through defined serializable props", function(){
 		}
 	});
 	var inst = new MyMap({propA: 1, propB: 2});
+
 	QUnit.deepEqual(Object.keys(inst.get()), ["propA"]);
 
 });
@@ -185,15 +186,15 @@ QUnit.test("set multiple props", function(){
 	var map = new DefineMap();
 	map.set({a: 0, b: 2});
 
-	QUnit.deepEqual(map.get(), {a: 0, b: 2});
+	QUnit.deepEqual(map.get(), {a: 0, b: 2}, "added props");
 
 	map.set({a: 2}, true);
 
-	QUnit.deepEqual(map.get(), {a: 2});
+	QUnit.deepEqual(map.get(), {a: 2}, "removed b");
 
 	map.set({foo: {bar: "VALUE"}});
 
-	QUnit.deepEqual(map.get(), {foo: {bar: "VALUE"}, a: 2});
+	QUnit.deepEqual(map.get(), {foo: {bar: "VALUE"}, a: 2}, "works nested");
 });
 
 QUnit.test("serialize responds to added props", function(){
@@ -733,14 +734,14 @@ QUnit.test("can-reflect getKeyDependencies", function() {
 
 });
 
-QUnit.test("can-reflect setValue", function() {
+QUnit.test("can-reflect assign", function() {
 	var aData = { "a": "b" };
 	var bData = { "b": "c" };
 
 	var a = new DefineMap(aData);
 	var b = new DefineMap(bData);
 
-	a[canSymbol.for("can.setValue")](b);
+	canReflect.assign( a,b);
 	QUnit.deepEqual(a.get(), assign(aData, bData), "when called with an object, should merge into existing object");
 });
 
