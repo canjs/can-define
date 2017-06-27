@@ -1037,9 +1037,7 @@ test("works with can-reflect", function(){
 	var c;
 	QUnit.equal( canReflect.getKeyValue(b, "0"), "foo", "unbound value");
 
-	var handler = function(newValue){
-		QUnit.equal(newValue, "quux", "observed new value");
-	};
+
 	QUnit.ok(!canReflect.isValueLike(b), "isValueLike is false");
 	QUnit.ok(canReflect.isObservableLike(b), "isObservableLike is true");
 	QUnit.ok(canReflect.isMapLike(b), "isMapLike is true");

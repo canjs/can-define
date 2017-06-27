@@ -1,6 +1,5 @@
 
 var assign = require("can-util/js/assign/assign");
-var CID = require("can-cid");
 var define = require("can-define");
 var canBatch = require("can-event/batch/batch");
 var canEvent = require("can-event");
@@ -65,87 +64,6 @@ var defineHelpers = {
 			return true;
 		}
 	},
-	// ## getValue
-	// If `val` is an observable, calls `how` on it; otherwise
-	// returns the value of `val`.
-	/*getValue: function(map, name, val, how){
-		// check if there's a serialize
-		if(how === "serialize") {
-			var constructorDefinitions = map._define.definitions;
-			var propDef = constructorDefinitions[name];
-			if(propDef && typeof propDef.serialize === "function") {
-				return propDef.serialize.call(map, val, name);
-			}
-			var defaultDefinition = map._define.defaultDefinition;
-			if(defaultDefinition && typeof defaultDefinition.serialize === "function") {
-				return defaultDefinition.serialize.call(map, val, name);
-			}
-		}
-
-		if(canReflect.isObservableLike(val)) {
-			return val[how]();
-		} else {
-			return val;
-		}
-	},*/
-	// ### mapHelpers.serialize
-	// Serializes a Map or Map.List by recursively calling the `how`
-	// method on any child objects. This is able to handle
-	// cycles.
-	// `map` - the map or list to serialize.
-	// `how` - the method to call recursively.
-	// `where` - the target Object or Array that becomes the serialized result.
-	/*serialize: (function(){
-
-		// A temporary mapping of map cids to the serialized result.
-		var serializeMap = null;
-
-		return function (map, how, where) {
-			var cid = CID(map),
-				firstSerialize = false;
-
-			// If there isn't an existing serializeMap, this means
-			// this is the initial non-recursive call to this function.
-			// We mark this  as the first call, and then setup the serializeMap.
-			// The serialize map is further devided into `how` because
-			// `.serialize` might call `.attr`.
-			if(!serializeMap) {
-				firstSerialize = true;
-				serializeMap = {
-					get: {},
-					serialize: {}
-				};
-			}
-
-			serializeMap[how][cid] = where;
-			// Go through each property.
-			map.each(function (val, name) {
-				// If the value is an `object`, and has an `attr` or `serialize` function.
-
-				var result,
-					isObservable = canReflect.isObservableLike(val),
-					serialized = isObservable && serializeMap[how][CID(val)];
-
-				if( serialized ) {
-					result = serialized;
-				} else {
-					// special attr or serializer
-					result = defineHelpers.getValue(map, name, val, how);
-				}
-				// this is probably removable
-				if(result !== undefined) {
-					where[name] = result;
-				}
-
-
-			});
-
-			if(firstSerialize) {
-				serializeMap = null;
-			}
-			return where;
-		};
-	})()*/
 	reflectSerialize: function(unwrapped){
 		var constructorDefinitions = this._define.definitions;
 		var defaultDefinition = this._define.defaultDefinition;
@@ -158,7 +76,7 @@ var defineHelpers = {
 			else if(defaultDefinition && typeof defaultDefinition.serialize === "function") {
 				val =  defaultDefinition.serialize.call(this, val, name);
 			} else {
-				val = canReflect.unwrap(val);
+				val = canReflect.serialize(val);
 			}
 			if(val !== undefined) {
 				unwrapped[name] = val;

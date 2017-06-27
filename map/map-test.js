@@ -6,7 +6,6 @@ var Observation = require("can-observation");
 var each = require("can-util/js/each/each");
 var compute = require("can-compute");
 var assign = require("can-util/js/assign/assign");
-var canSymbol = require("can-symbol");
 var canReflect = require("can-reflect");
 var sealWorks = (function() {
 	try {

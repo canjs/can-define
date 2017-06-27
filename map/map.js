@@ -1,6 +1,5 @@
 var Construct = require("can-construct");
 var define = require("can-define");
-var assign = require("can-util/js/assign/assign");
 var defineHelpers = require("../define-helpers/define-helpers");
 var Observation = require("can-observation");
 var types = require("can-types");
@@ -218,51 +217,61 @@ var DefineMap = Construct.extend("DefineMap",{
 		type: define.types.observable
 	}
 });
-DefineMap.prototype[canSymbol.for("can.getKeyValue")] = DefineMap.prototype.get;
-DefineMap.prototype[canSymbol.for("can.setKeyValue")] = DefineMap.prototype.set;
-DefineMap.prototype[canSymbol.for("can.deleteKeyValue")] = function(prop) {
-	this.set(prop, undefined);
-	return this;
-};
-DefineMap.prototype[canSymbol.for("can.assignDeep")] = function(source){
-	canBatch.start();
-	// TODO: we should probably just throw an error instead of cleaning
-	canReflect.assignDeepMap(this, defineHelpers.removeSpecialKeys(canReflect.assignMap({}, source)));
-	canBatch.stop();
-};
-DefineMap.prototype[canSymbol.for("can.updateDeep")] = function(source){
-	canBatch.start();
-	// TODO: we should probably just throw an error instead of cleaning
-	canReflect.updateDeepMap(this, defineHelpers.removeSpecialKeys(canReflect.assignMap({}, source)));
-	canBatch.stop();
-};
-DefineMap.prototype[canSymbol.for("can.unwrap")] = defineHelpers.reflectUnwrap;
-DefineMap.prototype[canSymbol.for("can.serialize")] = defineHelpers.reflectSerialize;
 
+canReflect.assignSymbols(DefineMap.prototype,{
+	// -type-
+	"can.isMapLike": true,
+	"can.isListLike":  false,
+	"can.isValueLike": false,
 
-DefineMap.prototype[canSymbol.for("can.getOwnEnumerableKeys")] = function(){
-	Observation.add(this, '__keys');
-	return keysForDefinition(this._define.definitions).concat(keysForDefinition(this._instanceDefinitions) );
-};
+	// -get/set-
+	"can.getKeyValue": DefineMap.prototype.get,
+	"can.setKeyValue": DefineMap.prototype.set,
+	"can.deleteKeyValue": function(prop) {
+		this.set(prop, undefined);
+		return this;
+	},
 
-DefineMap.prototype[canSymbol.for("can.isMapLike")] = true;
-DefineMap.prototype[canSymbol.for("can.isListLike")] = false;
-DefineMap.prototype[canSymbol.for("can.isValueLike")] = false;
-DefineMap.prototype[canSymbol.iterator] = function() {
-	return new define.Iterator(this);
-};
-DefineMap.prototype[canSymbol.for("can.keyHasDependencies")] = function(key) {
-	return !!(this._computed && this._computed[key] && this._computed[key].compute);
-};
-DefineMap.prototype[canSymbol.for("can.getKeyDependencies")] = function(key) {
-	var ret;
-	if(this._computed && this._computed[key] && this._computed[key].compute) {
-		ret = {};
-		ret.valueDependencies = new CIDSet();
-		ret.valueDependencies.add(this._computed[key].compute);
+	// -shape
+	"can.getOwnEnumerableKeys": function(){
+		Observation.add(this, '__keys');
+		return keysForDefinition(this._define.definitions).concat(keysForDefinition(this._instanceDefinitions) );
+	},
+
+	// -shape get/set-
+	"can.assignDeep": function(source){
+		canBatch.start();
+		// TODO: we should probably just throw an error instead of cleaning
+		canReflect.assignDeepMap(this, defineHelpers.removeSpecialKeys(canReflect.assignMap({}, source)));
+		canBatch.stop();
+	},
+	"can.updateDeep": function(source){
+		canBatch.start();
+		// TODO: we should probably just throw an error instead of cleaning
+		canReflect.updateDeepMap(this, defineHelpers.removeSpecialKeys(canReflect.assignMap({}, source)));
+		canBatch.stop();
+	},
+	"can.unwrap": defineHelpers.reflectUnwrap,
+	"can.serialize": defineHelpers.reflectSerialize,
+
+	// observable
+	"can.keyHasDependencies": function(key) {
+		return !!(this._computed && this._computed[key] && this._computed[key].compute);
+	},
+	"can.getKeyDependencies": function(key) {
+		var ret;
+		if(this._computed && this._computed[key] && this._computed[key].compute) {
+			ret = {};
+			ret.valueDependencies = new CIDSet();
+			ret.valueDependencies.add(this._computed[key].compute);
+		}
+		return ret;
 	}
-	return ret;
-};
+});
+
+canReflect.setKeyValue(DefineMap.prototype, canSymbol.iterator, function() {
+	return new define.Iterator(this);
+});
 
 // Add necessary event methods to this object.
 for(var prop in define.eventsProto) {

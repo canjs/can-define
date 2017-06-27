@@ -1379,34 +1379,60 @@ DefineList.prototype.items = function() {
 	return this.get();
 };
 
-DefineList.prototype[canSymbol.for("can.getKeyValue")] = DefineList.prototype.get;
-DefineList.prototype[canSymbol.for("can.setKeyValue")] = DefineList.prototype.set;
-DefineList.prototype[canSymbol.for("can.deleteKeyValue")] = function(prop) {
-	if(typeof prop === "number") {
-		this.splice(prop, 1);
-	} else {
-		this.set(prop, undefined);
+
+canReflect.assignSymbols(DefineList.prototype,{
+	// type
+	"can.isMoreListLikeThanMapLike": true,
+	"can.isMapLike": true,
+	"can.isListLike": true,
+	"can.isValueLike": false,
+	// get/set
+	"can.getKeyValue": DefineList.prototype.get,
+	"can.setKeyValue": DefineList.prototype.set,
+	"can.deleteKeyValue": function(prop) {
+		if(typeof prop === "number") {
+			this.splice(prop, 1);
+		} else {
+			this.set(prop, undefined);
+		}
+		return this;
+	},
+	// shape get/set
+	"can.assignDeep": function(source){
+		canBatch.start();
+		canReflect.assignList(this, source);
+		canBatch.stop();
+	},
+	"can.updateDeep": function(source){
+		canBatch.start();
+		this.replace(source);
+		canBatch.stop();
+	},
+
+	// observability
+	"can.keyHasDependencies": function(key) {
+		return !!(this._computed && this._computed[key] && this._computed[key].compute);
+	},
+	"can.getKeyDependencies": function(key) {
+		var ret;
+		if(this._computed && this._computed[key] && this._computed[key].compute) {
+			ret = {};
+			ret.valueDependencies = new CIDSet();
+			ret.valueDependencies.add(this._computed[key].compute);
+		}
+		return ret;
+	},
+
+	// Deprecated
+	"can.onKeysAdded": function(handler) {
+		this[canSymbol.for("can.onKeyValue")]("add", handler);
+	},
+	"can.onKeysRemoved": function(handler) {
+		this[canSymbol.for("can.onKeyValue")]("remove", handler);
 	}
-	return this;
-};
-// define map doesn't go deep
-DefineList.prototype[canSymbol.for("can.assignDeep")] = function(source){
-	canBatch.start();
-	canReflect.assignList(this, source);
-	canBatch.stop();
-};
-DefineList.prototype[canSymbol.for("can.updateDeep")] = function(source){
-	canBatch.start();
-	this.replace(source);
-	canBatch.stop();
-};
+});
 
-
-DefineList.prototype[canSymbol.for("can.isMoreListLikeThanMapLike")] = true;
-DefineList.prototype[canSymbol.for("can.isMapLike")] = true;
-DefineList.prototype[canSymbol.for("can.isListLike")] = true;
-DefineList.prototype[canSymbol.for("can.isValueLike")] = false;
-DefineList.prototype[canSymbol.iterator] = function() {
+canReflect.setKeyValue(DefineList.prototype, canSymbol.iterator, function() {
 	var index = -1;
 	return {
 		next: function() {
@@ -1417,19 +1443,7 @@ DefineList.prototype[canSymbol.iterator] = function() {
 			};
 		}.bind(this)
 	};
-};
-DefineList.prototype[canSymbol.for("can.keyHasDependencies")] = function(key) {
-	return !!(this._computed && this._computed[key] && this._computed[key].compute);
-};
-DefineList.prototype[canSymbol.for("can.getKeyDependencies")] = function(key) {
-	var ret;
-	if(this._computed && this._computed[key] && this._computed[key].compute) {
-		ret = {};
-		ret.valueDependencies = new CIDSet();
-		ret.valueDependencies.add(this._computed[key].compute);
-	}
-	return ret;
-};
+});
 
 types.DefineList = DefineList;
 types.DefaultList = DefineList;
