@@ -7,6 +7,8 @@ var each = require("can-util/js/each/each");
 var compute = require("can-compute");
 var assign = require("can-util/js/assign/assign");
 var canReflect = require("can-reflect");
+var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
+
 var sealWorks = (function() {
 	try {
 		var o = {};
@@ -833,4 +835,10 @@ QUnit.test("DefineMap short-hand Type (#221)", function(){
 
 	QUnit.ok(c.other instanceof DefineMap, "is a DefineMap");
 
+});
+
+QUnit.test("non-Object constructor", function() {
+	var Constructor = DefineMap.extend();
+	QUnit.ok(!isPlainObject(new DefineMap()), "instance of DefineMap is not a plain object");
+	QUnit.ok(!isPlainObject(new Constructor()), "instance of extended DefineMap is not a plain object");
 });
