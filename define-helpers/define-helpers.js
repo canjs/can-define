@@ -1,32 +1,10 @@
-
-var assign = require("can-util/js/assign/assign");
 var define = require("can-define");
 var canBatch = require("can-event/batch/batch");
 var canEvent = require("can-event");
 var canReflect = require("can-reflect");
 
+
 var defineHelpers = {
-	extendedSetup: function(props){
-		assign(this, props);
-	},
-	toObject: function(map, props, where, Type){
-		if(props instanceof Type) {
-			props.each(function(value, prop){
-				where[prop] = value;
-			});
-			return where;
-		} else {
-			return props;
-		}
-	},
-	removeSpecialKeys: function(map) {
-		if(map) {
-			["_data", "constructor", "_cid", "__bindEvents"].forEach(function(key) {
-				delete map[key];
-			});
-		}
-		return map;
-	},
 	defineExpando: function(map, prop, value) {
 		// first check if it's already a constructor define
 		var constructorDefines = map._define.definitions;

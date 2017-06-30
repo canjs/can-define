@@ -37,15 +37,6 @@ var defineConfigurableAndNotEnumerable = function(obj, prop, value) {
 	});
 };
 
-var defineNotWritable = function(obj, prop, value) {
-	Object.defineProperty(obj, prop, {
-		configurable: true,
-		enumerable: false,
-		writable: false,
-		value: value
-	});
-};
-
 var eachPropertyDescriptor = function(map, cb){
 	for(var prop in map) {
 		if(map.hasOwnProperty(prop)) {
@@ -791,16 +782,18 @@ canReflect.set(eventsProto, canSymbol.for("can.offKeyValue"), function(key, hand
 delete eventsProto.one;
 
 define.setup = function(props, sealed) {
-	defineNotWritable(this, "__bindEvents", Object.create(null));
-	defineNotWritable(this, "constructor", this.constructor);
-	/* jshint -W030 */
 	CID(this);
-	defineNotWritable(this, "_cid", this._cid);
+	Object.defineProperty(this,"_cid", {value: this._cid, enumerable: false, writable: false});
+	Object.defineProperty(this,"constructor", {value: this.constructor, enumerable: false, writable: false});
+	Object.defineProperty(this,"__bindEvents", {value: Object.create(null), enumerable: false, writable: false});
+
+	/* jshint -W030 */
+
 	var definitions = this._define.definitions;
 	var instanceDefinitions = Object.create(null);
 	var map = this;
-	each(props, function(value, prop){
-		if(definitions[prop]) {
+	canReflect.eachKey(props, function(value, prop){
+		if(definitions[prop] !== undefined) {
 			map[prop] = value;
 		} else {
 			var def = define.makeSimpleGetterSetter(prop);
