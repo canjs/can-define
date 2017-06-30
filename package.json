@@ -1,6 +1,6 @@
 {
   "name": "can-define",
-  "version": "1.2.3",
+  "version": "1.3.0-pre.2",
   "description": "Create observable objects with JS dot operator compatibility",
   "main": "can-define.js",
   "scripts": {
@@ -32,12 +32,12 @@
   "homepage": "https://github.com/canjs/can-define",
   "dependencies": {
     "can-cid": "^1.0.0",
-    "can-compute": "^3.1.0",
+    "can-compute": "^3.3.0-pre.1",
     "can-construct": "^3.2.0",
     "can-event": "^3.5.0",
     "can-namespace": "^1.0.0",
-    "can-observation": "^3.2.0",
-    "can-reflect": "^1.0.1",
+    "can-observation": "^3.3.0-pre.1",
+    "can-reflect": "^1.1.0-pre.2",
     "can-symbol": "^1.0.0",
     "can-types": "^1.1.0",
     "can-util": "^3.9.0"

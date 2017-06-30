@@ -105,7 +105,7 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 	if(objPrototype.hasOwnProperty("_data")) {
 		for (prop in dataInitializers) {
 			replaceWith(objPrototype._data, prop, dataInitializers[prop].bind(objPrototype), true);
-		}		
+		}
 	} else {
 		replaceWith(objPrototype, "_data", function() {
 			var map = this;
@@ -161,7 +161,7 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 			return new define.Iterator(this);
 		});
 	}
-	
+
 	return result;
 };
 

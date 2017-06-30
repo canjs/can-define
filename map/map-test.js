@@ -6,8 +6,9 @@ var Observation = require("can-observation");
 var each = require("can-util/js/each/each");
 var compute = require("can-compute");
 var assign = require("can-util/js/assign/assign");
-var canSymbol = require("can-symbol");
 var canReflect = require("can-reflect");
+var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
+
 var sealWorks = (function() {
 	try {
 		var o = {};
@@ -76,6 +77,7 @@ QUnit.test("loop only through defined serializable props", function(){
 		}
 	});
 	var inst = new MyMap({propA: 1, propB: 2});
+
 	QUnit.deepEqual(Object.keys(inst.get()), ["propA"]);
 
 });
@@ -185,15 +187,15 @@ QUnit.test("set multiple props", function(){
 	var map = new DefineMap();
 	map.set({a: 0, b: 2});
 
-	QUnit.deepEqual(map.get(), {a: 0, b: 2});
+	QUnit.deepEqual(map.get(), {a: 0, b: 2}, "added props");
 
 	map.set({a: 2}, true);
 
-	QUnit.deepEqual(map.get(), {a: 2});
+	QUnit.deepEqual(map.get(), {a: 2}, "removed b");
 
 	map.set({foo: {bar: "VALUE"}});
 
-	QUnit.deepEqual(map.get(), {foo: {bar: "VALUE"}, a: 2});
+	QUnit.deepEqual(map.get(), {foo: {bar: "VALUE"}, a: 2}, "works nested");
 });
 
 QUnit.test("serialize responds to added props", function(){
@@ -733,14 +735,14 @@ QUnit.test("can-reflect getKeyDependencies", function() {
 
 });
 
-QUnit.test("can-reflect setValue", function() {
+QUnit.test("can-reflect assign", function() {
 	var aData = { "a": "b" };
 	var bData = { "b": "c" };
 
 	var a = new DefineMap(aData);
 	var b = new DefineMap(bData);
 
-	a[canSymbol.for("can.setValue")](b);
+	canReflect.assign( a,b);
 	QUnit.deepEqual(a.get(), assign(aData, bData), "when called with an object, should merge into existing object");
 });
 
@@ -833,4 +835,10 @@ QUnit.test("DefineMap short-hand Type (#221)", function(){
 
 	QUnit.ok(c.other instanceof DefineMap, "is a DefineMap");
 
+});
+
+QUnit.test("non-Object constructor", function() {
+	var Constructor = DefineMap.extend();
+	QUnit.ok(!isPlainObject(new DefineMap()), "instance of DefineMap is not a plain object");
+	QUnit.ok(!isPlainObject(new Constructor()), "instance of extended DefineMap is not a plain object");
 });

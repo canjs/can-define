@@ -1037,9 +1037,7 @@ test("works with can-reflect", function(){
 	var c;
 	QUnit.equal( canReflect.getKeyValue(b, "0"), "foo", "unbound value");
 
-	var handler = function(newValue){
-		QUnit.equal(newValue, "quux", "observed new value");
-	};
+
 	QUnit.ok(!canReflect.isValueLike(b), "isValueLike is false");
 	QUnit.ok(canReflect.isObservableLike(b), "isObservableLike is true");
 	QUnit.ok(canReflect.isMapLike(b), "isMapLike is true");
@@ -1061,6 +1059,7 @@ test("works with can-reflect", function(){
 		"dependencies returned"
 	);
 
+	/*
 	canReflect.onKeysAdded(b, handler);
 	canReflect.onKeysRemoved(b, handler);
 	QUnit.ok(b.__bindEvents.add, "add handler added");
@@ -1069,7 +1068,7 @@ test("works with can-reflect", function(){
 	b.push("quux");
 	c.push("quux");
 	QUnit.equal( canReflect.getKeyValue(c, "length"), "4", "bound value");
-	b.pop();
+	b.pop();*/
 
 });
 
@@ -1093,7 +1092,7 @@ QUnit.test("can-reflect deleteKeyValue", function(){
 	QUnit.ok(!("foo" in a.get()), "value not included in serial");
 });
 
-QUnit.test("can-reflect getKeyDependencies", function() { 
+QUnit.test("can-reflect getKeyDependencies", function() {
 	var a = new DefineMap({ foo: 4 });
 	var b = new DefineList([ "foo", "bar" ]);
 	var c;
@@ -1113,7 +1112,7 @@ QUnit.test("can-reflect getKeyDependencies", function() {
 
 });
 
-QUnit.test("registered symbols", function() { 
+QUnit.test("registered symbols", function() {
 	var a = new DefineMap({ "a": "a" });
 
 	ok(a[canSymbol.for("can.isMapLike")], "can.isMapLike");

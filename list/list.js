@@ -17,6 +17,7 @@ var ns = require("can-namespace");
 var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
 var CIDSet = require("can-util/js/cid-set/cid-set");
+var CIDMap = require("can-util/js/cid-map/cid-map");
 
 var splice = [].splice;
 var runningNative = false;
@@ -168,7 +169,7 @@ var DefineList = Construct.extend("DefineList",
 				Observation.add(this, "" + index);
 				return this[index];
 			} else {
-				return defineHelpers.serialize(this, 'get', []);
+				return canReflect.unwrap(this, CIDMap);
 			}
 		},
 		/**
@@ -263,12 +264,10 @@ var DefineList = Construct.extend("DefineList",
 					if (value) {
 						this.replace(prop);
 					} else {
-						this.splice.apply(this, [ 0, prop.length ].concat(prop));
+						canReflect.assignList(this, prop);
 					}
 				} else {
-					canReflect.eachKey(prop, function(value, prop) {
-						canReflect.setKeyValue(this, prop, value);
-					}, this);
+					canReflect.assignMap(this, prop);
 				}
 			}
 			return this;
@@ -405,7 +404,7 @@ var DefineList = Construct.extend("DefineList",
 		 *   @return {Array} An array with each item's serialied value.
 		 */
 		serialize: function() {
-			return defineHelpers.serialize(this, 'serialize', []);
+			return canReflect.serialize(this, CIDMap);
 		}
 	});
 
@@ -746,7 +745,7 @@ each({
 	 * @signature `list.reduce(callback, initialValue, [, thisArg])`
 	 *
 	 * Loops through the values of the list, calling `callback` for each one until the list
-	 * ends.  The return value of `callback` is passed to the next iteration as the first argument, 
+	 * ends.  The return value of `callback` is passed to the next iteration as the first argument,
 	 * and finally returned by `reduce`.
 	 *
 	 * ```js
@@ -768,7 +767,7 @@ each({
 	 *    - index (Integer) - the index of the current element of the list.
 	 *    - list (DefineList) - the `DefineList` the elements are coming from.
 	 *
-	 * The return value of `callback` is passed to the next iteration as the first argument, and returned from 
+	 * The return value of `callback` is passed to the next iteration as the first argument, and returned from
 	 * `reduce` if the last iteration.
 	 *
 	 * @param {*} [initialValue] The initial value to use as `current` in the first iteration
@@ -785,7 +784,7 @@ each({
 	 * @signature `list.reduceRight(callback, initialValue, [, thisArg])`
 	 *
 	 * Loops through the values of the list in reverse order, calling `callback` for each one until the list
-	 * ends.  The return value of `callback` is passed to the next iteration as the first argument, 
+	 * ends.  The return value of `callback` is passed to the next iteration as the first argument,
 	 * and finally returned by `reduce`.
 	 *
 	 * ```js
@@ -807,7 +806,7 @@ each({
 	 *    - index (Integer) - the index of the current element of the list.
 	 *    - list (DefineList) - the `DefineList` the elements are coming from.
 	 *
-	 * The return value of `callback` is passed to the next iteration as the first argument, and returned from 
+	 * The return value of `callback` is passed to the next iteration as the first argument, and returned from
 	 * `reduce` if the last iteration.
 	 *
 	 * @param {*} [initialValue] The initial value to use as `current` in the first iteration
@@ -915,7 +914,7 @@ each({
 	 *    @return {Boolean} `false` if every element in `list` fails to match `props`, `true` otherwise
 	 */
 	"some": 3
-}, 
+},
 function a(fnLength, fnName) {
 	DefineList.prototype[fnName] = function() {
 		var self = this;
@@ -935,7 +934,7 @@ function a(fnLength, fnName) {
 			return callback.apply(thisArg, cbArgs);
 		};
 		var ret = Array.prototype[fnName].apply(this, args);
-		
+
 		if(fnName === "map") {
 			return new DefineList(ret);
 		}
@@ -1380,22 +1379,63 @@ DefineList.prototype.items = function() {
 	return this.get();
 };
 
-DefineList.prototype[canSymbol.for("can.getKeyValue")] = DefineList.prototype.get;
-DefineList.prototype[canSymbol.for("can.setKeyValue")] = DefineList.prototype.set;
-DefineList.prototype[canSymbol.for("can.deleteKeyValue")] = function(prop) {
-	if(typeof prop === "number") {
-		this.splice(prop, 1);
-	} else {
-		this.set(prop, undefined);	
+
+canReflect.assignSymbols(DefineList.prototype,{
+	// type
+	"can.isMoreListLikeThanMapLike": true,
+	"can.isMapLike": true,
+	"can.isListLike": true,
+	"can.isValueLike": false,
+	// get/set
+	"can.getKeyValue": DefineList.prototype.get,
+	"can.setKeyValue": DefineList.prototype.set,
+	"can.deleteKeyValue": function(prop) {
+		if(typeof prop === "number") {
+			this.splice(prop, 1);
+		} else {
+			this.set(prop, undefined);
+		}
+		return this;
+	},
+	// shape get/set
+	"can.assignDeep": function(source){
+		canBatch.start();
+		canReflect.assignList(this, source);
+		canBatch.stop();
+	},
+	"can.updateDeep": function(source){
+		canBatch.start();
+		this.replace(source);
+		canBatch.stop();
+	},
+
+	// observability
+	"can.keyHasDependencies": function(key) {
+		return !!(this._computed && this._computed[key] && this._computed[key].compute);
+	},
+	"can.getKeyDependencies": function(key) {
+		var ret;
+		if(this._computed && this._computed[key] && this._computed[key].compute) {
+			ret = {};
+			ret.valueDependencies = new CIDSet();
+			ret.valueDependencies.add(this._computed[key].compute);
+		}
+		return ret;
+	},
+
+	// Deprecated
+	"can.onKeysAdded": function(handler) {
+		this[canSymbol.for("can.onKeyValue")]("add", handler);
+	},
+	"can.onKeysRemoved": function(handler) {
+		this[canSymbol.for("can.onKeyValue")]("remove", handler);
+	},
+	"can.splice": function(index, deleteCount, insert){
+		this.splice.apply(this, [index, deleteCount].concat(insert));
 	}
-	return this;
-};
-DefineList.prototype[canSymbol.for("can.getValue")] = DefineList.prototype.get;
-DefineList.prototype[canSymbol.for("can.setValue")] = DefineList.prototype.replace;
-DefineList.prototype[canSymbol.for("can.isMapLike")] = true;
-DefineList.prototype[canSymbol.for("can.isListLike")] = true;
-DefineList.prototype[canSymbol.for("can.isValueLike")] = false;
-DefineList.prototype[canSymbol.iterator] = function() {
+});
+
+canReflect.setKeyValue(DefineList.prototype, canSymbol.iterator, function() {
 	var index = -1;
 	return {
 		next: function() {
@@ -1406,25 +1446,7 @@ DefineList.prototype[canSymbol.iterator] = function() {
 			};
 		}.bind(this)
 	};
-};
-DefineList.prototype[canSymbol.for("can.keyHasDependencies")] = function(key) {
-	return !!(this._computed && this._computed[key] && this._computed[key].compute);
-};
-DefineList.prototype[canSymbol.for("can.getKeyDependencies")] = function(key) {
-	var ret;
-	if(this._computed && this._computed[key] && this._computed[key].compute) {
-		ret = {};
-		ret.valueDependencies = new CIDSet();
-		ret.valueDependencies.add(this._computed[key].compute);
-	}
-	return ret;
-};
-DefineList.prototype[canSymbol.for("can.onKeysAdded")] = function(handler) {
-	this[canSymbol.for("can.onKeyValue")]("add", handler);
-};
-DefineList.prototype[canSymbol.for("can.onKeysRemoved")] = function(handler) {
-	this[canSymbol.for("can.onKeyValue")]("remove", handler);
-};
+});
 
 types.DefineList = DefineList;
 types.DefaultList = DefineList;
