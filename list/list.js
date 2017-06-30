@@ -76,7 +76,7 @@ var DefineList = Construct.extend("DefineList",
 			define.setup.call(this, {}, false);
 			this._length = 0;
 			if (items) {
-				this.splice.apply(this, [ 0, 0 ].concat(defineHelpers.toObject(this, items, [], DefineList)));
+				this.splice.apply(this, [ 0, 0 ].concat(canReflect.toArray(items)));
 			}
 		},
 		__type: define.types.observable,

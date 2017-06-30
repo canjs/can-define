@@ -443,20 +443,18 @@ QUnit.test("copying DefineMap excludes constructor", function() {
 });
 
 QUnit.test("cloning from non-defined map excludes special keys on setup", function() {
+	var MyType = DefineMap.extend({
 
-	var a = {
-		_data: {},
-		constructor: function() {},
-		_bindEvents: {},
-		_cid: "object0",
+	});
+	var a = new MyType({
 		"foo": "bar"
-	};
+	});
 
 	var b = new DefineMap(a);
 
 	QUnit.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
 	QUnit.notEqual(a._data, b._data, "_data prop not copied");
-	QUnit.notEqual(a._bindEvents, b._bindEvents, "_bindEvents prop not copied");
+	QUnit.notEqual(a.__bindEvents, b.__bindEvents, "_bindEvents prop not copied");
 	QUnit.notEqual(a._cid, b._cid, "_cid prop not copied");
 	QUnit.equal(a.foo, b.foo, "Other props copied");
 
@@ -464,14 +462,12 @@ QUnit.test("cloning from non-defined map excludes special keys on setup", functi
 
 QUnit.test("copying from .set() excludes special keys", function() {
 
-	var a = {
-		_data: {},
-		constructor: function() {},
-		_bindEvents: {},
-		_cid: "object0",
+	var MyType = DefineMap.extend({});
+
+	var a = new MyType({
 		"foo": "bar",
 		"existing": "newVal"
-	};
+	});
 
 	var b = new DefineMap({
 		"existing": "oldVal"
@@ -480,7 +476,7 @@ QUnit.test("copying from .set() excludes special keys", function() {
 
 	QUnit.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
 	QUnit.notEqual(a._data, b._data, "_data prop not copied");
-	QUnit.notEqual(a._bindEvents, b._bindEvents, "_bindEvents prop not copied");
+	QUnit.notEqual(a.__bindEvents, b.__bindEvents, "_bindEvents prop not copied");
 	QUnit.notEqual(a._cid, b._cid, "_cid prop not copied");
 	QUnit.equal(a.foo, b.foo, "NEw props copied");
 

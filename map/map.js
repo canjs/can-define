@@ -22,12 +22,39 @@ var keysForDefinition = function(definitions) {
 	return keys;
 };
 
-
+function assignDeep(source){
+	canBatch.start();
+	// TODO: we should probably just throw an error instead of cleaning
+	canReflect.assignDeepMap(this, source || {});
+	canBatch.stop();
+}
+function updateDeep(source){
+	canBatch.start();
+	// TODO: we should probably just throw an error instead of cleaning
+	canReflect.updateDeepMap(this, source || {});
+	canBatch.stop();
+}
+function setKeyValue(key, value) {
+	var defined = defineHelpers.defineExpando(this, key, value);
+	if(!defined) {
+		this[key] = value;
+	}
+}
+function getKeyValue(key) {
+	var value = this[key];
+	if(value !== undefined || key in this || Object.isSealed(this)) {
+		return value;
+	} else {
+		Observation.add(this, key);
+		return this[key];
+	}
+}
 var DefineMap = Construct.extend("DefineMap",{
 	setup: function(base){
 		var key,
 			prototype = this.prototype;
 		if(DefineMap) {
+			// we have already created
 			define(prototype, prototype, base.prototype._define);
 			for(key in DefineMap.prototype) {
 				define.defineConfigurableAndNotEnumerable(prototype, key, prototype[key]);
@@ -36,15 +63,15 @@ var DefineMap = Construct.extend("DefineMap",{
 			this.prototype.setup = function(props){
 				define.setup.call(
 					this,
-					defineHelpers.removeSpecialKeys(defineHelpers.toObject(this, props,{}, DefineMap)),
+					props || {},
 					this.constructor.seal
 				);
 			};
 		} else {
 			for(key in prototype) {
 				define.defineConfigurableAndNotEnumerable(prototype, key, prototype[key]);
+			}
 		}
-	}
 		define.defineConfigurableAndNotEnumerable(prototype, "constructor", this);
 	}
 },{
@@ -64,7 +91,7 @@ var DefineMap = Construct.extend("DefineMap",{
 		}
 		define.setup.call(
 			this,
-			defineHelpers.removeSpecialKeys(defineHelpers.toObject(this, props,{}, DefineMap)),
+			props || {},
 			sealed === true
 		);
 	},
@@ -108,14 +135,7 @@ var DefineMap = Construct.extend("DefineMap",{
 	 */
 	get: function(prop){
 		if(prop) {
-			var value = this[prop];
-			if(value !== undefined || prop in this || Object.isSealed(this)) {
-				return value;
-			} else {
-				Observation.add(this, prop);
-				return this[prop];
-			}
-
+			return getKeyValue.call(this, prop);
 		} else {
 			return canReflect.unwrap(this, CIDMap);
 		}
@@ -152,17 +172,15 @@ var DefineMap = Construct.extend("DefineMap",{
 		if(typeof prop === "object") {
 
 			if(value === true) {
-				this[canSymbol.for("can.updateDeep")](prop);
+				updateDeep.call(this, prop);
 			} else {
-				this[canSymbol.for("can.assignDeep")](prop);
+				assignDeep.call(this, prop);
 			}
 
-			return this;
+		} else {
+			setKeyValue.call(this, prop, value);
 		}
-		var defined = defineHelpers.defineExpando(this, prop, value);
-		if(!defined) {
-			this[prop] = value;
-		}
+
 		return this;
 	},
 	/**
@@ -225,8 +243,8 @@ canReflect.assignSymbols(DefineMap.prototype,{
 	"can.isValueLike": false,
 
 	// -get/set-
-	"can.getKeyValue": DefineMap.prototype.get,
-	"can.setKeyValue": DefineMap.prototype.set,
+	"can.getKeyValue": getKeyValue,
+	"can.setKeyValue": setKeyValue,
 	"can.deleteKeyValue": function(prop) {
 		this.set(prop, undefined);
 		return this;
@@ -239,18 +257,8 @@ canReflect.assignSymbols(DefineMap.prototype,{
 	},
 
 	// -shape get/set-
-	"can.assignDeep": function(source){
-		canBatch.start();
-		// TODO: we should probably just throw an error instead of cleaning
-		canReflect.assignDeepMap(this, defineHelpers.removeSpecialKeys(canReflect.assignMap({}, source)));
-		canBatch.stop();
-	},
-	"can.updateDeep": function(source){
-		canBatch.start();
-		// TODO: we should probably just throw an error instead of cleaning
-		canReflect.updateDeepMap(this, defineHelpers.removeSpecialKeys(canReflect.assignMap({}, source)));
-		canBatch.stop();
-	},
+	"can.assignDeep": assignDeep,
+	"can.updateDeep": updateDeep,
 	"can.unwrap": defineHelpers.reflectUnwrap,
 	"can.serialize": defineHelpers.reflectSerialize,
 
