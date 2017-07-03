@@ -14,7 +14,6 @@ var assign = require("can-util/js/assign/assign");
 var dev = require("can-util/js/dev/dev");
 var CID = require("can-cid");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
-var isArray = require("can-util/js/is-array/is-array");
 var types = require("can-types");
 var each = require("can-util/js/each/each");
 var defaults = require("can-util/js/defaults/defaults");
@@ -474,7 +473,7 @@ make = {
 		},
 		Type: function(prop, Type, set) {
 			// `type`: {foo: "string"}
-			if(isArray(Type) && types.DefineList) {
+			if(Array.isArray(Type) && types.DefineList) {
 				Type = types.DefineList.extend({
 					"#": Type[0]
 				});
@@ -645,7 +644,7 @@ getDefinitionOrMethod = function(prop, value, defaultDefinition){
 			definition = {type: value};
 		}
 		// or leaves as a function
-	} else if( isArray(value) ) {
+	} else if( Array.isArray(value) ) {
 		definition = {Type: value};
 	} else if( isPlainObject(value) ){
 		definition = value;
@@ -906,7 +905,7 @@ define.types = {
 		return true;
 	},
 	'observable': function(newVal) {
-				if(isArray(newVal) && types.DefineList) {
+				if(Array.isArray(newVal) && types.DefineList) {
 						newVal = new types.DefineList(newVal);
 				}
 				else if(isPlainObject(newVal) &&  types.DefineMap) {
@@ -915,7 +914,7 @@ define.types = {
 				return newVal;
 		},
 	'stringOrObservable': function(newVal) {
-		if(isArray(newVal)) {
+		if(Array.isArray(newVal)) {
 			return new types.DefaultList(newVal);
 		}
 		else if(isPlainObject(newVal)) {

@@ -3,7 +3,6 @@ require("../map/map-test");
 require("../define-test");
 var DefineMap = require("can-define/map/map");
 var DefineList = require("can-define/list/list");
-var isArray = require("can-util/js/is-array/is-array");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
 var types = require("can-types");
 
@@ -102,7 +101,7 @@ QUnit.test("recursively `get`s (#31)", function(){
     });
 
     var res = m.get();
-    QUnit.ok( isArray(res.l), "is a plain array");
+    QUnit.ok( Array.isArray(res.l), "is a plain array");
     QUnit.ok( isPlainObject(res.l[0]), "plain object");
 });
 
