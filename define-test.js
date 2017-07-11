@@ -3,7 +3,6 @@ var compute = require("can-compute");
 var define = require("can-define");
 var CanList = require("can-define/list/list");
 var canBatch = require("can-event/batch/batch");
-var isArray = require("can-util/js/is-array/is-array");
 var each = require("can-util/js/each/each");
 var canSymbol = require("can-symbol");
 
@@ -265,7 +264,7 @@ QUnit.test("basics value", function() {
 		t2 = new Typer2();
 
 	QUnit.ok(t1.prop !== t2.prop, "different array instances");
-	QUnit.ok(isArray(t1.prop), "its an array");
+	QUnit.ok(Array.isArray(t1.prop), "its an array");
 
 
 });
@@ -287,7 +286,7 @@ test("basics Value", function() {
 	var t1 = new Typer(),
 		t2 = new Typer();
 	QUnit.ok(t1.prop !== t2.prop, "different array instances");
-	QUnit.ok(isArray(t1.prop), "its an array");
+	QUnit.ok(Array.isArray(t1.prop), "its an array");
 
 
 });
