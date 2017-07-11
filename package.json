@@ -47,7 +47,7 @@
     "serve": "^5.1.4",
     "steal": "^1.0.7",
     "steal-qunit": "^1.0.0",
-    "steal-tools": "^1.0.1",
+    "steal-tools": "^1.4.0",
     "testee": "^0.7.0",
     "bit-docs": "^0.0.7"
   },
