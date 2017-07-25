@@ -1031,6 +1031,16 @@ test("compute(DefineList, 0) works (#17)", function(assert){
 	list.set(0, 5);
 });
 
+QUnit.test("can-reflect onValue", function(assert) {
+	assert.expect(1);
+	var list = new DefineList([1,2,3]);
+	var first = compute(list, 0);
+	canReflect.onValue(first, function(newVal) {
+		assert.equal(newVal, 5);
+	});
+	list.set(0, 5);
+});
+
 test("works with can-reflect", function(){
 	var a = new DefineMap({ foo: 4 });
 	var b = new DefineList([ "foo", "bar" ]);
