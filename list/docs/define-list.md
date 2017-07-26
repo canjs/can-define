@@ -92,3 +92,15 @@ people.pop(); // remove ["eve"] 2
 people.unshift("Xerxes"); // add ["Xerxes"] 1
                           // length 3 2
 ```
+
+Note that there is no way to listen to when an index changes. The below usage is invalid:
+
+```
+var list = new can.DefineList(['zero', 'one', 'two']);
+list.on(0, function onIndexChange () {
+  // this callback is never called
+});
+list[0] = 'foo';
+list.set(0, 'bar');
+list.splice(0, 1, 'baz');
+```
