@@ -102,5 +102,5 @@ list.on(0, function onIndexChange () {
 });
 list[0] = 'foo';
 list.set(0, 'bar');
-list.splice(0, 1, 'zero!!!');
+list.splice(0, 1, 'baz');
 ```
