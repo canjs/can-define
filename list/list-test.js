@@ -1041,6 +1041,16 @@ QUnit.test("can-reflect onValue", function(assert) {
 	list.set(0, 5);
 });
 
+QUnit.test("can-reflect onKeyValue", function(assert) {
+	assert.expect(1);
+	var list = new DefineList([1,2,3]);
+	var key = 1;
+	canReflect.onKeyValue(list, key, function(newVal) {
+		assert.equal(newVal, 5);
+	});
+	list.set(key, 5);
+});
+
 test("works with can-reflect", function(){
 	var a = new DefineMap({ foo: 4 });
 	var b = new DefineList([ "foo", "bar" ]);
