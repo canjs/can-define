@@ -92,3 +92,7 @@ people.pop(); // remove ["eve"] 2
 people.unshift("Xerxes"); // add ["Xerxes"] 1
                           // length 3 2
 ```
+
+__NOTE:__ Only changes made to indexed values using the list's `set` method will dispatch change events.
+👍  `defineList.set(0, 'newValue'); // will dispatch event`
+👎  `defineList[0] = 'newValue'; // will NOT dispatch event`

@@ -18,6 +18,7 @@ var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
 var CIDSet = require("can-util/js/cid-set/cid-set");
 var CIDMap = require("can-util/js/cid-map/cid-map");
+var singleReference = require("can-util/js/single-reference/single-reference");
 
 var splice = [].splice;
 var runningNative = false;
@@ -1389,6 +1390,33 @@ canReflect.assignSymbols(DefineList.prototype,{
 	// get/set
 	"can.getKeyValue": DefineList.prototype.get,
 	"can.setKeyValue": DefineList.prototype.set,
+
+	// Called for every reference to a property in a template
+	// if a key is a numerical index then translate to length event
+	"can.onKeyValue": function(key, handler) {
+		if (isNaN(key)) {
+			this.addEventListener(key, handler);
+		}
+		else {
+			var translationHandler = function() {
+				handler(this[key]);
+			};
+
+			singleReference.set(handler, this, translationHandler, key);
+			this.addEventListener('length', translationHandler);
+		}
+	},
+	// Called when a property reference is removed
+	"can.offKeyValue": function(key, handler) {
+		if (isNaN(key)) {
+			this.removeEventListener(key, handler);
+		}
+		else {
+			var translationHandler = singleReference.getAndDelete(handler, this, key);
+			this.removeEventListener('length', translationHandler);
+		}
+	},
+
 	"can.deleteKeyValue": function(prop) {
 		if(typeof prop === "number") {
 			this.splice(prop, 1);
