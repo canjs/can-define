@@ -581,6 +581,9 @@ make = {
 		},
 		computed: function(prop) {
 			return function() {
+				if (!this.__inSetup) {
+					Observation.add(this, prop);
+				}
 				return canReflect.getValue(this._computed[prop].compute);
 			};
 		}

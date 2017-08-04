@@ -1356,3 +1356,47 @@ QUnit.test('defined properties are configurable', function(){
 	var a = new A();
 	QUnit.equal(a.val, "bar", "It was redefined");
 });
+
+function objectMock (obj, propertyKey, newValue) {
+	var oldValue = obj[propertyKey];
+	obj[propertyKey] = newValue;
+	return function unmock () {
+		obj[propertyKey] = oldValue;
+	};
+}
+
+QUnit.test('reflect onKeyValue should be bound for property computes', function (assert) {
+	/*
+	This test is making sure that the binding is placed on the
+	property key, not the property value.
+	*/
+	assert.expect(1);
+	var value = 1;
+	var externalCompute = compute(value);
+
+	var Person = function(first, last) {
+		this.first = first;
+		this.last = last;
+	};
+
+	define(Person.prototype, {
+		get foo () {
+			return externalCompute();
+		}
+	});
+
+	var map = new Person();
+	var onKeyValueKey = canSymbol.for('can.onKeyValue');
+	var unmock = objectMock(map, onKeyValueKey, function (key, handler) {
+		assert.equal(key, 'foo', 'should match listening key');
+	});
+
+	var proxyValue = compute(function () {
+		return map.foo;
+	});
+
+	var subscription = function () {};
+	proxyValue.on('change', subscription);
+	proxyValue.off('change', subscription);
+	unmock();
+});
