@@ -1132,6 +1132,49 @@ QUnit.test("can-reflect getKeyDependencies", function() {
 
 });
 
+QUnit.test("assign property", function() {
+	var list = new DefineList(["A","B"]);
+	list.assign({count: 0, skip: 2});
+	equal(list.get('count'), 0, 'Count set properly');
+	list.assign({count: 1000});
+	equal(list.get('count'), 1000, 'Count set properly');
+	equal(list.get('skip'), 2, 'Skip is unchanged');
+});
+
+QUnit.test("update property", function() {
+	var list = new DefineList(["A","B"]);
+	list.update({count: 0, skip: 2});
+	equal(list.get('count'), 0, 'Count set properly');
+
+	list.update({count: 1000});
+
+	equal(list.get('count'), 1000, 'Count set properly');
+	equal(list.get('skip'), undefined, 'Skip is changed');
+});
+
+QUnit.test("assignDeep property", function() {
+	var list = new DefineList(["A","B"]);
+	list.assignDeep({count: 0, skip: 2, foo: { bar: 'zed', tar: 'yap' }});
+
+	equal(list.get('count'), 0, 'Count set properly');
+
+	list.assignDeep({count: 1000, foo: {bar: 'updated'}});
+	equal(list.get('count'), 1000, 'Count set properly');
+	equal(list.get('skip'), 2, 'Skip is unchanged');
+	propEqual(list.get('foo'), { bar: 'updated', tar: 'yap' }, 'Foo was updated properly');
+});
+
+QUnit.test("updateDeep property", function() {
+	var list = new DefineList(["A","B"]);
+	list.updateDeep({count: 0, skip: 2, foo: { bar: 'zed', tar: 'yap' }});
+	equal(list.get('count'), 0, 'Count set properly');
+
+	list.updateDeep({count: 1000});
+
+	equal(list.get('count'), 1000, 'Count set properly');
+	equal(list.get('skip'), undefined, 'Skip is set to undefined');
+	propEqual(list.get('foo'), undefined, 'Foo is set to undefined');
+});
 
 QUnit.test("registered symbols", function() {
 	var a = new DefineMap({ "a": "a" });

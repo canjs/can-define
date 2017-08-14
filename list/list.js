@@ -261,6 +261,7 @@ var DefineList = Construct.extend("DefineList",
 			}
 			// otherwise we are setting multiple
 			else {
+				//we are deprecating this in #245
 				if (canReflect.isListLike(prop)) {
 					if (value) {
 						this.replace(prop);
@@ -273,10 +274,106 @@ var DefineList = Construct.extend("DefineList",
 			}
 			return this;
 		},
-		assign: function(prop, value) {},
-		update: function(prop, value) {},
-		assignDeep: function(prop, value) {},
-		updateDeep: function(prop, value) {},
+		/**
+		 * @function can-define/list/list.prototype.assign assign
+		 * @parent can-define/list/list.prototype
+		 *
+		 * Sets an item or property or items or properties on a list.
+		 *
+		 * @signature `list.assign(newProps)`
+		 *
+		 * Updates the properties on the list with `newProps`.
+		 *
+		 * ```js
+		 * var list = new DefineList(["A","B"]);
+		 * list.assign({count: 1000, skip: 2});
+		 * list.get("count") //-> 1000
+		 * ```
+		 */
+		assign: function(prop) {
+			if (canReflect.isListLike(prop)) {
+				canReflect.assignList(this, prop);
+			} else {
+				canReflect.assignMap(this, prop);
+			}
+			return this;
+		},
+		/**
+		 * @function can-define/list/list.prototype.assign update
+		 * @parent can-define/list/list.prototype
+		 *
+		 * Sets an item or property or items or properties on a list.
+		 *
+		 * @signature `list.update(newProps)`
+		 *
+		 * Updates the properties on the list with `newProps`. Properties not in `newProps` will be set to `undefined`.
+		 *
+		 * ```js
+		 * var list = new DefineList(["A","B"]);
+		 * list.assign({count: 0, skip: 2});
+		 * list.update({count: 1000});
+		 * list.get("count") //-> 1000
+		 * list.get("skip") //-> undefined
+		 * ```
+		 */
+		update: function(prop) {
+			if (canReflect.isListLike(prop)) {
+				canReflect.updateList(this, prop);
+			} else {
+				canReflect.updateMap(this, prop);
+			}
+			return this;
+		},
+		/**
+		 * @function can-define/list/list.prototype.assign assignDeep
+		 * @parent can-define/list/list.prototype
+		 *
+		 * Sets an item or property or items or properties on a list.
+		 *
+		 * @signature `list.assignDeep(newProps)`
+		 *
+		 * Updates the properties on the list with `newProps`.
+		 *
+		 * ```js
+		 * var list = new DefineList(["A","B"]);
+		 * list.assignDeep({count: 1000, skip: 2});
+		 * list.get("count") //-> 1000
+		 * ```
+		 */
+		assignDeep: function(prop) {
+			if (canReflect.isListLike(prop)) {
+				canReflect.assignDeepList(this, prop);
+			} else {
+				canReflect.assignDeepMap(this, prop);
+			}
+			return this;
+		},
+		/**
+		 * @function can-define/list/list.prototype.assign updateDeep
+		 * @parent can-define/list/list.prototype
+		 *
+		 * Sets an item or property or items or properties on a list.
+		 *
+		 * @signature `list.updateDeep(newProps)`
+		 *
+		 * Updates the properties on the list with `newProps`. Properties not in `newProps` will be set to `undefined`.
+		 *
+		 * ```js
+		 * var list = new DefineList(["A","B"]);
+		 * list.assign({count: 0, skip: 2, foo: {bar: 'zed'}});
+		 * list.updateDeep({count: 1000});
+		 * list.get("count") //-> 1000
+		 * list.get("foo") //-> undefined
+		 * ```
+		 */
+		updateDeep: function(prop) {
+			if (canReflect.isListLike(prop)) {
+				canReflect.updateDeepList(this, prop);
+			} else {
+				canReflect.updateDeepMap(this, prop);
+			}
+			return this;
+		},
 		_items: function() {
 			var arr = [];
 			this._each(function(item) {
