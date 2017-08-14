@@ -1132,6 +1132,7 @@ QUnit.test("can-reflect getKeyDependencies", function() {
 
 });
 
+
 QUnit.test("registered symbols", function() {
 	var a = new DefineMap({ "a": "a" });
 

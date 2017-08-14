@@ -273,6 +273,10 @@ var DefineList = Construct.extend("DefineList",
 			}
 			return this;
 		},
+		assign: function(prop, value) {},
+		update: function(prop, value) {},
+		assignDeep: function(prop, value) {},
+		updateDeep: function(prop, value) {},
 		_items: function() {
 			var arr = [];
 			this._each(function(item) {

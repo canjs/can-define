@@ -1,6 +1,7 @@
 "use strict";
 var QUnit = require("steal-qunit");
 var DefineMap = require("can-define/map/map");
+var DefineList = require("can-define/list/list");
 var define = require("can-define");
 var Observation = require("can-observation");
 var each = require("can-util/js/each/each");
@@ -835,4 +836,108 @@ QUnit.test("non-Object constructor", function() {
 	var Constructor = DefineMap.extend();
 	QUnit.ok(!isPlainObject(new DefineMap()), "instance of DefineMap is not a plain object");
 	QUnit.ok(!isPlainObject(new Constructor()), "instance of extended DefineMap is not a plain object");
+});
+
+QUnit.test('Assign value on map', function() {
+	var MyConstruct = DefineMap.extend({
+		list: DefineList,
+		name: 'string'
+	});
+
+	var obj = new MyConstruct({
+		list: ['data', 'data', 'data'],
+		name: 'CanJS',
+		foo: {
+			bar: 'bar',
+			zoo: 'say'
+		}
+	});
+
+
+	obj.assign({
+		list: ['another'],
+		foo: {
+			bar: 'zed'
+		}
+	});
+
+	QUnit.equal(obj.list.length, 1, 'list length should be 1');
+	QUnit.propEqual(obj.foo, { bar: 'zed' }, 'foo.bar is set correctly');
+	QUnit.equal(obj.name, 'CanJS', 'name is unchanged');
+
+});
+
+QUnit.test('Update value on a map', function() {
+	var MyConstruct = DefineMap.extend({
+		list: DefineList,
+		name: 'string'
+	});
+
+	var obj = new MyConstruct({
+		list: ['data', 'data', 'data'],
+		name: 'CanJS',
+		foo: {
+			bar: 'bar'
+		}
+	});
+
+	obj.update({
+		list: ['another'],
+		foo: {
+			bar: 'zed'
+		}
+	});
+
+	QUnit.equal(obj.list.length, 1, 'list length should be 0');
+	QUnit.equal(obj.foo.bar, 'zed', 'foo.bar is set correctly');
+	QUnit.equal(obj.name, undefined, 'name is removed');
+
+});
+
+
+QUnit.test('Deep assign a map', function() {
+	var MyConstruct = DefineMap.extend({
+		list: DefineList,
+		name: 'string'
+	});
+
+	var obj = new MyConstruct({
+		list: ['data', 'data', 'data'],
+		name: 'Test Name'
+	});
+
+	QUnit.equal(obj.list.length, 3, 'list length should be 3');
+
+
+	obj.assignDeep({
+		list: ['something']
+	});
+
+	QUnit.equal(obj.name, 'Test Name', 'Name property is still intact');
+	QUnit.equal(obj.list[0], 'something', 'list length should be 0');
+
+});
+
+
+QUnit.test('Deep updating a map', function() {
+	var MyConstruct = DefineMap.extend({
+		list: DefineList,
+		name: 'string'
+	});
+
+	var obj = new MyConstruct({
+		list: ['data', 'data', 'data'],
+		name: 'Test Name'
+	});
+
+	QUnit.equal(obj.list.length, 3, 'list length should be 3');
+
+
+	obj.updateDeep({
+		list: ['something']
+	});
+
+	QUnit.equal(obj.name, undefined, 'Name property has been reset');
+	QUnit.equal(obj.list[0], 'something', 'list length should be 0');
+
 });
