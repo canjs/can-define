@@ -261,6 +261,7 @@ var DefineList = Construct.extend("DefineList",
 			}
 			// otherwise we are setting multiple
 			else {
+				canDev.warn('can-define/list/list.prototype.set is deprecated; please use can-define/list/list.prototype.assign or can-define/list/list.prototype.update instead');
 				//we are deprecating this in #245
 				if (canReflect.isListLike(prop)) {
 					if (value) {
