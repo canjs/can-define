@@ -5,7 +5,7 @@ var canEvent = require("can-event");
 var canBatch = require("can-event/batch/batch");
 var Observation = require("can-observation");
 var canLog = require("can-util/js/log/log");
-
+var canDev = require("can-util/js/dev/dev");
 var defineHelpers = require("../define-helpers/define-helpers");
 
 var assign = require("can-util/js/assign/assign");

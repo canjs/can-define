@@ -10,6 +10,7 @@ var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
 var CIDSet = require("can-util/js/cid-set/cid-set");
 var CIDMap = require("can-util/js/cid-map/cid-map");
+var canDev = require("can-util/js/dev/dev");
 
 var keysForDefinition = function(definitions) {
 	var keys = [];
