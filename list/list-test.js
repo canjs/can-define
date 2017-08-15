@@ -1042,13 +1042,18 @@ QUnit.test("can-reflect onValue", function(assert) {
 });
 
 QUnit.test("can-reflect onKeyValue", function(assert) {
-	assert.expect(1);
+	assert.expect(3);
 	var list = new DefineList([1,2,3]);
 	var key = 1;
 	canReflect.onKeyValue(list, key, function(newVal) {
 		assert.equal(newVal, 5);
 	});
 	list.set(key, 5);
+
+	canReflect.onKeyValue(list, 'length', function(newVal) {
+		assert.equal(newVal, 4);
+	});
+	list.push(6);
 });
 
 test("works with can-reflect", function(){
