@@ -154,7 +154,9 @@ var DefineMap = Construct.extend("DefineMap",{
 	/**
 	 * @function can-define/map/map.prototype.set set
 	 * @parent can-define/map/map.prototype
-	 * @deprecated Set has been deprecated in favour of deepAssign and deepUpdate
+	 *
+	 * @deprecated {3.9.2} Set has been deprecated in favour of deepAssign and deepUpdate
+	 *
 	 * @description Sets multiple properties on a map instance or a property that wasn't predefined.
 	 *
 	 * @signature `map.set(props [,removeProps])`
