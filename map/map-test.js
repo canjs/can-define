@@ -188,7 +188,7 @@ QUnit.test("set multiple props", function(){
 
 	QUnit.deepEqual(map.get(), {a: 0, b: 2}, "added props");
 
-	map.update({a: 2}, true);
+	map.update({a: 2});
 
 	QUnit.deepEqual(map.get(), {a: 2}, "removed b");
 
@@ -471,7 +471,7 @@ QUnit.test("copying from .set() excludes special keys", function() {
 	var b = new DefineMap({
 		"existing": "oldVal"
 	});
-	b.set(a);
+	b.assign(a);
 
 	QUnit.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
 	QUnit.notEqual(a._data, b._data, "_data prop not copied");

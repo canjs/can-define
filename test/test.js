@@ -113,5 +113,5 @@ QUnit.test("DefineList trigger deprecation warning when set with Map.set (#93)",
 		ok(false, "attr should not be called");
 	};
 
-	map.set({ things: [{ baz: 'luhrmann' }] });
+	map.assign({ things: [{ baz: 'luhrmann' }] });
 });
