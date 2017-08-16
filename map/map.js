@@ -183,7 +183,9 @@ var DefineMap = Construct.extend("DefineMap",{
 	 */
 	set: function(prop, value){
 		if(typeof prop === "object") {
+			//!steal-remove-start
 			canDev.warn('can-define/map/map.prototype.set is deprecated; please use can-define/map/map.prototype.assign or can-define/map/map.prototype.update instead');
+			//!steal-remove-end
 			if(value === true) {
 				updateDeep.call(this, prop);
 			} else {
