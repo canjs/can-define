@@ -300,7 +300,7 @@ var DefineList = Construct.extend("DefineList",
 			return this;
 		},
 		/**
-		 * @function can-define/list/list.prototype.assign update
+		 * @function can-define/list/list.prototype.update update
 		 * @parent can-define/list/list.prototype
 		 *
 		 * Sets an item or property or items or properties on a list.
@@ -326,7 +326,7 @@ var DefineList = Construct.extend("DefineList",
 			return this;
 		},
 		/**
-		 * @function can-define/list/list.prototype.assign assignDeep
+		 * @function can-define/list/list.prototype.assignDeep assignDeep
 		 * @parent can-define/list/list.prototype
 		 *
 		 * Sets an item or property or items or properties on a list.
@@ -337,8 +337,12 @@ var DefineList = Construct.extend("DefineList",
 		 *
 		 * ```js
 		 * var list = new DefineList(["A","B"]);
-		 * list.assignDeep({count: 1000, skip: 2});
+		 * list.assign({count: 1000, skip: 2});
 		 * list.get("count") //-> 1000
+		 *
+		 * list.assign({count: 1000});
+		 * list.get("count") //-> 1000
+		 * list.get("skip") //-> undefined
 		 * ```
 		 */
 		assignDeep: function(prop) {
@@ -350,7 +354,7 @@ var DefineList = Construct.extend("DefineList",
 			return this;
 		},
 		/**
-		 * @function can-define/list/list.prototype.assign updateDeep
+		 * @function can-define/list/list.prototype.updateDeep updateDeep
 		 * @parent can-define/list/list.prototype
 		 *
 		 * Sets an item or property or items or properties on a list.

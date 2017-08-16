@@ -184,15 +184,15 @@ QUnit.test("get with dynamically added properties", function(){
 
 QUnit.test("set multiple props", function(){
 	var map = new DefineMap();
-	map.set({a: 0, b: 2});
+	map.assign({a: 0, b: 2});
 
 	QUnit.deepEqual(map.get(), {a: 0, b: 2}, "added props");
 
-	map.set({a: 2}, true);
+	map.update({a: 2}, true);
 
 	QUnit.deepEqual(map.get(), {a: 2}, "removed b");
 
-	map.set({foo: {bar: "VALUE"}});
+	map.assign({foo: {bar: "VALUE"}});
 
 	QUnit.deepEqual(map.get(), {foo: {bar: "VALUE"}, a: 2}, "works nested");
 });
@@ -208,7 +208,7 @@ QUnit.test("serialize responds to added props", function(){
 	});
 	oi.start();
 
-	map.set({a: 1, b: 2});
+	map.assign({a: 1, b: 2});
 });
 
 QUnit.test("initialize an undefined property", function(){
@@ -220,7 +220,7 @@ QUnit.test("initialize an undefined property", function(){
 
 QUnit.test("set an already initialized null property", function(){
   var map = new DefineMap({ foo: null });
-  map.set({ foo: null });
+  map.assign({ foo: null });
 
   equal(map.foo, null);
 });
@@ -242,8 +242,8 @@ QUnit.test("creating a new key doesn't cause two changes", 1, function(){
 QUnit.test("setting nested object", function(){
 	var m = new DefineMap({});
 
-	m.set({foo: {}});
-	m.set({foo: {}});
+	m.assign({foo: {}});
+	m.assign({foo: {}});
 	QUnit.deepEqual(m.get(), {foo: {}});
 });
 
@@ -888,7 +888,7 @@ QUnit.test('Update value on a map', function() {
 		}
 	});
 
-	QUnit.equal(obj.list.length, 1, 'list length should be 0');
+	QUnit.equal(obj.list.length, 1, 'list length should be 1');
 	QUnit.equal(obj.foo.bar, 'zed', 'foo.bar is set correctly');
 	QUnit.equal(obj.name, undefined, 'name is removed');
 
@@ -914,7 +914,7 @@ QUnit.test('Deep assign a map', function() {
 	});
 
 	QUnit.equal(obj.name, 'Test Name', 'Name property is still intact');
-	QUnit.equal(obj.list[0], 'something', 'list length should be 0');
+	QUnit.equal(obj.list[0], 'something', 'the first element in the list should be updated');
 
 });
 
@@ -938,6 +938,6 @@ QUnit.test('Deep updating a map', function() {
 	});
 
 	QUnit.equal(obj.name, undefined, 'Name property has been reset');
-	QUnit.equal(obj.list[0], 'something', 'list length should be 0');
+	QUnit.equal(obj.list[0], 'something', 'the first element of the list should be updated');
 
 });
