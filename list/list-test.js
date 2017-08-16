@@ -504,7 +504,7 @@ QUnit.test("setting expandos on a DefineList", function() {
     });
 
     var dl = new DL();
-	dl.set({ count: 5, skip: 2 });
+	dl.assign({ count: 5, skip: 2 });
 
 	QUnit.equal(dl.get("count"), 5, "read with .get defined"); //-> 5
 	QUnit.equal(dl.count, 5, "read with . defined");
