@@ -125,6 +125,13 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 		});
 	}
 
+	// Places a `_cid` on the prototype that when first called replaces itself
+	// with a `_cid` object local to the instance.
+	if (!objPrototype.hasOwnProperty("_cid")) {
+		replaceWith(objPrototype, "_cid", function() {
+			return CID({});
+		});
+	}	
 
 	// Add necessary event methods to this object.
 	for (prop in eventsProto) {
@@ -297,7 +304,10 @@ make = {
 					computeFn = defaultValue;
 					valueTrap = trapSets(computeFn);
 				} else {
-					computeFn = new Observation(boundGet, map);
+					computeFn = new Observation(boundGet, map, {
+						isObservable: false,
+						isProactivelyCacheable: true
+					});
 					valueTrap = trapSets(computeFn);
 					valueTrap.lastSetValue = defaultValue;
 				}
@@ -581,6 +591,9 @@ make = {
 		},
 		computed: function(prop) {
 			return function() {
+				if (!this.__inSetup) {
+					Observation.add(this, prop);
+				}
 				return canReflect.getValue(this._computed[prop].compute);
 			};
 		}
