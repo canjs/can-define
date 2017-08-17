@@ -304,7 +304,10 @@ make = {
 					computeFn = defaultValue;
 					valueTrap = trapSets(computeFn);
 				} else {
-					computeFn = new Observation(boundGet, map);
+					computeFn = new Observation(boundGet, map, {
+						isObservable: false,
+						isProactivelyCacheable: true
+					});
 					valueTrap = trapSets(computeFn);
 					valueTrap.lastSetValue = defaultValue;
 				}

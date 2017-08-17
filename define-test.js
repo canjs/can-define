@@ -5,6 +5,7 @@ var CanList = require("can-define/list/list");
 var canBatch = require("can-event/batch/batch");
 var each = require("can-util/js/each/each");
 var canSymbol = require("can-symbol");
+var Observation = require("can-observation");
 
 QUnit.module("can-define");
 
@@ -1365,7 +1366,7 @@ function objectMock (obj, propertyKey, newValue) {
 	};
 }
 
-QUnit.test('reflect onKeyValue should be bound for property computes', function (assert) {
+QUnit.test('canReflect.onKeyValue should bind directly on the map for computed props (#149)', function (assert) {
 	/*
 	This test is making sure that the binding is placed on the
 	property key, not the property value.
@@ -1387,18 +1388,27 @@ QUnit.test('reflect onKeyValue should be bound for property computes', function 
 
 	var map = new Person();
 	var onKeyValueKey = canSymbol.for('can.onKeyValue');
-	var unmock = objectMock(map, onKeyValueKey, function (key, handler) {
-		assert.equal(key, 'foo', 'should match listening key');
+	var unmockMap = objectMock(map, onKeyValueKey, function (key, handler) {
+		assert.equal(key, 'foo', 'should bind on the ' + key + ' property');
 	});
 
 	var proxyValue = compute(function () {
 		return map.foo;
 	});
 
+	var origAdd = Observation.add;
+	var unmockObservation = objectMock(Observation, 'add', function(obj, event) {
+		if (obj instanceof Observation) {
+			assert.ok(false, 'Observation.add should not be called on the internal observation');
+		}
+		origAdd.call(null, obj, event);
+	});
+
 	var subscription = function () {};
 	proxyValue.on('change', subscription);
 	proxyValue.off('change', subscription);
-	unmock();
+	unmockMap();
+	unmockObservation();
 });
 
 QUnit.test('define() should add a CID (#246)', function() {
