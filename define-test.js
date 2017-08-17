@@ -1400,3 +1400,15 @@ QUnit.test('reflect onKeyValue should be bound for property computes', function 
 	proxyValue.off('change', subscription);
 	unmock();
 });
+
+QUnit.test('define() should add a CID (#246)', function() {
+	var Greeting = function(message){
+		this.message = message;
+	};
+
+	define(Greeting.prototype, {
+		message: {type: "string"}
+	});
+	var g = new Greeting();
+	QUnit.ok(g._cid, "should have a CID property");
+});
