@@ -226,7 +226,7 @@ var DefineMap = Construct.extend("DefineMap",{
 	 * 	list: ['first']
  	 * });
 	 *
-	 * obj.list[0] //-> 'first'
+	 * obj.list //-> ['first']
 	 * obj.foo //-> 'bar'
 	 * ```
 	 *   @return {can-define/map/map} The map instance for chaining.
@@ -255,13 +255,21 @@ var DefineMap = Construct.extend("DefineMap",{
 	 * });
 	 * var obj = new MyMap({
 	 * 	list: ['1', '2', '3'],
-	 * 	name: 'bar'
+	 * 	name: 'bar',
+	 * 	foo: {
+	 * 		bar: 'zed',
+	 * 		boo: 'goo'
+	 * 	}
 	 * });
 	 * obj.updateDeep({
-	 * 	list: ['first']
+	 * 	list: ['first'],
+	 * 	foo: {
+	 * 		bar: 'abc'
+	 * 	}
  	 * });
 	 *
-	 * obj.list[0] //-> 'first'
+	 * obj.list //-> ['first', '2', '3']
+	 * obj.foo	//-> { bar: 'abc', boo: undefined }
 	 * obj.name //-> 'undefined'
 	 * ```
 	 *   @param {Object} props A collection of key-value pairs to set.
@@ -295,7 +303,7 @@ var DefineMap = Construct.extend("DefineMap",{
 	 * 	list: ['first']
  	 * });
 	 *
-	 * obj.list.length //-> 1
+	 * obj.list //-> ['first']
 	 * obj.foo //-> 'bar'
 	 * ```
 	 * Assigns each value in `props` to a property on this map instance named after the
@@ -333,8 +341,7 @@ var DefineMap = Construct.extend("DefineMap",{
 	 * 	list: ['first']
  	 * });
 	 *
-	 * obj.list.length //-> 3
-	 * obj.list[0] //-> 'first'
+	 * obj.list //-> ['first', '2', '3']
 	 * obj.foo //-> 'undefined'
 	 * ```
 	 * Assigns each value in `props` to a property on this map instance named after the

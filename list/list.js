@@ -366,16 +366,16 @@ var DefineList = Construct.extend("DefineList",
 		 *
 		 * @signature `list.updateDeep(newProps)`
 		 *
-		 * Updates the properties on the list with `newProps`. Properties not in `newProps` will be set to `undefined`.
+		 * Recursively updates the properties on the list with `newProps`. Properties not in `newProps` will be set to `undefined`.
 		 *
 		 * ```js
 		 * var list = new DefineList(["A","B"]);
-		 * list.assign({count: 0, skip: 2, foo: {bar: 'zed'}});
-		 * list.updateDeep({count: 1000});
+		 * list.assign({count: 0, skip: 2, foo: {bar: 'zed', a: 'b'}});
+		 * list.updateDeep({foo: {bar: 'yay'}});
 		 *
-		 * list.get("count") //-> 1000
+		 * list.get("count") //-> undefined
 		 * list.get("skip") //-> undefined
-		 * list.get("foo") // -> undefined
+		 * list.get("foo") // -> {bar: 'yay', a: undefined}
 		 * ```
 		 */
 		updateDeep: function(prop) {
