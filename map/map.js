@@ -155,7 +155,7 @@ var DefineMap = Construct.extend("DefineMap",{
 	 * @function can-define/map/map.prototype.set set
 	 * @parent can-define/map/map.prototype
 	 *
-	 * @deprecated {3.9.2} Set has been deprecated in favour of deepAssign and deepUpdate
+	 * @deprecated {3.10.1} Using .set with {Object} `props` has been deprecated in favour of `assign` and `update`
 	 *
 	 * @description Sets multiple properties on a map instance or a property that wasn't predefined.
 	 *
@@ -213,10 +213,6 @@ var DefineMap = Construct.extend("DefineMap",{
 	 *   @param {Object} props A collection of key-value pairs to set.
 	 *   If any properties already exist on the map, they will be overwritten.
 	 *
-	 *   @return {can-define/map/map} The map instance for chaining.
-	 *
-	 * @signature `map.assignDeep(propName)`
-	 *
 	 * ```js
 	 * var MyMap = DefineMap.extend({
 	 * 	list: DefineList,
@@ -230,14 +226,11 @@ var DefineMap = Construct.extend("DefineMap",{
 	 * 	list: ['first']
  	 * });
 	 *
-	 * console.log(obj.list[0]) //-> 'first'
-	 * console.log(obj.foo) //-> 'bar'
+	 * obj.list[0] //-> 'first'
+	 * obj.foo //-> 'bar'
 	 * ```
-	 * Assigns _value_ to a property on this map instance called _propName_.  This will define
-	 * the property if it hasn't already been predefined.
+	 *   @return {can-define/map/map} The map instance for chaining.
 	 *
-	 *   @param {String} propName The property to set.
-	 *   @return {can-define/map/map} This map instance, for chaining.
 	 */
 	assignDeep: function(prop) {
 		assignDeep.call(this, prop);
@@ -255,13 +248,6 @@ var DefineMap = Construct.extend("DefineMap",{
 	 * corresponding key in `props`, effectively merging `props` into the Map.
 	 * Properties not in `props` will be set to `undefined`.
 	 *
-	 *   @param {Object} props A collection of key-value pairs to set.
-	 *   If any properties already exist on the map, they will be overwritten.
-	 *
-	 *   @return {can-define/map/map} The map instance for chaining.
-	 *
-	 * @signature `map.updateDeep(propName)`
-	 *
 	 * ```js
 	 * var MyMap = DefineMap.extend({
 	 * 	list: DefineList,
@@ -269,20 +255,20 @@ var DefineMap = Construct.extend("DefineMap",{
 	 * });
 	 * var obj = new MyMap({
 	 * 	list: ['1', '2', '3'],
-	 * 	foo: 'bar'
+	 * 	name: 'bar'
 	 * });
 	 * obj.updateDeep({
 	 * 	list: ['first']
  	 * });
 	 *
-	 * console.log(obj.list[0]) //-> 'first'
-	 * console.log(obj.foo) //-> 'undefined'
+	 * obj.list[0] //-> 'first'
+	 * obj.name //-> 'undefined'
 	 * ```
-	 * Assigns _value_ to a property on this map instance called _propName_.  This will define
-	 * the property if it hasn't already been predefined.
+	 *   @param {Object} props A collection of key-value pairs to set.
+	 *   If any properties already exist on the map, they will be overwritten.
 	 *
-	 *   @param {String} propName The property to set.
-	 *   @return {can-define/map/map} This map instance, for chaining.
+	 *   @return {can-define/map/map} The map instance for chaining.
+	 *
 	 */
 	updateDeep: function(prop) {
 		updateDeep.call(this, prop);
@@ -295,17 +281,6 @@ var DefineMap = Construct.extend("DefineMap",{
 	 * @description Sets multiple properties on a map instance or a property that wasn't predefined.
 	 *
 	 * @signature `map.assign(props)`
-	 *
-	 * Assigns each value in `props` to a property on this map instance named after the
-	 * corresponding key in `props`, effectively replacing `props` into the Map.
-	 * Properties not in `props` will not be changed.
-	 *
-	 *   @param {Object} props A collection of key-value pairs to set.
-	 *   If any properties already exist on the map, they will be overwritten.
-	 *
-	 *   @return {can-define/map/map} The map instance for chaining.
-	 *
-	 * @signature `map.assign(propName)`
 	 *
 	 * ```js
 	 * var MyMap = DefineMap.extend({
@@ -320,14 +295,18 @@ var DefineMap = Construct.extend("DefineMap",{
 	 * 	list: ['first']
  	 * });
 	 *
-	 * console.log(obj.list.length) //-> 1
-	 * console.log(obj.foo) //-> 'bar'
+	 * obj.list.length //-> 1
+	 * obj.foo //-> 'bar'
 	 * ```
-	 * Assigns _value_ to a property on this map instance called _propName_.  This will define
-	 * the property if it hasn't already been predefined.
+	 * Assigns each value in `props` to a property on this map instance named after the
+	 * corresponding key in `props`, effectively replacing `props` into the Map.
+	 * Properties not in `props` will not be changed.
 	 *
-	 *   @param {String} propName The property to set.
-	 *   @return {can-define/map/map} This map instance, for chaining.
+	 *   @param {Object} props A collection of key-value pairs to set.
+	 *   If any properties already exist on the map, they will be overwritten.
+	 *
+	 *   @return {can-define/map/map} The map instance for chaining.
+	 *
 	 */
 	assign: function(prop) {
 		assign.call(this, prop);
@@ -340,17 +319,6 @@ var DefineMap = Construct.extend("DefineMap",{
 	 * @description Sets multiple properties on a map instance or a property that wasn't predefined.
 	 *
 	 * @signature `map.update(props)`
-	 *
-	 * Assigns each value in `props` to a property on this map instance named after the
-	 * corresponding key in `props`, effectively merging `props` into the Map.
-	 * Properties not in `props` will be set to `undefined`.
-	 *
-	 *   @param {Object} props A collection of key-value pairs to set.
-	 *   If any properties already exist on the map, they will be overwritten.
-	 *
-	 *   @return {can-define/map/map} The map instance for chaining.
-	 *
-	 * @signature `map.update(propName)`
 	 *
 	 * ```js
 	 * var MyMap = DefineMap.extend({
@@ -365,15 +333,19 @@ var DefineMap = Construct.extend("DefineMap",{
 	 * 	list: ['first']
  	 * });
 	 *
-	 * console.log(obj.list.length) //-> 3
-	 * console.log(obj.list[0]) //-> 'first'
-	 * console.log(obj.foo) //-> 'undefined'
+	 * obj.list.length //-> 3
+	 * obj.list[0] //-> 'first'
+	 * obj.foo //-> 'undefined'
 	 * ```
-	 * Assigns _value_ to a property on this map instance called _propName_.  This will define
-	 * the property if it hasn't already been predefined.
+	 * Assigns each value in `props` to a property on this map instance named after the
+	 * corresponding key in `props`, effectively merging `props` into the Map.
+	 * Properties not in `props` will be set to `undefined`.
 	 *
-	 *   @param {String} propName The property to set.
-	 *   @return {can-define/map/map} This map instance, for chaining.
+	 *   @param {Object} props A collection of key-value pairs to set.
+	 *   If any properties already exist on the map, they will be overwritten.
+	 *
+	 *   @return {can-define/map/map} The map instance for chaining.
+	 *
 	 */
 	update: function(prop) {
 		update.call(this, prop);

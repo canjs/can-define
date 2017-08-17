@@ -177,7 +177,9 @@ var DefineList = Construct.extend("DefineList",
 		 * @function can-define/list/list.prototype.set set
 		 * @parent can-define/list/list.prototype
 		 *
-		 * Sets an item or property or items or properties on a list.
+		 * @deprecated {3.10.1} Using .set with {Object} `props` has been deprecated in favour of `assign` and `update`
+		 *
+		 * @description Sets an item or property or items or properties on a list.
 		 *
 		 * @signature `list.set(prop, value)`
 		 *
@@ -282,11 +284,11 @@ var DefineList = Construct.extend("DefineList",
 		 * @function can-define/list/list.prototype.assign assign
 		 * @parent can-define/list/list.prototype
 		 *
-		 * Sets an item or property or items or properties on a list.
+		 * Sets items or properties on a list.
 		 *
 		 * @signature `list.assign(newProps)`
 		 *
-		 * Updates the properties on the list with `newProps`.
+		 * Assigns the properties on the list with `newProps`. Properties not present in `newProps` will be left unchanged.
 		 *
 		 * ```js
 		 * var list = new DefineList(["A","B"]);
@@ -336,16 +338,16 @@ var DefineList = Construct.extend("DefineList",
 		 *
 		 * @signature `list.assignDeep(newProps)`
 		 *
-		 * Updates the properties on the list with `newProps`.
+		 * Updates the properties on the list with `newProps`. Properties not in `newProps` will be left unchanged.
 		 *
 		 * ```js
 		 * var list = new DefineList(["A","B"]);
-		 * list.assign({count: 1000, skip: 2});
-		 * list.get("count") //-> 1000
+		 * list.assign({count: 1, skip: 2});
+		 * list.get("count") //-> 1
 		 *
-		 * list.assign({count: 1000});
+		 * list.assignDeep({count: 1000});
 		 * list.get("count") //-> 1000
-		 * list.get("skip") //-> undefined
+		 * list.get("skip") //-> 2
 		 * ```
 		 */
 		assignDeep: function(prop) {
@@ -370,8 +372,10 @@ var DefineList = Construct.extend("DefineList",
 		 * var list = new DefineList(["A","B"]);
 		 * list.assign({count: 0, skip: 2, foo: {bar: 'zed'}});
 		 * list.updateDeep({count: 1000});
+		 *
 		 * list.get("count") //-> 1000
-		 * list.get("foo") //-> undefined
+		 * list.get("skip") //-> undefined
+		 * list.get("foo") // -> undefined
 		 * ```
 		 */
 		updateDeep: function(prop) {
