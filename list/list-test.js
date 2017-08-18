@@ -1134,12 +1134,16 @@ QUnit.test("can-reflect getKeyDependencies", function() {
 
 QUnit.test("assign property", function() {
 	var list = new DefineList(["A","B"]);
-	list.assign({count: 0, skip: 2});
+	list.assign({count: 0, skip: 2, arr: ['1', '2', '3']});
 	equal(list.get('count'), 0, 'Count set properly');
-	list.assign({count: 1000});
+
+	list.assign({count: 1000, arr: ['first']});
+
+	deepEqual(list.get('arr'), new DefineList(['first']), 'Array is set properly');
 	equal(list.get('count'), 1000, 'Count set properly');
 	equal(list.get('skip'), 2, 'Skip is unchanged');
 });
+
 
 QUnit.test("update property", function() {
 	var list = new DefineList(["A","B"]);
