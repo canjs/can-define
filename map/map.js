@@ -210,9 +210,6 @@ var DefineMap = Construct.extend("DefineMap",{
 	 * corresponding key in `props`, effectively replacing `props` into the Map.
 	 * Properties not in `props` will not be changed.
 	 *
-	 *   @param {Object} props A collection of key-value pairs to set.
-	 *   If any properties already exist on the map, they will be overwritten.
-	 *
 	 * ```js
 	 * var MyMap = DefineMap.extend({
 	 * 	list: DefineList,
@@ -229,6 +226,9 @@ var DefineMap = Construct.extend("DefineMap",{
 	 * obj.list //-> ['first']
 	 * obj.foo //-> 'bar'
 	 * ```
+	 *   @param {Object} props A collection of key-value pairs to set.
+	 *   If any properties already exist on the map, they will be overwritten.
+	 *
 	 *   @return {can-define/map/map} The map instance for chaining.
 	 *
 	 */

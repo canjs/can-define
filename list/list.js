@@ -295,6 +295,8 @@ var DefineList = Construct.extend("DefineList",
 		 * list.assign({count: 1000, skip: 2});
 		 * list.get("count") //-> 1000
 		 * ```
+		 *   @param {Array} newProps Properties that need to be assigned to the list instance
+		 *   @return {can-define/list/list} The list instance.
 		 */
 		assign: function(prop) {
 			if (canReflect.isListLike(prop)) {
@@ -321,6 +323,8 @@ var DefineList = Construct.extend("DefineList",
 		 * list.get("count") //-> 1000
 		 * list.get("skip") //-> undefined
 		 * ```
+		 *   @param {Array} newProps Properties that need to be updated to the list instance
+		 *   @return {can-define/list/list} The list instance.
 		 */
 		update: function(prop) {
 			if (canReflect.isListLike(prop)) {
@@ -349,6 +353,9 @@ var DefineList = Construct.extend("DefineList",
 		 * list.get("count") //-> 1000
 		 * list.get("skip") //-> 2
 		 * ```
+		 *
+		 *   @param {Array} newProps Properties that need to be assigned to the list instance
+		 *   @return {can-define/list/list} The list instance.
 		 */
 		assignDeep: function(prop) {
 			if (canReflect.isListLike(prop)) {
@@ -377,6 +384,8 @@ var DefineList = Construct.extend("DefineList",
 		 * list.get("skip") //-> undefined
 		 * list.get("foo") // -> {bar: 'yay', a: undefined}
 		 * ```
+		 *   @param {Array} newProps Properties that need to be updated on the list instance
+		 *   @return {can-define/list/list} The list instance.
 		 */
 		updateDeep: function(prop) {
 			if (canReflect.isListLike(prop)) {
