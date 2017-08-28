@@ -304,10 +304,7 @@ make = {
 					computeFn = defaultValue;
 					valueTrap = trapSets(computeFn);
 				} else {
-					computeFn = new Observation(boundGet, map, {
-						isObservable: false,
-						isProactivelyCacheable: true
-					});
+					computeFn = new Observation(boundGet, map);
 					valueTrap = trapSets(computeFn);
 					valueTrap.lastSetValue = defaultValue;
 				}
@@ -591,9 +588,6 @@ make = {
 		},
 		computed: function(prop) {
 			return function() {
-				if (!this.__inSetup) {
-					Observation.add(this, prop);
-				}
 				return canReflect.getValue(this._computed[prop].compute);
 			};
 		}
