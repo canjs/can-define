@@ -5,6 +5,7 @@ var CanList = require("can-define/list/list");
 var canBatch = require("can-event/batch/batch");
 var each = require("can-util/js/each/each");
 var canSymbol = require("can-symbol");
+var canDev = require("can-util/js/dev/dev");
 
 QUnit.module("can-define");
 
@@ -1368,3 +1369,32 @@ QUnit.test('define() should add a CID (#246)', function() {
 	var g = new Greeting();
 	QUnit.ok(g._cid, "should have a CID property");
 });
+
+if(System.env.indexOf("production") < 0) {
+	QUnit.test('Setting a value with only a get() generates a warning (#202)', function() {
+		QUnit.expect(2);
+		var VM = function() {};
+		define(VM.prototype, {
+			derivedProp: {
+				get: function() {
+					return "Hello World";
+				}
+			}
+		});
+
+		var vm = new VM();
+		vm.on("derivedProp", function() {});
+
+		var oldwarn = canDev.warn;
+		canDev.warn = function(mesg) {
+			QUnit.equal(
+				mesg,
+				"Set value for property derivedProp ignored, as its definition has a zero-argument getter and no setter",
+				"Warning is expected message");
+		};
+
+		vm.derivedProp = 'prop is set';
+		QUnit.equal(vm.derivedProp, "Hello World", "Getter value is preserved");
+		canDev.warn = oldwarn;
+	});
+}

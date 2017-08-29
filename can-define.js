@@ -253,11 +253,21 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 		// Add `set` functionality to the eventSetter.
 		setter = make.set.setter(prop, definition.set, reader, eventsSetter, false);
 	}
-	// If there's niether `set` or `get`,
+	// If there's neither `set` or `get`,
 	else if (!definition.get) {
 		// make a set that produces events.
 		setter = eventsSetter;
 	}
+	//!steal-remove-start
+	// If there's zero-arg `get` but not `set`, warn on all sets in dev mode
+	else if (definition.get.length < 1) {
+		setter = function() {
+			dev.warn("Set value for property " +
+				prop +
+				" ignored, as its definition has a zero-argument getter and no setter");
+		};
+	}
+	//!steal-remove-end
 
 	// Add type behavior to the setter.
 	if (type) {
@@ -326,6 +336,7 @@ make = {
 				handler: function(newVal) {
 					var oldValue = computeObj.oldValue;
 					computeObj.oldValue = newVal;
+
 					canEvent.dispatch.call(map, {
 						type: prop,
 						target: map,
