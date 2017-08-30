@@ -5,8 +5,6 @@ var CanList = require("can-define/list/list");
 var canBatch = require("can-event/batch/batch");
 var each = require("can-util/js/each/each");
 var canSymbol = require("can-symbol");
-var canDev = require("can-util/js/dev/dev");
-var DefineMap = require("can-define/map/map");
 
 QUnit.module("can-define");
 
@@ -1370,40 +1368,3 @@ QUnit.test('define() should add a CID (#246)', function() {
 	var g = new Greeting();
 	QUnit.ok(g._cid, "should have a CID property");
 });
-
-if(System.env.indexOf("production") < 0) {
-	QUnit.test('Setting a value with an object type generates a warning (#148)', function() {
-		QUnit.expect(2);
-		var oldwarn = canDev.warn;
-		canDev.warn = function(mesg) {
-			QUnit.equal(mesg, "The value for options is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.", "Warning is expected message");
-		};
-		//should issue a warning
-		DefineMap.extend({
-			options: {
-				value: {}
-			}
-		});
-		//should issue a warning
-		DefineMap.extend({
-			options: {
-				value: []
-			}
-		});
-
-		//should not issue a warning
-		DefineMap.extend({
-			options: {
-				value: function(){}
-			}
-		});
-
-		//should not issue a warning
-		DefineMap.extend({
-			options: {
-				value: 2
-			}
-		});
-		canDev.warn = oldwarn;
-	});
-}
