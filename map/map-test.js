@@ -843,7 +843,7 @@ if(System.env.indexOf("production") < 0) {
 		QUnit.expect(2);
 		var oldwarn = canDev.warn;
 		canDev.warn = function(mesg) {
-			QUnit.equal(mesg, "The value for options is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.", "Warning is expected message");
+			QUnit.equal(mesg, "can-define: The value for options is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.");
 		};
 		//should issue a warning
 		DefineMap.extend({

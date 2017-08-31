@@ -230,7 +230,7 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 
 		// If value is an object or array, give a warning 
 		if (definition.value !== null && typeof definition.value === 'object') {
-			dev.warn("The value for options is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.");
+			dev.warn("can-define: The value for options is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.");
 		}
 		//!steal-remove-end
 		getInitialValue = Observation.ignore(make.get.defaultValue(prop, definition, typeConvert, eventsSetter));
