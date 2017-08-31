@@ -1426,7 +1426,9 @@ if(System.env.indexOf("production") < 0) {
 		define(VM.prototype, {
 		    currency: {
 		        type: Currency, // should be `Type: Currency`
-		        value: new Currency({})
+		        value: function() {
+		        	return new Currency({});
+		        }
 		    }
 		});
 
@@ -1439,7 +1441,9 @@ if(System.env.indexOf("production") < 0) {
 		define(VM2.prototype, {
 		    currency: {
 		        type: Currency, // should be `Type: Currency`
-		        value: new Currency({})
+		        value: function() {
+		        	return new Currency({});
+		        }
 		    }
 		});
 
