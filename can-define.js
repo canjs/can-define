@@ -262,8 +262,9 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 	// If there's zero-arg `get` but not `set`, warn on all sets in dev mode
 	else if (definition.get.length < 1) {
 		setter = function() {
-			dev.warn("Set value for property " +
+			dev.warn("can-define: Set value for property " +
 				prop +
+				(objPrototype.constructor.shortName ? " on " + objPrototype.constructor.shortName : "") +
 				" ignored, as its definition has a zero-argument getter and no setter");
 		};
 	}

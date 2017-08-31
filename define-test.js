@@ -1372,7 +1372,7 @@ QUnit.test('define() should add a CID (#246)', function() {
 
 if(System.env.indexOf("production") < 0) {
 	QUnit.test('Setting a value with only a get() generates a warning (#202)', function() {
-		QUnit.expect(2);
+		QUnit.expect(3);
 		var VM = function() {};
 		define(VM.prototype, {
 			derivedProp: {
@@ -1389,12 +1389,22 @@ if(System.env.indexOf("production") < 0) {
 		canDev.warn = function(mesg) {
 			QUnit.equal(
 				mesg,
-				"Set value for property derivedProp ignored, as its definition has a zero-argument getter and no setter",
+				"can-define: Set value for property derivedProp ignored, as its definition has a zero-argument getter and no setter",
 				"Warning is expected message");
 		};
 
 		vm.derivedProp = 'prop is set';
 		QUnit.equal(vm.derivedProp, "Hello World", "Getter value is preserved");
+
+		VM.shortName = "VM";
+		canDev.warn = function(mesg) {
+			QUnit.equal(
+				mesg,
+				"can-define: Set value for property derivedProp on VM ignored, as its definition has a zero-argument getter and no setter",
+				"Warning is expected message");
+		};
+
+		vm.derivedProp = 'prop is set';
 		canDev.warn = oldwarn;
 	});
 }
