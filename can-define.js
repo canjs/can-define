@@ -182,6 +182,17 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 
 	var type = definition.type;
 
+	//!steal-remove-start
+	if (type && canReflect.isConstructorLike(type)) {
+		dev.warn(
+			"can-define: the definition for " +
+			prop +
+			(objPrototype.constructor.shortName ? " on " + objPrototype.constructor.shortName : "") +
+			" uses a constructor for \"type\". Did you mean \"Type\"?"
+		);
+	}
+	//!steal-remove-end
+
 	// Special case definitions that have only `type: "*"`.
 	if (type && onlyType(definition) && type === define.types["*"]) {
 		Object.defineProperty(objPrototype, prop, {
