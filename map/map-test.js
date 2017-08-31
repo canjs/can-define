@@ -839,11 +839,11 @@ QUnit.test("non-Object constructor", function() {
 });
 
 if(System.env.indexOf("production") < 0) {
-	QUnit.test('Setting a value with an object or constructor type generates a warning (#148)', function() {
+	QUnit.test('Setting a value with an object type generates a warning (#148)', function() {
 		QUnit.expect(2);
 		var oldwarn = canDev.warn;
 		canDev.warn = function(mesg) {
-			QUnit.equal(mesg, "can-define: The value for options is set to an object or constructor. Use a function or primitive instead.");
+			QUnit.equal(mesg, "can-define: The value for options is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.");
 		};
 		//should issue a warning
 		DefineMap.extend({
@@ -854,7 +854,7 @@ if(System.env.indexOf("production") < 0) {
 		//should issue a warning
 		DefineMap.extend({
 			options: {
-				value: DefineMap
+				value: []
 			}
 		});
 
@@ -873,4 +873,21 @@ if(System.env.indexOf("production") < 0) {
 		});
 		canDev.warn = oldwarn;
 	});
+	QUnit.test('Setting a value to a constructor type generates a warning', function() {
+		QUnit.expect(1);
+		var oldwarn = canDev.warn;
+		canDev.warn = function(mesg) {
+			QUnit.equal(mesg, "can-define: The \"value\" for options is set to a constructor. Did you mean \"Value\" instead?");
+		};
+
+		//should issue a warning
+		DefineMap.extend({
+			options: {
+				value: DefineMap
+			}
+		});
+
+		canDev.warn = oldwarn;
+	});
+
 }

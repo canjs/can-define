@@ -237,13 +237,18 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 
 	// Determine a function that will provide the initial property value.
 	if ((definition.value !== undefined || definition.Value !== undefined)) {
+		
 		//!steal-remove-start
-
-		// If value is an object, array, or constructor give a warning
-		if (definition.value !== null && (typeof definition.value === 'object' || canReflect.isConstructorLike(definition.value || {}))) {
-			dev.warn("can-define: The value for " + prop + " is set to an object or constructor. Use a function or primitive instead.");
+		// If value is an object or array, give a warning
+		if (definition.value !== null && typeof definition.value === 'object') {
+			dev.warn("can-define: The value for " + prop + " is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.");
+		}
+		// If value is a constructor, give a warning
+		if (definition.value && canReflect.isConstructorLike(definition.value)) {
+			dev.warn("can-define: The \"value\" for " + prop + " is set to a constructor. Did you mean \"Value\" instead?");
 		}
 		//!steal-remove-end
+
 		getInitialValue = Observation.ignore(make.get.defaultValue(prop, definition, typeConvert, eventsSetter));
 	}
 
