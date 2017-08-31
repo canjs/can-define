@@ -182,6 +182,17 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 
 	var type = definition.type;
 
+	//!steal-remove-start
+	if (type && canReflect.isConstructorLike(type)) {
+		dev.warn(
+			"can-define: the definition for " +
+			prop +
+			(objPrototype.constructor.shortName ? " on " + objPrototype.constructor.shortName : "") +
+			" uses a constructor for \"type\". Did you mean \"Type\"?"
+		);
+	}
+	//!steal-remove-end
+
 	// Special case definitions that have only `type: "*"`.
 	if (type && onlyType(definition) && type === define.types["*"]) {
 		Object.defineProperty(objPrototype, prop, {
@@ -226,6 +237,13 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 
 	// Determine a function that will provide the initial property value.
 	if ((definition.value !== undefined || definition.Value !== undefined)) {
+		//!steal-remove-start
+
+		// If value is an object or array, give a warning 
+		if (definition.value !== null && typeof definition.value === 'object') {
+			dev.warn("can-define: The value for options is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.");
+		}
+		//!steal-remove-end
 		getInitialValue = Observation.ignore(make.get.defaultValue(prop, definition, typeConvert, eventsSetter));
 	}
 
@@ -856,40 +874,40 @@ define.makeSimpleGetterSetter = function(prop){
 };
 
 define.Iterator = function(obj){
-  this.obj = obj;
-  this.definitions = Object.keys(obj._define.definitions);
-  this.instanceDefinitions = obj._instanceDefinitions ?
-    Object.keys(obj._instanceDefinitions) :
-    Object.keys(obj);
-  this.hasGet = typeof obj.get === "function";
+	this.obj = obj;
+	this.definitions = Object.keys(obj._define.definitions);
+	this.instanceDefinitions = obj._instanceDefinitions ?
+		Object.keys(obj._instanceDefinitions) :
+		Object.keys(obj);
+	this.hasGet = typeof obj.get === "function";
 };
 
 define.Iterator.prototype.next = function(){
-  var key;
-  if(this.definitions.length) {
-    key = this.definitions.shift();
+	var key;
+	if(this.definitions.length) {
+		key = this.definitions.shift();
 
-    // Getters should not be enumerable
-    var def = this.obj._define.definitions[key];
-    if(def.get) {
-      return this.next();
-    }
-  } else if(this.instanceDefinitions.length) {
-    key = this.instanceDefinitions.shift();
-  } else {
-    return {
-      value: undefined,
-      done: true
-    };
-  }
+		// Getters should not be enumerable
+		var def = this.obj._define.definitions[key];
+		if(def.get) {
+			return this.next();
+		}
+	} else if(this.instanceDefinitions.length) {
+		key = this.instanceDefinitions.shift();
+	} else {
+		return {
+			value: undefined,
+			done: true
+		};
+	}
 
-  return {
-    value: [
-      key,
-      this.hasGet ? this.obj.get(key) : this.obj[key]
-    ],
-    done: false
-  };
+	return {
+		value: [
+			key,
+			this.hasGet ? this.obj.get(key) : this.obj[key]
+		],
+		done: false
+	};
 };
 
 isDefineType = function(func){

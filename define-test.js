@@ -1407,4 +1407,43 @@ if(System.env.indexOf("production") < 0) {
 		vm.derivedProp = 'prop is set';
 		canDev.warn = oldwarn;
 	});
+
+	QUnit.test("warn on using a Constructor for small-t type definintions", function() {
+		expect(2);
+		var oldWarn = canDev.warn;
+		canDev.warn = function(mesg) {
+			QUnit.equal(mesg, "can-define: the definition for currency uses a constructor for \"type\". Did you mean \"Type\"?");
+		};
+
+		function Currency() {
+			return this;
+		}
+		Currency.prototype = {
+			symbol: "USD"
+		};
+
+		function VM() {}
+		define(VM.prototype, {
+		    currency: {
+		        type: Currency, // should be `Type: Currency`
+		        value: new Currency({})
+		    }
+		});
+
+		canDev.warn = function(mesg) {
+			QUnit.equal(mesg, "can-define: the definition for currency on VM2 uses a constructor for \"type\". Did you mean \"Type\"?");
+		};
+
+		function VM2() {}
+		VM2.shortName = "VM2";
+		define(VM2.prototype, {
+		    currency: {
+		        type: Currency, // should be `Type: Currency`
+		        value: new Currency({})
+		    }
+		});
+
+		canDev.warn = oldWarn;
+	});
+
 }

@@ -8,6 +8,7 @@ var compute = require("can-compute");
 var assign = require("can-util/js/assign/assign");
 var canReflect = require("can-reflect");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
+var canDev = require("can-util/js/dev/dev");
 
 var sealWorks = (function() {
 	try {
@@ -836,3 +837,40 @@ QUnit.test("non-Object constructor", function() {
 	QUnit.ok(!isPlainObject(new DefineMap()), "instance of DefineMap is not a plain object");
 	QUnit.ok(!isPlainObject(new Constructor()), "instance of extended DefineMap is not a plain object");
 });
+
+if(System.env.indexOf("production") < 0) {
+	QUnit.test('Setting a value with an object type generates a warning (#148)', function() {
+		QUnit.expect(2);
+		var oldwarn = canDev.warn;
+		canDev.warn = function(mesg) {
+			QUnit.equal(mesg, "can-define: The value for options is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.");
+		};
+		//should issue a warning
+		DefineMap.extend({
+			options: {
+				value: {}
+			}
+		});
+		//should issue a warning
+		DefineMap.extend({
+			options: {
+				value: []
+			}
+		});
+
+		//should not issue a warning
+		DefineMap.extend({
+			options: {
+				value: function(){}
+			}
+		});
+
+		//should not issue a warning
+		DefineMap.extend({
+			options: {
+				value: 2
+			}
+		});
+		canDev.warn = oldwarn;
+	});
+}
