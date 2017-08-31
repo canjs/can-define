@@ -873,4 +873,21 @@ if(System.env.indexOf("production") < 0) {
 		});
 		canDev.warn = oldwarn;
 	});
+	QUnit.test('Setting a value to a constructor type generates a warning', function() {
+		QUnit.expect(1);
+		var oldwarn = canDev.warn;
+		canDev.warn = function(mesg) {
+			QUnit.equal(mesg, "can-define: The \"value\" for options is set to a constructor. Did you mean \"Value\" instead?");
+		};
+
+		//should issue a warning
+		DefineMap.extend({
+			options: {
+				value: DefineMap
+			}
+		});
+
+		canDev.warn = oldwarn;
+	});
+
 }
