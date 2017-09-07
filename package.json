@@ -1,6 +1,6 @@
 {
   "name": "can-define",
-  "version": "1.4.0",
+  "version": "1.4.4",
   "description": "Create observable objects with JS dot operator compatibility",
   "main": "can-define.js",
   "scripts": {
@@ -36,7 +36,7 @@
     "can-construct": "^3.2.0",
     "can-event": "^3.5.0",
     "can-namespace": "^1.0.0",
-    "can-observation": "^3.3.0-pre.1",
+    "can-observation": "^3.3.4",
     "can-reflect": "^1.2.1",
     "can-symbol": "^1.0.0",
     "can-types": "^1.1.0",
@@ -44,26 +44,11 @@
   },
   "devDependencies": {
     "jshint": "^2.9.1",
-    "serve": "^5.1.4",
+    "serve": "^6.0.1",
     "steal": "^1.0.7",
     "steal-qunit": "^1.0.0",
     "steal-tools": "^1.4.0",
     "testee": "^0.7.0",
     "bit-docs": "^0.0.7"
-  },
-  "bit-docs": {
-    "dependencies": {
-      "bit-docs-glob-finder": "^0.0.5",
-      "bit-docs-dev": "^0.0.3",
-      "bit-docs-js": "^0.0.4"
-    },
-    "glob": {
-      "pattern": "**/*.{js,md}",
-      "ignore": "node_modules/**/*"
-    },
-    "parent": "can-define",
-    "readme": {
-      "apis": "./docs/apis.json"
-    }
   }
 }

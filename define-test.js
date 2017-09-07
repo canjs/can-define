@@ -5,6 +5,7 @@ var CanList = require("can-define/list/list");
 var canBatch = require("can-event/batch/batch");
 var each = require("can-util/js/each/each");
 var canSymbol = require("can-symbol");
+var canDev = require("can-util/js/dev/dev");
 
 QUnit.module("can-define");
 
@@ -1356,3 +1357,97 @@ QUnit.test('defined properties are configurable', function(){
 	var a = new A();
 	QUnit.equal(a.val, "bar", "It was redefined");
 });
+
+QUnit.test('define() should add a CID (#246)', function() {
+	var Greeting = function(message){
+		this.message = message;
+	};
+
+	define(Greeting.prototype, {
+		message: {type: "string"}
+	});
+	var g = new Greeting();
+	QUnit.ok(g._cid, "should have a CID property");
+});
+
+if(System.env.indexOf("production") < 0) {
+	QUnit.test('Setting a value with only a get() generates a warning (#202)', function() {
+		QUnit.expect(3);
+		var VM = function() {};
+		define(VM.prototype, {
+			derivedProp: {
+				get: function() {
+					return "Hello World";
+				}
+			}
+		});
+
+		var vm = new VM();
+		vm.on("derivedProp", function() {});
+
+		var oldwarn = canDev.warn;
+		canDev.warn = function(mesg) {
+			QUnit.equal(
+				mesg,
+				"can-define: Set value for property derivedProp ignored, as its definition has a zero-argument getter and no setter",
+				"Warning is expected message");
+		};
+
+		vm.derivedProp = 'prop is set';
+		QUnit.equal(vm.derivedProp, "Hello World", "Getter value is preserved");
+
+		VM.shortName = "VM";
+		canDev.warn = function(mesg) {
+			QUnit.equal(
+				mesg,
+				"can-define: Set value for property derivedProp on VM ignored, as its definition has a zero-argument getter and no setter",
+				"Warning is expected message");
+		};
+
+		vm.derivedProp = 'prop is set';
+		canDev.warn = oldwarn;
+	});
+
+	QUnit.test("warn on using a Constructor for small-t type definintions", function() {
+		expect(2);
+		var oldWarn = canDev.warn;
+		canDev.warn = function(mesg) {
+			QUnit.equal(mesg, "can-define: the definition for currency uses a constructor for \"type\". Did you mean \"Type\"?");
+		};
+
+		function Currency() {
+			return this;
+		}
+		Currency.prototype = {
+			symbol: "USD"
+		};
+
+		function VM() {}
+		define(VM.prototype, {
+		    currency: {
+		        type: Currency, // should be `Type: Currency`
+		        value: function() {
+		        	return new Currency({});
+		        }
+		    }
+		});
+
+		canDev.warn = function(mesg) {
+			QUnit.equal(mesg, "can-define: the definition for currency on VM2 uses a constructor for \"type\". Did you mean \"Type\"?");
+		};
+
+		function VM2() {}
+		VM2.shortName = "VM2";
+		define(VM2.prototype, {
+		    currency: {
+		        type: Currency, // should be `Type: Currency`
+		        value: function() {
+		        	return new Currency({});
+		        }
+		    }
+		});
+
+		canDev.warn = oldWarn;
+	});
+
+}

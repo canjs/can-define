@@ -1431,19 +1431,6 @@ for (var prop in define.eventsProto) {
 		writable: true
 	});
 }
-// @@can.onKeyValue and @@can.offKeyValue are also on define.eventsProto
-//  but symbols are not enumerated in for...in loops
-var eventsProtoSymbols = ("getOwnPropertySymbols" in Object) ?
-  Object.getOwnPropertySymbols(define.eventsProto) :
-  [canSymbol.for("can.onKeyValue"), canSymbol.for("can.offKeyValue")];
-
-eventsProtoSymbols.forEach(function(sym) {
-  Object.defineProperty(DefineList.prototype, sym, {
-    enumerable:false,
-    value: define.eventsProto[sym],
-    writable: true
-  });
-});
 
 Object.defineProperty(DefineList.prototype, "length", {
 	get: function() {
@@ -1516,11 +1503,15 @@ canReflect.assignSymbols(DefineList.prototype,{
 	// Called for every reference to a property in a template
 	// if a key is a numerical index then translate to length event
 	"can.onKeyValue": function(key, handler) {
+		var translationHandler;
 		if (isNaN(key)) {
-			this.addEventListener(key, handler);
+			translationHandler = function(ev, newValue, oldValue) {
+				handler(newValue, oldValue);
+			};
+			this.addEventListener(key, translationHandler);
 		}
 		else {
-			var translationHandler = function() {
+			translationHandler = function() {
 				handler(this[key]);
 			};
 
@@ -1530,11 +1521,15 @@ canReflect.assignSymbols(DefineList.prototype,{
 	},
 	// Called when a property reference is removed
 	"can.offKeyValue": function(key, handler) {
+		var translationHandler;
 		if (isNaN(key)) {
-			this.removeEventListener(key, handler);
+			translationHandler = function(ev, newValue, oldValue) {
+				handler(newValue, oldValue);
+			};
+			this.removeEventListener(key, translationHandler);
 		}
 		else {
-			var translationHandler = singleReference.getAndDelete(handler, this, key);
+			translationHandler = singleReference.getAndDelete(handler, this, key);
 			this.removeEventListener('length', translationHandler);
 		}
 	},
