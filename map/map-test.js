@@ -838,6 +838,54 @@ QUnit.test("non-Object constructor", function() {
 	QUnit.ok(!isPlainObject(new Constructor()), "instance of extended DefineMap is not a plain object");
 });
 
+QUnit.test('Observation bound to getter using lastSetVal updates correctly (canjs#3541)', function() {
+	var MyMap = DefineMap.extend({
+		foo: {
+			get: function(lastSetVal) {
+				if (lastSetVal) {
+					return lastSetVal;
+				}
+			}
+		}
+	});
+	var map = new MyMap();
+	var oi = new Observation(function(){
+		return map.get("foo");
+	},null,{
+		updater: function(newVal){
+			QUnit.equal(newVal, "bar", "updated to bar");
+		}
+	});
+	oi.start();
+
+	map.set("foo","bar");
+
+});
+
+QUnit.test('Observation bound to async getter updates correctly (canjs#3541)', function() {
+	var MyMap = DefineMap.extend({
+		foo: {
+			get: function(lastSetVal, resolve) {
+				if (lastSetVal) {
+					return resolve(lastSetVal);
+				}
+			}
+		}
+	});
+	var map = new MyMap();
+	var oi = new Observation(function(){
+		return map.get("foo");
+	},null,{
+		updater: function(newVal){
+			QUnit.equal(newVal, "bar", "updated to bar");
+		}
+	});
+	oi.start();
+
+	map.set("foo","bar");
+
+});
+
 if(System.env.indexOf("production") < 0) {
 	QUnit.test('Setting a value with an object type generates a warning (#148)', function() {
 		QUnit.expect(2);

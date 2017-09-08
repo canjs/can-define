@@ -62,7 +62,6 @@ function trapSets(observableValue) {
 				if(canSymbol.for("can.setValue") in this.observable) {
 					canReflect.setValue(this.observable, value);
 				} else {
-					//this.observable.value = this.lastSetValue;
 					this.observable.update();
 				}
 			}
@@ -333,7 +332,7 @@ make = {
 				return get.call(map, computeObj.valueTrap.lastSetValue);
 			};
 
-			if(get.length < 2) {
+			if(get.length < 1) {
 				if(defaultValue && defaultValue.isComputed) {
 					computeFn = defaultValue;
 					valueTrap = trapSets(computeFn);
