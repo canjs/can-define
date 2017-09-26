@@ -1593,8 +1593,8 @@ canReflect.assignSymbols(DefineList.prototype,{
 
 canReflect.setKeyValue(DefineList.prototype, canSymbol.iterator, function() {
 	var index = -1;
-	if(this._length == null) {
-		this.length = 0;
+	if(typeof this._length !== "number") {
+		this._length = 0;
 	}
 	return {
 		next: function() {
