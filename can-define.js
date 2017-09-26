@@ -22,6 +22,7 @@ var ns = require("can-namespace");
 var canSymbol = require("can-symbol");
 var canReflect = require("can-reflect");
 var singleReference = require("can-util/js/single-reference/single-reference");
+var simpleObervable = require("can-simple-observable");
 
 var eventsProto, define,
 	make, makeDefinition, replaceWith, getDefinitionsAndMethods,
@@ -54,10 +55,10 @@ var eachPropertyDescriptor = function(map, cb){
 function trapSets(observableValue) {
 	return {
 		observable: observableValue,
-		lastSetValue: undefined,
+		lastSetValue: simpleObervable(),
 		setValue: function(value) {
 			// Hold on to this value for next time.
-			this.lastSetValue = value;
+			canReflect.setValue(this.lastSetValue, value);
 			if(this.observable) {
 				if(canSymbol.for("can.setValue") in this.observable) {
 					canReflect.setValue(this.observable, value);
@@ -329,17 +330,17 @@ make = {
 				computeFn, valueTrap, computeObj;
 
 			var boundGet = function() {
-				return get.call(map, computeObj.valueTrap.lastSetValue);
+				return get.call(map, canReflect.getValue(computeObj.valueTrap.lastSetValue));
 			};
 
-			if(get.length < 1) {
+			if(get.length < 2) {
 				if(defaultValue && defaultValue.isComputed) {
 					computeFn = defaultValue;
 					valueTrap = trapSets(computeFn);
 				} else {
 					computeFn = new Observation(boundGet, map);
 					valueTrap = trapSets(computeFn);
-					valueTrap.lastSetValue = defaultValue;
+					canReflect.setValue(valueTrap.lastSetValue, defaultValue);
 				}
 			} else {
 				if (defaultValue) {
@@ -563,7 +564,7 @@ make = {
 		lastSet: function(prop) {
 			return function() {
 				var lastSetValue = this._computed[prop].valueTrap.lastSetValue;
-				return lastSetValue;
+				return canReflect.getValue(lastSetValue);
 			};
 		}
 	},
