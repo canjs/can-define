@@ -66,7 +66,10 @@ var DefineList = Construct.extend("DefineList",
 				Object.defineProperty(this, "_define", {
 					enumerable: false,
 					value: {
-						definitions: {}
+						definitions: {
+							length: { type: "number" },
+							_length: { type: "number" }
+						}
 					}
 				});
 				Object.defineProperty(this, "_data", {
@@ -75,7 +78,12 @@ var DefineList = Construct.extend("DefineList",
 				});
 			}
 			define.setup.call(this, {}, false);
-			this._length = 0;
+			Object.defineProperty(this, "_length", {
+				enumerable: false,
+				configurable: true,
+				writable: true,
+				value: 0
+			});
 			if (items) {
 				this.splice.apply(this, [ 0, 0 ].concat(canReflect.toArray(items)));
 			}
@@ -1445,7 +1453,7 @@ Object.defineProperty(DefineList.prototype, "length", {
 			return;
 		}
 
-		if (newVal === this._length) {
+		if (newVal == null || isNaN(+newVal) || newVal === this._length) {
 			return;
 		}
 
@@ -1535,8 +1543,11 @@ canReflect.assignSymbols(DefineList.prototype,{
 	},
 
 	"can.deleteKeyValue": function(prop) {
+		prop = isNaN(+prop) || (prop % 1) ? prop : +prop;
 		if(typeof prop === "number") {
 			this.splice(prop, 1);
+		} else if(prop === "length" || prop === "_length") {
+			return; // length must not be deleted
 		} else {
 			this.set(prop, undefined);
 		}
@@ -1582,12 +1593,15 @@ canReflect.assignSymbols(DefineList.prototype,{
 
 canReflect.setKeyValue(DefineList.prototype, canSymbol.iterator, function() {
 	var index = -1;
+	if(this._length == null) {
+		this.length = 0;
+	}
 	return {
 		next: function() {
 			index++;
 			return {
 				value: this[index],
-				done: index >= this.length
+				done: index >= this._length
 			};
 		}.bind(this)
 	};

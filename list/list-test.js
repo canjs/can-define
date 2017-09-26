@@ -1203,3 +1203,73 @@ QUnit.test("registered symbols", function() {
 	a[canSymbol.for("can.offKeyValue")]("a", handler);
 	a.a = "d"; // doesn't trigger handler
 });
+
+QUnit.test("cannot remove length", function() {
+	var list = new DefineList(["a"]);
+
+	list.set("length", undefined);
+
+	QUnit.equal(list.length, 1, "list length is unchanged");
+
+});
+
+QUnit.test("cannot set length to a non-number", function() {
+	var list = new DefineList(["a"]);
+
+	list.set("length", null);
+	QUnit.equal(list.length, 1, "list length is unchanged");
+
+	list.set("length", "foo");
+	QUnit.equal(list.length, 1, "list length is unchanged");
+
+	list.set("length", {});
+	QUnit.equal(list.length, 1, "list length is unchanged");
+});
+
+QUnit.test("_length is not enumerable", function() {
+	QUnit.ok(!Object.getOwnPropertyDescriptor(new DefineList(), "_length").enumerable, "_length is not enumerable");
+});
+
+QUnit.test("update with no indexed items sets length to 0", function() {
+	var list = new DefineList(["a"]);
+	QUnit.equal(list.length, 1, "list length is correct before update");
+
+	list.update({ foo: "bar" });
+
+	QUnit.equal(list.length, 0, "list length is correct after update");
+});
+
+["length", "_length"].forEach(function(prop) {
+	QUnit.test("setting " + prop + " does not overwrite definition", function () {
+		var list = new DefineList();
+
+		list.get(prop);
+		var proto = list, listDef, listDef2;
+		while(!listDef && proto) {
+			listDef = Object.getOwnPropertyDescriptor(proto, prop);
+			proto = Object.getPrototypeOf(proto);
+		}
+
+		list.set(prop, 1);
+
+		proto = list;
+		while(!listDef2 && proto) {
+			listDef2 = Object.getOwnPropertyDescriptor(proto, prop);
+			proto = Object.getPrototypeOf(proto);
+		}
+		delete listDef2.value;
+		delete listDef.value;
+
+		QUnit.deepEqual(listDef2, listDef, "descriptor hasn't changed");
+	});
+});
+
+QUnit.test("iterator can recover from bad _length", function() {
+	var list = new DefineList(["a"]);
+	list.set("_length", null);
+	QUnit.equal(list._length, null, "Bad value for _length");
+
+	var iterator = list[canSymbol.iterator]();
+	var iteration = iterator.next();
+	QUnit.ok(iteration.done, "Didn't fail");
+});
