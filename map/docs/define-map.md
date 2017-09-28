@@ -8,11 +8,11 @@
 
 @description Create observable objects.
 
-@signature `new DefineMap([props])`
+@signature `new DefineMap([options],[props])`
 
 The `can-define/map/map` module exports the `DefineMap` constructor function.  
 
-Calling `new DefineMap(props)` creates a new instance of DefineMap or an [can-define/map/map.extend extended] DefineMap. Then, assigns every property on `props` to the new instance.  If props are passed that are not defined already, those property definitions are created.  If the instance should be sealed, it is sealed.
+Calling `new DefineMap(props)` creates a new instance of DefineMap or an [can-define/map/map.extend extended] DefineMap. Then, assigns every property on `props` to the new instance.  If props are passed that are not defined already, those property definitions are created.  If the instance should be sealed, it is sealed see @options wich are optional.
 
 ```js
 var DefineMap = require("can-define/map/map");
@@ -26,6 +26,7 @@ var person = new DefineMap({
   Custom `DefineMap` types, with special properties and behaviors, can be defined with [can-define/map/map.extend].
 
   @param {Object} [props] Properties and values to seed the map with.
+  @options {Object} [options] please see https://canjs.com/doc/can-define/map/map.seal.html
   @return {can-define/map/map} An instance of `DefineMap` with the properties from _props_.
 
 @body
