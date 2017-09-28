@@ -297,6 +297,7 @@ myType.myProp = "value"; // no error thrown
 
 myType.otherProp = "value" // throws Error!
 ```
+Read the [can-define/map/map.seal] documentation for more information on this behavior.
 
 ## init Function for the instances
 
@@ -319,6 +320,3 @@ var myType = new MyType();
 myType.myProp === "Hello"; 
 
 ```
-
-
-Read the [can-define/map/map.seal] documentation for more information on this behavior.
