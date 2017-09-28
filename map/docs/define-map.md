@@ -300,7 +300,7 @@ myType.otherProp = "value" // throws Error!
 
 ## init Function for the instances
 
-By default, `DefineMap` instances get only inital values pre defined but sometimes you need to assign programatical via a Constructor init is the DefineMap Constructor. For example:
+By default, `DefineMap` instances get only inital values pre defined but sometimes you need to assign programatical via a Constructor. init is the DefineMap Constructor property. For example:
 
 ```js
 "use strict";
@@ -317,7 +317,6 @@ var MyType = DefineMap.extend({
 var myType = new MyType();
 
 myType.myProp === "Hello"; 
-
 
 ```
 
