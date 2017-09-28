@@ -297,5 +297,27 @@ myType.myProp = "value"; // no error thrown
 
 myType.otherProp = "value" // throws Error!
 ```
-
 Read the [can-define/map/map.seal] documentation for more information on this behavior.
+
+## init Function for the instances
+
+By default, `DefineMap` instances get only inital values pre defined but sometimes you need to assign programatical via a Constructor. init is the DefineMap Constructor property. For example:
+
+```js
+"use strict";
+
+var DefineMap = require("can-define/map/map");
+
+var MyType = DefineMap.extend({
+    init() {
+	  this.myProp = "Hello"
+	},
+	myProp: "string"
+});
+
+var myType = new MyType();
+
+myType.myProp === "Hello"; 
+
+```
+If you get can't assign errors you should Read the [can-define/map/map.seal] documentation for more information on that behavior.
