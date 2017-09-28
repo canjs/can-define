@@ -320,3 +320,4 @@ var myType = new MyType();
 myType.myProp === "Hello"; 
 
 ```
+If you get can't assign errors you should Read the [can-define/map/map.seal] documentation for more information on that behavior.
