@@ -1453,6 +1453,10 @@ Object.defineProperty(DefineList.prototype, "length", {
 			return;
 		}
 
+		// Don't set _length if:
+		//  - null or undefined
+		//  - a string that doesn't convert to number
+		//  - already the length being set
 		if (newVal == null || isNaN(+newVal) || newVal === this._length) {
 			return;
 		}
@@ -1543,6 +1547,10 @@ canReflect.assignSymbols(DefineList.prototype,{
 	},
 
 	"can.deleteKeyValue": function(prop) {
+		// convert string key to number index if key can be an integer:
+		//   isNaN if prop isn't a numeric representation
+		//   (prop % 1) if numeric representation is a float
+		//   In both of the above cases, leave as string.
 		prop = isNaN(+prop) || (prop % 1) ? prop : +prop;
 		if(typeof prop === "number") {
 			this.splice(prop, 1);
