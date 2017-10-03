@@ -5,7 +5,7 @@ var canEvent = require("can-event");
 var canBatch = require("can-event/batch/batch");
 var Observation = require("can-observation");
 var canLog = require("can-util/js/log/log");
-
+var canDev = require("can-util/js/dev/dev");
 var defineHelpers = require("../define-helpers/define-helpers");
 
 var assign = require("can-util/js/assign/assign");
@@ -66,7 +66,10 @@ var DefineList = Construct.extend("DefineList",
 				Object.defineProperty(this, "_define", {
 					enumerable: false,
 					value: {
-						definitions: {}
+						definitions: {
+							length: { type: "number" },
+							_length: { type: "number" }
+						}
 					}
 				});
 				Object.defineProperty(this, "_data", {
@@ -75,7 +78,12 @@ var DefineList = Construct.extend("DefineList",
 				});
 			}
 			define.setup.call(this, {}, false);
-			this._length = 0;
+			Object.defineProperty(this, "_length", {
+				enumerable: false,
+				configurable: true,
+				writable: true,
+				value: 0
+			});
 			if (items) {
 				this.splice.apply(this, [ 0, 0 ].concat(canReflect.toArray(items)));
 			}
@@ -177,7 +185,9 @@ var DefineList = Construct.extend("DefineList",
 		 * @function can-define/list/list.prototype.set set
 		 * @parent can-define/list/list.prototype
 		 *
-		 * Sets an item or property or items or properties on a list.
+		 * @deprecated {3.10.1} Using .set with {Object} `props` has been deprecated in favour of `assign` and `update`
+		 *
+		 * @description Sets an item or property or items or properties on a list.
 		 *
 		 * @signature `list.set(prop, value)`
 		 *
@@ -261,6 +271,11 @@ var DefineList = Construct.extend("DefineList",
 			}
 			// otherwise we are setting multiple
 			else {
+				//!steal-remove-start
+				canDev.warn('can-define/list/list.prototype.set is deprecated; please use can-define/list/list.prototype.assign or can-define/list/list.prototype.update instead');
+				//!steal-remove-end
+
+				//we are deprecating this in #245
 				if (canReflect.isListLike(prop)) {
 					if (value) {
 						this.replace(prop);
@@ -270,6 +285,121 @@ var DefineList = Construct.extend("DefineList",
 				} else {
 					canReflect.assignMap(this, prop);
 				}
+			}
+			return this;
+		},
+		/**
+		 * @function can-define/list/list.prototype.assign assign
+		 * @parent can-define/list/list.prototype
+		 *
+		 * Sets items or properties on a list.
+		 *
+		 * @signature `list.assign(newProps)`
+		 *
+		 * Assigns the properties on the list with `newProps`. Properties not present in `newProps` will be left unchanged.
+		 *
+		 * ```js
+		 * var list = new DefineList(["A","B"]);
+		 * list.assign({count: 1000, skip: 2});
+		 * list.get("count") //-> 1000
+		 * ```
+		 *   @param {Array} newProps Properties that need to be assigned to the list instance
+		 *   @return {can-define/list/list} The list instance.
+		 */
+		assign: function(prop) {
+			if (canReflect.isListLike(prop)) {
+				canReflect.assignList(this, prop);
+			} else {
+				canReflect.assignMap(this, prop);
+			}
+			return this;
+		},
+		/**
+		 * @function can-define/list/list.prototype.update update
+		 * @parent can-define/list/list.prototype
+		 *
+		 * Sets an item or property or items or properties on a list.
+		 *
+		 * @signature `list.update(newProps)`
+		 *
+		 * Updates the properties on the list with `newProps`. Properties not in `newProps` will be set to `undefined`.
+		 *
+		 * ```js
+		 * var list = new DefineList(["A","B"]);
+		 * list.assign({count: 0, skip: 2});
+		 * list.update({count: 1000});
+		 * list.get("count") //-> 1000
+		 * list.get("skip") //-> undefined
+		 * ```
+		 *   @param {Array} newProps Properties that need to be updated to the list instance
+		 *   @return {can-define/list/list} The list instance.
+		 */
+		update: function(prop) {
+			if (canReflect.isListLike(prop)) {
+				canReflect.updateList(this, prop);
+			} else {
+				canReflect.updateMap(this, prop);
+			}
+			return this;
+		},
+		/**
+		 * @function can-define/list/list.prototype.assignDeep assignDeep
+		 * @parent can-define/list/list.prototype
+		 *
+		 * Sets an item or property or items or properties on a list.
+		 *
+		 * @signature `list.assignDeep(newProps)`
+		 *
+		 * Updates the properties on the list with `newProps`. Properties not in `newProps` will be left unchanged.
+		 *
+		 * ```js
+		 * var list = new DefineList(["A","B"]);
+		 * list.assign({count: 1, skip: 2});
+		 * list.get("count") //-> 1
+		 *
+		 * list.assignDeep({count: 1000});
+		 * list.get("count") //-> 1000
+		 * list.get("skip") //-> 2
+		 * ```
+		 *
+		 *   @param {Array} newProps Properties that need to be assigned to the list instance
+		 *   @return {can-define/list/list} The list instance.
+		 */
+		assignDeep: function(prop) {
+			if (canReflect.isListLike(prop)) {
+				canReflect.assignDeepList(this, prop);
+			} else {
+				canReflect.assignDeepMap(this, prop);
+			}
+			return this;
+		},
+		/**
+		 * @function can-define/list/list.prototype.updateDeep updateDeep
+		 * @parent can-define/list/list.prototype
+		 *
+		 * Sets an item or property or items or properties on a list.
+		 *
+		 * @signature `list.updateDeep(newProps)`
+		 *
+		 * Recursively updates the properties on the list with `newProps`. Properties not in `newProps` will be set to `undefined`.
+		 *
+		 * ```js
+		 * var list = new DefineList(["A","B"]);
+		 * list.assign({count: 0, skip: 2, foo: {bar: 'zed', a: 'b'}});
+		 * list.updateDeep({foo: {bar: 'yay'}});
+		 *
+		 * list.get("count") //-> undefined
+		 * list.get("skip") //-> undefined
+		 * list.get("foo") // -> {bar: 'yay', a: undefined}
+		 * ```
+		 *   @param {Array} newProps Properties that need to be updated on the list instance
+		 *   @return {can-define/list/list} The list instance.
+		 */
+		updateDeep: function(prop) {
+			if (canReflect.isListLike(prop)) {
+				canReflect.updateDeepList(this, prop);
+			} else {
+				canReflect.updateDeepMap(this, prop);
 			}
 			return this;
 		},
@@ -1323,7 +1453,11 @@ Object.defineProperty(DefineList.prototype, "length", {
 			return;
 		}
 
-		if (newVal === this._length) {
+		// Don't set _length if:
+		//  - null or undefined
+		//  - a string that doesn't convert to number
+		//  - already the length being set
+		if (newVal == null || isNaN(+newVal) || newVal === this._length) {
 			return;
 		}
 
@@ -1413,8 +1547,15 @@ canReflect.assignSymbols(DefineList.prototype,{
 	},
 
 	"can.deleteKeyValue": function(prop) {
+		// convert string key to number index if key can be an integer:
+		//   isNaN if prop isn't a numeric representation
+		//   (prop % 1) if numeric representation is a float
+		//   In both of the above cases, leave as string.
+		prop = isNaN(+prop) || (prop % 1) ? prop : +prop;
 		if(typeof prop === "number") {
 			this.splice(prop, 1);
+		} else if(prop === "length" || prop === "_length") {
+			return; // length must not be deleted
 		} else {
 			this.set(prop, undefined);
 		}
@@ -1460,12 +1601,15 @@ canReflect.assignSymbols(DefineList.prototype,{
 
 canReflect.setKeyValue(DefineList.prototype, canSymbol.iterator, function() {
 	var index = -1;
+	if(typeof this._length !== "number") {
+		this._length = 0;
+	}
 	return {
 		next: function() {
 			index++;
 			return {
 				value: this[index],
-				done: index >= this.length
+				done: index >= this._length
 			};
 		}.bind(this)
 	};
