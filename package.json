@@ -15,7 +15,8 @@
     "release:major": "npm version major && npm publish",
     "start": "serve -p 8080",
     "testee": "testee test/test.html --browsers firefox",
-    "test": "npm run jshint && npm run testee"
+    "test": "npm run detect-cycle && npm run jshint && npm run testee",
+    "detect-cycle": "detect-cyclic-packages --ignore done-serve"
   },
   "repository": {
     "type": "git",
@@ -44,12 +45,13 @@
     "can-util": "^3.9.0"
   },
   "devDependencies": {
+    "bit-docs": "^0.0.7",
+    "detect-cyclic-packages": "^1.1.0",
     "jshint": "^2.9.1",
     "serve": "^6.0.1",
     "steal": "^1.0.7",
     "steal-qunit": "^1.0.0",
     "steal-tools": "^1.4.0",
-    "testee": "^0.7.0",
-    "bit-docs": "^0.0.7"
+    "testee": "^0.7.0"
   }
 }
