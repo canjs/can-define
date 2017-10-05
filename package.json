@@ -35,6 +35,7 @@
     "can-cid": "^1.0.0",
     "can-compute": "^3.3.1",
     "can-construct": "^3.2.0",
+    "can-define-lazy-value": "^1.0.0",
     "can-event": "^3.5.0",
     "can-namespace": "^1.0.0",
     "can-observation": "^3.3.4",

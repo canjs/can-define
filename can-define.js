@@ -23,9 +23,10 @@ var canSymbol = require("can-symbol");
 var canReflect = require("can-reflect");
 var singleReference = require("can-util/js/single-reference/single-reference");
 var simpleObervable = require("can-simple-observable");
+var defineLazyValue = require("can-define-lazy-value");
 
 var eventsProto, define,
-	make, makeDefinition, replaceWith, getDefinitionsAndMethods,
+	make, makeDefinition, getDefinitionsAndMethods,
 	isDefineType, getDefinitionOrMethod;
 
 var defineConfigurableAndNotEnumerable = function(obj, prop, value) {
@@ -94,14 +95,14 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 	// for any value that has a default value.
 	if(objPrototype.hasOwnProperty("_data")) {
 		for (prop in dataInitializers) {
-			replaceWith(objPrototype._data, prop, dataInitializers[prop].bind(objPrototype), true);
+			defineLazyValue(objPrototype._data, prop, dataInitializers[prop].bind(objPrototype), true);
 		}
 	} else {
-		replaceWith(objPrototype, "_data", function() {
+		defineLazyValue(objPrototype, "_data", function() {
 			var map = this;
 			var data = {};
 			for (var prop in dataInitializers) {
-				replaceWith(data, prop, dataInitializers[prop].bind(map), true);
+				defineLazyValue(data, prop, dataInitializers[prop].bind(map), true);
 			}
 			return data;
 		});
@@ -112,14 +113,14 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 	// that will create the property's compute when read.
 	if(objPrototype.hasOwnProperty("_computed")) {
 		for (prop in computedInitializers) {
-			replaceWith(objPrototype._computed, prop, computedInitializers[prop].bind(objPrototype));
+			defineLazyValue(objPrototype._computed, prop, computedInitializers[prop].bind(objPrototype));
 		}
 	} else {
-		replaceWith(objPrototype, "_computed", function() {
+		defineLazyValue(objPrototype, "_computed", function() {
 			var map = this;
 			var data = Object.create(null);
 			for (var prop in computedInitializers) {
-				replaceWith(data, prop, computedInitializers[prop].bind(map));
+				defineLazyValue(data, prop, computedInitializers[prop].bind(map));
 			}
 			return data;
 		});
@@ -128,7 +129,7 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 	// Places a `_cid` on the prototype that when first called replaces itself
 	// with a `_cid` object local to the instance.
 	if (!objPrototype.hasOwnProperty("_cid")) {
-		replaceWith(objPrototype, "_cid", function() {
+		defineLazyValue(objPrototype, "_cid", function() {
 			return CID({});
 		});
 	}	
@@ -739,31 +740,6 @@ getDefinitionsAndMethods = function(defines, baseDefines) {
 	return {definitions: definitions, methods: methods, defaultDefinition: defaultDefinition};
 };
 
-replaceWith = function(obj, prop, cb, writable) {
-	Object.defineProperty(obj, prop, {
-		configurable: true,
-		get: function() {
-			Object.defineProperty(this, prop, {
-				value: undefined,
-				writable: true
-			});
-			var value = cb.call(this, obj, prop);
-			Object.defineProperty(this, prop, {
-				value: value,
-				writable: !!writable
-			});
-			return value;
-		},
-		set: function(value){
-			Object.defineProperty(this, prop, {
-				value: value,
-				writable: !!writable
-			});
-			return value;
-		}
-	});
-};
-
 eventsProto = assign({}, canEvent);
 assign(eventsProto, {
 	_eventSetup: function() {},
@@ -856,7 +832,7 @@ define.setup = function(props, sealed) {
 	}
 	//!steal-remove-end
 };
-define.replaceWith = replaceWith;
+define.replaceWith = defineLazyValue;
 define.eventsProto = eventsProto;
 define.defineConfigurableAndNotEnumerable = defineConfigurableAndNotEnumerable;
 define.make = make;
