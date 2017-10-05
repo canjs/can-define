@@ -22,6 +22,11 @@ QUnit.test("basics", function(){
 
 QUnit.test("serialize works", function(){
     var Person = DefineMap.extend({
+        __v: {
+	    	value: 0,
+	    	type: 'number',
+	    	serialize: false
+        },
         first: "string",
         last: "string"
     });
@@ -31,8 +36,27 @@ QUnit.test("serialize works", function(){
 
     var people = new People([{first: "j", last: "m"}]);
     QUnit.deepEqual(people.serialize(), [{first: "j", last: "m"}]);
-
 });
+
+QUnit.test("get() works", function(){
+    var Person = DefineMap.extend({
+        __v: {
+	    	value: 0,
+	    	type: 'number',
+	    	serialize: false
+        },
+        first: "string",
+        last: "string"
+    });
+
+    var People = DefineList.extend({
+        "*": Person
+    });
+
+    var people = new People([{first: "j", last: "m"}]);
+    QUnit.deepEqual(people.get(), [{ __v: 0, first: "j", last: "m"}]);
+});
+
 
 QUnit.test("Extended Map with empty def converts to default Observables", function(){
     var School = DefineMap.extend({
