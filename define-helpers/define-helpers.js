@@ -1,7 +1,6 @@
 var define = require("can-define");
-var canBatch = require("can-event/batch/batch");
-var canEvent = require("can-event");
 var canReflect = require("can-reflect");
+var queues = require("can-queues");
 
 
 var defineHelpers = {
@@ -27,18 +26,18 @@ var defineHelpers = {
 			// possibly convert value to List or DefineMap
 			map._data[prop] = defaultDefinition.type ? defaultDefinition.type(value) : define.types.observable(value);
 			instanceDefines[prop] = defaultDefinition;
-			canBatch.start();
-			canEvent.dispatch.call(map, {
+			queues.batch.start();
+			map.dispatch({
 				type: "__keys",
 				target: map
 			});
 			if(map._data[prop] !== undefined) {
-				canEvent.dispatch.call(map, {
+				map.dispatch({
 					type: prop,
 					target: map
 				},[map._data[prop], undefined]);
 			}
-			canBatch.stop();
+			queues.batch.stop();
 			return true;
 		}
 	},

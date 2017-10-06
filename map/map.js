@@ -3,7 +3,6 @@ var define = require("can-define");
 var defineHelpers = require("../define-helpers/define-helpers");
 var Observation = require("can-observation");
 var types = require("can-types");
-var canBatch = require("can-event/batch/batch");
 var ns = require("can-namespace");
 var canLog = require("can-util/js/log/log");
 var canReflect = require("can-reflect");
@@ -11,6 +10,7 @@ var canSymbol = require("can-symbol");
 var CIDSet = require("can-util/js/cid-set/cid-set");
 var CIDMap = require("can-util/js/cid-map/cid-map");
 var canDev = require("can-util/js/dev/dev");
+var queues = require("can-queues");
 
 var keysForDefinition = function(definitions) {
 	var keys = [];
@@ -24,26 +24,26 @@ var keysForDefinition = function(definitions) {
 };
 
 function assign(source) {
-	canBatch.start();
+	queues.batch.start();
 	canReflect.assignMap(this, source || {});
-	canBatch.stop();
+	queues.batch.stop();
 }
 function update(source) {
-	canBatch.start();
+	queues.batch.start();
 	canReflect.updateMap(this, source || {});
-	canBatch.stop();
+	queues.batch.stop();
 }
 function assignDeep(source){
-	canBatch.start();
+	queues.batch.start();
 	// TODO: we should probably just throw an error instead of cleaning
 	canReflect.assignDeepMap(this, source || {});
-	canBatch.stop();
+	queues.batch.stop();
 }
 function updateDeep(source){
-	canBatch.start();
+	queues.batch.start();
 	// TODO: we should probably just throw an error instead of cleaning
 	canReflect.updateDeepMap(this, source || {});
-	canBatch.stop();
+	queues.batch.stop();
 }
 function setKeyValue(key, value) {
 	var defined = defineHelpers.defineExpando(this, key, value);

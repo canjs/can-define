@@ -1,8 +1,7 @@
 var Construct = require("can-construct");
 var define = require("can-define");
 var make = define.make;
-var canEvent = require("can-event");
-var canBatch = require("can-event/batch/batch");
+var queues = require("can-queues");
 var Observation = require("can-observation");
 var canLog = require("can-util/js/log/log");
 var canDev = require("can-util/js/dev/dev");
@@ -102,17 +101,17 @@ var DefineList = Construct.extend("DefineList",
 					if (itemsDefinition && typeof itemsDefinition.added === 'function') {
 						Observation.ignore(itemsDefinition.added).call(this, newVal, index);
 					}
-					canEvent.dispatch.call(this, how, [ newVal, index ]);
+					this.dispatch( how, [ newVal, index ]);
 				} else if (how === 'remove') {
 					if (itemsDefinition && typeof itemsDefinition.removed === 'function') {
 						Observation.ignore(itemsDefinition.removed).call(this, oldVal, index);
 					}
-					canEvent.dispatch.call(this, how, [ oldVal, index ]);
+					this.dispatch(how, [ oldVal, index ]);
 				} else {
-					canEvent.dispatch.call(this, how, [ newVal, index ]);
+					this.dispatch(how, [ newVal, index ]);
 				}
 			} else {
-				canEvent.dispatch.call(this, {
+				this.dispatch({
 					type: "" + attr,
 					target: this
 				}, [ newVal, oldVal ]);
@@ -495,7 +494,7 @@ var DefineList = Construct.extend("DefineList",
 			var removed = splice.apply(this, args);
 			runningNative = false;
 
-			canBatch.start();
+			queues.batch.start();
 			if (howMany > 0) {
 				// tears down bubbling
 				this._triggerChange("" + index, "remove", undefined, removed);
@@ -504,9 +503,9 @@ var DefineList = Construct.extend("DefineList",
 				this._triggerChange("" + index, "add", added, removed);
 			}
 
-			canEvent.dispatch.call(this, 'length', [ this._length ]);
+			this.dispatch('length', [ this._length ]);
 
-			canBatch.stop();
+			queues.batch.stop();
 			return removed;
 		},
 
@@ -669,10 +668,10 @@ each({
 			runningNative = false;
 
 			if (!this.comparator || args.length) {
-				canBatch.start();
+				queues.batch.start();
 				this._triggerChange("" + len, "add", args, undefined);
-				canEvent.dispatch.call(this, 'length', [ this._length ]);
-				canBatch.stop();
+				this.dispatch('length', [ this._length ]);
+				queues.batch.stop();
 			}
 
 			return res;
@@ -778,10 +777,10 @@ each({
 			// `remove` - Items removed.
 			// `undefined` - The new values (there are none).
 			// `res` - The old, removed values (should these be unbound).
-			canBatch.start();
+			queues.batch.start();
 			this._triggerChange("" + len, "remove", undefined, [ res ]);
-			canEvent.dispatch.call(this, 'length', [ this._length ]);
-			canBatch.stop();
+			this.dispatch('length', [ this._length ]);
+			queues.batch.stop();
 
 			return res;
 		};
@@ -1360,14 +1359,14 @@ assign(DefineList.prototype, {
 	replace: function(newList) {
 		var patches = diff(this, newList);
 
-		canBatch.start();
+		queues.batch.start();
 		for (var i = 0, len = patches.length; i < len; i++) {
 			this.splice.apply(this, [
 				patches[i].index,
 				patches[i].deleteCount
 			].concat(patches[i].insert));
 		}
-		canBatch.stop();
+		queues.batch.stop();
 
 		return this;
 	},
@@ -1420,11 +1419,11 @@ assign(DefineList.prototype, {
 		Array.prototype.sort.call(this, compareFunction);
 		var added = Array.prototype.slice.call(this);
 
-		canBatch.start();
-		canEvent.dispatch.call(this, 'remove', [ removed, 0 ]);
-		canEvent.dispatch.call(this, 'add', [ added, 0 ]);
-		canEvent.dispatch.call(this, 'length', [ this._length, this._length ]);
-		canBatch.stop();
+		queues.batch.start();
+		this.dispatch('remove', [ removed, 0 ]);
+		this.dispatch('add', [ added, 0 ]);
+		this.dispatch('length', [ this._length, this._length ]);
+		queues.batch.stop();
 		return this;
 	}
 });
@@ -1514,13 +1513,13 @@ canReflect.assignSymbols(DefineList.prototype,{
 
 	// Called for every reference to a property in a template
 	// if a key is a numerical index then translate to length event
-	"can.onKeyValue": function(key, handler) {
+	"can.onKeyValue": function(key, handler, queue) {
 		var translationHandler;
 		if (isNaN(key)) {
 			translationHandler = function(ev, newValue, oldValue) {
 				handler(newValue, oldValue);
 			};
-			this.addEventListener(key, translationHandler);
+			this.addEventListener(key, translationHandler, queue);
 		}
 		else {
 			translationHandler = function() {
@@ -1528,21 +1527,21 @@ canReflect.assignSymbols(DefineList.prototype,{
 			};
 
 			singleReference.set(handler, this, translationHandler, key);
-			this.addEventListener('length', translationHandler);
+			this.addEventListener('length', translationHandler, queue);
 		}
 	},
 	// Called when a property reference is removed
-	"can.offKeyValue": function(key, handler) {
+	"can.offKeyValue": function(key, handler, queue) {
 		var translationHandler;
 		if (isNaN(key)) {
 			translationHandler = function(ev, newValue, oldValue) {
 				handler(newValue, oldValue);
 			};
-			this.removeEventListener(key, translationHandler);
+			this.removeEventListener(key, translationHandler, queue);
 		}
 		else {
 			translationHandler = singleReference.getAndDelete(handler, this, key);
-			this.removeEventListener('length', translationHandler);
+			this.removeEventListener('length', translationHandler, queue);
 		}
 	},
 
@@ -1563,14 +1562,14 @@ canReflect.assignSymbols(DefineList.prototype,{
 	},
 	// shape get/set
 	"can.assignDeep": function(source){
-		canBatch.start();
+		queues.batch.start();
 		canReflect.assignList(this, source);
-		canBatch.stop();
+		queues.batch.stop();
 	},
 	"can.updateDeep": function(source){
-		canBatch.start();
+		queues.batch.start();
 		this.replace(source);
-		canBatch.stop();
+		queues.batch.stop();
 	},
 
 	// observability

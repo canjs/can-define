@@ -1,11 +1,9 @@
 "use strict";
 var QUnit = require("steal-qunit");
 var DefineMap = require("can-define/map/map");
-var DefineList = require("can-define/list/list");
 var define = require("can-define");
 var Observation = require("can-observation");
 var each = require("can-util/js/each/each");
-var compute = require("can-compute");
 var assign = require("can-util/js/assign/assign");
 var canReflect = require("can-reflect");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
@@ -87,12 +85,10 @@ QUnit.test("get and set can setup expandos", function(){
 	var map = new DefineMap();
 	var oi = new Observation(function(){
 		return map.get("foo");
-	},null,{
-		updater: function(newVal){
-			QUnit.equal(newVal, "bar", "updated to bar");
-		}
 	});
-	oi.start();
+	canReflect.onValue(oi, function(newVal){
+		QUnit.equal(newVal, "bar", "updated to bar");
+	});
 
 	map.set("foo","bar");
 
@@ -202,12 +198,10 @@ QUnit.test("serialize responds to added props", function(){
 	var map = new DefineMap();
 	var oi = new Observation(function(){
 		return map.serialize();
-	},null,{
-		updater: function(newVal){
-			QUnit.deepEqual(newVal, {a: 1, b: 2}, "updated right");
-		}
 	});
-	oi.start();
+	canReflect.onValue(oi, function(newVal){
+		QUnit.deepEqual(newVal, {a: 1, b: 2}, "updated right");
+	});
 
 	map.assign({a: 1, b: 2});
 });
@@ -230,12 +224,10 @@ QUnit.test("creating a new key doesn't cause two changes", 1, function(){
 	var map = new DefineMap();
 	var oi = new Observation(function(){
 		return map.serialize();
-	},null,{
-		updater: function(newVal){
-			QUnit.deepEqual(newVal, {a: 1}, "updated right");
-		}
 	});
-	oi.start();
+	canReflect.onValue(oi, function(newVal){
+		QUnit.deepEqual(newVal, {a: 1}, "updated right");
+	});
 
 	map.set("a", 1);
 });
@@ -454,7 +446,6 @@ QUnit.test("cloning from non-defined map excludes special keys on setup", functi
 
 	QUnit.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
 	QUnit.notEqual(a._data, b._data, "_data prop not copied");
-	QUnit.notEqual(a.__bindEvents, b.__bindEvents, "_bindEvents prop not copied");
 	QUnit.notEqual(a._cid, b._cid, "_cid prop not copied");
 	QUnit.equal(a.foo, b.foo, "Other props copied");
 
@@ -476,7 +467,6 @@ QUnit.test("copying from .set() excludes special keys", function() {
 
 	QUnit.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
 	QUnit.notEqual(a._data, b._data, "_data prop not copied");
-	QUnit.notEqual(a.__bindEvents, b.__bindEvents, "_bindEvents prop not copied");
 	QUnit.notEqual(a._cid, b._cid, "_cid prop not copied");
 	QUnit.equal(a.foo, b.foo, "NEw props copied");
 
@@ -500,7 +490,6 @@ QUnit.test("copying with assign() excludes special keys", function() {
 
 	QUnit.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
 	QUnit.notEqual(a._data, b._data, "_data prop not copied");
-	QUnit.notEqual(a.__bindEvents, b.__bindEvents, "_bindEvents prop not copied");
 	QUnit.notEqual(a._cid, b._cid, "_cid prop not copied");
 	QUnit.equal(a.foo, b.foo, "New props copied");
 	QUnit.equal(a.existing, b.existing, "Existing props copied");
@@ -632,12 +621,12 @@ QUnit.test(".value functions should not be observable", function(){
 	var items = new ItemsVM();
 
 	var count = 0;
-	var itemsList = compute(function(){
+	var itemsList = new Observation(function(){
 		count++;
 		return items.item;
 	});
 
-	itemsList.on('change', function() {});
+	canReflect.onValue(itemsList, function(){});
 
 	items.item.foo = "changed";
 	items.zed = "changed";
@@ -852,12 +841,10 @@ QUnit.test('Observation bound to getter using lastSetVal updates correctly (canj
 	var map = new MyMap();
 	var oi = new Observation(function(){
 		return map.get("foo");
-	},null,{
-		updater: function(newVal){
-			QUnit.equal(newVal, "bar", "updated to bar");
-		}
 	});
-	oi.start();
+	canReflect.onValue(oi, function(newVal){
+		QUnit.equal(newVal, "bar", "updated to bar");
+	});
 
 	map.set("foo","bar");
 
@@ -876,12 +863,10 @@ QUnit.test('Observation bound to async getter updates correctly (canjs#3541)', f
 	var map = new MyMap();
 	var oi = new Observation(function(){
 		return map.get("foo");
-	},null,{
-		updater: function(newVal){
-			QUnit.equal(newVal, "bar", "updated to bar");
-		}
 	});
-	oi.start();
+	canReflect.onValue(oi, function(newVal){
+		QUnit.equal(newVal, "bar", "updated to bar");
+	});
 
 	map.set("foo","bar");
 
@@ -940,107 +925,3 @@ if(System.env.indexOf("production") < 0) {
 	});
 
 }
-
-QUnit.test('Assign value on map', function() {
-	var MyConstruct = DefineMap.extend({
-		list: DefineList,
-		name: 'string'
-	});
-
-	var obj = new MyConstruct({
-		list: ['data', 'data', 'data'],
-		name: 'CanJS',
-		foo: {
-			bar: 'bar',
-			zoo: 'say'
-		}
-	});
-
-
-	obj.assign({
-		list: ['another'],
-		foo: {
-			bar: 'zed'
-		}
-	});
-
-	QUnit.equal(obj.list.length, 1, 'list length should be 1');
-	QUnit.propEqual(obj.foo, { bar: 'zed' }, 'foo.bar is set correctly');
-	QUnit.equal(obj.name, 'CanJS', 'name is unchanged');
-
-});
-
-QUnit.test('Update value on a map', function() {
-	var MyConstruct = DefineMap.extend({
-		list: DefineList,
-		name: 'string'
-	});
-
-	var obj = new MyConstruct({
-		list: ['data', 'data', 'data'],
-		name: 'CanJS',
-		foo: {
-			bar: 'bar'
-		}
-	});
-
-	obj.update({
-		list: ['another'],
-		foo: {
-			bar: 'zed'
-		}
-	});
-
-	QUnit.equal(obj.list.length, 1, 'list length should be 1');
-	QUnit.equal(obj.foo.bar, 'zed', 'foo.bar is set correctly');
-	QUnit.equal(obj.name, undefined, 'name is removed');
-
-});
-
-
-QUnit.test('Deep assign a map', function() {
-	var MyConstruct = DefineMap.extend({
-		list: DefineList,
-		name: 'string'
-	});
-
-	var obj = new MyConstruct({
-		list: ['data', 'data', 'data'],
-		name: 'Test Name'
-	});
-
-	QUnit.equal(obj.list.length, 3, 'list length should be 3');
-
-
-	obj.assignDeep({
-		list: ['something']
-	});
-
-	QUnit.equal(obj.name, 'Test Name', 'Name property is still intact');
-	QUnit.equal(obj.list[0], 'something', 'the first element in the list should be updated');
-
-});
-
-
-QUnit.test('Deep updating a map', function() {
-	var MyConstruct = DefineMap.extend({
-		list: DefineList,
-		name: 'string'
-	});
-
-	var obj = new MyConstruct({
-		list: ['data', 'data', 'data'],
-		name: 'Test Name'
-	});
-
-	QUnit.equal(obj.list.length, 3, 'list length should be 3');
-
-
-	obj.updateDeep({
-		list: ['something']
-	});
-
-	QUnit.equal(obj.name, undefined, 'Name property has been reset');
-	QUnit.equal(obj.list[0], 'something', 'the first element of the list should be updated');
-
-});

@@ -4,12 +4,11 @@ var DefineList = require("can-define/list/list");
 var DefineMap = require("can-define/map/map");
 var Observation = require("can-observation");
 var define = require("can-define");
-var compute = require("can-compute");
 var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
 
 var assign = require("can-util/js/assign/assign");
-var CID = require("can-cid");
+
 QUnit.module("can-define/list/list");
 
 QUnit.test("List is an event emitter", function(assert) {
@@ -294,25 +293,22 @@ test("slice and join are observable by a compute (#1884)", function() {
 
 	var sliced = new Observation(function() {
 		return list.slice(0, 1);
-	}, null, {
-		updater: function(newVal) {
-			deepEqual(newVal.get(), [ 2 ], "got a new DefineList");
-		}
 	});
-	sliced.start();
+
+	canReflect.onValue(sliced, function(newVal){
+		deepEqual(newVal.get(), [ 2 ], "got a new DefineList");
+	});
 
 	var joined = new Observation(function() {
 		return list.join(",");
-	}, null, {
-		updater: function(newVal) {
-			equal(newVal, "2,3", "joined is observable");
-		}
 	});
-	joined.start();
+
+	canReflect.onValue(joined, function(newVal){
+		equal(newVal, "2,3", "joined is observable");
+	});
 
 
 	list.shift();
-
 
 });
 
@@ -431,7 +427,7 @@ test('list.sort a list of objects without losing reference (#137)', function() {
 test("list defines", 6, function() {
 	var Todo = function(props) {
         assign(this, props);
-        CID(this);
+        //CID(this);
     };
 	define(Todo.prototype, {
         completed: "boolean",
@@ -878,12 +874,11 @@ QUnit.test("set/splice are observable", function() {
 			count += (list[i] % 2) ? 1 : 0;
 		}
 		return count;
-	}, null, {
-		updater: function() {
-			ok(true);
-		}
 	});
-	count.start();
+
+	canReflect.onValue(count, function(){
+		ok(true);
+	});
 
 	expect(3);
 	list.set(3, 5);
@@ -1009,6 +1004,8 @@ test('reduceRight', function() {
 	equal(concatenatedNames, "BobAlice", "ReduceRight works over list");
 });
 
+/*
+// TODO: bring these back with can-stache-key
 test("compute(defineMap, 'property.names') works (#20)", function(){
 	var map = new DefineMap();
 	var c = compute(map, "foo.bar");
@@ -1031,6 +1028,7 @@ test("compute(DefineList, 0) works (#17)", function(assert){
 	list.set(0, 5);
 });
 
+
 QUnit.test("can-reflect onValue", function(assert) {
 	assert.expect(1);
 	var list = new DefineList([1,2,3]);
@@ -1040,6 +1038,7 @@ QUnit.test("can-reflect onValue", function(assert) {
 	});
 	list.set(0, 5);
 });
+*/
 
 QUnit.test("can-reflect onKeyValue", function(assert) {
 	assert.expect(3);
