@@ -110,7 +110,7 @@ var DefineList = Construct.extend("DefineList",
 					}
 					queues.batch.start();
 					this.dispatch( how, [ newVal, index ]);
-					this.dispatch( localOnPatchesSymbol, [[{inserted: newVal, index: index, deleteCount: 0}]]);
+					this.dispatch( localOnPatchesSymbol, [[{insert: newVal, index: index, deleteCount: 0}]]);
 					queues.batch.stop();
 				} else if (how === 'remove') {
 					if (itemsDefinition && typeof itemsDefinition.removed === 'function') {

@@ -1277,7 +1277,7 @@ QUnit.test("onPatches", function(){
 	var list = new DefineList(["a","b"]);
 	var PATCHES = [
 		[ {deleteCount: 2, index: 0} ],
-		[ {index: 0, inserted: ["A","B"], deleteCount: 0} ]
+		[ {index: 0, insert: ["A","B"], deleteCount: 0} ]
 	];
 	var handlerCalls = 0;
 	var handler = function(patches){
