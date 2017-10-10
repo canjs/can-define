@@ -26,6 +26,9 @@ var identity = function(x) {
 	return x;
 };
 
+// symbols aren't enumerable ... we'd need a version of Object that treats them that way
+var localOnPatchesSymbol = "can.onPatches";
+
 var makeFilterCallback = function(props) {
 	return function(item) {
 		for (var prop in props) {
@@ -36,6 +39,10 @@ var makeFilterCallback = function(props) {
 		return true;
 	};
 };
+
+var onKeyValue = define.eventsProto[canSymbol.for("can.onKeyValue")];
+var offKeyValue = define.eventsProto[canSymbol.for("can.offKeyValue")];
+
 /** @add can-define/list/list */
 var DefineList = Construct.extend("DefineList",
 	/** @static */
@@ -94,19 +101,25 @@ var DefineList = Construct.extend("DefineList",
 			// `batchTrigger` direct add and remove events...
 
 			// Make sure this is not nested and not an expando
-			if (!~("" + attr).indexOf('.') && !isNaN(index)) {
+			if ( !isNaN(index)) {
 				var itemsDefinition = this._define.definitions["#"];
 
 				if (how === 'add') {
 					if (itemsDefinition && typeof itemsDefinition.added === 'function') {
 						Observation.ignore(itemsDefinition.added).call(this, newVal, index);
 					}
+					queues.batch.start();
 					this.dispatch( how, [ newVal, index ]);
+					this.dispatch( localOnPatchesSymbol, [[{inserted: newVal, index: index, deleteCount: 0}]]);
+					queues.batch.stop();
 				} else if (how === 'remove') {
 					if (itemsDefinition && typeof itemsDefinition.removed === 'function') {
 						Observation.ignore(itemsDefinition.removed).call(this, oldVal, index);
 					}
+					queues.batch.start();
 					this.dispatch(how, [ oldVal, index ]);
+					this.dispatch( localOnPatchesSymbol, [[{index: index, deleteCount: oldVal.length}]]);
+					queues.batch.stop();
 				} else {
 					this.dispatch(how, [ newVal, index ]);
 				}
@@ -1516,32 +1529,25 @@ canReflect.assignSymbols(DefineList.prototype,{
 	"can.onKeyValue": function(key, handler, queue) {
 		var translationHandler;
 		if (isNaN(key)) {
-			translationHandler = function(ev, newValue, oldValue) {
-				handler(newValue, oldValue);
-			};
-			this.addEventListener(key, translationHandler, queue);
+			return onKeyValue.apply(this, arguments);
 		}
 		else {
 			translationHandler = function() {
 				handler(this[key]);
 			};
-
 			singleReference.set(handler, this, translationHandler, key);
-			this.addEventListener('length', translationHandler, queue);
+			return onKeyValue.call(this, 'length',  translationHandler, queue);
 		}
 	},
 	// Called when a property reference is removed
 	"can.offKeyValue": function(key, handler, queue) {
 		var translationHandler;
-		if (isNaN(key)) {
-			translationHandler = function(ev, newValue, oldValue) {
-				handler(newValue, oldValue);
-			};
-			this.removeEventListener(key, translationHandler, queue);
+		if ( isNaN(key)) {
+			return offKeyValue.apply(this, arguments);
 		}
 		else {
 			translationHandler = singleReference.getAndDelete(handler, this, key);
-			this.removeEventListener('length', translationHandler, queue);
+			return offKeyValue.call(this, 'length',  translationHandler, queue);
 		}
 	},
 
@@ -1585,16 +1591,20 @@ canReflect.assignSymbols(DefineList.prototype,{
 		}
 		return ret;
 	},
-
-	// Deprecated
-	"can.onKeysAdded": function(handler) {
-		this[canSymbol.for("can.onKeyValue")]("add", handler);
+	/*"can.onKeysAdded": function(handler,queue) {
+		this[canSymbol.for("can.onKeyValue")]("add", handler,queue);
 	},
-	"can.onKeysRemoved": function(handler) {
-		this[canSymbol.for("can.onKeyValue")]("remove", handler);
-	},
+	"can.onKeysRemoved": function(handler,queue) {
+		this[canSymbol.for("can.onKeyValue")]("remove", handler,queue);
+	},*/
 	"can.splice": function(index, deleteCount, insert){
 		this.splice.apply(this, [index, deleteCount].concat(insert));
+	},
+	"can.onPatches": function(handler,queue){
+		this[canSymbol.for("can.onKeyValue")](localOnPatchesSymbol, handler,queue);
+	},
+	"can.offPatches": function(handler,queue) {
+		this[canSymbol.for("can.offKeyValue")](localOnPatchesSymbol, handler,queue);
 	}
 });
 

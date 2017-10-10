@@ -22,7 +22,6 @@ var types = require("can-types");
 var each = require("can-util/js/each/each");
 var defaults = require("can-util/js/defaults/defaults");
 var stringToAny = require("can-util/js/string-to-any/string-to-any");
-var singleReference = require("can-util/js/single-reference/single-reference");
 //var simpleObervable = require("can-simple-observable");
 var defineLazyValue = require("can-define-lazy-value");
 
@@ -749,7 +748,7 @@ assign(eventsProto, {
 });
 eventsProto.on = eventsProto.bind = eventsProto.addEventListener;
 eventsProto.off = eventsProto.unbind = eventsProto.removeEventListener;
-canReflect.set(eventsProto, canSymbol.for("can.onKeyValue"), function(key, handler, queue){
+/*canReflect.set(eventsProto, canSymbol.for("can.onKeyValue"), function(key, handler, queue){
 	var translationHandler = function(ev, newValue, oldValue){
 		handler(newValue, oldValue);
 	};
@@ -760,7 +759,7 @@ canReflect.set(eventsProto, canSymbol.for("can.onKeyValue"), function(key, handl
 
 canReflect.set(eventsProto, canSymbol.for("can.offKeyValue"), function(key, handler, queue){
 	this.removeEventListener(key, singleReference.getAndDelete(handler, this, key), queue );
-});
+});*/
 
 delete eventsProto.one;
 

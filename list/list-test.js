@@ -1272,3 +1272,23 @@ QUnit.test("iterator can recover from bad _length", function() {
 	var iteration = iterator.next();
 	QUnit.ok(iteration.done, "Didn't fail");
 });
+
+QUnit.test("onPatches", function(){
+	var list = new DefineList(["a","b"]);
+	var PATCHES = [
+		[ {deleteCount: 2, index: 0} ],
+		[ {index: 0, inserted: ["A","B"], deleteCount: 0} ]
+	];
+	var handlerCalls = 0;
+	var handler = function(patches){
+		QUnit.deepEqual(patches, PATCHES[handlerCalls], "patches looked right for "+handlerCalls);
+		handlerCalls++;
+	};
+	list[canSymbol.for("can.onPatches")](handler,"notify");
+
+	list.replace(["A","B"]);
+
+	list[canSymbol.for("can.offPatches")](handler,"notify");
+
+	list.replace(["1","2"]);
+});
