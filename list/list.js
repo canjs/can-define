@@ -1511,6 +1511,9 @@ canReflect.assignSymbols(DefineList.prototype,{
 	// get/set
 	"can.getKeyValue": DefineList.prototype.get,
 	"can.setKeyValue": DefineList.prototype.set,
+	"can.getName": function() {
+		return this.constructor.name + "[" + this._cid + "]";
+	},
 
 	// Called for every reference to a property in a template
 	// if a key is a numerical index then translate to length event

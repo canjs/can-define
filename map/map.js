@@ -424,6 +424,9 @@ canReflect.assignSymbols(DefineMap.prototype,{
 		this.set(prop, undefined);
 		return this;
 	},
+	"can.getName": function() {
+		return this.constructor.name + "{" + this._cid + "}";
+	},
 
 	// -shape
 	"can.getOwnEnumerableKeys": function(){

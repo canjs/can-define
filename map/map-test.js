@@ -10,6 +10,7 @@ var assign = require("can-util/js/assign/assign");
 var canReflect = require("can-reflect");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
 var canDev = require("can-util/js/dev/dev");
+var canSymbol = require("can-symbol");
 
 var sealWorks = (function() {
 	try {
@@ -1043,4 +1044,40 @@ QUnit.test('Deep updating a map', function() {
 	QUnit.equal(obj.name, undefined, 'Name property has been reset');
 	QUnit.equal(obj.list[0], 'something', 'the first element of the list should be updated');
 
+});
+
+QUnit.test("registered symbols", function() {
+	var a = new DefineMap({ "a": "a" });
+
+	ok(a[canSymbol.for("can.isMapLike")], "can.isMapLike");
+	equal(a[canSymbol.for("can.getKeyValue")]("a"), "a", "can.getKeyValue");
+	a[canSymbol.for("can.setKeyValue")]("a", "b");
+	equal(a.a, "b", "can.setKeyValue");
+
+	function handler(val) {
+		equal(val, "c", "can.onKeyValue");
+	}
+
+	a[canSymbol.for("can.onKeyValue")]("a", handler);
+	a.a = "c";
+
+	a[canSymbol.for("can.offKeyValue")]("a", handler);
+	a.a = "d"; // doesn't trigger handler
+});
+
+QUnit.test("can.getName symbol behavior", function(assert) {
+	var getName = function(instance) {
+		return instance[canSymbol.for("can.getName")]();
+	};
+
+	assert.ok(
+		/DefineMap\{\d+\}/.test(getName(new DefineMap())),
+		"should use DefineMap constructor name by default"
+	);
+
+	var MyMap = DefineMap.extend("MyMap", {});
+	assert.ok(
+		/MyMap\{\d+\}/.test(getName(new MyMap())),
+		"should use custom list name when provided"
+	);
 });
