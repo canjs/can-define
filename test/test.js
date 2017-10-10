@@ -8,7 +8,6 @@ var types = require("can-types");
 var Observation = require("can-observation");
 var canReflect = require("can-reflect");
 var define = require("can-define");
-var queues = require("can-queues");
 
 var QUnit = require("steal-qunit");
 
