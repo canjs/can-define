@@ -391,31 +391,3 @@ QUnit.test('Deep updating a map', function() {
 	QUnit.equal(obj.list[0], 'something', 'the first element of the list should be updated');
 
 });
-
-
-QUnit.test("weird test", function(){
-    var Person = DefineMap.extend("Person",{
-        first: "string",
-        last:"string"
-    });
-
-
-    var person = new Person({first: "Justin", last: "Meyer"});
-
-    var other = new DefineMap({name: null});
-
-    var fullName = new Observation(function fullName(){
-        return person.first + person.last;
-    });
-
-    canReflect.onValue(fullName, function fullName_onValue(newValue){
-        other.name = newValue;
-    });
-
-
-    other.on("name", function other_name_updated(){
-        queues.logStack();
-    });
-
-    person.first = "Ramiya";
-});
