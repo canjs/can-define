@@ -1185,24 +1185,6 @@ QUnit.test("updateDeep property", function() {
 	propEqual(list.get('foo'), undefined, 'Foo is set to undefined');
 });
 
-QUnit.test("registered symbols", function() {
-	var a = new DefineMap({ "a": "a" });
-
-	ok(a[canSymbol.for("can.isMapLike")], "can.isMapLike");
-	equal(a[canSymbol.for("can.getKeyValue")]("a"), "a", "can.getKeyValue");
-	a[canSymbol.for("can.setKeyValue")]("a", "b");
-	equal(a.a, "b", "can.setKeyValue");
-
-	function handler(val) {
-		equal(val, "c", "can.onKeyValue");
-	}
-
-	a[canSymbol.for("can.onKeyValue")]("a", handler);
-	a.a = "c";
-
-	a[canSymbol.for("can.offKeyValue")]("a", handler);
-	a.a = "d"; // doesn't trigger handler
-});
 
 QUnit.test("cannot remove length", function() {
 	var list = new DefineList(["a"]);
@@ -1272,4 +1254,21 @@ QUnit.test("iterator can recover from bad _length", function() {
 	var iterator = list[canSymbol.iterator]();
 	var iteration = iterator.next();
 	QUnit.ok(iteration.done, "Didn't fail");
+});
+
+QUnit.test("can.getName symbol behavior", function(assert) {
+	var getName = function(instance) {
+		return instance[canSymbol.for("can.getName")]();
+	};
+
+	assert.ok(
+		/DefineList\[\d+\]/.test(getName(new DefineList())),
+		"should use DefineList constructor name by default"
+	);
+
+	var MyList = DefineList.extend("MyList", {});
+	assert.ok(
+		/MyList\[\d+\]/.test(getName(new MyList())),
+		"should use custom list name when provided"
+	);
 });

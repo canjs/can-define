@@ -8,6 +8,7 @@ var canLog = require("can-util/js/log/log");
 var canDev = require("can-util/js/dev/dev");
 var defineHelpers = require("../define-helpers/define-helpers");
 
+var CID = require("can-cid");
 var assign = require("can-util/js/assign/assign");
 var diff = require("can-util/js/diff/diff");
 var each = require("can-util/js/each/each");
@@ -1511,6 +1512,9 @@ canReflect.assignSymbols(DefineList.prototype,{
 	// get/set
 	"can.getKeyValue": DefineList.prototype.get,
 	"can.setKeyValue": DefineList.prototype.set,
+	"can.getName": function() {
+		return this.constructor.name + "[" + CID(this) + "]";
+	},
 
 	// Called for every reference to a property in a template
 	// if a key is a numerical index then translate to length event

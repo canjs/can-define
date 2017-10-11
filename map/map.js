@@ -11,6 +11,7 @@ var canSymbol = require("can-symbol");
 var CIDSet = require("can-util/js/cid-set/cid-set");
 var CIDMap = require("can-util/js/cid-map/cid-map");
 var canDev = require("can-util/js/dev/dev");
+var CID = require("can-cid");
 
 var keysForDefinition = function(definitions) {
 	var keys = [];
@@ -423,6 +424,9 @@ canReflect.assignSymbols(DefineMap.prototype,{
 	"can.deleteKeyValue": function(prop) {
 		this.set(prop, undefined);
 		return this;
+	},
+	"can.getName": function() {
+		return this.constructor.name + "{" + CID(this) + "}";
 	},
 
 	// -shape
