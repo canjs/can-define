@@ -32,13 +32,13 @@
   "dependencies": {
     "can-construct": "^3.2.0",
     "can-define-lazy-value": "^1.0.0",
-    "can-event-queue": "^0.1.1",
+    "can-event-queue": "<2.0.0",
     "can-namespace": "^1.0.0",
-    "can-observation": "^4.0.0-pre.1",
-    "can-observation-recorder": "0.0.1",
-    "can-queues": "^0.2.1",
+    "can-observation": "^4.0.0-pre.3",
+    "can-observation-recorder": "<2.0.0",
+    "can-queues": "<2.0.0",
     "can-reflect": "^1.2.1",
-    "can-simple-observable": "^2.0.0-pre.2",
+    "can-simple-observable": "^2.0.0-pre.4",
     "can-symbol": "^1.0.0",
     "can-types": "^1.1.0",
     "can-util": "^3.9.0"
