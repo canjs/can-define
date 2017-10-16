@@ -1600,22 +1600,18 @@ canReflect.assignSymbols(DefineList.prototype,{
 	"can.splice": function(index, deleteCount, insert){
 		this.splice.apply(this, [index, deleteCount].concat(insert));
 	},
-<<<<<<< HEAD
-
-	//!steal-remove-start
-	"can.getName": function() {
-		var identity = canReflect.getIdentity(this) || "";
-		return canReflect.getName(this.constructor) + "[" + identity + "]";
-	},
-	//!steal-remove-end
-=======
 	"can.onPatches": function(handler,queue){
 		this[canSymbol.for("can.onKeyValue")](localOnPatchesSymbol, handler,queue);
 	},
 	"can.offPatches": function(handler,queue) {
 		this[canSymbol.for("can.offKeyValue")](localOnPatchesSymbol, handler,queue);
-	}
->>>>>>> 8c3d346c8e34f8b9a9b38f5344f74e6476621a14
+	},
+
+	//!steal-remove-start
+	"can.getName": function() {
+		return canReflect.getName(this.constructor) + "[]";
+	},
+	//!steal-remove-end
 });
 
 canReflect.setKeyValue(DefineList.prototype, canSymbol.iterator, function() {

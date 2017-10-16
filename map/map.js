@@ -453,8 +453,7 @@ canReflect.assignSymbols(DefineMap.prototype,{
 
 	//!steal-remove-start
 	"can.getName": function() {
-		var identity = canReflect.getIdentity(this) || "";
-		return canReflect.getName(this.constructor) + "{" + identity + "}";
+		return canReflect.getName(this.constructor) + "{}";
 	},
 	//!steal-remove-end
 });

@@ -6,7 +6,7 @@ var Observation = require("can-observation");
 var define = require("can-define");
 var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
-var canTestHelpers = require("can-test-helpers");
+var canTestHelpers = require("can-test-helpers/lib/dev");
 
 var assign = require("can-util/js/assign/assign");
 
@@ -1294,7 +1294,7 @@ QUnit.test("onPatches", function(){
 	list.replace(["1","2"]);
 });
 
-canTestHelpers.devOnlyTest("can.getName and can.getIdentity symbol behavior", function(assert) {
+canTestHelpers.devOnlyTest("can.getName symbol behavior", function(assert) {
 	var getName = function(instance) {
 		return instance[canSymbol.for("can.getName")]();
 	};
@@ -1305,12 +1305,9 @@ canTestHelpers.devOnlyTest("can.getName and can.getIdentity symbol behavior", fu
 	);
 
 	var MyList = DefineList.extend("MyList", {});
-	MyList.prototype[canSymbol.for("can.getIdentity")] = function() {
-		return 0;
-	};
 
 	assert.ok(
-		"MyList[0]", getName(new MyList()),
+		"MyList[]", getName(new MyList()),
 		"should use custom list name when provided"
 	);
 });

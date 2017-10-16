@@ -6,9 +6,10 @@ var Observation = require("can-observation");
 var each = require("can-util/js/each/each");
 var assign = require("can-util/js/assign/assign");
 var canReflect = require("can-reflect");
+var canSymbol = require("can-symbol");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
 var canDev = require("can-util/js/dev/dev");
-var canTestHelpers = require("can-test-helpers");
+var canTestHelpers = require("can-test-helpers/lib/dev");
 
 var sealWorks = (function() {
 	try {
@@ -927,7 +928,7 @@ if(System.env.indexOf("production") < 0) {
 
 }
 
-canTestHelpers.devOnlyTest("can.getName and can.getIdentity symbol behavior", function(assert) {
+canTestHelpers.devOnlyTest("can.getName symbol behavior", function(assert) {
 	var getName = function(instance) {
 		return instance[canSymbol.for("can.getName")]();
 	};
@@ -938,12 +939,9 @@ canTestHelpers.devOnlyTest("can.getName and can.getIdentity symbol behavior", fu
 	);
 
 	var MyMap = DefineMap.extend("MyMap", {});
-	MyMap.prototype[canSymbol.for("can.getIdentity")] = function() {
-		return 0;
-	};
 
 	assert.ok(
-		"MyMap{0}", getName(new MyMap()),
+		"MyMap{}", getName(new MyMap()),
 		"should use custom map name when provided"
 	);
 });

@@ -37,7 +37,7 @@
     "can-observation": "^4.0.0-pre.3",
     "can-observation-recorder": "<2.0.0",
     "can-queues": "<2.0.0",
-    "can-reflect": "^1.2.1",
+    "can-reflect": "^1.7.0",
     "can-simple-observable": "^2.0.0-pre.4",
     "can-symbol": "^1.0.0",
     "can-types": "^1.1.0",
@@ -45,6 +45,7 @@
   },
   "devDependencies": {
     "bit-docs": "^0.0.7",
+    "can-test-helpers": "^1.0.1",
     "detect-cyclic-packages": "^1.1.0",
     "jshint": "^2.9.1",
     "serve": "^6.0.1",
