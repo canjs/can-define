@@ -1274,6 +1274,26 @@ QUnit.test("iterator can recover from bad _length", function() {
 	QUnit.ok(iteration.done, "Didn't fail");
 });
 
+QUnit.test("onPatches", function(){
+	var list = new DefineList(["a","b"]);
+	var PATCHES = [
+		[ {deleteCount: 2, index: 0} ],
+		[ {index: 0, insert: ["A","B"], deleteCount: 0} ]
+	];
+	var handlerCalls = 0;
+	var handler = function(patches){
+		QUnit.deepEqual(patches, PATCHES[handlerCalls], "patches looked right for "+handlerCalls);
+		handlerCalls++;
+	};
+	list[canSymbol.for("can.onPatches")](handler,"notify");
+
+	list.replace(["A","B"]);
+
+	list[canSymbol.for("can.offPatches")](handler,"notify");
+
+	list.replace(["1","2"]);
+});
+
 canTestHelpers.devOnlyTest("can.getName and can.getIdentity symbol behavior", function(assert) {
 	var getName = function(instance) {
 		return instance[canSymbol.for("can.getName")]();
