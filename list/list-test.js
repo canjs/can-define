@@ -6,6 +6,7 @@ var Observation = require("can-observation");
 var define = require("can-define");
 var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
+var canTestHelpers = require("can-test-helpers");
 
 var assign = require("can-util/js/assign/assign");
 
@@ -1271,4 +1272,25 @@ QUnit.test("iterator can recover from bad _length", function() {
 	var iterator = list[canSymbol.iterator]();
 	var iteration = iterator.next();
 	QUnit.ok(iteration.done, "Didn't fail");
+});
+
+canTestHelpers.devOnlyTest("can.getName and can.getIdentity symbol behavior", function(assert) {
+	var getName = function(instance) {
+		return instance[canSymbol.for("can.getName")]();
+	};
+
+	assert.ok(
+		"DefineList[]", getName(new DefineList()),
+		"should use DefineList constructor name by default"
+	);
+
+	var MyList = DefineList.extend("MyList", {});
+	MyList.prototype[canSymbol.for("can.getIdentity")] = function() {
+		return 0;
+	};
+
+	assert.ok(
+		"MyList[0]", getName(new MyList()),
+		"should use custom list name when provided"
+	);
 });

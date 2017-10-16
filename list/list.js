@@ -101,7 +101,7 @@ var DefineList = Construct.extend("DefineList",
 					if (itemsDefinition && typeof itemsDefinition.added === 'function') {
 						Observation.ignore(itemsDefinition.added).call(this, newVal, index);
 					}
-					this.dispatch( how, [ newVal, index ]);
+					this.dispatch(how, [ newVal, index ]);
 				} else if (how === 'remove') {
 					if (itemsDefinition && typeof itemsDefinition.removed === 'function') {
 						Observation.ignore(itemsDefinition.removed).call(this, oldVal, index);
@@ -1595,7 +1595,14 @@ canReflect.assignSymbols(DefineList.prototype,{
 	},
 	"can.splice": function(index, deleteCount, insert){
 		this.splice.apply(this, [index, deleteCount].concat(insert));
-	}
+	},
+
+	//!steal-remove-start
+	"can.getName": function() {
+		var identity = canReflect.getIdentity(this) || "";
+		return canReflect.getName(this.constructor) + "[" + identity + "]";
+	},
+	//!steal-remove-end
 });
 
 canReflect.setKeyValue(DefineList.prototype, canSymbol.iterator, function() {

@@ -449,7 +449,14 @@ canReflect.assignSymbols(DefineMap.prototype,{
 			ret.valueDependencies.add(this._computed[key].compute);
 		}
 		return ret;
-	}
+	},
+
+	//!steal-remove-start
+	"can.getName": function() {
+		var identity = canReflect.getIdentity(this) || "";
+		return canReflect.getName(this.constructor) + "{" + identity + "}";
+	},
+	//!steal-remove-end
 });
 
 canReflect.setKeyValue(DefineMap.prototype, canSymbol.iterator, function() {

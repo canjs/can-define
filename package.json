@@ -35,7 +35,7 @@
     "can-event-queue": "^0.1.1",
     "can-namespace": "^1.0.0",
     "can-observation": "^4.0.0-pre.1",
-    "can-observation-recorder": "0.0.1",
+    "can-observation-recorder": "0.1.0",
     "can-queues": "^0.1.1",
     "can-reflect": "^1.2.1",
     "can-simple-observable": "^2.0.0-pre.2",
