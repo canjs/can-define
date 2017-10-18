@@ -355,14 +355,17 @@ make = {
 					if (newVal !== current) {
 						setData.call(this, newVal);
 
+						//!steal-remove-start
+						var reasonLog = [ canReflect.getName(this) + "'s", prop, "changed to", JSON.stringify(newVal), "from", JSON.stringify(current) ];
+						//!steal-remove-end
 						this.dispatch({
 							type: prop,
 							target: this,
 							//!steal-remove-start
-							reasonLog: [ canReflect.getName(this) + "'s", prop, "changed to", JSON.stringify(newVal), "from", JSON.stringify(current) ],
+							reasonLog: reasonLog,
 							makeMeta: function makeMeta(handler, context, args) {
 								return {
-									log: [ canReflect.getName(handler), "called because" ].concat(args[0].reasonLog),
+									log: [ canReflect.getName(handler), "called because" ].concat(reasonLog),
 								};
 							},
 							//!steal-remove-end

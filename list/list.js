@@ -109,16 +109,36 @@ var DefineList = Construct.extend("DefineList",
 						Observation.ignore(itemsDefinition.added).call(this, newVal, index);
 					}
 					queues.batch.start();
-					this.dispatch( how, [ newVal, index ]);
-					this.dispatch( localOnPatchesSymbol, [[{insert: newVal, index: index, deleteCount: 0}]]);
+					this.dispatch({
+	                    type: how,
+	                    //!steal-remove-start
+	                    reasonLog: [ canReflect.getName(this), "added", JSON.stringify(newVal), "at", index ],
+	                    makeMeta: function makeMeta(handler, context, args) {
+	                        return {
+	                            log: [ canReflect.getName(handler), "called because" ].concat(args[0].reasonLog),
+	                        };
+	                    },
+	                    //!steal-remove-end
+	                }, [ newVal, index ]);
+					this.dispatch(localOnPatchesSymbol, [[{insert: newVal, index: index, deleteCount: 0}]]);
 					queues.batch.stop();
 				} else if (how === 'remove') {
 					if (itemsDefinition && typeof itemsDefinition.removed === 'function') {
 						Observation.ignore(itemsDefinition.removed).call(this, oldVal, index);
 					}
 					queues.batch.start();
-					this.dispatch(how, [ oldVal, index ]);
-					this.dispatch( localOnPatchesSymbol, [[{index: index, deleteCount: oldVal.length}]]);
+					this.dispatch({
+	                    type: how,
+	                    //!steal-remove-start
+	                    reasonLog: [ canReflect.getName(this), "remove", JSON.stringify(oldVal), "at", index ],
+	                    makeMeta: function makeMeta(handler, context, args) {
+	                        return {
+	                            log: [ canReflect.getName(handler), "called because" ].concat(args[0].reasonLog),
+	                        };
+	                    },
+	                    //!steal-remove-end
+	                }, [ oldVal, index ]);
+					this.dispatch(localOnPatchesSymbol, [[{index: index, deleteCount: oldVal.length}]]);
 					queues.batch.stop();
 				} else {
 					this.dispatch(how, [ newVal, index ]);
