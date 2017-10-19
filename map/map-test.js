@@ -10,6 +10,8 @@ var canSymbol = require("can-symbol");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
 var canDev = require("can-util/js/dev/dev");
 var canTestHelpers = require("can-test-helpers/lib/dev");
+var DefineList = require("can-define/list/list");
+var dev = require("can-log/dev/dev");
 
 var sealWorks = (function() {
 	try {
@@ -872,6 +874,115 @@ QUnit.test('Observation bound to async getter updates correctly (canjs#3541)', f
 
 	map.set("foo","bar");
 
+});
+
+QUnit.test("log all property changes", function(assert) {
+	var done = assert.async();
+
+	var Person = DefineMap.extend({
+		first: "string",
+		last: "string",
+		children: {
+			Type: DefineList
+		},
+		fullName: {
+			get: function(){
+				return this.first + " " + this.last;
+			}
+		}
+	});
+
+	var changed = [];
+	var log = dev.log;
+	dev.log = function() {
+		// collect the property keys that were logged
+		changed.push(JSON.parse(arguments[2]));
+	};
+
+	var p = new Person();
+	p.log();
+
+	// bind fullName to get events from the getter
+	p.on("fullName", function() {});
+
+	p.first = "Manuel";
+	p.last = "Mujica";
+
+	assert.expect(1);
+	setTimeout(function() {
+		dev.log = log;
+		assert.deepEqual(
+			changed,
+			["first", "fullName", "last", "fullName"],
+			"should log all property changes"
+		);
+		done();
+	});
+});
+
+QUnit.test("log single property changes", function(assert) {
+	var done = assert.async();
+
+	var Person = DefineMap.extend({
+		first: "string",
+		last: "string",
+		age: "number"
+	});
+
+	var changed = [];
+	var log = dev.log;
+	dev.log = function() {
+		// collect the property keys that were logged
+		changed.push(JSON.parse(arguments[2]));
+	};
+
+	var p = new Person();
+	p.log("first");
+
+	p.first = "John";
+	p.last = "Doe";
+	p.age = 99;
+
+	assert.expect(1);
+	setTimeout(function() {
+		dev.log = log;
+		assert.deepEqual(changed, ["first"], "should log 'first' changes");
+		done();
+	});
+});
+
+QUnit.test("log multiple property changes", function(assert) {
+	var done = assert.async();
+
+	var Person = DefineMap.extend({
+		first: "string",
+		last: "string",
+		age: "number",
+		company: "string"
+	});
+
+	var changed = [];
+	var log = dev.log;
+	dev.log = function() {
+		// collect the property keys that were logged
+		changed.push(JSON.parse(arguments[2]));
+	};
+
+	var p = new Person();
+	p.log("first");
+	p.log("age");
+
+	p.first = "John";
+	p.last = "Doe";
+	p.company = "Bitovi";
+	p.age = 99;
+
+	assert.expect(1);
+	setTimeout(function() {
+		dev.log = log;
+		assert.deepEqual(changed, ["first", "age"], "should log first and age");
+		done();
+	});
 });
 
 if(System.env.indexOf("production") < 0) {
