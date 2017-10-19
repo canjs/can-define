@@ -356,7 +356,7 @@ make = {
 						setData.call(this, newVal);
 
 						//!steal-remove-start
-						var reasonLog = [ canReflect.getName(this) + "'s", prop, "changed to", JSON.stringify(newVal), "from", JSON.stringify(current) ];
+						var reasonLog = [ canReflect.getName(this) + "'s", prop, "changed to", newVal, "from", current ];
 						//!steal-remove-end
 						this.dispatch({
 							type: prop,
