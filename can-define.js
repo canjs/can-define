@@ -301,6 +301,12 @@ define.Constructor = function(defines) {
 make = {
 	// Returns a function that creates the `_computed` prop.
 	compute: function(prop, get, defaultValueFn) {
+		//!steal-remove-start
+		Object.defineProperty(get, "name", {
+			value: canReflect.getName(this) + "'s " + prop + " getter",
+		});
+		//!steal-remove-end
+
 		return function() {
 			var map = this,
 				defaultValue = defaultValueFn && defaultValueFn.call(this),
