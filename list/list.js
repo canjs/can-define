@@ -6,6 +6,8 @@ var Observation = require("can-observation");
 var canLog = require("can-util/js/log/log");
 var canDev = require("can-util/js/dev/dev");
 var defineHelpers = require("../define-helpers/define-helpers");
+var dev = require("can-log/dev/dev");
+var ensureMeta = require("../ensure-meta");
 
 var assign = require("can-util/js/assign/assign");
 var diff = require("can-util/js/diff/diff");
@@ -501,7 +503,8 @@ var DefineList = Construct.extend("DefineList",
 			var args = makeArray(arguments),
 				added = [],
 				i, len, listIndex,
-				allSame = args.length > 2;
+				allSame = args.length > 2,
+				oldLength = this._length;
 
 			index = index || 0;
 
@@ -540,7 +543,7 @@ var DefineList = Construct.extend("DefineList",
 				this._triggerChange("" + index, "add", added, removed);
 			}
 
-			this.dispatch('length', [ this._length ]);
+			this.dispatch('length', [ this._length, oldLength ]);
 
 			queues.batch.stop();
 			return removed;
@@ -572,8 +575,54 @@ var DefineList = Construct.extend("DefineList",
 		 */
 		serialize: function() {
 			return canReflect.serialize(this, CIDMap);
+		},
+
+		// call `list.log()` to log all event changes
+		// pass `key` to only log the matching event, e.g: `list.log("add")`
+		log: function(key) {
+			//!steal-remove-start
+			var instance = this;
+
+			var quoteString = function quoteString(x) {
+				return typeof x === "string" ? JSON.stringify(x) : x;
+			};
+
+			var meta = ensureMeta(instance);
+			var allowed = meta.allowedLogKeysSet || new Set();
+			meta.allowedLogKeysSet = allowed;
+
+			if (key) {
+				allowed.add(key);
+			}
+
+			meta._log = function(event, data) {
+				var type = event.type;
+
+				if (type === "can.onPatches" || (key && !allowed.has(type))) {
+					return;
+				}
+
+				if (type === "add" || type === "remove") {
+					dev.log(
+						canReflect.getName(instance),
+						"\n how   ", quoteString(type),
+						"\n what  ", quoteString(data[0]),
+						"\n index ", quoteString(data[1])
+					);
+				} else {
+					// log `length` and `propertyName` events
+					dev.log(
+						canReflect.getName(instance),
+						"\n key ", quoteString(type),
+						"\n is  ", quoteString(data[0]),
+						"\n was ", quoteString(data[1])
+					);
+				}
+			};
+			//!steal-remove-end
 		}
-	});
+	}
+);
 
 // Converts to an `array` of arguments.
 var getArgs = function(args) {
@@ -707,7 +756,7 @@ each({
 			if (!this.comparator || args.length) {
 				queues.batch.start();
 				this._triggerChange("" + len, "add", args, undefined);
-				this.dispatch('length', [ this._length ]);
+				this.dispatch('length', [ this._length, len ]);
 				queues.batch.stop();
 			}
 
@@ -802,6 +851,7 @@ each({
 
 			var args = getArgs(arguments),
 				len = where && this._length ? this._length - 1 : 0,
+				oldLength = this._length ? this._length : 0,
 				res;
 
 			// Call the original method.
@@ -816,7 +866,7 @@ each({
 			// `res` - The old, removed values (should these be unbound).
 			queues.batch.start();
 			this._triggerChange("" + len, "remove", undefined, [ res ]);
-			this.dispatch('length', [ this._length ]);
+			this.dispatch('length', [ this._length, oldLength ]);
 			queues.batch.stop();
 
 			return res;

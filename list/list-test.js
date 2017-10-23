@@ -6,6 +6,7 @@ var Observation = require("can-observation");
 var define = require("can-define");
 var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
+var dev = require("can-log/dev/dev");
 var canTestHelpers = require("can-test-helpers/lib/dev");
 
 var assign = require("can-util/js/assign/assign");
@@ -1310,4 +1311,121 @@ canTestHelpers.devOnlyTest("can.getName symbol behavior", function(assert) {
 		"MyList[]", getName(new MyList()),
 		"should use custom list name when provided"
 	);
+});
+
+QUnit.test("length event should include previous value", function(assert) {
+	var done = assert.async();
+	var list = new DefineList([]);
+	var other = new DefineList(["a"]);
+
+	var changes = [];
+	list.on("length", function(_, current, previous) {
+		changes.push({ current: current, previous: previous });
+	});
+
+	list.push("x");
+	list.pop();
+	list.push("y", "z");
+	list.splice(2, 0, "x", "w");
+	list.splice(0, 1);
+	list.sort();
+	list.replace(other);
+
+	assert.expect(1);
+	setTimeout(function() {
+		assert.deepEqual(
+			changes,
+			[
+				{ current: 1, previous: 0 },
+				{ current: 0, previous: 1 },
+				{ current: 2, previous: 0 },
+				{ current: 4, previous: 2 },
+				{ current: 3, previous: 4 },
+				{ current: 3, previous: 3 },
+				{ current: 1, previous: 3 }
+			],
+			"should include length before mutation"
+		);
+		done();
+	});
+});
+
+QUnit.test("log all events", function(assert) {
+	var done = assert.async();
+	var list = new DefineList(["a","b", "c"]);
+
+	list.set("total", 100);
+	list.log();
+
+	var keys = [];
+	var log = dev.log;
+	dev.log = function() {
+		keys.push(JSON.parse(arguments[2]));
+	};
+
+	list.push("x");
+	list.pop();
+	list.set("total", 50);
+
+	assert.expect(1);
+	setTimeout(function() {
+		dev.log = log;
+		assert.deepEqual(
+			keys,
+			["add", "length", "remove", "length", "total"],
+			"should log 'add', 'remove', 'length' and 'propertyName' events"
+		);
+		done();
+	});
+});
+
+QUnit.test("log single events", function(assert) {
+	var done = assert.async();
+	var list = new DefineList(["a","b", "c"]);
+
+	list.set("total", 100);
+	list.log("length");
+
+	var keys = [];
+	var log = dev.log;
+	dev.log = function() {
+		keys.push(JSON.parse(arguments[2]));
+	};
+
+	list.push("x");
+	list.pop();
+	list.set("total", 50);
+
+	assert.expect(1);
+	setTimeout(function() {
+		dev.log = log;
+		assert.deepEqual(keys, ["length", "length"], "should log 'length' event");
+		done();
+	});
+});
+
+QUnit.test("log multiple events", function(assert) {
+	var done = assert.async();
+	var list = new DefineList(["a","b", "c"]);
+
+	list.set("total", 100);
+	list.log("add");
+	list.log("total");
+
+	var keys = [];
+	var log = dev.log;
+	dev.log = function() {
+		keys.push(JSON.parse(arguments[2]));
+	};
+
+	list.push("x");
+	list.pop();
+	list.set("total", 50);
+
+	assert.expect(1);
+	setTimeout(function() {
+		dev.log = log;
+		assert.deepEqual(keys, ["add", "total"], "should log add and total");
+		done();
+	});
 });

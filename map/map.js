@@ -11,6 +11,8 @@ var CIDSet = require("can-util/js/cid-set/cid-set");
 var CIDMap = require("can-util/js/cid-map/cid-map");
 var canDev = require("can-util/js/dev/dev");
 var queues = require("can-queues");
+var ensureMeta = require("../ensure-meta");
+var dev = require("can-log/dev/dev");
 
 var keysForDefinition = function(definitions) {
 	var keys = [];
@@ -408,6 +410,39 @@ var DefineMap = Construct.extend("DefineMap",{
 	})(),
 	"*": {
 		type: define.types.observable
+	},
+
+	// call `map.log()` to log all event changes
+	// pass `key` to only log the matching property, e.g: `map.log("foo")`
+	log: function(key) {
+		//!steal-remove-start
+		var instance = this;
+
+		var quoteString = function quoteString(x) {
+			return typeof x === "string" ? JSON.stringify(x) : x;
+		};
+
+		var meta = ensureMeta(instance);
+		var allowed = meta.allowedLogKeysSet || new Set();
+		meta.allowedLogKeysSet = allowed;
+
+		if (key) {
+			allowed.add(key);
+		}
+
+		meta._log = function(event, data) {
+			var type = event.type;
+			if (type === "__keys" || (key && !allowed.has(type))) {
+				return;
+			}
+			dev.log(
+				canReflect.getName(instance),
+				"\n key ", quoteString(type),
+				"\n is  ", quoteString(data[0]),
+				"\n was ", quoteString(data[1])
+			);
+		};
+		//!steal-remove-end
 	}
 });
 
