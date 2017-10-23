@@ -196,6 +196,18 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 		setter = make.set[dataProperty](prop),
 		getInitialValue;
 
+	//!steal-remove-start
+	if (definition.get) {
+		Object.defineProperty(definition.get, "name", {
+			value: canReflect.getName(objPrototype) + "'s " + prop + " getter",
+		});
+	}
+	if (definition.set) {
+		Object.defineProperty(definition.set, "name", {
+			value: canReflect.getName(objPrototype) + "'s " + prop + " setter",
+		});
+	}
+	//!steal-remove-end
 
 	// Determine the type converter
 	var typeConvert = function(val) {
@@ -301,11 +313,6 @@ define.Constructor = function(defines) {
 make = {
 	// Returns a function that creates the `_computed` prop.
 	compute: function(prop, get, defaultValueFn) {
-		//!steal-remove-start
-		Object.defineProperty(get, "name", {
-			value: canReflect.getName(this) + "'s " + prop + " getter",
-		});
-		//!steal-remove-end
 
 		return function() {
 			var map = this,
@@ -319,8 +326,6 @@ make = {
 			} else {
 				observable = new AsyncObservable(get, map, defaultValue);
 			}
-
-
 
 			computeObj = {
 				oldValue: undefined,
@@ -336,6 +341,13 @@ make = {
 					}, [newVal, oldValue]);
 				}
 			};
+
+			//!steal-remove-start
+			Object.defineProperty(computeObj.handler, "name", {
+				value: canReflect.getName(get).replace('getter', 'event emitter')
+			});
+			//!steal-remove-end
+
 			return computeObj;
 		};
 	},
@@ -361,19 +373,11 @@ make = {
 					if (newVal !== current) {
 						setData.call(this, newVal);
 
-						//!steal-remove-start
-						var reasonLog = [ canReflect.getName(this) + "'s", prop, "changed to", newVal, "from", current ];
-						//!steal-remove-end
 						this.dispatch({
 							type: prop,
 							target: this,
 							//!steal-remove-start
-							reasonLog: reasonLog,
-							makeMeta: function makeMeta(handler, context, args) {
-								return {
-									log: [ canReflect.getName(handler), "called because" ].concat(reasonLog),
-								};
-							},
+							reasonLog: [ canReflect.getName(this) + "'s", prop, "changed to", newVal, "from", current ],
 							//!steal-remove-end
 						}, [newVal, current]);
 					}

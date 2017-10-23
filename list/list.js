@@ -112,16 +112,11 @@ var DefineList = Construct.extend("DefineList",
 					}
 					queues.batch.start();
 					this.dispatch({
-	                    type: how,
-	                    //!steal-remove-start
-	                    reasonLog: [ canReflect.getName(this), "added", JSON.stringify(newVal), "at", index ],
-	                    makeMeta: function makeMeta(handler, context, args) {
-	                        return {
-	                            log: [ canReflect.getName(handler), "called because" ].concat(args[0].reasonLog),
-	                        };
-	                    },
-	                    //!steal-remove-end
-	                }, [ newVal, index ]);
+						type: how,
+						//!steal-remove-start
+						reasonLog: [ canReflect.getName(this), "added", JSON.stringify(newVal), "at", index ],
+						//!steal-remove-end
+					}, [ newVal, index ]);
 					this.dispatch(localOnPatchesSymbol, [[{insert: newVal, index: index, deleteCount: 0}]]);
 					queues.batch.stop();
 				} else if (how === 'remove') {
@@ -130,16 +125,11 @@ var DefineList = Construct.extend("DefineList",
 					}
 					queues.batch.start();
 					this.dispatch({
-	                    type: how,
-	                    //!steal-remove-start
-	                    reasonLog: [ canReflect.getName(this), "remove", JSON.stringify(oldVal), "at", index ],
-	                    makeMeta: function makeMeta(handler, context, args) {
-	                        return {
-	                            log: [ canReflect.getName(handler), "called because" ].concat(args[0].reasonLog),
-	                        };
-	                    },
-	                    //!steal-remove-end
-	                }, [ oldVal, index ]);
+						type: how,
+						//!steal-remove-start
+						reasonLog: [ canReflect.getName(this), "remove", JSON.stringify(oldVal), "at", index ],
+						//!steal-remove-end
+					}, [ oldVal, index ]);
 					this.dispatch(localOnPatchesSymbol, [[{index: index, deleteCount: oldVal.length}]]);
 					queues.batch.stop();
 				} else {
@@ -1611,7 +1601,7 @@ canReflect.assignSymbols(DefineList.prototype,{
 			};
 			//!steal-remove-start
 			Object.defineProperty(translationHandler, "name", {
-				value: "translationHandler("+key+")::"+canReflect.getName(this)+".onKeyValue('length',"+canReflect.getName(handler)+")",
+				value: "translationHandler(" + key + ")::" + canReflect.getName(this) + ".onKeyValue('length'," + canReflect.getName(handler) + ")",
 			});
 			//!steal-remove-end
 			singleReference.set(handler, this, translationHandler, key);
