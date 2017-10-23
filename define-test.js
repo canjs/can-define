@@ -512,7 +512,7 @@ test('Can make an attr alias a compute (#1470)', 9, function() {
 
 
 test("One event on getters (#1585)", function() {
-	queues.log();
+	
 	var Person = define.Constructor({
 		name: "*",
 		id: "number"
