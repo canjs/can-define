@@ -512,6 +512,7 @@ test('Can make an attr alias a compute (#1470)', 9, function() {
 
 
 test("One event on getters (#1585)", function() {
+	queues.log();
 	var Person = define.Constructor({
 		name: "*",
 		id: "number"
@@ -519,7 +520,7 @@ test("One event on getters (#1585)", function() {
 
 	var AppState = define.Constructor({
 		person: {
-			get: function(lastSetValue, resolve) {
+			get: function appState_person_get(lastSetValue, resolve) {
 				if (lastSetValue) {
 					return lastSetValue;
 				} else if (this.personId) {
@@ -538,7 +539,7 @@ test("One event on getters (#1585)", function() {
 
 	var appState = new AppState();
 	var personEvents = 0;
-	appState.bind("person", function(ev, person) {
+	appState.bind("person", function addPersonEvents(ev, person) {
 		personEvents++;
 	});
 

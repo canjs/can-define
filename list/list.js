@@ -207,7 +207,11 @@ var DefineList = Construct.extend("DefineList",
 		 */
 		get: function(index) {
 			if (arguments.length) {
-				Observation.add(this, "" + index);
+				if(isNaN(index)) {
+					Observation.add(this, index);
+				} else {
+					Observation.add(this, "length");
+				}
 				return this[index];
 			} else {
 				return canReflect.unwrap(this, CIDMap);
@@ -1555,6 +1559,11 @@ canReflect.assignSymbols(DefineList.prototype,{
 			translationHandler = function() {
 				handler(this[key]);
 			};
+			//!steal-remove-start
+			Object.defineProperty(translationHandler, "name", {
+				value: "translationHandler("+key+")::"+canReflect.getName(this)+".onKeyValue('length',"+canReflect.getName(handler)+")",
+			});
+			//!steal-remove-end
 			singleReference.set(handler, this, translationHandler, key);
 			return onKeyValue.call(this, 'length',  translationHandler, queue);
 		}
