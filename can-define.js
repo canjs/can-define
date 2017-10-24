@@ -669,7 +669,7 @@ makeDefinition = function(prop, def, defaultDefinition) {
 	// if def.type is a string it is handled in addDefinition
 	if(typeof def.type !== 'string') {
 		// if there's no type definition, take it from the defaultDefinition
-		if(typeof def.type !== 'string' && !definition.type && !definition.Type) {
+		if(!definition.type && !definition.Type) {
 			defaults(definition, defaultDefinition);
 		}
 
