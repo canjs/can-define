@@ -642,7 +642,9 @@ var addDefinition = function(definition, behavior, value) {
 				behaviorDef = behaviorDef[behavior];
 			}
 		}
-		definition[behavior] = behaviorDef;
+		if (typeof behaviorDef !== 'undefined') {
+			definition[behavior] = behaviorDef;
+		}
 	}
 	else {
 		definition[behavior] = value;
@@ -663,20 +665,24 @@ makeDefinition = function(prop, def, defaultDefinition) {
 			}
 		}
 	});
-	// if there's no type definition, take it from the defaultDefinition
-	if(!definition.type && !definition.Type) {
-		defaults(definition, defaultDefinition);
-	}
+	// We only want to add a defaultDefinition if def.type is not a string
+	// if def.type is a string it is handled in addDefinition
+	if(typeof def.type !== 'string') {
+		// if there's no type definition, take it from the defaultDefinition
+		if(typeof def.type !== 'string' && !definition.type && !definition.Type) {
+			defaults(definition, defaultDefinition);
+		}
 
-
-	if( isEmptyObject(definition) ) {
-		definition.type = define.types["*"];
+		if( isEmptyObject(definition) ) {
+			definition.type = define.types["*"];
+		}
 	}
+	
 	return definition;
 };
 
 getDefinitionOrMethod = function(prop, value, defaultDefinition){
-	var definition;
+	var definition;	
 	if(typeof value === "string") {
 		definition = {type: value};
 	}
@@ -695,10 +701,12 @@ getDefinitionOrMethod = function(prop, value, defaultDefinition){
 
 	if(definition) {
 		return makeDefinition(prop, definition, defaultDefinition);
-	} else {
+	}
+	else {
 		return value;
 	}
 };
+
 getDefinitionsAndMethods = function(defines, baseDefines) {
 	// make it so the definitions include base definitions on the proto
 	var definitions = Object.create(baseDefines ? baseDefines.definitions : null);
@@ -727,16 +735,20 @@ getDefinitionsAndMethods = function(defines, baseDefines) {
 			return;
 		} else {
 			var result = getDefinitionOrMethod(prop, value, defaultDefinition);
-			if(result && typeof result === "object") {
+			if(result && typeof result === "object" && !isEmptyObject(result)) {
 				definitions[prop] = result;
 			} 
-			//!steal-remove-start
 			else {
-				// Removed adding raw values that are not types or Types
-				// methods[prop] = result;
-				canLogDev.error("A Constructor or string must be used with shorthand definitions: https://canjs.com/doc/can-define.types.propDefinition.html#String");
+				// Removed adding raw values that are not functions
+				if (typeof result === 'function') {
+					methods[prop] = result;
+				}
+				//!steal-remove-start
+				else if (typeof result !== 'undefined') {
+					canLogDev.error("A Constructor or string must be used with shorthand definitions: https://canjs.com/doc/can-define.types.propDefinition.html#String");
+				}
+				//!steal-remove-end
 			}
-			//!steal-remove-end
 		}
 	});
 	if(defaults) {

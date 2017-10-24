@@ -1056,9 +1056,11 @@ testHelpers.dev.devOnlyTest("Error on not using a constructor or string on short
 		prop02: function() {},
 		prop03: 'string',
 		prop04: DefineMap,
-		// prop05: [],
-		get prop06() {},
-		set prop06(newVal) {}
+		prop05: "a string that is not a type",
+		prop06: [],
+		get prop07() {},
+		set prop07(newVal) {},
+		prop08: 'boolean'
 	});
 	/* jshint ignore:end */
 
@@ -1073,6 +1075,6 @@ QUnit.test('Improper shorthand properties are not set', function() {
 	});
 
 	QUnit.equal(VM.prototype._define.methods.prop01, undefined);
-	QUnit.equal(VM.prototype._define.methods.prop02, undefined);
+	QUnit.equal(typeof VM.prototype._define.methods.prop02, 'function');
 	QUnit.equal(VM.prototype._define.methods.prop03, undefined);
 });
