@@ -11,7 +11,7 @@ var Observation = require("can-observation");
 
 var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
 var assign = require("can-util/js/assign/assign");
-var canLog = require("can-log/dev/dev");
+var canLogDev = require("can-log/dev/dev");
 var CID = require("can-cid");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
 var types = require("can-types");
@@ -185,7 +185,7 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 
 	//!steal-remove-start
 	if (type && canReflect.isConstructorLike(type)) {
-		canLog.warn(
+		canLogDev.warn(
 			"can-define: the definition for " +
 			prop +
 			(objPrototype.constructor.shortName ? " on " + objPrototype.constructor.shortName : "") +
@@ -242,11 +242,11 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 		//!steal-remove-start
 		// If value is an object or array, give a warning
 		if (definition.value !== null && typeof definition.value === 'object') {
-			canLog.warn("can-define: The value for " + prop + " is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.");
+			canLogDev.warn("can-define: The value for " + prop + " is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.");
 		}
 		// If value is a constructor, give a warning
 		if (definition.value && canReflect.isConstructorLike(definition.value)) {
-			canLog.warn("can-define: The \"value\" for " + prop + " is set to a constructor. Did you mean \"Value\" instead?");
+			canLogDev.warn("can-define: The \"value\" for " + prop + " is set to a constructor. Did you mean \"Value\" instead?");
 		}
 		//!steal-remove-end
 
@@ -286,7 +286,7 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 	// If there's zero-arg `get` but not `set`, warn on all sets in dev mode
 	else if (definition.get.length < 1) {
 		setter = function() {
-			canLog.warn("can-define: Set value for property " +
+			canLogDev.warn("can-define: Set value for property " +
 				prop +
 				(objPrototype.constructor.shortName ? " on " + objPrototype.constructor.shortName : "") +
 				" ignored, as its definition has a zero-argument getter and no setter");
@@ -458,8 +458,8 @@ make = {
 						else {
 							//!steal-remove-start
 							asyncTimer = setTimeout(function() {
-								canLog.warn('can/map/setter.js: Setter "' + prop + '" did not return a value or call the setter callback.');
-							}, canLog.warnTimeout);
+								canLogDev.warn('can/map/setter.js: Setter "' + prop + '" did not return a value or call the setter callback.');
+							}, canLogDev.warnTimeout);
 							//!steal-remove-end
 							canBatch.stop();
 							return;
@@ -490,8 +490,8 @@ make = {
 						else {
 							//!steal-remove-start
 							asyncTimer = setTimeout(function() {
-								canLog.warn('can/map/setter.js: Setter "' + prop + '" did not return a value or call the setter callback.');
-							}, canLog.warnTimeout);
+								canLogDev.warn('can/map/setter.js: Setter "' + prop + '" did not return a value or call the setter callback.');
+							}, canLogDev.warnTimeout);
 							//!steal-remove-end
 							canBatch.stop();
 							return;
@@ -734,7 +734,7 @@ getDefinitionsAndMethods = function(defines, baseDefines) {
 			else {
 				// Removed adding raw values that are not types or Types
 				// methods[prop] = result;
-				canLog.error("A Constructor or string must be used with shorthand definitions: https://canjs.com/doc/can-define.types.propDefinition.html#String");
+				canLogDev.error("A Constructor or string must be used with shorthand definitions: https://canjs.com/doc/can-define.types.propDefinition.html#String");
 			}
 			//!steal-remove-end
 		}
