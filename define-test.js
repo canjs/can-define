@@ -581,7 +581,6 @@ test('Can make an attr alias a compute (#1470)', 9, function() {
 	var GetMap = define.Constructor({
 		value: {
 			set: function(newValue, setVal, oldValue) {
-				//debugger;
 				if (newValue.isComputed) {
 					return newValue;
 				}

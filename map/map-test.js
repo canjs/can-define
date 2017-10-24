@@ -10,6 +10,7 @@ var assign = require("can-util/js/assign/assign");
 var canReflect = require("can-reflect");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
 var canDev = require("can-util/js/dev/dev");
+var testHelpers = require('can-test-helpers');
 
 var sealWorks = (function() {
 	try {
@@ -1043,4 +1044,38 @@ QUnit.test('Deep updating a map', function() {
 	QUnit.equal(obj.name, undefined, 'Name property has been reset');
 	QUnit.equal(obj.list[0], 'something', 'the first element of the list should be updated');
 
+});
+
+testHelpers.dev.devOnlyTest("Error on not using a constructor or string on short-hand definitions (#278)", function() {
+	expect(1);
+	var message = "A Constructor or string must be used with shorthand definitions: https://canjs.com/doc/can-define.types.propDefinition.html#String";
+	var finishErrorCheck = testHelpers.dev.willError(message);
+
+	// Having JSHint ignore this because we don't need to actually
+	// use 'VM' anywhere to get the errors to show and the test to complete
+	/* jshint ignore:start */
+	var VM = DefineMap.extend({
+		prop01: 0,
+		prop02: function() {},
+		prop03: 'string',
+		prop04: DefineMap,
+		// prop05: [],
+		get prop06() {},
+		set prop06(newVal) {}
+	});
+	/* jshint ignore:end */
+
+	QUnit.equal(finishErrorCheck(), 2);
+});
+
+QUnit.test('Improper shorthand properties are not set', function() {
+	var VM = DefineMap.extend({
+		prop01: 0,
+		prop02: function() {},
+		prop03: 'some random string'
+	});
+
+	QUnit.equal(VM.prototype._define.methods.prop01, undefined);
+	QUnit.equal(VM.prototype._define.methods.prop02, undefined);
+	QUnit.equal(VM.prototype._define.methods.prop03, undefined);
 });
