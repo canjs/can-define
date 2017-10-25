@@ -145,7 +145,7 @@ propertyName: function() {}
 
 For example:
 ```js
-subMap: DefineMap // <- calls constructor
+subMap: DefineMap // <- sets Type to DefineMap
 ```
 OR
 ```js

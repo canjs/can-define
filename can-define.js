@@ -41,7 +41,7 @@ var defineConfigurableAndNotEnumerable = function(obj, prop, value) {
 var eachPropertyDescriptor = function(map, cb){
 	for(var prop in map) {
 		if(map.hasOwnProperty(prop)) {
-			cb(prop, Object.getOwnPropertyDescriptor(map,prop));
+			cb.call(map, prop, Object.getOwnPropertyDescriptor(map,prop));
 		}
 	}
 };
@@ -745,7 +745,7 @@ getDefinitionsAndMethods = function(defines, baseDefines) {
 				}
 				//!steal-remove-start
 				else if (typeof result !== 'undefined') {
-					canLogDev.error("A Constructor or string must be used with shorthand definitions: https://canjs.com/doc/can-define.types.propDefinition.html#String");
+					canLogDev.error(prop + " on " + this.constructor.shortName + " does not match a supported propDefinition. See: https://canjs.com/doc/can-define.types.propDefinition.html");
 				}
 				//!steal-remove-end
 			}

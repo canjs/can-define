@@ -1044,14 +1044,16 @@ QUnit.test('Deep updating a map', function() {
 });
 
 testHelpers.dev.devOnlyTest("Error on not using a constructor or string on short-hand definitions (#278)", function() {
-	expect(1);
-	var message = "A Constructor or string must be used with shorthand definitions: https://canjs.com/doc/can-define.types.propDefinition.html#String";
-	var finishErrorCheck = testHelpers.dev.willError(message);
+	expect(5);
+	var message = /.+ on .+ does not match a supported propDefinition. See: https:\/\/canjs.com\/doc\/can-define.types.propDefinition.html/i;
 
-	// Having JSHint ignore this because we don't need to actually
-	// use 'VM' anywhere to get the errors to show and the test to complete
-	/* jshint ignore:start */
-	var VM = DefineMap.extend({
+	var finishErrorCheck = testHelpers.dev.willError(message, function(actual, match) {
+		var rightProp = /prop0[15]/;
+		QUnit.ok(rightProp.test(actual.slice(0, 6)));
+		QUnit.ok(match);
+	});
+
+	DefineMap.extend('ShortName', {
 		prop01: 0,
 		prop02: function() {},
 		prop03: 'string',
@@ -1062,7 +1064,6 @@ testHelpers.dev.devOnlyTest("Error on not using a constructor or string on short
 		set prop07(newVal) {},
 		prop08: 'boolean'
 	});
-	/* jshint ignore:end */
 
 	QUnit.equal(finishErrorCheck(), 2);
 });
