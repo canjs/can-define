@@ -745,7 +745,8 @@ getDefinitionsAndMethods = function(defines, baseDefines) {
 				}
 				//!steal-remove-start
 				else if (typeof result !== 'undefined') {
-					canLogDev.error(prop + " on " + this.constructor.shortName + " does not match a supported propDefinition. See: https://canjs.com/doc/can-define.types.propDefinition.html");
+					var shortName = this.constructor.shortName ? this.constructor.shortName : "DefineMap";
+					canLogDev.error(prop + " on " + shortName + " does not match a supported propDefinition. See: https://canjs.com/doc/can-define.types.propDefinition.html");
 				}
 				//!steal-remove-end
 			}
