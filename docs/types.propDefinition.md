@@ -133,11 +133,23 @@ propertyName: {
 propertyName: "typeName"
 ```
 
-@type {Constructor} Defines a [can-define.types.TypeConstructor Type] setting with a constructor
-function.  Constructor functions are identified with [can-util/js/types/types.isConstructor].
+@type {Constructor} Either creates a method or Defines a [can-define.types.TypeConstructor Type] setting with a constructor function.  Constructor functions are identified with [can-reflect.isConstructorLike].
 
 ```
 propertyName: Constructor
+```
+OR
+```
+propertyName: function() {}
+```
+
+For example:
+```js
+subMap: DefineMap // <- sets Type to DefineMap
+```
+OR
+```js
+increment: function() { ++this.count } // <- sets method prop
 ```
 
 @type {Array} Defines an inline [can-define/list/list] Type setting. This is

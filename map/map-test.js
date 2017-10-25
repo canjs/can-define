@@ -9,7 +9,7 @@ var compute = require("can-compute");
 var assign = require("can-util/js/assign/assign");
 var canReflect = require("can-reflect");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
-var canDev = require("can-util/js/dev/dev");
+var testHelpers = require('can-test-helpers');
 
 var sealWorks = (function() {
 	try {
@@ -887,59 +887,57 @@ QUnit.test('Observation bound to async getter updates correctly (canjs#3541)', f
 
 });
 
-if(System.env.indexOf("production") < 0) {
-	QUnit.test('Setting a value with an object type generates a warning (#148)', function() {
-		QUnit.expect(2);
-		var oldwarn = canDev.warn;
-		canDev.warn = function(mesg) {
-			QUnit.equal(mesg, "can-define: The value for options is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.");
-		};
-		//should issue a warning
-		DefineMap.extend({
-			options: {
-				value: {}
-			}
-		});
-		//should issue a warning
-		DefineMap.extend({
-			options: {
-				value: []
-			}
-		});
+testHelpers.dev.devOnlyTest("Setting a value with an object type generates a warning (#148)", function() {
+	QUnit.expect(1);
 
-		//should not issue a warning
-		DefineMap.extend({
-			options: {
-				value: function(){}
-			}
-		});
+	var message = "can-define: The value for options is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.";
+	var finishErrorCheck = testHelpers.dev.willWarn(message);
 
-		//should not issue a warning
-		DefineMap.extend({
-			options: {
-				value: 2
-			}
-		});
-		canDev.warn = oldwarn;
+	//should issue a warning
+	DefineMap.extend({
+		options: {
+			value: {}
+		}
 	});
-	QUnit.test('Setting a value to a constructor type generates a warning', function() {
-		QUnit.expect(1);
-		var oldwarn = canDev.warn;
-		canDev.warn = function(mesg) {
-			QUnit.equal(mesg, "can-define: The \"value\" for options is set to a constructor. Did you mean \"Value\" instead?");
-		};
-
-		//should issue a warning
-		DefineMap.extend({
-			options: {
-				value: DefineMap
-			}
-		});
-
-		canDev.warn = oldwarn;
+	//should issue a warning
+	DefineMap.extend({
+		options: {
+			value: []
+		}
 	});
 
-}
+	//should not issue a warning
+	DefineMap.extend({
+		options: {
+			value: function(){}
+		}
+	});
+
+	//should not issue a warning
+	DefineMap.extend({
+		options: {
+			value: 2
+		}
+	});
+
+	QUnit.equal(finishErrorCheck(), 2);
+});
+
+testHelpers.dev.devOnlyTest("Setting a value to a constructor type generates a warning", function() {
+	QUnit.expect(1);
+
+	var message = "can-define: The \"value\" for options is set to a constructor. Did you mean \"Value\" instead?";
+	var finishErrorCheck = testHelpers.dev.willWarn(message);
+
+	//should issue a warning
+	DefineMap.extend({
+		options: {
+			value: DefineMap
+		}
+	});
+
+	QUnit.equal(finishErrorCheck(), 1);
+});
 
 QUnit.test('Assign value on map', function() {
 	var MyConstruct = DefineMap.extend({
@@ -1043,4 +1041,41 @@ QUnit.test('Deep updating a map', function() {
 	QUnit.equal(obj.name, undefined, 'Name property has been reset');
 	QUnit.equal(obj.list[0], 'something', 'the first element of the list should be updated');
 
+});
+
+testHelpers.dev.devOnlyTest("Error on not using a constructor or string on short-hand definitions (#278)", function() {
+	expect(5);
+	var message = /.+ on .+ does not match a supported propDefinition. See: https:\/\/canjs.com\/doc\/can-define.types.propDefinition.html/i;
+
+	var finishErrorCheck = testHelpers.dev.willError(message, function(actual, match) {
+		var rightProp = /prop0[15]/;
+		QUnit.ok(rightProp.test(actual.slice(0, 6)));
+		QUnit.ok(match);
+	});
+
+	DefineMap.extend('ShortName', {
+		prop01: 0,
+		prop02: function() {},
+		prop03: 'string',
+		prop04: DefineMap,
+		prop05: "a string that is not a type",
+		prop06: [],
+		get prop07() {},
+		set prop07(newVal) {},
+		prop08: 'boolean'
+	});
+
+	QUnit.equal(finishErrorCheck(), 2);
+});
+
+QUnit.test('Improper shorthand properties are not set', function() {
+	var VM = DefineMap.extend({
+		prop01: 0,
+		prop02: function() {},
+		prop03: 'some random string'
+	});
+
+	QUnit.equal(VM.prototype._define.methods.prop01, undefined);
+	QUnit.equal(typeof VM.prototype._define.methods.prop02, 'function');
+	QUnit.equal(VM.prototype._define.methods.prop03, undefined);
 });
