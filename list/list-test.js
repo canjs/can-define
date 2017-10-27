@@ -1350,7 +1350,7 @@ QUnit.test("length event should include previous value", function(assert) {
 	});
 });
 
-QUnit.test("log all events", function(assert) {
+canTestHelpers.devOnlyTest("log all events", function(assert) {
 	var done = assert.async();
 	var list = new DefineList(["a","b", "c"]);
 
@@ -1379,7 +1379,7 @@ QUnit.test("log all events", function(assert) {
 	});
 });
 
-QUnit.test("log single events", function(assert) {
+canTestHelpers.devOnlyTest("log single events", function(assert) {
 	var done = assert.async();
 	var list = new DefineList(["a","b", "c"]);
 
@@ -1404,7 +1404,7 @@ QUnit.test("log single events", function(assert) {
 	});
 });
 
-QUnit.test("log multiple events", function(assert) {
+canTestHelpers.devOnlyTest("log multiple events", function(assert) {
 	var done = assert.async();
 	var list = new DefineList(["a","b", "c"]);
 
