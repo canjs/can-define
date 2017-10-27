@@ -497,13 +497,13 @@ make = {
 		},
 		Type: function(prop, Type, set) {
 			// `type`: {foo: "string"}
-			if(Array.isArray(Type) && types.DefineList) {
-				Type = types.DefineList.extend({
+			if(Array.isArray(Type) && define.DefineList) {
+				Type = define.DefineList.extend({
 					"#": Type[0]
 				});
 			} else if (typeof Type === "object") {
-				if(types.DefineMap) {
-					Type = types.DefineMap.extend(Type);
+				if(define.DefineMap) {
+					Type = define.DefineMap.extend(Type);
 				} else {
 					Type = define.Constructor(Type);
 				}
@@ -913,20 +913,20 @@ define.types = {
 		return true;
 	},
 	'observable': function(newVal) {
-			if(Array.isArray(newVal) && types.DefineList) {
-					newVal = new types.DefineList(newVal);
+			if(Array.isArray(newVal) && define.DefineList) {
+					newVal = new define.DefineList(newVal);
 			}
-			else if(isPlainObject(newVal) &&  types.DefineMap) {
-					newVal = new types.DefineMap(newVal);
+			else if(isPlainObject(newVal) &&  define.DefineMap) {
+					newVal = new define.DefineMap(newVal);
 			}
 			return newVal;
 	},
 	'stringOrObservable': function(newVal) {
 		if(Array.isArray(newVal)) {
-			return new types.DefaultList(newVal);
+			return new define.DefaultList(newVal);
 		}
 		else if(isPlainObject(newVal)) {
-			return new types.DefaultMap(newVal);
+			return new define.DefaultMap(newVal);
 		}
 		else {
 			return define.types.string(newVal);

@@ -2,7 +2,6 @@ var Construct = require("can-construct");
 var define = require("can-define");
 var defineHelpers = require("../define-helpers/define-helpers");
 var Observation = require("can-observation");
-var types = require("can-types");
 var ns = require("can-namespace");
 var canLog = require("can-util/js/log/log");
 var canReflect = require("can-reflect");
@@ -520,8 +519,8 @@ eventsProtoSymbols.forEach(function(sym) {
   });
 });
 
-types.DefineMap = DefineMap;
-types.DefaultMap = DefineMap;
+// tells `can-define` to use this 
+define.DefineMap = DefineMap;
 
 Object.defineProperty(DefineMap.prototype, "toObject", {
 	enumerable: false,

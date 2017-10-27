@@ -13,7 +13,6 @@ var assign = require("can-util/js/assign/assign");
 var diff = require("can-util/js/diff/diff");
 var each = require("can-util/js/each/each");
 var makeArray = require("can-util/js/make-array/make-array");
-var types = require("can-types");
 var ns = require("can-namespace");
 var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
@@ -1699,6 +1698,6 @@ canReflect.setKeyValue(DefineList.prototype, canSymbol.iterator, function() {
 	};
 });
 
-types.DefineList = DefineList;
-types.DefaultList = DefineList;
+define.DefineList = DefineList;
+
 module.exports = ns.DefineList = DefineList;
