@@ -876,7 +876,7 @@ QUnit.test('Observation bound to async getter updates correctly (canjs#3541)', f
 
 });
 
-QUnit.test("log all property changes", function(assert) {
+canTestHelpers.devOnlyTest("log all property changes", function(assert) {
 	var done = assert.async();
 
 	var Person = DefineMap.extend({
@@ -920,7 +920,7 @@ QUnit.test("log all property changes", function(assert) {
 	});
 });
 
-QUnit.test("log single property changes", function(assert) {
+canTestHelpers.devOnlyTest("log single property changes", function(assert) {
 	var done = assert.async();
 
 	var Person = DefineMap.extend({
@@ -951,7 +951,7 @@ QUnit.test("log single property changes", function(assert) {
 	});
 });
 
-QUnit.test("log multiple property changes", function(assert) {
+canTestHelpers.devOnlyTest("log multiple property changes", function(assert) {
 	var done = assert.async();
 
 	var Person = DefineMap.extend({
