@@ -18,7 +18,6 @@ var assign = require("can-util/js/assign/assign");
 var dev = require("can-util/js/dev/dev");
 
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
-var types = require("can-types");
 var each = require("can-util/js/each/each");
 var defaults = require("can-util/js/defaults/defaults");
 var stringToAny = require("can-util/js/string-to-any/string-to-any");
