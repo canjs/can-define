@@ -3,8 +3,8 @@ var define = require("can-define");
 var make = define.make;
 var queues = require("can-queues");
 var Observation = require("can-observation");
-var canLog = require("can-util/js/log/log");
-var canDev = require("can-util/js/dev/dev");
+var canLog = require("can-log");
+var canLogDev = require("can-log/dev/dev");
 var defineHelpers = require("../define-helpers/define-helpers");
 var dev = require("can-log/dev/dev");
 var ensureMeta = require("../ensure-meta");
@@ -299,7 +299,7 @@ var DefineList = Construct.extend("DefineList",
 			// otherwise we are setting multiple
 			else {
 				//!steal-remove-start
-				canDev.warn('can-define/list/list.prototype.set is deprecated; please use can-define/list/list.prototype.assign or can-define/list/list.prototype.update instead');
+				canLogDev.warn('can-define/list/list.prototype.set is deprecated; please use can-define/list/list.prototype.assign or can-define/list/list.prototype.update instead');
 				//!steal-remove-end
 
 				//we are deprecating this in #245
