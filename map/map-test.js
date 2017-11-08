@@ -1056,3 +1056,13 @@ canTestHelpers.devOnlyTest("can.getName symbol behavior", function(assert) {
 		"should use custom map name when provided"
 	);
 });
+
+
+QUnit.test("DefineMap has defineInstanceKey symbol", function(){
+	var Type = DefineMap.extend({});
+	Type[canSymbol.for("can.defineInstanceKey")]("prop", {type: "number"});
+
+	var t = new Type();
+	t.prop = "5";
+	QUnit.equal(t.prop, 5, "value set");
+});

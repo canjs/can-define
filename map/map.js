@@ -68,7 +68,9 @@ var DefineMap = Construct.extend("DefineMap",{
 			prototype = this.prototype;
 		if(DefineMap) {
 			// we have already created
-			define(prototype, prototype, base.prototype._define);
+			var result = define(prototype, prototype, base.prototype._define);
+				define.makeDefineInstanceKey(this, result);
+				
 			addTypeEvents(this);
 			for(key in DefineMap.prototype) {
 				define.defineConfigurableAndNotEnumerable(prototype, key, prototype[key]);

@@ -299,7 +299,12 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 		configurable: true
 	});
 };
-
+define.makeDefineInstanceKey = function(constructor, defineResult) {
+	constructor[canSymbol.for("can.defineInstanceKey")] = function(property, value) {
+		var definition = getDefinitionOrMethod(property, value, defineResult.defaultDefinition);
+		define.property(constructor.prototype, property, definition, defineResult.dataInitializers, defineResult.computedInitializers);
+	};
+};
 
 // Makes a simple constructor function.
 define.Constructor = function(defines) {
@@ -313,8 +318,9 @@ define.Constructor = function(defines) {
 		define.setup.call(this, props);
 		this.__inSetup = false;
 	};
-	define(constructor.prototype, defines);
+	var result = define(constructor.prototype, defines);
 	addTypeEvents(constructor);
+	define.makeDefineInstanceKey(constructor, result);
 	return constructor;
 };
 

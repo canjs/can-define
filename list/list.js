@@ -55,6 +55,8 @@ var DefineList = Construct.extend("DefineList",
 				addTypeEvents(this);
 				var prototype = this.prototype;
 				var result = define(prototype, prototype, base.prototype._define);
+				define.makeDefineInstanceKey(this, result);
+
 				var itemsDefinition = result.definitions["#"] || result.defaultDefinition;
 
 				if (itemsDefinition) {

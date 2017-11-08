@@ -1429,3 +1429,12 @@ canTestHelpers.devOnlyTest("log multiple events", function(assert) {
 		done();
 	});
 });
+
+QUnit.test("DefineList has defineInstanceKey symbol", function(){
+	var Type = DefineList.extend({});
+	Type[canSymbol.for("can.defineInstanceKey")]("prop", {type: "number"});
+
+	var t = new Type();
+	t.prop = "5";
+	QUnit.equal(t.prop, 5, "value set");
+});

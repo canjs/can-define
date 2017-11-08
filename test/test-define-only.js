@@ -512,7 +512,7 @@ test('Can make an attr alias a compute (#1470)', 9, function() {
 
 
 test("One event on getters (#1585)", function() {
-	
+
 	var Person = define.Constructor({
 		name: "*",
 		id: "number"
@@ -1188,6 +1188,15 @@ QUnit.test('define() should add a CID (#246)', function() {
 	});
 	var g = new Greeting();
 	QUnit.ok(g._cid, "should have a CID property");
+});
+
+QUnit.test("define.Constructor has defineInstanceKey symbol", function(){
+	var Type = define.Constructor({});
+	Type[canSymbol.for("can.defineInstanceKey")]("prop", {type: "number"});
+
+	var t = new Type();
+	t.prop = "5";
+	QUnit.equal(t.prop, 5, "value set");
 });
 
 if(System.env.indexOf("production") < 0) {

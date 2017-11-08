@@ -92,3 +92,32 @@ QUnit.test("DefineList can.onInstancePatches basics", function(){
         [list, [{type: "set",    key: "count", value: 8} ] ]
     ]);
 });
+
+QUnit.test("define can.onInstanceBoundChange basics", function(){
+
+    var Person = define.Constructor({
+        first: "any",
+        last: "any"
+    });
+
+    var calls = [];
+    function handler(obj, patches) {
+        calls.push([obj, patches]);
+    }
+
+    Person[canSymbol.for("can.onInstanceBoundChange")](handler);
+
+    var person = new Person({first: "Justin", last: "Meyer"});
+    var bindHandler = function(){};
+    person.on("first", bindHandler);
+    person.off("first", bindHandler);
+
+    Person[canSymbol.for("can.offInstanceBoundChange")](handler);
+    person.on("first", bindHandler);
+    person.off("first", bindHandler);
+
+    QUnit.deepEqual(calls,[
+        [person,  true ],
+        [person, false ]
+    ]);
+});
