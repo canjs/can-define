@@ -299,10 +299,16 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 		configurable: true
 	});
 };
-define.makeDefineInstanceKey = function(constructor, defineResult) {
+define.makeDefineInstanceKey = function(constructor) {
 	constructor[canSymbol.for("can.defineInstanceKey")] = function(property, value) {
+		var defineResult = this.prototype._define;
 		var definition = getDefinitionOrMethod(property, value, defineResult.defaultDefinition);
-		define.property(constructor.prototype, property, definition, defineResult.dataInitializers, defineResult.computedInitializers);
+		if(definition && typeof definition === "object") {
+			define.property(constructor.prototype, property, definition, defineResult.dataInitializers, defineResult.computedInitializers);
+			defineResult.definitions[property] = definition;
+		} else {
+			defineResult.methods[property] = definition;
+		}
 	};
 };
 
