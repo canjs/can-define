@@ -2,6 +2,8 @@ var Construct = require("can-construct");
 var define = require("can-define");
 var make = define.make;
 var queues = require("can-queues");
+var addTypeEvents = require("can-event-queue/type-events/type-events");
+
 var Observation = require("can-observation");
 var canLog = require("can-util/js/log/log");
 var canDev = require("can-util/js/dev/dev");
@@ -50,7 +52,7 @@ var DefineList = Construct.extend("DefineList",
 	{
 		setup: function(base) {
 			if (DefineList) {
-
+				addTypeEvents(this);
 				var prototype = this.prototype;
 				var result = define(prototype, prototype, base.prototype._define);
 				var itemsDefinition = result.definitions["#"] || result.defaultDefinition;
@@ -104,32 +106,36 @@ var DefineList = Construct.extend("DefineList",
 			// Make sure this is not nested and not an expando
 			if ( !isNaN(index)) {
 				var itemsDefinition = this._define.definitions["#"];
-
+				var patches;
 				if (how === 'add') {
 					if (itemsDefinition && typeof itemsDefinition.added === 'function') {
 						Observation.ignore(itemsDefinition.added).call(this, newVal, index);
 					}
 					queues.batch.start();
+					patches = [{type: "splice", insert: newVal, index: index, deleteCount: 0}];
 					this.dispatch({
 						type: how,
+						patches: patches,
 						//!steal-remove-start
 						reasonLog: [ canReflect.getName(this), "added", JSON.stringify(newVal), "at", index ],
 						//!steal-remove-end
 					}, [ newVal, index ]);
-					this.dispatch(localOnPatchesSymbol, [[{insert: newVal, index: index, deleteCount: 0}]]);
+					this.dispatch(localOnPatchesSymbol, [patches]);
 					queues.batch.stop();
 				} else if (how === 'remove') {
 					if (itemsDefinition && typeof itemsDefinition.removed === 'function') {
 						Observation.ignore(itemsDefinition.removed).call(this, oldVal, index);
 					}
 					queues.batch.start();
+					patches = [{type: "splice", index: index, deleteCount: oldVal.length}];
 					this.dispatch({
 						type: how,
+						patches: patches,
 						//!steal-remove-start
 						reasonLog: [ canReflect.getName(this), "remove", JSON.stringify(oldVal), "at", index ],
 						//!steal-remove-end
 					}, [ oldVal, index ]);
-					this.dispatch(localOnPatchesSymbol, [[{index: index, deleteCount: oldVal.length}]]);
+					this.dispatch(localOnPatchesSymbol, [patches]);
 					queues.batch.stop();
 				} else {
 					this.dispatch(how, [ newVal, index ]);

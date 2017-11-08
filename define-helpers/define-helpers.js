@@ -34,7 +34,8 @@ var defineHelpers = {
 			if(map._data[prop] !== undefined) {
 				map.dispatch({
 					type: prop,
-					target: map
+					target: map,
+					patches: [{type: "set", key: prop, value: map._data[prop]}],
 				},[map._data[prop], undefined]);
 			}
 			queues.batch.stop();

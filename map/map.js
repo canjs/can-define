@@ -12,6 +12,7 @@ var canDev = require("can-util/js/dev/dev");
 var queues = require("can-queues");
 var ensureMeta = require("../ensure-meta");
 var dev = require("can-log/dev/dev");
+var addTypeEvents = require("can-event-queue/type-events/type-events");
 
 var keysForDefinition = function(definitions) {
 	var keys = [];
@@ -68,6 +69,7 @@ var DefineMap = Construct.extend("DefineMap",{
 		if(DefineMap) {
 			// we have already created
 			define(prototype, prototype, base.prototype._define);
+			addTypeEvents(this);
 			for(key in DefineMap.prototype) {
 				define.defineConfigurableAndNotEnumerable(prototype, key, prototype[key]);
 			}
@@ -519,7 +521,7 @@ eventsProtoSymbols.forEach(function(sym) {
   });
 });
 
-// tells `can-define` to use this 
+// tells `can-define` to use this
 define.DefineMap = DefineMap;
 
 Object.defineProperty(DefineMap.prototype, "toObject", {

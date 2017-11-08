@@ -11,6 +11,7 @@ var SettableObservable = require("can-simple-observable/settable/settable");
 
 var CID = require("can-cid");
 var eventQueue = require("can-event-queue");
+var addTypeEvents = require("can-event-queue/type-events/type-events");
 var queues = require("can-queues");
 
 var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
@@ -303,9 +304,17 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 // Makes a simple constructor function.
 define.Constructor = function(defines) {
 	var constructor = function(props) {
+		Object.defineProperty(this,"__inSetup",{
+			configurable: true,
+			enumerable: false,
+			value: true,
+			writable: true
+		});
 		define.setup.call(this, props);
+		this.__inSetup = false;
 	};
 	define(constructor.prototype, defines);
+	addTypeEvents(constructor);
 	return constructor;
 };
 
@@ -374,6 +383,7 @@ make = {
 						setData.call(this, newVal);
 
 						this.dispatch({
+							patches: [{type: "set", key: prop, value: newVal}],
 							type: prop,
 							target: this,
 							//!steal-remove-start
