@@ -6,6 +6,7 @@ var each = require("can-util/js/each/each");
 var canSymbol = require("can-symbol");
 var canDev = require("can-util/js/dev/dev");
 var SimpleObservable = require("can-simple-observable");
+var canReflect = require("can-reflect");
 
 QUnit.module("can-define");
 
@@ -1188,15 +1189,6 @@ QUnit.test('define() should add a CID (#246)', function() {
 	});
 	var g = new Greeting();
 	QUnit.ok(g._cid, "should have a CID property");
-});
-
-QUnit.test("define.Constructor has defineInstanceKey symbol", function(){
-	var Type = define.Constructor({});
-	Type[canSymbol.for("can.defineInstanceKey")]("prop", {type: "number"});
-
-	var t = new Type();
-	t.prop = "5";
-	QUnit.equal(t.prop, 5, "value set");
 });
 
 if(System.env.indexOf("production") < 0) {

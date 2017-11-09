@@ -313,7 +313,7 @@ define.makeDefineInstanceKey = function(constructor) {
 };
 
 // Makes a simple constructor function.
-define.Constructor = function(defines) {
+define.Constructor = function(defines, sealed) {
 	var constructor = function(props) {
 		Object.defineProperty(this,"__inSetup",{
 			configurable: true,
@@ -321,7 +321,7 @@ define.Constructor = function(defines) {
 			value: true,
 			writable: true
 		});
-		define.setup.call(this, props);
+		define.setup.call(this, props, sealed);
 		this.__inSetup = false;
 	};
 	var result = define(constructor.prototype, defines);
@@ -637,8 +637,13 @@ make = {
 
 define.behaviors = ["get", "set", "value", "Value", "type", "Type", "serialize"];
 
-var addDefinition = function(definition, behavior, value) {
-	if(behavior === "type") {
+// This cleans up a particular behavior and adds it to the definition
+var addBehaviorToDefinition = function(definition, behavior, value) {
+	if(behavior === "enumerable") {
+		// treat enumerable like serialize
+		definition.serialize = !!value;
+	}
+	else if(behavior === "type") {
 		var behaviorDef = value;
 		if(typeof behaviorDef === "string") {
 			behaviorDef = define.types[behaviorDef];
@@ -658,7 +663,7 @@ makeDefinition = function(prop, def, defaultDefinition) {
 	var definition = {};
 
 	each(def, function(value, behavior) {
-		addDefinition(definition, behavior, value);
+		addBehaviorToDefinition(definition, behavior, value);
 	});
 	// only add default if it doesn't exist
 	each(defaultDefinition, function(value, prop){
@@ -681,6 +686,7 @@ makeDefinition = function(prop, def, defaultDefinition) {
 };
 
 getDefinitionOrMethod = function(prop, value, defaultDefinition){
+	// Clean up the value to make it a definition-like object
 	var definition;
 	if(typeof value === "string") {
 		definition = {type: value};
