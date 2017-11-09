@@ -6,7 +6,6 @@ var each = require("can-util/js/each/each");
 var canSymbol = require("can-symbol");
 var canDev = require("can-util/js/dev/dev");
 var SimpleObservable = require("can-simple-observable");
-var canReflect = require("can-reflect");
 
 QUnit.module("can-define");
 
