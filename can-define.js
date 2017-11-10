@@ -16,8 +16,7 @@ var queues = require("can-queues");
 
 var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
 var assign = require("can-util/js/assign/assign");
-var dev = require("can-util/js/dev/dev");
-
+var canLogDev = require("can-log/dev/dev");
 var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
 var each = require("can-util/js/each/each");
 var defaults = require("can-util/js/defaults/defaults");
@@ -42,7 +41,7 @@ var defineConfigurableAndNotEnumerable = function(obj, prop, value) {
 var eachPropertyDescriptor = function(map, cb){
 	for(var prop in map) {
 		if(map.hasOwnProperty(prop)) {
-			cb(prop, Object.getOwnPropertyDescriptor(map,prop));
+			cb.call(map, prop, Object.getOwnPropertyDescriptor(map,prop));
 		}
 	}
 };
@@ -161,7 +160,7 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 
 	//!steal-remove-start
 	if (type && canReflect.isConstructorLike(type)) {
-		dev.warn(
+		canLogDev.warn(
 			"can-define: the definition for " +
 			prop +
 			(objPrototype.constructor.shortName ? " on " + objPrototype.constructor.shortName : "") +
@@ -230,11 +229,11 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 		//!steal-remove-start
 		// If value is an object or array, give a warning
 		if (definition.value !== null && typeof definition.value === 'object') {
-			dev.warn("can-define: The value for " + prop + " is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.");
+			canLogDev.warn("can-define: The value for " + prop + " is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.");
 		}
 		// If value is a constructor, give a warning
 		if (definition.value && canReflect.isConstructorLike(definition.value)) {
-			dev.warn("can-define: The \"value\" for " + prop + " is set to a constructor. Did you mean \"Value\" instead?");
+			canLogDev.warn("can-define: The \"value\" for " + prop + " is set to a constructor. Did you mean \"Value\" instead?");
 		}
 		//!steal-remove-end
 
@@ -274,7 +273,7 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 	else if (definition.get.length < 1) {
 		setter = function() {
 			//!steal-remove-start
-			dev.warn("can-define: Set value for property " +
+			canLogDev.warn("can-define: Set value for property " +
 				prop +
 				(objPrototype.constructor.shortName ? " on " + objPrototype.constructor.shortName : "") +
 				" ignored, as its definition has a zero-argument getter and no setter");
@@ -461,8 +460,8 @@ make = {
 						else {
 							//!steal-remove-start
 							asyncTimer = setTimeout(function() {
-								dev.warn('can/map/setter.js: Setter "' + prop + '" did not return a value or call the setter callback.');
-							}, dev.warnTimeout);
+								canLogDev.warn('can/map/setter.js: Setter "' + prop + '" did not return a value or call the setter callback.');
+							}, canLogDev.warnTimeout);
 							//!steal-remove-end
 							queues.batch.stop();
 							return;
@@ -493,8 +492,8 @@ make = {
 						else {
 							//!steal-remove-start
 							asyncTimer = setTimeout(function() {
-								dev.warn('can/map/setter.js: Setter "' + prop + '" did not return a value or call the setter callback.');
-							}, dev.warnTimeout);
+								canLogDev.warn('can/map/setter.js: Setter "' + prop + '" did not return a value or call the setter callback.');
+							}, canLogDev.warnTimeout);
 							//!steal-remove-end
 							queues.batch.stop();
 							return;
@@ -652,7 +651,9 @@ var addBehaviorToDefinition = function(definition, behavior, value) {
 				behaviorDef = behaviorDef[behavior];
 			}
 		}
-		definition[behavior] = behaviorDef;
+		if (typeof behaviorDef !== 'undefined') {
+			definition[behavior] = behaviorDef;
+		}
 	}
 	else {
 		definition[behavior] = value;
@@ -673,15 +674,19 @@ makeDefinition = function(prop, def, defaultDefinition) {
 			}
 		}
 	});
-	// if there's no type definition, take it from the defaultDefinition
-	if(!definition.type && !definition.Type) {
-		defaults(definition, defaultDefinition);
+	// We only want to add a defaultDefinition if def.type is not a string
+	// if def.type is a string it is handled in addDefinition
+	if(typeof def.type !== 'string') {
+		// if there's no type definition, take it from the defaultDefinition
+		if(!definition.type && !definition.Type) {
+			defaults(definition, defaultDefinition);
+		}
+
+		if( isEmptyObject(definition) ) {
+			definition.type = define.types["*"];
+		}
 	}
 
-
-	if( isEmptyObject(definition) ) {
-		definition.type = define.types["*"];
-	}
 	return definition;
 };
 
@@ -706,10 +711,12 @@ getDefinitionOrMethod = function(prop, value, defaultDefinition){
 
 	if(definition) {
 		return makeDefinition(prop, definition, defaultDefinition);
-	} else {
+	}
+	else {
 		return value;
 	}
 };
+
 getDefinitionsAndMethods = function(defines, baseDefines) {
 	// make it so the definitions include base definitions on the proto
 	var definitions = Object.create(baseDefines ? baseDefines.definitions : null);
@@ -738,10 +745,19 @@ getDefinitionsAndMethods = function(defines, baseDefines) {
 			return;
 		} else {
 			var result = getDefinitionOrMethod(prop, value, defaultDefinition);
-			if(result && typeof result === "object") {
+			if(result && typeof result === "object" && !isEmptyObject(result)) {
 				definitions[prop] = result;
-			} else {
-				methods[prop] = result;
+			}
+			else {
+				// Removed adding raw values that are not functions
+				if (typeof result === 'function') {
+					methods[prop] = result;
+				}
+				//!steal-remove-start
+				else if (typeof result !== 'undefined') {
+					canLogDev.error(prop + (this.constructor.shortName ? " on " + this.constructor.shortName : "") + " does not match a supported propDefinition. See: https://canjs.com/doc/can-define.types.propDefinition.html");
+				}
+				//!steal-remove-end
 			}
 		}
 	});
