@@ -1,5 +1,6 @@
 @module {function} can-define
-@parent can-core
+@parent can-observables
+@collection can-core
 @description Exports the `define` method that defines observable properties
 and their behavior on a prototype object.
 @group can-define.static 0 static
