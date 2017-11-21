@@ -10,8 +10,8 @@ var AsyncObservable = require("can-simple-observable/async/async");
 var SettableObservable = require("can-simple-observable/settable/settable");
 
 var CID = require("can-cid");
-var eventQueue = require("can-event-queue");
-var addTypeEvents = require("can-event-queue/type-events/type-events");
+var eventQueue = require("can-event-queue/map/legacy/legacy");
+var addTypeEvents = require("can-event-queue/type/type");
 var queues = require("can-queues");
 
 var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
