@@ -2,7 +2,7 @@ var Construct = require("can-construct");
 var define = require("can-define");
 var make = define.make;
 var queues = require("can-queues");
-var addTypeEvents = require("can-event-queue/type-events/type-events");
+var addTypeEvents = require("can-event-queue/type/type");
 
 var Observation = require("can-observation");
 var canLog = require("can-log");

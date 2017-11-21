@@ -12,7 +12,7 @@ var CIDMap = require("can-util/js/cid-map/cid-map");
 var queues = require("can-queues");
 var ensureMeta = require("../ensure-meta");
 var dev = require("can-log/dev/dev");
-var addTypeEvents = require("can-event-queue/type-events/type-events");
+var addTypeEvents = require("can-event-queue/type/type");
 
 var keysForDefinition = function(definitions) {
 	var keys = [];
