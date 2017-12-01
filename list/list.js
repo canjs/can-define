@@ -4,7 +4,7 @@ var make = define.make;
 var queues = require("can-queues");
 var addTypeEvents = require("can-event-queue/type/type");
 
-var Observation = require("can-observation");
+var ObservationRecorder = require("can-observation-recorder");
 var canLog = require("can-log");
 var canLogDev = require("can-log/dev/dev");
 var defineHelpers = require("../define-helpers/define-helpers");
@@ -111,7 +111,7 @@ var DefineList = Construct.extend("DefineList",
 				var patches;
 				if (how === 'add') {
 					if (itemsDefinition && typeof itemsDefinition.added === 'function') {
-						Observation.ignore(itemsDefinition.added).call(this, newVal, index);
+						ObservationRecorder.ignore(itemsDefinition.added).call(this, newVal, index);
 					}
 					queues.batch.start();
 					patches = [{type: "splice", insert: newVal, index: index, deleteCount: 0}];
@@ -126,7 +126,7 @@ var DefineList = Construct.extend("DefineList",
 					queues.batch.stop();
 				} else if (how === 'remove') {
 					if (itemsDefinition && typeof itemsDefinition.removed === 'function') {
-						Observation.ignore(itemsDefinition.removed).call(this, oldVal, index);
+						ObservationRecorder.ignore(itemsDefinition.removed).call(this, oldVal, index);
 					}
 					queues.batch.start();
 					patches = [{type: "splice", index: index, deleteCount: oldVal.length}];
@@ -207,9 +207,9 @@ var DefineList = Construct.extend("DefineList",
 		get: function(index) {
 			if (arguments.length) {
 				if(isNaN(index)) {
-					Observation.add(this, index);
+					ObservationRecorder.add(this, index);
 				} else {
-					Observation.add(this, "length");
+					ObservationRecorder.add(this, "length");
 				}
 				return this[index];
 			} else {
@@ -1240,7 +1240,7 @@ assign(DefineList.prototype, {
 	 *
 	 */
 	join: function() {
-		Observation.add(this, "length");
+		ObservationRecorder.add(this, "length");
 		return [].join.apply(this, arguments);
 	},
 
@@ -1306,7 +1306,7 @@ assign(DefineList.prototype, {
 	 */
 	slice: function() {
 		// tells computes to listen on length for changes.
-		Observation.add(this, "length");
+		ObservationRecorder.add(this, "length");
 		var temp = Array.prototype.slice.apply(this, arguments);
 		return new this.constructor(temp);
 	},
@@ -1526,7 +1526,7 @@ for (var prop in define.eventsProto) {
 Object.defineProperty(DefineList.prototype, "length", {
 	get: function() {
 		if (!this.__inSetup) {
-			Observation.add(this, "length");
+			ObservationRecorder.add(this, "length");
 		}
 		return this._length;
 	},

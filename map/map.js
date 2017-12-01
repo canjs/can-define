@@ -1,7 +1,7 @@
 var Construct = require("can-construct");
 var define = require("can-define");
 var defineHelpers = require("../define-helpers/define-helpers");
-var Observation = require("can-observation");
+var ObservationRecorder = require("can-observation-recorder");
 var ns = require("can-namespace");
 var canLog = require("can-log");
 var canLogDev = require("can-log/dev/dev");
@@ -58,7 +58,7 @@ function getKeyValue(key) {
 	if(value !== undefined || key in this || Object.isSealed(this)) {
 		return value;
 	} else {
-		Observation.add(this, key);
+		ObservationRecorder.add(this, key);
 		return this[key];
 	}
 }
@@ -70,7 +70,7 @@ var DefineMap = Construct.extend("DefineMap",{
 			// we have already created
 			var result = define(prototype, prototype, base.prototype._define);
 				define.makeDefineInstanceKey(this, result);
-				
+
 			addTypeEvents(this);
 			for(key in DefineMap.prototype) {
 				define.defineConfigurableAndNotEnumerable(prototype, key, prototype[key]);
@@ -404,7 +404,7 @@ var DefineMap = Construct.extend("DefineMap",{
 		var forEach = function(list, cb, thisarg){
 			return canReflect.eachKey(list, cb, thisarg);
 		},
-			noObserve = Observation.ignore(forEach);
+			noObserve = ObservationRecorder.ignore(forEach);
 
 		return function(cb, thisarg, observe) {
 			return observe === false ? noObserve(this, cb, thisarg) : forEach(this, cb, thisarg);
@@ -465,7 +465,7 @@ canReflect.assignSymbols(DefineMap.prototype,{
 
 	// -shape
 	"can.getOwnEnumerableKeys": function(){
-		Observation.add(this, '__keys');
+		ObservationRecorder.add(this, '__keys');
 		return keysForDefinition(this._define.definitions).concat(keysForDefinition(this._instanceDefinitions) );
 	},
 

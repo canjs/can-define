@@ -6,6 +6,7 @@ var canSymbol = require("can-symbol");
 var canReflect = require("can-reflect");
 
 var Observation = require("can-observation");
+var ObservationRecorder = require("can-observation-recorder");
 var AsyncObservable = require("can-simple-observable/async/async");
 var SettableObservable = require("can-simple-observable/settable/settable");
 
@@ -238,7 +239,7 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 		}
 		//!steal-remove-end
 
-		getInitialValue = Observation.ignore(make.get.defaultValue(prop, definition, typeConvert, eventsSetter));
+		getInitialValue = ObservationRecorder.ignore(make.get.defaultValue(prop, definition, typeConvert, eventsSetter));
 	}
 
 	// If property has a getter, create the compute that stores its data.
@@ -621,7 +622,7 @@ make = {
 		data: function(prop) {
 			return function() {
 				if (!this.__inSetup) {
-					Observation.add(this, prop);
+					ObservationRecorder.add(this, prop);
 				}
 
 				return this._data[prop];
