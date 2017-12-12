@@ -534,10 +534,5 @@ Object.defineProperty(DefineMap.prototype, "toObject", {
 		return this.get();
 	}
 });
-Object.defineProperty(DefineMap.prototype, "each", {
-	enumerable: false,
-	writable: true,
-	value: DefineMap.prototype.forEach
-});
 
 module.exports = ns.DefineMap = DefineMap;

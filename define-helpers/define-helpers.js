@@ -45,7 +45,7 @@ var defineHelpers = {
 	reflectSerialize: function(unwrapped){
 		var constructorDefinitions = this._define.definitions;
 		var defaultDefinition = this._define.defaultDefinition;
-		this.each(function(val, name){
+		this.forEach(function(val, name){
 			var propDef = constructorDefinitions[name];
 
 			if(propDef && typeof propDef.serialize === "function") {

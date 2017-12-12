@@ -1555,11 +1555,6 @@ Object.defineProperty(DefineList.prototype, "length", {
 	enumerable: true
 });
 
-Object.defineProperty(DefineList.prototype, "each", {
-	enumerable: false,
-	writable: true,
-	value: DefineList.prototype.forEach
-});
 DefineList.prototype.attr = function(prop, value) {
 	canLog.warn("DefineMap::attr shouldn't be called");
 	if (arguments.length === 0) {
