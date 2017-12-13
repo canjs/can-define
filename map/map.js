@@ -435,7 +435,7 @@ var DefineMap = Construct.extend("DefineMap",{
 
 		meta._log = function(event, data) {
 			var type = event.type;
-			if (type === "__keys" || (key && !allowed.has(type))) {
+			if (type === "can.keys" || (key && !allowed.has(type))) {
 				return;
 			}
 			dev.log(
@@ -465,7 +465,7 @@ canReflect.assignSymbols(DefineMap.prototype,{
 
 	// -shape
 	"can.getOwnEnumerableKeys": function(){
-		ObservationRecorder.add(this, '__keys');
+		ObservationRecorder.add(this, 'can.keys');
 		return keysForDefinition(this._define.definitions).concat(keysForDefinition(this._instanceDefinitions) );
 	},
 

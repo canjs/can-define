@@ -1090,3 +1090,22 @@ QUnit.test('Improper shorthand properties are not set', function() {
 	QUnit.equal(typeof VM.prototype._define.methods.prop02, 'function');
 	QUnit.equal(VM.prototype._define.methods.prop03, undefined);
 });
+
+QUnit.test("onKeyValue sets up computed values", function(){
+	var fullNameCalls = [];
+	var VM = DefineMap.extend({
+		first: "string",
+		last: "string",
+		get fullName() {
+			fullNameCalls.push(this.first + " "+ this.last);
+			return this.first + " "+ this.last;
+		}
+	});
+
+	var vm = new VM({first: "J", last: "M"});
+
+	canReflect.onKeyValue(vm, "fullName", function(){});
+
+	QUnit.deepEqual(fullNameCalls,["J M"]);
+
+});

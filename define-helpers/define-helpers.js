@@ -28,7 +28,7 @@ var defineHelpers = {
 			instanceDefines[prop] = defaultDefinition;
 			queues.batch.start();
 			map.dispatch({
-				type: "__keys",
+				type: "can.keys",
 				target: map
 			});
 			if(map._data[prop] !== undefined) {

@@ -11,7 +11,7 @@ var AsyncObservable = require("can-simple-observable/async/async");
 var SettableObservable = require("can-simple-observable/settable/settable");
 
 var CID = require("can-cid");
-var eventQueue = require("can-event-queue/map/legacy/legacy");
+var eventQueue = require("can-event-queue/map/map");
 var addTypeEvents = require("can-event-queue/type/type");
 var queues = require("can-queues");
 
@@ -771,25 +771,37 @@ getDefinitionsAndMethods = function(defines, baseDefines) {
 
 eventsProto = eventQueue({});
 
+function setupComputed(instance, eventName) {
+	var computedBinding = instance._computed && instance._computed[eventName];
+	if (computedBinding && computedBinding.compute) {
+		if (!computedBinding.count) {
+			computedBinding.count = 1;
+			canReflect.onValue(computedBinding.compute, computedBinding.handler, "notify");
+			computedBinding.oldValue = canReflect.getValue(computedBinding.compute);
+		} else {
+			computedBinding.count++;
+		}
+
+	}
+}
+function teardownComputed(instance, eventName){
+	var computedBinding = instance._computed && instance._computed[eventName];
+	if (computedBinding) {
+		if (computedBinding.count === 1) {
+			computedBinding.count = 0;
+			canReflect.offValue(computedBinding.compute, computedBinding.handler,"notify");
+		} else {
+			computedBinding.count--;
+		}
+	}
+}
 
 var canMetaSymbol = canSymbol.for("can.meta");
 assign(eventsProto, {
 	_eventSetup: function() {},
 	_eventTeardown: function() {},
 	addEventListener: function(eventName, handler, queue) {
-
-		var computedBinding = this._computed && this._computed[eventName];
-		if (computedBinding && computedBinding.compute) {
-			if (!computedBinding.count) {
-				computedBinding.count = 1;
-				canReflect.onValue(computedBinding.compute, computedBinding.handler, "notify");
-				computedBinding.oldValue = canReflect.getValue(computedBinding.compute);
-			} else {
-				computedBinding.count++;
-			}
-
-		}
-
+		setupComputed(this, eventName);
 		return eventQueue.addEventListener.apply(this, arguments);
 	},
 
@@ -798,23 +810,29 @@ assign(eventsProto, {
 	// If this is the last listener of a computed property,
 	// stop forwarding events of the computed property to this map.
 	removeEventListener: function(eventName, handler) {
-		var computedBinding = this._computed && this._computed[eventName];
-		if (computedBinding) {
-			if (computedBinding.count === 1) {
-				computedBinding.count = 0;
-				canReflect.offValue(computedBinding.compute, computedBinding.handler,"notify");
-			} else {
-				computedBinding.count--;
-			}
-
-		}
-
+		teardownComputed(this, eventName);
 		return eventQueue.removeEventListener.apply(this, arguments);
 
 	}
 });
 eventsProto.on = eventsProto.bind = eventsProto.addEventListener;
 eventsProto.off = eventsProto.unbind = eventsProto.removeEventListener;
+
+
+var onKeyValueSymbol = canSymbol.for("can.onKeyValue");
+var offKeyValueSymbol = canSymbol.for("can.offKeyValue");
+
+canReflect.assignSymbols(eventsProto,{
+	"can.onKeyValue": function(key){
+		setupComputed(this, key);
+		return eventQueue[onKeyValueSymbol].apply(this, arguments);
+	},
+	"can.offKeyValue": function(key){
+		teardownComputed(this, key);
+		return eventQueue[offKeyValueSymbol].apply(this, arguments);
+	}
+});
+
 /*canReflect.set(eventsProto, canSymbol.for("can.onKeyValue"), function(key, handler, queue){
 	var translationHandler = function(ev, newValue, oldValue){
 		handler(newValue, oldValue);
