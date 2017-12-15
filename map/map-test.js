@@ -1109,3 +1109,23 @@ QUnit.test("onKeyValue sets up computed values", function(){
 	QUnit.deepEqual(fullNameCalls,["J M"]);
 
 });
+
+QUnit.test("async getters derived from other properties should have correct keyDependencies", function() {
+
+	var VM = DefineMap.extend({
+		get source() {
+			return 'source value';
+		},
+
+		derived: {
+			get: function(last, resolve) {
+				return resolve(this.source);
+			}
+		}
+	});
+
+	var vm = new VM();
+
+	vm.on('derived', function(){});
+	QUnit.ok(vm._computed.derived.compute.observation.newDependencies.keyDependencies.get(vm).has('source'), 'getter should depend on vm.source');
+});
