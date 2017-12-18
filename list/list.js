@@ -113,7 +113,7 @@ var DefineList = Construct.extend("DefineList",
 					if (itemsDefinition && typeof itemsDefinition.added === 'function') {
 						ObservationRecorder.ignore(itemsDefinition.added).call(this, newVal, index);
 					}
-					queues.batch.start();
+					
 					patches = [{type: "splice", insert: newVal, index: index, deleteCount: 0}];
 					this.dispatch({
 						type: how,
@@ -122,13 +122,12 @@ var DefineList = Construct.extend("DefineList",
 						reasonLog: [ canReflect.getName(this), "added", JSON.stringify(newVal), "at", index ],
 						//!steal-remove-end
 					}, [ newVal, index ]);
-					this.dispatch(localOnPatchesSymbol, [patches]);
-					queues.batch.stop();
+
 				} else if (how === 'remove') {
 					if (itemsDefinition && typeof itemsDefinition.removed === 'function') {
 						ObservationRecorder.ignore(itemsDefinition.removed).call(this, oldVal, index);
 					}
-					queues.batch.start();
+
 					patches = [{type: "splice", index: index, deleteCount: oldVal.length}];
 					this.dispatch({
 						type: how,
@@ -137,8 +136,7 @@ var DefineList = Construct.extend("DefineList",
 						reasonLog: [ canReflect.getName(this), "remove", JSON.stringify(oldVal), "at", index ],
 						//!steal-remove-end
 					}, [ oldVal, index ]);
-					this.dispatch(localOnPatchesSymbol, [patches]);
-					queues.batch.stop();
+
 				} else {
 					this.dispatch(how, [ newVal, index ]);
 				}
