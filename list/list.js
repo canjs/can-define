@@ -30,7 +30,7 @@ var identity = function(x) {
 };
 
 // symbols aren't enumerable ... we'd need a version of Object that treats them that way
-var localOnPatchesSymbol = "can.onPatches";
+var localOnPatchesSymbol = "can.patches";
 
 var makeFilterCallback = function(props) {
 	return function(item) {

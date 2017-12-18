@@ -5,6 +5,7 @@
 @group can-define/list/list/events events
 @alias can.DefineList
 @inherits can.Construct
+@templateRender true
 
 
 @description Create observable lists.
@@ -26,6 +27,43 @@ var people = new DefineList([
   @return {can-define/list/list} An instance of `DefineList` with the values from _items_.
 
 @body
+
+## Mixed-in instance methods and properties
+
+Instances of `DefineList` have all methods and properties from
+[can-event-queue/map/map]:
+
+{{#each (getChildren [can-event-queue/map/map])}}
+- [{{name}}] - {{description}}{{/each}}
+
+Example:
+
+```js
+var MyList = DefineList.extend({ "#": "string" });
+
+var listInstance = new MyList(["a","b"]);
+
+listInstance.on("length", function(event, newLength, oldLength){ ... });
+```
+
+
+## Mixed-in type methods and properties
+
+Extended `DefineList` constructor functions have all methods and properties from
+[can-event-queue/type/type]:
+
+{{#each (getChildren [can-event-queue/type/type])}}
+- [{{name}}] - {{description}}{{/each}}
+
+Example:
+
+```js
+var MyList = DefineList.extend({ "#": "string" });
+
+canReflect.onInstancePatches(MyList, function(instance, patches){
+
+});
+```
 
 ## Use
 
