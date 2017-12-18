@@ -31,6 +31,8 @@ var eventsProto, define,
 	make, makeDefinition, getDefinitionsAndMethods,
 	isDefineType, getDefinitionOrMethod;
 
+var peek = ObservationRecorder.ignore(canReflect.getValue.bind(canReflect));
+
 var defineConfigurableAndNotEnumerable = function(obj, prop, value) {
 	Object.defineProperty(obj, prop, {
 		configurable: true,
@@ -629,8 +631,16 @@ make = {
 			};
 		},
 		computed: function(prop) {
-			return function() {
-				return canReflect.getValue(this._computed[prop].compute);
+			return function(val) {
+				var compute = this._computed[prop].compute;
+				if (ObservationRecorder.isRecording()) {
+					ObservationRecorder.add(this, prop);
+					if (!canReflect.isBound(compute)) {
+						Observation.temporarilyBind(compute);
+					}
+				}
+
+				return peek(compute);
 			};
 		}
 	}
