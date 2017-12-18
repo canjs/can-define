@@ -1284,7 +1284,7 @@ QUnit.test("onPatches", function(){
 	];
 	var calledPatches = [];
 	var handler = function patchesHandler(patches){
-		calledPatches.push(patches)
+		calledPatches.push(patches);
 	};
 	list[canSymbol.for("can.onPatches")](handler,"notify");
 	list.replace(["A","B"]);
