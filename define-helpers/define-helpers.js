@@ -1,7 +1,6 @@
 var define = require("can-define");
-var canBatch = require("can-event/batch/batch");
-var canEvent = require("can-event");
 var canReflect = require("can-reflect");
+var queues = require("can-queues");
 
 
 var defineHelpers = {
@@ -27,25 +26,26 @@ var defineHelpers = {
 			// possibly convert value to List or DefineMap
 			map._data[prop] = defaultDefinition.type ? defaultDefinition.type(value) : define.types.observable(value);
 			instanceDefines[prop] = defaultDefinition;
-			canBatch.start();
-			canEvent.dispatch.call(map, {
-				type: "__keys",
+			queues.batch.start();
+			map.dispatch({
+				type: "can.keys",
 				target: map
 			});
 			if(map._data[prop] !== undefined) {
-				canEvent.dispatch.call(map, {
+				map.dispatch({
 					type: prop,
-					target: map
+					target: map,
+					patches: [{type: "set", key: prop, value: map._data[prop]}],
 				},[map._data[prop], undefined]);
 			}
-			canBatch.stop();
+			queues.batch.stop();
 			return true;
 		}
 	},
 	reflectSerialize: function(unwrapped){
 		var constructorDefinitions = this._define.definitions;
 		var defaultDefinition = this._define.defaultDefinition;
-		this.each(function(val, name){
+		this.forEach(function(val, name){
 			var propDef = constructorDefinitions[name];
 
 			if(propDef && typeof propDef.serialize === "function") {

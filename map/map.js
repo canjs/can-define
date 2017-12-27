@@ -1,9 +1,7 @@
 var Construct = require("can-construct");
 var define = require("can-define");
 var defineHelpers = require("../define-helpers/define-helpers");
-var Observation = require("can-observation");
-var types = require("can-types");
-var canBatch = require("can-event/batch/batch");
+var ObservationRecorder = require("can-observation-recorder");
 var ns = require("can-namespace");
 var canLog = require("can-log");
 var canLogDev = require("can-log/dev/dev");
@@ -11,6 +9,10 @@ var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
 var CIDSet = require("can-util/js/cid-set/cid-set");
 var CIDMap = require("can-util/js/cid-map/cid-map");
+var queues = require("can-queues");
+var ensureMeta = require("../ensure-meta");
+var dev = require("can-log/dev/dev");
+var addTypeEvents = require("can-event-queue/type/type");
 
 var keysForDefinition = function(definitions) {
 	var keys = [];
@@ -24,26 +26,26 @@ var keysForDefinition = function(definitions) {
 };
 
 function assign(source) {
-	canBatch.start();
+	queues.batch.start();
 	canReflect.assignMap(this, source || {});
-	canBatch.stop();
+	queues.batch.stop();
 }
 function update(source) {
-	canBatch.start();
+	queues.batch.start();
 	canReflect.updateMap(this, source || {});
-	canBatch.stop();
+	queues.batch.stop();
 }
 function assignDeep(source){
-	canBatch.start();
+	queues.batch.start();
 	// TODO: we should probably just throw an error instead of cleaning
 	canReflect.assignDeepMap(this, source || {});
-	canBatch.stop();
+	queues.batch.stop();
 }
 function updateDeep(source){
-	canBatch.start();
+	queues.batch.start();
 	// TODO: we should probably just throw an error instead of cleaning
 	canReflect.updateDeepMap(this, source || {});
-	canBatch.stop();
+	queues.batch.stop();
 }
 function setKeyValue(key, value) {
 	var defined = defineHelpers.defineExpando(this, key, value);
@@ -56,7 +58,7 @@ function getKeyValue(key) {
 	if(value !== undefined || key in this || Object.isSealed(this)) {
 		return value;
 	} else {
-		Observation.add(this, key);
+		ObservationRecorder.add(this, key);
 		return this[key];
 	}
 }
@@ -66,7 +68,10 @@ var DefineMap = Construct.extend("DefineMap",{
 			prototype = this.prototype;
 		if(DefineMap) {
 			// we have already created
-			define(prototype, prototype, base.prototype._define);
+			var result = define(prototype, prototype, base.prototype._define);
+				define.makeDefineInstanceKey(this, result);
+
+			addTypeEvents(this);
 			for(key in DefineMap.prototype) {
 				define.defineConfigurableAndNotEnumerable(prototype, key, prototype[key]);
 			}
@@ -399,7 +404,7 @@ var DefineMap = Construct.extend("DefineMap",{
 		var forEach = function(list, cb, thisarg){
 			return canReflect.eachKey(list, cb, thisarg);
 		},
-			noObserve = Observation.ignore(forEach);
+			noObserve = ObservationRecorder.ignore(forEach);
 
 		return function(cb, thisarg, observe) {
 			return observe === false ? noObserve(this, cb, thisarg) : forEach(this, cb, thisarg);
@@ -408,6 +413,39 @@ var DefineMap = Construct.extend("DefineMap",{
 	})(),
 	"*": {
 		type: define.types.observable
+	},
+
+	// call `map.log()` to log all event changes
+	// pass `key` to only log the matching property, e.g: `map.log("foo")`
+	log: function(key) {
+		//!steal-remove-start
+		var instance = this;
+
+		var quoteString = function quoteString(x) {
+			return typeof x === "string" ? JSON.stringify(x) : x;
+		};
+
+		var meta = ensureMeta(instance);
+		var allowed = meta.allowedLogKeysSet || new Set();
+		meta.allowedLogKeysSet = allowed;
+
+		if (key) {
+			allowed.add(key);
+		}
+
+		meta._log = function(event, data) {
+			var type = event.type;
+			if (type === "can.keys" || (key && !allowed.has(type))) {
+				return;
+			}
+			dev.log(
+				canReflect.getName(instance),
+				"\n key ", quoteString(type),
+				"\n is  ", quoteString(data[0]),
+				"\n was ", quoteString(data[1])
+			);
+		};
+		//!steal-remove-end
 	}
 });
 
@@ -427,7 +465,7 @@ canReflect.assignSymbols(DefineMap.prototype,{
 
 	// -shape
 	"can.getOwnEnumerableKeys": function(){
-		Observation.add(this, '__keys');
+		ObservationRecorder.add(this, 'can.keys');
 		return keysForDefinition(this._define.definitions).concat(keysForDefinition(this._instanceDefinitions) );
 	},
 
@@ -449,7 +487,13 @@ canReflect.assignSymbols(DefineMap.prototype,{
 			ret.valueDependencies.add(this._computed[key].compute);
 		}
 		return ret;
-	}
+	},
+
+	//!steal-remove-start
+	"can.getName": function() {
+		return canReflect.getName(this.constructor) + "{}";
+	},
+	//!steal-remove-end
 });
 
 canReflect.setKeyValue(DefineMap.prototype, canSymbol.iterator, function() {
@@ -479,8 +523,8 @@ eventsProtoSymbols.forEach(function(sym) {
   });
 });
 
-types.DefineMap = DefineMap;
-types.DefaultMap = DefineMap;
+// tells `can-define` to use this
+define.DefineMap = DefineMap;
 
 Object.defineProperty(DefineMap.prototype, "toObject", {
 	enumerable: false,
@@ -489,11 +533,6 @@ Object.defineProperty(DefineMap.prototype, "toObject", {
 		canLog.warn("Use DefineMap::get instead of DefineMap::toObject");
 		return this.get();
 	}
-});
-Object.defineProperty(DefineMap.prototype, "each", {
-	enumerable: false,
-	writable: true,
-	value: DefineMap.prototype.forEach
 });
 
 module.exports = ns.DefineMap = DefineMap;

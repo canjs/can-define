@@ -6,6 +6,7 @@
 @group can-define/map/map/events events
 @alias can.DefineMap
 @inherits can.Construct
+@templateRender true
 
 @description Create observable objects.
 
@@ -30,6 +31,43 @@ var person = new DefineMap({
   @return {can-define/map/map} An instance of `DefineMap` with the properties from _props_.
 
 @body
+
+## Mixed-in instance methods and properties
+
+Instances of `DefineMap` have all methods and properties from
+[can-event-queue/map/map]:
+
+{{#each (getChildren [can-event-queue/map/map])}}
+- [{{name}}] - {{description}}{{/each}}
+
+Example:
+
+```js
+var MyType = DefineMap.extend({ prop: "string" });
+
+var myInstance = new MyType({prop: "VALUE"});
+
+myInstance.on("prop", function(event, newVal, oldVal){ ... });
+```
+
+
+## Mixed-in type methods and properties
+
+Extended `DefineMap` constructor functions have all methods and properties from
+[can-event-queue/type/type]:
+
+{{#each (getChildren [can-event-queue/type/type])}}
+- [{{name}}] - {{description}}{{/each}}
+
+Example:
+
+```js
+var MyType = DefineMap.extend({ ... });
+
+canReflect.onInstancePatches(MyType, function(instance, patches){
+
+});
+```
 
 ## Use
 

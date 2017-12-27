@@ -4,12 +4,13 @@ var DefineList = require("can-define/list/list");
 var DefineMap = require("can-define/map/map");
 var Observation = require("can-observation");
 var define = require("can-define");
-var compute = require("can-compute");
 var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
+var dev = require("can-log/dev/dev");
+var canTestHelpers = require("can-test-helpers/lib/dev");
 
 var assign = require("can-util/js/assign/assign");
-var CID = require("can-cid");
+
 QUnit.module("can-define/list/list");
 
 QUnit.test("List is an event emitter", function(assert) {
@@ -294,25 +295,22 @@ test("slice and join are observable by a compute (#1884)", function() {
 
 	var sliced = new Observation(function() {
 		return list.slice(0, 1);
-	}, null, {
-		updater: function(newVal) {
-			deepEqual(newVal.get(), [ 2 ], "got a new DefineList");
-		}
 	});
-	sliced.start();
+
+	canReflect.onValue(sliced, function(newVal){
+		deepEqual(newVal.get(), [ 2 ], "got a new DefineList");
+	});
 
 	var joined = new Observation(function() {
 		return list.join(",");
-	}, null, {
-		updater: function(newVal) {
-			equal(newVal, "2,3", "joined is observable");
-		}
 	});
-	joined.start();
+
+	canReflect.onValue(joined, function(newVal){
+		equal(newVal, "2,3", "joined is observable");
+	});
 
 
 	list.shift();
-
 
 });
 
@@ -431,7 +429,7 @@ test('list.sort a list of objects without losing reference (#137)', function() {
 test("list defines", 6, function() {
 	var Todo = function(props) {
         assign(this, props);
-        CID(this);
+        //CID(this);
     };
 	define(Todo.prototype, {
         completed: "boolean",
@@ -878,12 +876,11 @@ QUnit.test("set/splice are observable", function() {
 			count += (list[i] % 2) ? 1 : 0;
 		}
 		return count;
-	}, null, {
-		updater: function() {
-			ok(true);
-		}
 	});
-	count.start();
+
+	canReflect.onValue(count, function(){
+		ok(true);
+	});
 
 	expect(3);
 	list.set(3, 5);
@@ -1009,6 +1006,8 @@ test('reduceRight', function() {
 	equal(concatenatedNames, "BobAlice", "ReduceRight works over list");
 });
 
+/*
+// TODO: bring these back with can-stache-key
 test("compute(defineMap, 'property.names') works (#20)", function(){
 	var map = new DefineMap();
 	var c = compute(map, "foo.bar");
@@ -1031,6 +1030,7 @@ test("compute(DefineList, 0) works (#17)", function(assert){
 	list.set(0, 5);
 });
 
+
 QUnit.test("can-reflect onValue", function(assert) {
 	assert.expect(1);
 	var list = new DefineList([1,2,3]);
@@ -1040,6 +1040,7 @@ QUnit.test("can-reflect onValue", function(assert) {
 	});
 	list.set(0, 5);
 });
+*/
 
 QUnit.test("can-reflect onKeyValue", function(assert) {
 	assert.expect(3);
@@ -1272,4 +1273,168 @@ QUnit.test("iterator can recover from bad _length", function() {
 	var iterator = list[canSymbol.iterator]();
 	var iteration = iterator.next();
 	QUnit.ok(iteration.done, "Didn't fail");
+});
+
+
+QUnit.test("onPatches", function(){
+	var list = new DefineList(["a","b"]);
+	var PATCHES = [
+		[ {deleteCount: 2, index: 0, type: "splice"} ],
+		[ {index: 0, insert: ["A","B"], deleteCount: 0, type: "splice"} ]
+	];
+	var calledPatches = [];
+	var handler = function patchesHandler(patches){
+		calledPatches.push(patches);
+	};
+	list[canSymbol.for("can.onPatches")](handler,"notify");
+	list.replace(["A","B"]);
+
+	list[canSymbol.for("can.offPatches")](handler,"notify");
+
+	list.replace(["1","2"]);
+	QUnit.deepEqual(calledPatches, PATCHES);
+});
+
+canTestHelpers.devOnlyTest("can.getName symbol behavior", function(assert) {
+	var getName = function(instance) {
+		return instance[canSymbol.for("can.getName")]();
+	};
+
+	assert.ok(
+		"DefineList[]", getName(new DefineList()),
+		"should use DefineList constructor name by default"
+	);
+
+	var MyList = DefineList.extend("MyList", {});
+
+	assert.ok(
+		"MyList[]", getName(new MyList()),
+		"should use custom list name when provided"
+	);
+});
+
+QUnit.test("length event should include previous value", function(assert) {
+	var done = assert.async();
+	var list = new DefineList([]);
+	var other = new DefineList(["a"]);
+
+	var changes = [];
+	list.on("length", function(_, current, previous) {
+		changes.push({ current: current, previous: previous });
+	});
+
+	list.push("x");
+	list.pop();
+	list.push("y", "z");
+	list.splice(2, 0, "x", "w");
+	list.splice(0, 1);
+	list.sort();
+	list.replace(other);
+
+	assert.expect(1);
+	setTimeout(function() {
+		assert.deepEqual(
+			changes,
+			[
+				{ current: 1, previous: 0 },
+				{ current: 0, previous: 1 },
+				{ current: 2, previous: 0 },
+				{ current: 4, previous: 2 },
+				{ current: 3, previous: 4 },
+				{ current: 3, previous: 3 },
+				{ current: 1, previous: 3 }
+			],
+			"should include length before mutation"
+		);
+		done();
+	});
+});
+
+canTestHelpers.devOnlyTest("log all events", function(assert) {
+	var done = assert.async();
+	var list = new DefineList(["a","b", "c"]);
+
+	list.set("total", 100);
+	list.log();
+
+	var keys = [];
+	var log = dev.log;
+	dev.log = function() {
+		keys.push(JSON.parse(arguments[2]));
+	};
+
+	list.push("x");
+	list.pop();
+	list.set("total", 50);
+
+	assert.expect(1);
+	setTimeout(function() {
+		dev.log = log;
+		assert.deepEqual(
+			keys,
+			["add", "length", "remove", "length", "total"],
+			"should log 'add', 'remove', 'length' and 'propertyName' events"
+		);
+		done();
+	});
+});
+
+canTestHelpers.devOnlyTest("log single events", function(assert) {
+	var done = assert.async();
+	var list = new DefineList(["a","b", "c"]);
+
+	list.set("total", 100);
+	list.log("length");
+
+	var keys = [];
+	var log = dev.log;
+	dev.log = function() {
+		keys.push(JSON.parse(arguments[2]));
+	};
+
+	list.push("x");
+	list.pop();
+	list.set("total", 50);
+
+	assert.expect(1);
+	setTimeout(function() {
+		dev.log = log;
+		assert.deepEqual(keys, ["length", "length"], "should log 'length' event");
+		done();
+	});
+});
+
+canTestHelpers.devOnlyTest("log multiple events", function(assert) {
+	var done = assert.async();
+	var list = new DefineList(["a","b", "c"]);
+
+	list.set("total", 100);
+	list.log("add");
+	list.log("total");
+
+	var keys = [];
+	var log = dev.log;
+	dev.log = function() {
+		keys.push(JSON.parse(arguments[2]));
+	};
+
+	list.push("x");
+	list.pop();
+	list.set("total", 50);
+
+	assert.expect(1);
+	setTimeout(function() {
+		dev.log = log;
+		assert.deepEqual(keys, ["add", "total"], "should log add and total");
+		done();
+	});
+});
+
+QUnit.test("DefineList has defineInstanceKey symbol", function(){
+	var Type = DefineList.extend({});
+	Type[canSymbol.for("can.defineInstanceKey")]("prop", {type: "number"});
+
+	var t = new Type();
+	t.prop = "5";
+	QUnit.equal(t.prop, 5, "value set");
 });
