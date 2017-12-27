@@ -119,7 +119,7 @@ var DefineList = Construct.extend("DefineList",
 						type: how,
 						patches: patches,
 						//!steal-remove-start
-						reasonLog: [ canReflect.getName(this), "added", JSON.stringify(newVal), "at", index ],
+						reasonLog: [ canReflect.getName(this), "added", newVal, "at", index ],
 						//!steal-remove-end
 					}, [ newVal, index ]);
 
@@ -133,7 +133,7 @@ var DefineList = Construct.extend("DefineList",
 						type: how,
 						patches: patches,
 						//!steal-remove-start
-						reasonLog: [ canReflect.getName(this), "remove", JSON.stringify(oldVal), "at", index ],
+						reasonLog: [ canReflect.getName(this), "remove", oldVal, "at", index ],
 						//!steal-remove-end
 					}, [ oldVal, index ]);
 
