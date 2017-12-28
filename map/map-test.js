@@ -449,9 +449,7 @@ QUnit.test("cloning from non-defined map excludes special keys on setup", functi
 
 	QUnit.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
 	QUnit.notEqual(a._data, b._data, "_data prop not copied");
-	QUnit.notEqual(a._cid, b._cid, "_cid prop not copied");
 	QUnit.equal(a.foo, b.foo, "Other props copied");
-
 });
 
 QUnit.test("copying from .set() excludes special keys", function() {
@@ -470,9 +468,7 @@ QUnit.test("copying from .set() excludes special keys", function() {
 
 	QUnit.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
 	QUnit.notEqual(a._data, b._data, "_data prop not copied");
-	QUnit.notEqual(a._cid, b._cid, "_cid prop not copied");
 	QUnit.equal(a.foo, b.foo, "NEw props copied");
-
 });
 
 QUnit.test("copying with assign() excludes special keys", function() {

@@ -184,17 +184,17 @@ test('reverse triggers add/remove events (#851)', function() {
 	deepEqual(l.get(), [ 3, 2, 1 ], "reversed");
 });
 
-test('filter', function() {
+QUnit.test('filter', function(assert) {
 	var l = new DefineList([ { id: 1, name: "John" }, { id: 2, name: "Mary" } ]);
 
 	var filtered = l.filter(function(item) {
 		return item.name === "Mary";
 	});
 
-	notEqual(filtered._cid, l._cid, "not same object");
+	assert.notDeepEqual(filtered, l, "not same object");
 
-	equal(filtered.length, 1, "one item");
-	equal(filtered[0].name, "Mary", "filter works");
+	assert.equal(filtered.length, 1, "one item");
+	assert.equal(filtered[0].name, "Mary", "filter works");
 });
 
 test('No Add Events if DefineList Splice adds the same items that it is removing. (#1277, #1399)', function() {

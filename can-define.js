@@ -10,7 +10,6 @@ var ObservationRecorder = require("can-observation-recorder");
 var AsyncObservable = require("can-simple-observable/async/async");
 var SettableObservable = require("can-simple-observable/settable/settable");
 
-var CID = require("can-cid");
 var eventQueue = require("can-event-queue/map/map");
 var addTypeEvents = require("can-event-queue/type/type");
 var queues = require("can-queues");
@@ -23,7 +22,6 @@ var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
 var each = require("can-util/js/each/each");
 var defaults = require("can-util/js/defaults/defaults");
 var stringToAny = require("can-util/js/string-to-any/string-to-any");
-//var simpleObervable = require("can-simple-observable");
 var defineLazyValue = require("can-define-lazy-value");
 
 
@@ -102,14 +100,6 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 				defineLazyValue(data, prop, computedInitializers[prop].bind(map));
 			}
 			return data;
-		});
-	}
-
-	// Places a `_cid` on the prototype that when first called replaces itself
-	// with a `_cid` object local to the instance.
-	if (!objPrototype.hasOwnProperty("_cid")) {
-		defineLazyValue(objPrototype, "_cid", function() {
-			return CID({});
 		});
 	}
 
@@ -859,7 +849,6 @@ canReflect.set(eventsProto, canSymbol.for("can.offKeyValue"), function(key, hand
 delete eventsProto.one;
 
 define.setup = function(props, sealed) {
-	CID(this);
 	Object.defineProperty(this,"_cid", {value: this._cid, enumerable: false, writable: false});
 	Object.defineProperty(this,"constructor", {value: this.constructor, enumerable: false, writable: false});
 	Object.defineProperty(this,canMetaSymbol, {value: Object.create(null), enumerable: false, writable: false});
