@@ -1177,18 +1177,6 @@ QUnit.test('defined properties are configurable', function(){
 	QUnit.equal(a.val, "bar", "It was redefined");
 });
 
-QUnit.test('define() should add a CID (#246)', function() {
-	var Greeting = function(message){
-		this.message = message;
-	};
-
-	define(Greeting.prototype, {
-		message: {type: "string"}
-	});
-	var g = new Greeting();
-	QUnit.ok(g._cid, "should have a CID property");
-});
-
 testHelpers.dev.devOnlyTest("Setting a value with only a get() generates a warning (#202)", function() {
 	QUnit.expect(7);
 

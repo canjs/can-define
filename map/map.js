@@ -7,8 +7,6 @@ var canLog = require("can-log");
 var canLogDev = require("can-log/dev/dev");
 var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
-var CIDSet = require("can-util/js/cid-set/cid-set");
-var CIDMap = require("can-util/js/cid-map/cid-map");
 var queues = require("can-queues");
 var ensureMeta = require("../ensure-meta");
 var dev = require("can-log/dev/dev");
@@ -153,7 +151,7 @@ var DefineMap = Construct.extend("DefineMap",{
 		if(prop) {
 			return getKeyValue.call(this, prop);
 		} else {
-			return canReflect.unwrap(this, CIDMap);
+			return canReflect.unwrap(this, Map);
 		}
 	},
 	/**
@@ -396,7 +394,7 @@ var DefineMap = Construct.extend("DefineMap",{
 	 *
 	 */
 	serialize: function () {
-		return canReflect.serialize(this, CIDMap);
+		return canReflect.serialize(this, Map);
 	},
 
 	forEach: (function(){
@@ -483,8 +481,9 @@ canReflect.assignSymbols(DefineMap.prototype,{
 		var ret;
 		if(this._computed && this._computed[key] && this._computed[key].compute) {
 			ret = {};
-			ret.valueDependencies = new CIDSet();
-			ret.valueDependencies.add(this._computed[key].compute);
+			ret.valueDependencies = new Set([
+				this._computed[key].compute
+			]);
 		}
 		return ret;
 	},

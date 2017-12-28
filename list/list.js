@@ -18,8 +18,6 @@ var makeArray = require("can-util/js/make-array/make-array");
 var ns = require("can-namespace");
 var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
-var CIDSet = require("can-util/js/cid-set/cid-set");
-var CIDMap = require("can-util/js/cid-map/cid-map");
 var singleReference = require("can-util/js/single-reference/single-reference");
 
 var splice = [].splice;
@@ -113,7 +111,7 @@ var DefineList = Construct.extend("DefineList",
 					if (itemsDefinition && typeof itemsDefinition.added === 'function') {
 						ObservationRecorder.ignore(itemsDefinition.added).call(this, newVal, index);
 					}
-					
+
 					patches = [{type: "splice", insert: newVal, index: index, deleteCount: 0}];
 					this.dispatch({
 						type: how,
@@ -211,7 +209,7 @@ var DefineList = Construct.extend("DefineList",
 				}
 				return this[index];
 			} else {
-				return canReflect.unwrap(this, CIDMap);
+				return canReflect.unwrap(this, Map);
 			}
 		},
 		/**
@@ -569,7 +567,7 @@ var DefineList = Construct.extend("DefineList",
 		 *   @return {Array} An array with each item's serialied value.
 		 */
 		serialize: function() {
-			return canReflect.serialize(this, CIDMap);
+			return canReflect.serialize(this, Map);
 		},
 
 		// call `list.log()` to log all event changes
@@ -1655,8 +1653,9 @@ canReflect.assignSymbols(DefineList.prototype,{
 		var ret;
 		if(this._computed && this._computed[key] && this._computed[key].compute) {
 			ret = {};
-			ret.valueDependencies = new CIDSet();
-			ret.valueDependencies.add(this._computed[key].compute);
+			ret.valueDependencies = new Set([
+				this._computed[key].compute
+			]);
 		}
 		return ret;
 	},
