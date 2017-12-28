@@ -24,7 +24,8 @@
 		"global": true,
 		"event": true,
 		"define": true,
-		"Set": true
+		"Set": true,
+		"Map": true
 	},
 	"curly": true,
 	"eqeqeq": true,
