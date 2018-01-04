@@ -1,4 +1,3 @@
-"use strict";
 var QUnit = require("steal-qunit");
 var DefineMap = require("can-define/map/map");
 var define = require("can-define");
@@ -1127,7 +1126,6 @@ QUnit.test("async getters derived from other properties should have correct keyD
 });
 
 QUnit.test("setting a property gives a nice error", function(){
-	"use strict;"
 	var VM = DefineMap.extend({});
 	var vm = new VM();
 

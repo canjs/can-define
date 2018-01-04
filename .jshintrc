@@ -27,6 +27,7 @@
 		"Set": true,
 		"Map": true
 	},
+	"validthis": true,
 	"curly": true,
 	"eqeqeq": true,
 	"freeze": true,
