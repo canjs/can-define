@@ -4,6 +4,7 @@ var queues = require("can-queues");
 
 
 var defineHelpers = {
+	// returns `true` if the value was defined and set
 	defineExpando: function(map, prop, value) {
 		// first check if it's already a constructor define
 		var constructorDefines = map._define.definitions;
@@ -13,6 +14,9 @@ var defineHelpers = {
 		// next if it's already on this instances
 		var instanceDefines = map._instanceDefinitions;
 		if(!instanceDefines) {
+			if(Object.isSealed(map)) {
+				return;
+			}
 			Object.defineProperty(map, "_instanceDefinitions", {
 				configurable: true,
 				enumerable: false,

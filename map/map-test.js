@@ -1125,3 +1125,15 @@ QUnit.test("async getters derived from other properties should have correct keyD
 	vm.on('derived', function(){});
 	QUnit.ok(vm._computed.derived.compute.observation.newDependencies.keyDependencies.get(vm).has('source'), 'getter should depend on vm.source');
 });
+
+QUnit.test("setting a property gives a nice error", function(){
+	"use strict;"
+	var VM = DefineMap.extend({});
+	var vm = new VM();
+
+	try {
+		vm.set("fooxyz","bar");
+	} catch(e) {
+		QUnit.ok( e.message.indexOf("fooxyz") >= 0, "talks about the right property being set");
+	}
+});
