@@ -1136,7 +1136,7 @@ var sealDoesErrorWithPropertyName = (function () {
 	return false;
 })();
 
-QUnit.test("setting a property gives a nice error", function(){
+canTestHelpers.devOnlyTest("setting a property gives a nice error", function(){
 	var VM = DefineMap.extend({});
 	var vm = new VM();
 
