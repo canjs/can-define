@@ -467,6 +467,12 @@ canReflect.assignSymbols(DefineMap.prototype,{
 		ObservationRecorder.add(this, 'can.keys');
 		return keysForDefinition(this._define.definitions).concat(keysForDefinition(this._instanceDefinitions) );
 	},
+	"can.hasOwnKey": function(key) {
+		return Object.hasOwnProperty.call(this._define.definitions, key);
+	},
+	"can.hasKey": function(key) {
+		return this._define.definitions[key];
+	},
 
 	// -shape get/set-
 	"can.assignDeep": assignDeep,

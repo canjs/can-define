@@ -1153,3 +1153,48 @@ canTestHelpers.devOnlyTest("setting a property gives a nice error", function(){
 		}
 	}
 });
+
+canTestHelpers.devOnlyTest("can.hasKey and can.hasOwnKey (#303)", function(assert) {
+	var hasKeySymbol = canSymbol.for("can.hasKey"),
+		hasOwnKeySymbol = canSymbol.for("can.hasOwnKey");
+
+	var Parent = DefineMap.extend({
+		parentProp: "any",
+
+		get parentDerivedProp() {
+			if (this.parentProp) {
+				return "parentDerived";
+			}
+		}
+	});
+
+	var VM = Parent.extend({
+		prop: "any",
+
+		get derivedProp() {
+			if (this.prop) {
+				return "derived";
+			}
+		}
+	});
+
+	var vm = new VM();
+
+	// hasKey
+	assert.ok(vm[hasKeySymbol]("prop"), "vm.hasKey('prop') true");
+	assert.ok(vm[hasKeySymbol]("derivedProp"), "vm.hasKey('derivedProp') true");
+
+	assert.ok(vm[hasKeySymbol]("parentProp"), "vm.hasKey('parentProp') true");
+	assert.ok(vm[hasKeySymbol]("parentDerivedProp"), "vm.hasKey('parentDerivedProp') true");
+
+	assert.ok(!vm[hasKeySymbol]("anotherProp"), "!vm.hasKey('anotherProp') false");
+
+	// hasOwnKey
+	assert.ok(vm[hasOwnKeySymbol]("prop"), "vm.hasOwnKey('prop') true");
+	assert.ok(vm[hasOwnKeySymbol]("derivedProp"), "vm.hasOwnKey('derivedProp') true");
+
+	assert.ok(!vm[hasOwnKeySymbol]("parentProp"), "vm.hasOwnKey('parentProp') false");
+	assert.ok(!vm[hasOwnKeySymbol]("parentDerivedProp"), "vm.hasOwnKey('parentDerivedProp') false");
+
+	assert.ok(!vm[hasOwnKeySymbol]("anotherProp"), "!vm.hasOwnKey('anotherProp') false");
+});
