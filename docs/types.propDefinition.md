@@ -9,17 +9,18 @@ observable property.  These behaviors can be specified with as an `Object`, `Str
 
 ```js
 propertyName: {
-  get: function(){ ... },
-  set: function(){ ... },
+  default: function(){ ... },
+  Default: Constructor,
   type: function(){ ... },
   Type: Constructor,
+  get: function(){ ... },
   value: function(){ ... },
-  Value: Constructor,
+  set: function(){ ... },
   serialize: function(){ ... }
 }
 ```
 
-    @option {can-define.types.value} value Specifies the initial value of the property or
+    @option {can-define.types.default} default Specifies the initial value of the property or
     a function that returns the initial value.
 
     ```js
@@ -36,13 +37,13 @@ propertyName: {
     });
     ```
 
-    @option {can-define.types.ValueConstructor} Value Specifies a function that will be called with `new` whose result is
+    @option {can-define.types.defaultConstructor} Default Specifies a function that will be called with `new` whose result is
     set as the initial value of the attribute.
 
     ```js
     // A default empty DefineList of hobbies:
     var Person = DefineMap.extend({
-      hobbies: {Value: DefineList}
+      hobbies: {Default: DefineList}
     });
 
     new Person().hobbies //-> []
@@ -67,7 +68,7 @@ propertyName: {
     });
     ```
 
-    @option {can-define.types.TypeConstructor} Type A constructor function that takes
+    @option {can-define.types.typeConstructor} Type A constructor function that takes
     the assigned property value as the first argument and called with new. For example, the following will call
     `new Address(newValue)` with whatever non null, undefined, or address type is set as a `Person`'s address property.
 
@@ -82,6 +83,42 @@ propertyName: {
     });
     ```
 
+
+
+    @option {can-define.types.get} get A function that specifies how the value is retrieved.  The get function is
+    converted to an [can-compute.async async compute].  It should derive its value from other values on the object. The following
+    defines a `page` getter that reads from a map's offset and limit:
+
+    ```js
+    DefineMap.extend({
+      page: {
+        get: function (newVal) {
+          return Math.floor(this.offset / this.limit) + 1;
+        }
+      }
+    });
+    ```
+
+    A `get` definition makes the property __computed__ which means it will not be enumerable by default.
+
+    @option {can-define.types.value} value A function that listens to events and resolves the value of the
+    property.  This should be used when [can-define.types.get] is unable to model the right behavior. The following
+    counts the number of times the `page` property changes:
+
+    ```js
+    DefineMap.extend({
+      pageChangeCount: function(resolve, listenTo){
+        var count = 0;
+        listenTo("page", function(){
+          resolve(++count);
+        });
+        resolve(count); //-> initial value
+      }
+    });
+    ```
+
+    A `value` definition makes the property __computed__ which means it will not be enumerable by default.
+
     @option {can-define.types.set} set A set function that specifies what should happen when a property is set. `set` is called with the result of `type` or `Type`. The following
     defines a `page` setter that updates the map's offset:
 
@@ -94,22 +131,6 @@ propertyName: {
       }
     });
     ```
-
-    @option {can-define.types.get} get A function that specifies how the value is retrieved.  The get function is
-    converted to an [can-compute.async async compute].  It should derive its value from other values on the object. The following
-    defines a `page` getter that reads from a map's offset and limit:
-
-    ```js
-    DefineMap.extend({
-      page: {
-        get: function (newVal) {
-    	  return Math.floor(this.offset / this.limit) + 1;
-    	}
-      }
-    });
-    ```
-
-    A `get` definition makes the property __computed__ which means it will not be enumerable by default.
 
     @option {can-define.types.serialize} serialize Specifies the behavior of the property when [can-define/map/map::serialize serialize] is called.
 
@@ -133,7 +154,7 @@ propertyName: {
 propertyName: "typeName"
 ```
 
-@type {Constructor} Either creates a method or Defines a [can-define.types.TypeConstructor Type] setting with a constructor function.  Constructor functions are identified with [can-reflect.isConstructorLike].
+@type {Constructor} Either creates a method or Defines a [can-define.types.typeConstructor Type] setting with a constructor function.  Constructor functions are identified with [can-reflect.isConstructorLike].
 
 ```
 propertyName: Constructor
@@ -259,8 +280,8 @@ DefineMap.extend({
     type: function(newValue, prop){...}| Array<PropertyDefinition> | PropertyDefinition,
     Type: Constructor | Array<PropertyDefinition> | PropertyDefinition,
 
-    value: function(){...},
-    Value: Constructor,
+    default: function(){...},
+    Default: Constructor,
 
     serialize: Boolean | function(){...}
   }

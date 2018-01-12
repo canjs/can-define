@@ -39,7 +39,7 @@
     "can-observation-recorder": "<2.0.0",
     "can-queues": "<2.0.0",
     "can-reflect": "^1.7.0",
-    "can-simple-observable": "^2.0.0-pre.22",
+    "can-simple-observable": "^2.0.0-pre.30",
     "can-symbol": "^1.0.0",
     "can-util": "^3.9.0"
   },

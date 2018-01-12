@@ -413,7 +413,7 @@ QUnit.test("extending DefineMap constructor functions more than once (#18)", fun
 });
 
 QUnit.test("extending DefineMap constructor functions - value (#18)", function(){
-	var AType = DefineMap.extend("AType", { aProp: {value: 1} });
+	var AType = DefineMap.extend("AType", { aProp: {default: 1} });
 
 	var BType = AType.extend("BType", { });
 
@@ -425,7 +425,7 @@ QUnit.test("extending DefineMap constructor functions - value (#18)", function()
 
 QUnit.test("copying DefineMap excludes constructor", function() {
 
-	var AType = DefineMap.extend("AType", { aProp: {value: 1} });
+	var AType = DefineMap.extend("AType", { aProp: {default: 1} });
 
 	var a = new AType();
 
@@ -570,7 +570,7 @@ QUnit.test(".extend errors when re-defining a property (#117)", function(){
 	var A = DefineMap.extend("A", {
 		foo: {
 			type: "string",
-			value: "blah"
+			default: "blah"
 		}
 	});
 
@@ -578,7 +578,7 @@ QUnit.test(".extend errors when re-defining a property (#117)", function(){
 	A.extend("B", {
 		foo: {
 			type: "string",
-			value: "flub"
+			default: "flub"
 		}
 	});
 
@@ -608,7 +608,7 @@ QUnit.test(".value functions should not be observable", function(){
 
 	var ItemsVM = DefineMap.extend({
 		item: {
-			value: function(){
+			default: function(){
 				(function(){})(this.zed, outer.bam);
 				return new DefineMap({ foo: "bar" });
 			}
@@ -635,7 +635,7 @@ QUnit.test(".value functions should not be observable", function(){
 QUnit.test(".value values are overwritten by props in DefineMap construction", function() {
 	var Foo = DefineMap.extend({
 		bar: {
-			value: "baz"
+			default: "baz"
 		}
 	});
 
@@ -731,13 +731,13 @@ QUnit.test("can-reflect assign", function() {
 
 QUnit.test("Does not attempt to redefine _data if already defined", function() {
 	var Bar = DefineMap.extend({seal: false}, {
-		baz: { value : "thud" }
+		baz: { default: "thud" }
 	});
 
 	var baz = new Bar();
 
 	define(baz, {
-		quux: { value: "jeek" },
+		quux: { default: "jeek" },
 		plonk: {
 			get: function() {
 				return "waldo";
@@ -755,14 +755,14 @@ if (!System.isEnv('production')) {
 	QUnit.test("redefines still not allowed on sealed objects", function() {
 		QUnit.expect(6);
 		var Bar = DefineMap.extend({seal: true}, {
-			baz: { value : "thud" }
+			baz: { default: "thud" }
 		});
 
 		var baz = new Bar();
 
 		try {
 			define(baz, {
-				quux: { value: "jeek" }
+				quux: { default: "jeek" }
 			}, baz._define);
 		} catch(e) {
 			QUnit.ok(/is not extensible/i.test(e.message), "Sealed object throws on data property defines");
@@ -988,27 +988,27 @@ canTestHelpers.devOnlyTest("Setting a value with an object type generates a warn
 	//should issue a warning
 	DefineMap.extend({
 		options: {
-			value: {}
+			default: {}
 		}
 	});
 	//should issue a warning
 	DefineMap.extend({
 		options: {
-			value: []
+			default: []
 		}
 	});
 
 	//should not issue a warning
 	DefineMap.extend({
 		options: {
-			value: function(){}
+			default: function(){}
 		}
 	});
 
 	//should not issue a warning
 	DefineMap.extend({
 		options: {
-			value: 2
+			default: 2
 		}
 	});
 
@@ -1024,7 +1024,7 @@ canTestHelpers.devOnlyTest("Setting a value to a constructor type generates a wa
 	//should issue a warning
 	DefineMap.extend({
 		options: {
-			value: DefineMap
+			default: DefineMap
 		}
 	});
 

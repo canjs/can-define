@@ -81,7 +81,7 @@ var DefineMap = require("can-define/map/map");
 
 var Todo = DefineMap.extend({
 	name: "string",
-	completed: {type: "boolean", value: false},
+	completed: {type: "boolean", default: false},
 	toggle: function(){
 		this.completed = !this.completed;
 	}
@@ -257,7 +257,7 @@ todoVM.on("todo", function(ev, newVal){
 
 There's some functionality that a getter or an async getter can not describe
 declaratively.  For these situations, you can use [can-define.types.set] or
-even better, use the [can-define-stream] plugin.
+even better, use [can-define.types.value] or the [can-define-stream] plugin.
 
 For example, consider a __state__ and __city__ locator where you pick a United States
 __state__ like _Illinois_ and then a __city__ like _Chicago_.  In this example,

@@ -1,50 +1,199 @@
-@function can-define.types.value value
+@typedef {function} can-define.types.value value
 @parent can-define.behaviors
 
-Returns the default value for instances of the defined type.  The default value is defined on demand, when the property
-is read for the first time.
+Specify the behavior of a property by listening to changes in other properties.
 
-@signature `value()`
+@signature `value(resolve, listenTo, stopListening, lastSet)`
 
-A function can be provided that returns the default value used for this property, like:
+The `value` behavior is used to compose a property value from events dispatched
+by other properties on the map. It's similar to [can-define.types.get], but can
+be used to build property behaviors that [can-define.types.get] can not provide.
+
+`value` enables techniques very similar to using
+event streams and functional reactive programming. Use `listenTo` to listen to events
+dispatched on the map or other observables,
+`stopListening` to stop listening to those events if needed, and `resolve`
+to set a new value on the observable. For example, the following
+counts the number of times the `name` property changed:
 
 ```js
-prop: {
-  value: function(){ return []; }
+Person = DefineMap.extend("Person",{
+    name: "string",
+    nameChangeCount: {
+        value(resolve, listenTo){
+            var count = 0;
+
+            listenTo("name", () => {
+                resolve(++count);
+            });
+
+            resolve(count);
+        }
+    }
+});
+
+var p = new Person();
+p.on("nameChangedCount", (ev, newVal)=> {
+    console.log("name changed", newVal, "times");
+});
+
+p.name = "Justin" // logs name changed 1 times
+p.name = "Ramiya" // logs name changed 2 times
+```
+
+If the property defined by `value` is unbound, the `value` function will be called each time. Use `resolve` synchronously
+to provide a value.
+
+[can-define.types.type], [can-define.types.default], [can-define.types.get], and [can-define.types.set] behaviors are ignored when `value` is present.
+
+`value` properties are not enumerable by default.
+
+@param {function(Any)} resolve(value) Sets the value of this property as `value`. During a [can-queues.batch.start batch],
+the last value passed to `resolve` will be used as the value.
+
+@param {function(Any,String,Fuction,String)} listenTo(bindTarget,event,handler,queue) A function that sets up a binding that
+will be automatically torn-down when the `value` property is unbound.  This `listenTo` method is very similar to the [can-event-queue/map/map.listenTo] method available on [can-define/map/map DefineMap].  It differs only that it:
+
+- defaults bindings within the [can-queues.notifyQueue].
+- calls handlers with `this` as the instance.
+
+Examples:
+
+```js
+// Binds to the map's `name` event:
+listenTo("name", handler)     
+
+// Binds to the todos `length` event:
+listenTo(todos, "length", handler)
+
+// Binds to the `todos` `length` event in the mutate queue:
+listenTo(todos, "length", handler, "mutate")
+
+// Binds to an `onValue` emitter:
+listenTo(observable, handler) //
+```
+
+@param {function(Any,String,Fuction,String)} stopListening(bindTarget,event,handler,queue) A function that removes bindings
+registered by the `listenTo` argument.  This `stopListening` method is very similar to the [can-event-queue/map/map.stopListening] method available on [can-define/map/map DefineMap].  It differs only that it:
+
+- defaults to unbinding within the [can-queues.notifyQueue].
+
+Examples:
+
+```js
+// Unbind all handlers bound using `listenTo`:
+stopListening()    
+
+// Unbind handlers to the map's `name` event:
+stopListening("name")   
+
+// Unbind a specific handler on the map's `name` event
+// registered in the "notify" queue.
+stopListening("name", handler)    
+
+// Unbind all handlers bound to `todos` using `listenTo`:
+stopListening(todos)
+
+// Unbind all `length` handlers bound to `todos`
+// using `listenTo`:
+stopListening(todos, "length")
+
+// Unbind all handlers to an `onValue` emitter:
+stopListening(observable)
+```
+
+@param {can-simple-observable} lastSet An observable value that gets set when this
+property is set.  You can read its value or listen to when its value changes to
+derive the property value.  The following makes `property` behave like a
+normal object property that can be get or set:
+
+```js
+property: {
+    value: function(resolve, listenTo, stopListening, lastSet) {
+        // Make sure the initial value is whatever was set.
+        resolve(lastSet.get())
+        // When the property is set, update the read value.
+        listenTo(lastSet,resolve);
+    }
 }
 ```
 
+@return {function} An optional teardown function. If provided, the teardown function
+will be called when the property is unbound after `stopListening()` is used to
+remove all bindings.
 
-If the default value should be an object of some type, it should be specified as the return value of a function (the above call signature) so that all instances of this map don't point to the same object.  For example, if the property `value` above had not returned an empty array but instead just specified an array using the next call signature below, all instances of that map would point to the same array (because JavaScript passes objects by reference).
+The following `time` property increments every second.  Notice how a function
+is returned to clear the interval when the property is returned:
 
-@return {*} The default value.  This will be passed through setter and type.
+```js
+var Timer = DefineMap.extend("Timer",{
+    time: {
+        value(resolve) {
+            resolve(new Date());
 
-@signature `value`
+            var interval = setInterval(() => {
+                resolve(new Date())
+            },1000);
 
-Any value can be provided as the default value used for this property, like:
+            return () => {
+                clearInterval(interval);
+            };
+        }
+    }
+});
 
+var timer = new Timer();
+timer.on("time", function(ev, newVal, oldVal){
+    console.log(newVal) //-> logs a new date every second
+});
 ```
-prop: {
-  value: 'foo'
-}
-```
 
-@param {*} defaultVal The default value, which will be passed through setter and type.
 
 @body
 
-There is a third way to provide a default value, which is explained in the [can-define.types.ValueConstructor Value] docs page. `value` lowercased is for providing default values for a property type, while `Value` uppercased is for providing a constructor function, which will be invoked with `new` to create a default value for each instance of this map.
+## Use
+
+The `value` behavior should be used where the [can-define.types.get] behavior can
+not derive a property value from instantaneous values.  This often happens in situations
+where the fact that something changes needs to saved in the state of the application.
+
+Lets first see an example where [can-define.types.get] should be used, the
+ubiquitous `fullName` property.  The following creates a `fullName` property
+that derives its value from the instantaneous `first` and `last` values:
 
 ```js
-// A default age of `0`:
-var Person = DefineMap.extend({
-  age: {
-    value: 0
-  },
-  address: {
-    value: function(){
-      return {city: "Chicago", state: "IL"};
-    };
-  }
+DefineMap.extend("Person", {
+    first: "string",
+    last: "string",
+    get fullName() {
+        return this.first + " " + this.last;
+    }
+});
+```
+
+[can-define.types.get] is great for these types of values. But [can-define.types.get]
+is unable to derive property values based on the change of values or the
+passage of time.
+
+The following `fullNameChangeCount` increments every time `fullName` changes:
+
+```js
+DefineMap.extend("Person", {
+    first: "string",
+    last: "string",
+    fullName: {
+        get() {
+            return this.first + " " + this.last;
+        }
+    },
+    fullNameChangeCount: {
+        value(resolve, listenTo){
+            var count = 0;
+            resolve(0);
+            listenTo("fullName", ()=> {
+                resolve(++count)
+            })
+        }
+    }
 });
 ```

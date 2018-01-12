@@ -176,60 +176,60 @@ QUnit.test("DefineList trigger deprecation warning when set with Map.set (#93)",
 test("Value generator can read other properties", function() {
 	var Map = define.Constructor({
 		letters: {
-			value: "ABC"
+			default: "ABC"
 		},
 		numbers: {
-			value: [1, 2, 3]
+			default: [1, 2, 3]
 		},
 		definedLetters: {
-			value: 'DEF'
+			default: 'DEF'
 		},
 		definedNumbers: {
-			value: [4, 5, 6]
+			default: [4, 5, 6]
 		},
 		generatedLetters: {
-			value: function() {
+			default: function() {
 				return 'GHI';
 			}
 		},
 		generatedNumbers: {
-			value: function() {
+			default: function() {
 				return new DefineList([7, 8, 9]);
 			}
 		},
 
 		// Get prototype defaults
 		firstLetter: {
-			value: function() {
+			default: function() {
 				return this.letters.substr(0, 1);
 			}
 		},
 		firstNumber: {
-			value: function() {
+			default: function() {
 				return this.numbers[0];
 			}
 		},
 
 		// Get defined simple `value` defaults
 		middleLetter: {
-			value: function() {
+			default: function() {
 				return this.definedLetters.substr(1, 1);
 			}
 		},
 		middleNumber: {
-			value: function() {
+			default: function() {
 				return this.definedNumbers[1];
 			}
 		},
 
 		// Get defined `value` function defaults
 		lastLetter: {
-			value: function() {
+			default: function() {
 				return this.generatedLetters.substr(2, 1);
 			}
 		},
 		lastNumber: {
-			value: function() {
+			default: function() {
 				return this.generatedNumbers[2];
 			}
 		}
@@ -265,12 +265,12 @@ test('value and get (#1521)', function() {
 
 	var MyMap = define.Constructor({
 		data: {
-			value: function() {
+			default: function() {
 				return new DefineList(['test']);
 			}
 		},
 		size: {
-			value: 1,
+			default: 1,
 			get: function(val) {
 				var list = this.data;
 				var length = list.attr('length');

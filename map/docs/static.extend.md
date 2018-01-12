@@ -22,7 +22,7 @@ var Person = DefineMap.extend(
         return this.first+" "+this.last;
       }
     },
-    age: {value: 0},
+    age: {default: 0},
   });
 
 var me = new Person({first: "Justin", last: "Meyer"})
