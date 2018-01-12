@@ -3,16 +3,16 @@
 
 Specify the behavior of a property by listening to changes in other properties.
 
-@signature `value(resolve, listenTo, stopListening, lastSet)`
+@signature `value(prop)`
 
 The `value` behavior is used to compose a property value from events dispatched
 by other properties on the map. It's similar to [can-define.types.get], but can
 be used to build property behaviors that [can-define.types.get] can not provide.
 
 `value` enables techniques very similar to using
-event streams and functional reactive programming. Use `listenTo` to listen to events
+event streams and functional reactive programming. Use `prop.listenTo` to listen to events
 dispatched on the map or other observables,
-`stopListening` to stop listening to those events if needed, and `resolve`
+`prop.stopListening` to stop listening to those events if needed, and `prop.resolve`
 to set a new value on the observable. For example, the following
 counts the number of times the `name` property changed:
 
@@ -20,14 +20,14 @@ counts the number of times the `name` property changed:
 Person = DefineMap.extend("Person",{
     name: "string",
     nameChangeCount: {
-        value(resolve, listenTo){
+        value(prop){
             var count = 0;
 
-            listenTo("name", () => {
-                resolve(++count);
+            prop.listenTo("name", () => {
+                prop.resolve(++count);
             });
 
-            resolve(count);
+            prop.resolve(count);
         }
     }
 });
@@ -48,75 +48,81 @@ to provide a value.
 
 `value` properties are not enumerable by default.
 
-@param {function(Any)} resolve(value) Sets the value of this property as `value`. During a [can-queues.batch.start batch],
-the last value passed to `resolve` will be used as the value.
+@param {can-define.types.valueOptions} [prop] An object of methods and values used to specify the property
+behavior:  
 
-@param {function(Any,String,Fuction,String)} listenTo(bindTarget,event,handler,queue) A function that sets up a binding that
-will be automatically torn-down when the `value` property is unbound.  This `listenTo` method is very similar to the [can-event-queue/map/map.listenTo] method available on [can-define/map/map DefineMap].  It differs only that it:
 
-- defaults bindings within the [can-queues.notifyQueue].
-- calls handlers with `this` as the instance.
 
-Examples:
+- __prop.resolve(value)__ `{function(Any)}` Sets the value of this property as `value`. During a [can-queues.batch.start batch],
+  the last value passed to `resolve` will be used as the value.
 
-```js
-// Binds to the map's `name` event:
-listenTo("name", handler)     
+- __prop.listenTo(bindTarget, event, handler, queue)__ `{function(Any,String,Fuction,String)}`  A function that sets up a binding that
+  will be automatically torn-down when the `value` property is unbound.  This `listenTo` method is very similar to the [can-event-queue/map/map.listenTo] method available on [can-define/map/map DefineMap].  It differs only that it:
 
-// Binds to the todos `length` event:
-listenTo(todos, "length", handler)
+  - defaults bindings within the [can-queues.notifyQueue].
+  - calls handlers with `this` as the instance.
 
-// Binds to the `todos` `length` event in the mutate queue:
-listenTo(todos, "length", handler, "mutate")
+  Examples:
 
-// Binds to an `onValue` emitter:
-listenTo(observable, handler) //
-```
+  ```js
+  // Binds to the map's `name` event:
+  listenTo("name", handler)     
 
-@param {function(Any,String,Fuction,String)} stopListening(bindTarget,event,handler,queue) A function that removes bindings
-registered by the `listenTo` argument.  This `stopListening` method is very similar to the [can-event-queue/map/map.stopListening] method available on [can-define/map/map DefineMap].  It differs only that it:
+  // Binds to the todos `length` event:
+  listenTo(todos, "length", handler)
 
-- defaults to unbinding within the [can-queues.notifyQueue].
+  // Binds to the `todos` `length` event in the mutate queue:
+  listenTo(todos, "length", handler, "mutate")
 
-Examples:
+  // Binds to an `onValue` emitter:
+  listenTo(observable, handler) //
+  ```
 
-```js
-// Unbind all handlers bound using `listenTo`:
-stopListening()    
+- __prop.stopListening(bindTarget, event, handler, queue)__ `{function(Any,String,Fuction,String)}`  A function that removes bindings
+  registered by the `listenTo` argument.  This `stopListening` method is very similar to the [can-event-queue/map/map.stopListening] method available on [can-define/map/map DefineMap].  It differs only that it:
 
-// Unbind handlers to the map's `name` event:
-stopListening("name")   
+  - defaults to unbinding within the [can-queues.notifyQueue].
 
-// Unbind a specific handler on the map's `name` event
-// registered in the "notify" queue.
-stopListening("name", handler)    
+  Examples:
 
-// Unbind all handlers bound to `todos` using `listenTo`:
-stopListening(todos)
+  ```js
+  // Unbind all handlers bound using `listenTo`:
+  stopListening()    
 
-// Unbind all `length` handlers bound to `todos`
-// using `listenTo`:
-stopListening(todos, "length")
+  // Unbind handlers to the map's `name` event:
+  stopListening("name")   
 
-// Unbind all handlers to an `onValue` emitter:
-stopListening(observable)
-```
+  // Unbind a specific handler on the map's `name` event
+  // registered in the "notify" queue.
+  stopListening("name", handler)    
 
-@param {can-simple-observable} lastSet An observable value that gets set when this
-property is set.  You can read its value or listen to when its value changes to
-derive the property value.  The following makes `property` behave like a
-normal object property that can be get or set:
+  // Unbind all handlers bound to `todos` using `listenTo`:
+  stopListening(todos)
 
-```js
-property: {
+  // Unbind all `length` handlers bound to `todos`
+  // using `listenTo`:
+  stopListening(todos, "length")
+
+  // Unbind all handlers to an `onValue` emitter:
+  stopListening(observable)
+  ```
+
+- __lastSet__ `{can-simple-observable}` An observable value that gets set when this
+  property is set.  You can read its value or listen to when its value changes to
+  derive the property value.  The following makes `property` behave like a
+  normal object property that can be get or set:
+
+  ```js
+  property: {
     value: function(resolve, listenTo, stopListening, lastSet) {
         // Make sure the initial value is whatever was set.
         resolve(lastSet.get())
         // When the property is set, update the read value.
         listenTo(lastSet,resolve);
     }
-}
-```
+  }
+  ```
+
 
 @return {function} An optional teardown function. If provided, the teardown function
 will be called when the property is unbound after `stopListening()` is used to

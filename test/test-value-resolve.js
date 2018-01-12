@@ -12,11 +12,11 @@ QUnit.test("counter", function(){
     var Person = DefineMap.extend("Person", {
         name: "string",
         nameChangeCount: {
-            value: function(resolve, listenTo){
+            value: function(prop){
                 var count = 0;
-                resolve(count);
-                listenTo("name", function(){
-                    resolve(++count);
+                prop.resolve(count);
+                prop.listenTo("name", function(){
+                    prop.resolve(++count);
                 });
             }
         }
@@ -44,17 +44,17 @@ QUnit.test("fullName getter the hard way", 3, function(){
         first: "string",
         last: "string",
         fullName: {
-            value: function(resolve, listenTo){
+            value: function(prop){
                 var first = this.first,
                     last = this.last;
-                resolve(first + " " + last);
-                listenTo("first", function(ev, newFirst){
+                prop.resolve(first + " " + last);
+                prop.listenTo("first", function(ev, newFirst){
                     first = newFirst;
-                    resolve(first + " " + last);
+                    prop.resolve(first + " " + last);
                 });
-                listenTo("last", function(ev, newLast){
+                prop.listenTo("last", function(ev, newLast){
                     last = newLast;
-                    resolve(first + " " + last);
+                    prop.resolve(first + " " + last);
                 });
             }
         }
@@ -81,30 +81,30 @@ QUnit.test("list length", function(){
     var VM = DefineMap.extend("VM", {
         tasks: [],
         tasksLength: {
-            value: function(resolve, on, off){
+            value: function(prop){
                 var tasks;
                 function checkAndResolve(){
                     if(tasks) {
-                        resolve(tasks.length);
+                        prop.resolve(tasks.length);
                     } else {
-                        resolve(0);
+                        prop.resolve(0);
                     }
                 }
                 function updateTask(ev, newTask, oldTask) {
                     if(oldTask) {
-                        off(oldTask);
+                        prop.stopListening(oldTask);
                     }
                     tasks = newTask;
                     if(newTask) {
-                        on(newTask,"length", function(ev, newVal){
-                            resolve(newVal);
+                        prop.listenTo(newTask,"length", function(ev, newVal){
+                            prop.resolve(newVal);
                         });
                     }
 
                     checkAndResolve();
                 }
 
-                on("tasks", updateTask);
+                prop.listenTo("tasks", updateTask);
 
                 updateTask(null, this.tasks, null);
             }
@@ -146,17 +146,17 @@ QUnit.test("batches produce one result", 2, function(){
         first: "string",
         last: "string",
         fullName: {
-            value: function(resolve, listenTo){
+            value: function(prop){
                 var first = this.first,
                     last = this.last;
-                resolve(first + " " + last);
-                listenTo("first", function(ev, newFirst){
+                prop.resolve(first + " " + last);
+                prop.listenTo("first", function(ev, newFirst){
                     first = newFirst;
-                    resolve(first + " " + last);
+                    prop.resolve(first + " " + last);
                 });
-                listenTo("last", function(ev, newLast){
+                prop.listenTo("last", function(ev, newLast){
                     last = newLast;
-                    resolve(first + " " + last);
+                    prop.resolve(first + " " + last);
                 });
             }
         }
@@ -184,12 +184,12 @@ QUnit.test("location vm", function(){
             this.dispatch("citySet",city);
         },
     	city: {
-            value: function(resolve, listenTo) {
-                listenTo("citySet", function(ev, city){
-                    resolve(city);
+            value: function(prop) {
+                prop.listenTo("citySet", function(ev, city){
+                    prop.resolve(city);
                 });
-                listenTo("state", function(){
-                    resolve(null);
+                prop.listenTo("state", function(){
+                    prop.resolve(null);
                 });
             }
         }
@@ -211,14 +211,12 @@ QUnit.test("location vm with setter", function(){
     var Locator = DefineMap.extend("Locator",{
     	state: "string",
     	city: {
-            value: function(resolve, listenTo, stop, lastSet) {
-                listenTo(lastSet, function(city){
-                    resolve(city);
+            value: function(prop) {
+                prop.listenTo(prop.lastSet, prop.resolve);
+                prop.listenTo("state", function(){
+                    prop.resolve(null);
                 });
-                listenTo("state", function(){
-                    resolve(null);
-                });
-                resolve( lastSet.get() );
+                prop.resolve( prop.lastSet.get() );
             }
         }
     });
