@@ -107,12 +107,14 @@ propertyName: {
 
     ```js
     DefineMap.extend({
-      pageChangeCount: function(resolve, listenTo){
+      pageChangeCount: function(prop){
         var count = 0;
-        listenTo("page", function(){
-          resolve(++count);
+        // When page changes, update the count.
+        prop.listenTo("page", function(){
+          prop.resolve(++count);
         });
-        resolve(count); //-> initial value
+        // Set initial count.
+        prop.resolve(count);
       }
     });
     ```

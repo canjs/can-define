@@ -41,7 +41,7 @@ p.name = "Justin" // logs name changed 1 times
 p.name = "Ramiya" // logs name changed 2 times
 ```
 
-If the property defined by `value` is unbound, the `value` function will be called each time. Use `resolve` synchronously
+If the property defined by `value` is unbound, the `value` function will be called each time. Use `prop.resolve` synchronously
 to provide a value.
 
 [can-define.types.type], [can-define.types.default], [can-define.types.get], and [can-define.types.set] behaviors are ignored when `value` is present.
@@ -54,71 +54,73 @@ behavior:
 
 
 - __prop.resolve(value)__ `{function(Any)}` Sets the value of this property as `value`. During a [can-queues.batch.start batch],
-  the last value passed to `resolve` will be used as the value.
+  the last value passed to `prop.resolve` will be used as the value.
 
 - __prop.listenTo(bindTarget, event, handler, queue)__ `{function(Any,String,Fuction,String)}`  A function that sets up a binding that
-  will be automatically torn-down when the `value` property is unbound.  This `listenTo` method is very similar to the [can-event-queue/map/map.listenTo] method available on [can-define/map/map DefineMap].  It differs only that it:
+  will be automatically torn-down when the `value` property is unbound.  This `prop.listenTo` method is very similar to the [can-event-queue/map/map.listenTo] method available on [can-define/map/map DefineMap].  It differs only that it:
 
   - defaults bindings within the [can-queues.notifyQueue].
   - calls handlers with `this` as the instance.
+  - localizes saved bindings to the property instead of the entire map.
 
   Examples:
 
   ```js
   // Binds to the map's `name` event:
-  listenTo("name", handler)     
+  prop.listenTo("name", handler)     
 
   // Binds to the todos `length` event:
-  listenTo(todos, "length", handler)
+  prop.listenTo(todos, "length", handler)
 
   // Binds to the `todos` `length` event in the mutate queue:
-  listenTo(todos, "length", handler, "mutate")
+  prop.listenTo(todos, "length", handler, "mutate")
 
   // Binds to an `onValue` emitter:
-  listenTo(observable, handler) //
+  prop.listenTo(observable, handler) //
   ```
 
 - __prop.stopListening(bindTarget, event, handler, queue)__ `{function(Any,String,Fuction,String)}`  A function that removes bindings
-  registered by the `listenTo` argument.  This `stopListening` method is very similar to the [can-event-queue/map/map.stopListening] method available on [can-define/map/map DefineMap].  It differs only that it:
+  registered by the `prop.listenTo` argument.  This `prop.stopListening` method is very similar to the [can-event-queue/map/map.stopListening] method available on [can-define/map/map DefineMap].  It differs only that it:
 
   - defaults to unbinding within the [can-queues.notifyQueue].
+  - unbinds saved bindings by `prop.listenTo`.
 
   Examples:
 
   ```js
   // Unbind all handlers bound using `listenTo`:
-  stopListening()    
+  prop.stopListening()    
 
   // Unbind handlers to the map's `name` event:
-  stopListening("name")   
+  prop.stopListening("name")   
 
   // Unbind a specific handler on the map's `name` event
   // registered in the "notify" queue.
-  stopListening("name", handler)    
+  prop.stopListening("name", handler)    
 
   // Unbind all handlers bound to `todos` using `listenTo`:
-  stopListening(todos)
+  prop.stopListening(todos)
 
   // Unbind all `length` handlers bound to `todos`
   // using `listenTo`:
-  stopListening(todos, "length")
+  prop.stopListening(todos, "length")
 
   // Unbind all handlers to an `onValue` emitter:
-  stopListening(observable)
+  prop.stopListening(observable)
   ```
 
-- __lastSet__ `{can-simple-observable}` An observable value that gets set when this
+- __prop.lastSet__ `{can-simple-observable}` An observable value that gets set when this
   property is set.  You can read its value or listen to when its value changes to
   derive the property value.  The following makes `property` behave like a
   normal object property that can be get or set:
 
   ```js
   property: {
-    value: function(resolve, listenTo, stopListening, lastSet) {
-        // Make sure the initial value is whatever was set.
-        resolve(lastSet.get())
-        // When the property is set, update the read value.
-        listenTo(lastSet,resolve);
+    value: function(prop) {
+        // Set `property` initial value to set value.
+        prop.resolve(prop.lastSet.get())
+        // When the property is set, update `property`.
+        prop.listenTo(prop.lastSet,prop.resolve);
     }
   }
   ```
@@ -134,11 +136,11 @@ is returned to clear the interval when the property is returned:
 ```js
 var Timer = DefineMap.extend("Timer",{
     time: {
-        value(resolve) {
-            resolve(new Date());
+        value(prop) {
+            prop.resolve(new Date());
 
             var interval = setInterval(() => {
-                resolve(new Date())
+                prop.resolve(new Date())
             },1000);
 
             return () => {
@@ -193,12 +195,12 @@ DefineMap.extend("Person", {
         }
     },
     fullNameChangeCount: {
-        value(resolve, listenTo){
+        value(prop){
             var count = 0;
-            resolve(0);
-            listenTo("fullName", ()=> {
-                resolve(++count)
-            })
+            prop.resolve(0);
+            prop.listenTo("fullName", ()=> {
+                prop.resolve(++count);
+            });
         }
     }
 });
