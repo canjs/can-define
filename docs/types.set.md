@@ -5,6 +5,9 @@ Specify what happens when a property value is set.
 
 @signature `set( [newVal,] [resolve] )`
 
+
+> NOTE: Instead of using `set` to set the values of other properties, use the [can-define.types.value] behavior.
+
 A set function defines the behavior of what happens when a value is set on an
 instance. It is typically used to:
 

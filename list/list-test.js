@@ -434,7 +434,7 @@ test("list defines", 6, function() {
 	define(Todo.prototype, {
         completed: "boolean",
         destroyed: {
-            value: false
+            default: false
         }
     });
 	Todo.prototype.destroy = function() {
@@ -612,7 +612,7 @@ QUnit.test("extending DefineList constructor functions more than once (#61)", fu
 });
 
 QUnit.test("extending DefineList constructor functions - value (#61)", function() {
-	var AList = DefineList.extend("AList", { aProp: { value: 1 } });
+	var AList = DefineList.extend("AList", { aProp: { default: 1 } });
 
     var BList = AList.extend("BList", { });
 
@@ -702,7 +702,7 @@ QUnit.test("added and removed are called after items are added/removed (#14)", f
 		},
 		outsideProp: {
 			type: "boolean",
-			value: true
+			default: true
 		}
 	});
 

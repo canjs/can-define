@@ -185,7 +185,7 @@ QUnit.test("basics value", function() {
 
 	define(Typer.prototype, {
 		prop: {
-			value: 'foo'
+			default: 'foo'
 		}
 	});
 	var t = new Typer();
@@ -200,7 +200,7 @@ QUnit.test("basics value", function() {
 
 	define(Typer2.prototype, {
 		prop: {
-			value: function() {
+			default: function() {
 				return [];
 			},
 			type: "*"
@@ -224,7 +224,7 @@ test("basics Value", function() {
 	define(Typer.prototype, {
 
 		prop: {
-			Value: Array,
+			Default: Array,
 			type: "*"
 		}
 
@@ -332,7 +332,7 @@ test("getter with initial value", function() {
 	var Grabber = define.Constructor({
 		vals: {
 			type: "*",
-			Value: Array,
+			Default: Array,
 			get: function(current, setVal) {
 				if (setVal) {
 					current.push(comp.get());
@@ -377,7 +377,7 @@ test('default behaviors with "*" work for attributes', function() {
 			}
 		},
 		someNumber: {
-			value: '5'
+			default: '5'
 		},
 		number: {}
 	});
@@ -399,32 +399,32 @@ test("nested define", function() {
 
 	var Example = define.Constructor({
 		name: {
-			value: nailedIt
+			default: nailedIt
 		}
 	});
 
 	var NestedMap = define.Constructor({
 		isEnabled: {
-			value: true
+			default: true
 		},
 		test: {
-			Value: Example
+			Default: Example
 		},
 		examples: {
 			type: {
 				one: {
-					Value: Example
+					Default: Example
 				},
 				two: {
 					type: {
 						deep: {
-							Value: Example
+							Default: Example
 						}
 					},
-					Value: Object
+					Default: Object
 				}
 			},
-			Value: Object
+			Default: Object
 		}
 	});
 
@@ -562,7 +562,7 @@ test('Can read a defined property with a set/get method (#1648)', function() {
 
 	var Map = define.Constructor({
 		foo: {
-			value: '',
+			default: '',
 			set: function(setVal) {
 				return setVal;
 			},
@@ -589,7 +589,7 @@ test('Can bind to a defined property with a set/get method (#1648)', 3, function
 
 	var Map = define.Constructor({
 		foo: {
-			value: '',
+			default: '',
 			set: function(setVal) {
 				return setVal;
 			},
@@ -767,11 +767,11 @@ QUnit.test('Default values cannot be set (#8)', function() {
 	define(Person.prototype, {
 		first: {
 			type: 'string',
-			value: 'Chris'
+			default: 'Chris'
 		},
 		last: {
 			type: 'string',
-			value: 'Gomez'
+			default: 'Gomez'
 		},
 		fullName: {
 			get: function() {
@@ -794,10 +794,10 @@ QUnit.test('default type is setable', function() {
 	define(Person.prototype, {
 		'*': 'string',
 		first: {
-			value: 1
+			default: 1
 		},
 		last: {
-			value: 2
+			default: 2
 		}
 	});
 
@@ -841,7 +841,7 @@ QUnit.test('Compute type property can have a default value', function() {
 	var MyMap = define.Constructor({
 		computeProp: {
 			type: 'compute',
-			value: function() {
+			default: function() {
 				return 0;
 			}
 		}
@@ -861,7 +861,7 @@ QUnit.test('Compute type property with compute default value triggers change eve
 	var MyMap = define.Constructor({
 		computeProp: {
 			type: 'compute',
-			value: function() {
+			default: function() {
 				return c;
 			}
 		}
@@ -890,7 +890,7 @@ QUnit.test('Compute type property can have a default value that is a compute', f
 	var MyMap = define.Constructor({
 		computeProp: {
 			type: 'compute',
-			value: function() {
+			default: function() {
 				return c;
 			}
 		}
@@ -911,18 +911,18 @@ QUnit.test('Extensions can modify definitions', function() {
 	define.extensions = function(objPrototype, prop, definition) {
 		if (definition.extended) {
 			return {
-				value: 'extended'
+				default: 'extended'
 			};
 		}
 	};
 
 	var MyMap = define.Constructor({
 		foo: {
-			value: 'defined',
+			default: 'defined',
 			extended: true,
 		},
 		bar: {
-			value: 'defined'
+			default: 'defined'
 		}
 	});
 
@@ -1089,7 +1089,7 @@ QUnit.test("set and value work together (#87)", function(){
 
 	var Type = define.Constructor({
 		prop: {
-			value: 2,
+			default: 2,
 			set: function(num){
 				return num * num;
 			}
@@ -1107,13 +1107,13 @@ QUnit.test("async setter is provided", 5, function(){
 
 	var Type = define.Constructor({
 		prop: {
-			value: 2,
+			default: 2,
 			set: function(num, resolve){
 				resolve( num * num );
 			}
 		},
 		prop2: {
-			value: 3,
+			default: 3,
 			set: function(num, resolve){
 				RESOLVE = resolve;
 			}
@@ -1140,7 +1140,7 @@ QUnit.test("async setter is provided", 5, function(){
 QUnit.test('setter with default value causes an infinite loop (#142)', function(){
 	var A = define.Constructor({
 		val: {
-			value: 'hello',
+			default: 'hello',
 			set: function(val){
 				if(this.val) {}
 				return val;
@@ -1232,7 +1232,7 @@ testHelpers.dev.devOnlyTest("warn on using a Constructor for small-t type defini
 	define(VM.prototype, {
 		currency: {
 			type: Currency, // should be `Type: Currency`
-			value: function() {
+			default: function() {
 				return new Currency({});
 			}
 		}
@@ -1248,7 +1248,7 @@ testHelpers.dev.devOnlyTest("warn on using a Constructor for small-t type defini
 	define(VM2.prototype, {
 		currency: {
 			type: Currency, // should be `Type: Currency`
-			value: function() {
+			default: function() {
 				return new Currency({});
 			}
 		}

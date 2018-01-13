@@ -617,6 +617,26 @@ var DefineList = Construct.extend("DefineList",
 	}
 );
 
+for(var prop in define.eventsProto) {
+	Object.defineProperty(DefineList.prototype, prop, {
+		enumerable:false,
+		value: define.eventsProto[prop],
+		writable: true
+	});
+}
+
+var eventsProtoSymbols = ("getOwnPropertySymbols" in Object) ?
+  Object.getOwnPropertySymbols(define.eventsProto) :
+  [canSymbol.for("can.onKeyValue"), canSymbol.for("can.offKeyValue")];
+
+eventsProtoSymbols.forEach(function(sym) {
+  Object.defineProperty(DefineList.prototype, sym, {
+    enumerable:false,
+    value: define.eventsProto[sym],
+    writable: true
+  });
+});
+
 // Converts to an `array` of arguments.
 var getArgs = function(args) {
 	return args[0] && Array.isArray(args[0]) ?

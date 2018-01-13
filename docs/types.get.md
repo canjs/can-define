@@ -199,7 +199,7 @@ the [can-define/list/list] will be updated with the `id`s of the `locations`.
 var Store = DefineMap.extend({
     locations: DefineList,
 	locationIds: {
-		Value: DefineList,
+		Default: DefineList,
 		get: function(initialValue){
 			var ids = this.locations.map(function(location){
 				ids.push(location.id);
