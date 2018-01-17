@@ -1204,5 +1204,5 @@ QUnit.test("value as a string breaks", function(){
 		prop: {value: "a string"}
 	});
 	var my = new MyMap();
-	QUnit.equal(my.prop, "a string", "works")
+	QUnit.equal(my.prop, "a string", "works");
 });
