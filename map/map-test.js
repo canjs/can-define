@@ -1198,3 +1198,11 @@ canTestHelpers.devOnlyTest("can.hasKey and can.hasOwnKey (#303)", function(asser
 
 	assert.ok(!vm[hasOwnKeySymbol]("anotherProp"), "!vm.hasOwnKey('anotherProp') false");
 });
+
+QUnit.test("value as a string breaks", function(){
+	var MyMap = DefineMap.extend({
+		prop: {value: "a string"}
+	});
+	var my = new MyMap();
+	QUnit.equal(my.prop, "a string", "works")
+});

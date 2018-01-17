@@ -752,7 +752,7 @@ makeDefinition = function(prop, def, defaultDefinition) {
 			definition.type = define.types["*"];
 		}
 	}
-	cleanUpDefinition(prop, def, true);
+	cleanUpDefinition(prop, definition, true);
 	return definition;
 };
 
