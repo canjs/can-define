@@ -50,6 +50,35 @@ var eachPropertyDescriptor = function(map, cb){
 };
 
 
+function cleanUpDefinition(prop, definition, shouldWarn){
+	// cleanup `value` -> `default`
+	if(definition.value !== undefined && ( typeof definition.value !== "function" || definition.value.length === 0) ){
+
+		//!steal-remove-start
+		if(shouldWarn) {
+			canLogDev.warn(
+				"can-define: Change the 'value' definition for " + prop + " to 'default'."
+			);
+		}
+		//!steal-remove-end
+
+		definition.default = definition.value;
+		delete definition.value;
+	}
+	// cleanup `Value` -> `DEFAULT`
+	if(definition.Value !== undefined  ){
+		//!steal-remove-start
+		if(shouldWarn) {
+			canLogDev.warn(
+				"can-define: Change the 'Value' definition for " + prop + " to 'Default'."
+			);
+		}
+		//!steal-remove-end
+		definition.Default = definition.Value;
+		delete definition.Value;
+	}
+}
+
 module.exports = define = ns.define = function(objPrototype, defines, baseDefine) {
 	// default property definitions on _data
 	var prop,
@@ -309,6 +338,10 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 define.makeDefineInstanceKey = function(constructor) {
 	constructor[canSymbol.for("can.defineInstanceKey")] = function(property, value) {
 		var defineResult = this.prototype._define;
+		if(typeof value === "object") {
+			// change `value` to default.
+			cleanUpDefinition(property, value, false);
+		}
 		var definition = getDefinitionOrMethod(property, value, defineResult.defaultDefinition);
 		if(definition && typeof definition === "object") {
 			define.property(constructor.prototype, property, definition, defineResult.dataInitializers, defineResult.computedInitializers, defineResult.defaultDefinition);
@@ -719,26 +752,7 @@ makeDefinition = function(prop, def, defaultDefinition) {
 			definition.type = define.types["*"];
 		}
 	}
-	// cleanup `value` -> `default`
-	if(definition.value !== undefined && ( typeof definition.value !== "function" || definition.value.length === 0) ){
-		//!steal-remove-start
-		canLogDev.warn(
-			"can-define: Change the 'value' definition for " + prop + " to 'default'."
-		);
-		//!steal-remove-end
-		definition.default = definition.value;
-		delete definition.value;
-	}
-	// cleanup `Value` -> `DEFAULT`
-	if(definition.Value !== undefined  ){
-		//!steal-remove-start
-		canLogDev.warn(
-			"can-define: Change the 'Value' definition for " + prop + " to 'Default'."
-		);
-		//!steal-remove-end
-		definition.Default = definition.Value;
-		delete definition.Value;
-	}
+	cleanUpDefinition(prop, def, true);
 	return definition;
 };
 
