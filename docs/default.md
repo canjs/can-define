@@ -53,4 +53,4 @@ var Person = DefineMap.extend({
 
 ## Alternates
 
-There is a third way to provide a default value, which is explained in the [can-define.types.defaultConstructor] docs page. `value` lowercased is for providing default values for a property type, while `Value` uppercased is for providing a constructor function, which will be invoked with `new` to create a default value for each instance of this map.
+There is a third way to provide a default value, which is explained in the [can-define.types.defaultConstructor] docs page. `default` lowercased is for providing default values for a property type, while `Default` uppercased is for providing a constructor function, which will be invoked with `new` to create a default value for each instance of this map.
