@@ -62,11 +62,11 @@ normal object property that can be get or set:
 
 ```js
 property: {
-  value: function(resolve, listenTo, stopListening, lastSet) {
+  value: function(prop) {
       // Make sure the initial value is whatever was set.
-      resolve(lastSet.get())
+      resolve(prop.lastSet.get())
       // When the property is set, update the read value.
-      listenTo(lastSet,resolve);
+      listenTo(prop.lastSet,resolve);
   }
 }
 ```
