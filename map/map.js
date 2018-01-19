@@ -471,7 +471,7 @@ canReflect.assignSymbols(DefineMap.prototype,{
 		return Object.hasOwnProperty.call(this._define.definitions, key);
 	},
 	"can.hasKey": function(key) {
-		return this._define.definitions[key];
+		return !!this._define.definitions[key];
 	},
 
 	// -shape get/set-

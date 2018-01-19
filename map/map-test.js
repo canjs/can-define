@@ -1181,22 +1181,22 @@ canTestHelpers.devOnlyTest("can.hasKey and can.hasOwnKey (#303)", function(asser
 	var vm = new VM();
 
 	// hasKey
-	assert.ok(vm[hasKeySymbol]("prop"), "vm.hasKey('prop') true");
-	assert.ok(vm[hasKeySymbol]("derivedProp"), "vm.hasKey('derivedProp') true");
+	assert.equal(vm[hasKeySymbol]("prop"), true, "vm.hasKey('prop') true");
+	assert.equal(vm[hasKeySymbol]("derivedProp"), true, "vm.hasKey('derivedProp') true");
 
-	assert.ok(vm[hasKeySymbol]("parentProp"), "vm.hasKey('parentProp') true");
-	assert.ok(vm[hasKeySymbol]("parentDerivedProp"), "vm.hasKey('parentDerivedProp') true");
+	assert.equal(vm[hasKeySymbol]("parentProp"), true, "vm.hasKey('parentProp') true");
+	assert.equal(vm[hasKeySymbol]("parentDerivedProp"), true, "vm.hasKey('parentDerivedProp') true");
 
-	assert.ok(!vm[hasKeySymbol]("anotherProp"), "!vm.hasKey('anotherProp') false");
+	assert.equal(vm[hasKeySymbol]("anotherProp"), false, "vm.hasKey('anotherProp') false");
 
 	// hasOwnKey
-	assert.ok(vm[hasOwnKeySymbol]("prop"), "vm.hasOwnKey('prop') true");
-	assert.ok(vm[hasOwnKeySymbol]("derivedProp"), "vm.hasOwnKey('derivedProp') true");
+	assert.equal(vm[hasOwnKeySymbol]("prop"), true, "vm.hasOwnKey('prop') true");
+	assert.equal(vm[hasOwnKeySymbol]("derivedProp"), true, "vm.hasOwnKey('derivedProp') true");
 
-	assert.ok(!vm[hasOwnKeySymbol]("parentProp"), "vm.hasOwnKey('parentProp') false");
-	assert.ok(!vm[hasOwnKeySymbol]("parentDerivedProp"), "vm.hasOwnKey('parentDerivedProp') false");
+	assert.equal(vm[hasOwnKeySymbol]("parentProp"), false, "vm.hasOwnKey('parentProp') false");
+	assert.equal(vm[hasOwnKeySymbol]("parentDerivedProp"), false, "vm.hasOwnKey('parentDerivedProp') false");
 
-	assert.ok(!vm[hasOwnKeySymbol]("anotherProp"), "!vm.hasOwnKey('anotherProp') false");
+	assert.equal(vm[hasOwnKeySymbol]("anotherProp"), false, "vm.hasOwnKey('anotherProp') false");
 });
 
 QUnit.test("value as a string breaks", function(){
