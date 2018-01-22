@@ -32,6 +32,24 @@ var eventsProto, define,
 
 var peek = ObservationRecorder.ignore(canReflect.getValue.bind(canReflect));
 
+var Object_defineNamedPrototypeProperty = Object.defineProperty;
+//!steal-remove-start
+Object_defineNamedPrototypeProperty = function(obj, prop, definition) {
+	if (definition.get) {
+		Object.defineProperty(definition.get, "name", {
+			value: "get "+canReflect.getName(obj) + "."+prop
+		});
+	}
+	if (definition.set) {
+		Object.defineProperty(definition.set, "name", {
+			value:  "set "+canReflect.getName(obj) + "."+prop
+		});
+	}
+	return Object.defineProperty(obj, prop, definition);
+};
+//!steal-remove-end
+
+
 var defineConfigurableAndNotEnumerable = function(obj, prop, value) {
 	Object.defineProperty(obj, prop, {
 		configurable: true,
@@ -201,7 +219,7 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 
 	// Special case definitions that have only `type: "*"`.
 	if (type && onlyType(definition) && type === define.types["*"]) {
-		Object.defineProperty(objPrototype, prop, {
+		Object_defineNamedPrototypeProperty(objPrototype, prop, {
 			get: make.get.data(prop),
 			set: make.set.events(prop, make.get.data(prop), make.set.data(prop), make.eventType.data(prop)),
 			enumerable: true,
@@ -328,7 +346,7 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 	}
 
 	// Define the property.
-	Object.defineProperty(objPrototype, prop, {
+	Object_defineNamedPrototypeProperty(objPrototype, prop, {
 		get: getter,
 		set: setter,
 		enumerable: "serialize" in definition ? !!definition.serialize : !definition.get,
@@ -913,7 +931,6 @@ canReflect.set(eventsProto, canSymbol.for("can.offKeyValue"), function(key, hand
 delete eventsProto.one;
 
 define.setup = function(props, sealed) {
-	Object.defineProperty(this,"_cid", {value: this._cid, enumerable: false, writable: false});
 	Object.defineProperty(this,"constructor", {value: this.constructor, enumerable: false, writable: false});
 	Object.defineProperty(this,canMetaSymbol, {value: Object.create(null), enumerable: false, writable: false});
 
@@ -928,7 +945,7 @@ define.setup = function(props, sealed) {
 		} else {
 			var def = define.makeSimpleGetterSetter(prop);
 			instanceDefinitions[prop] = {};
-			Object.defineProperty(map, prop, def);
+			Object_defineNamedPrototypeProperty(map, prop, def);
 			// possibly convert value to List or DefineMap
 			map[prop] = define.types.observable(value);
 		}
@@ -952,7 +969,7 @@ define.make = make;
 define.getDefinitionOrMethod = getDefinitionOrMethod;
 var simpleGetterSetters = {};
 define.makeSimpleGetterSetter = function(prop){
-	if(!simpleGetterSetters[prop]) {
+	if(simpleGetterSetters[prop] === undefined) {
 
 		var setter = make.set.events(prop, make.get.data(prop), make.set.data(prop), make.eventType.data(prop) );
 
