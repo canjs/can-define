@@ -476,7 +476,6 @@ QUnit.test("copying with assign() excludes special keys", function() {
 		_data: {},
 		constructor: function() {},
 		__bindEvents: {},
-		_cid: "object0",
 		"foo": "bar",
 		"existing": "newVal"
 	};
@@ -488,7 +487,6 @@ QUnit.test("copying with assign() excludes special keys", function() {
 
 	QUnit.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
 	QUnit.notEqual(a._data, b._data, "_data prop not copied");
-	QUnit.notEqual(a._cid, b._cid, "_cid prop not copied");
 	QUnit.equal(a.foo, b.foo, "New props copied");
 	QUnit.equal(a.existing, b.existing, "Existing props copied");
 
