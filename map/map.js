@@ -5,12 +5,12 @@ var Observation = require("can-observation");
 var types = require("can-types");
 var canBatch = require("can-event/batch/batch");
 var ns = require("can-namespace");
-var canLog = require("can-util/js/log/log");
+var canLog = require("can-log");
+var canLogDev = require("can-log/dev/dev");
 var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
 var CIDSet = require("can-util/js/cid-set/cid-set");
 var CIDMap = require("can-util/js/cid-map/cid-map");
-var canDev = require("can-util/js/dev/dev");
 
 var keysForDefinition = function(definitions) {
 	var keys = [];
@@ -184,7 +184,7 @@ var DefineMap = Construct.extend("DefineMap",{
 	set: function(prop, value){
 		if(typeof prop === "object") {
 			//!steal-remove-start
-			canDev.warn('can-define/map/map.prototype.set is deprecated; please use can-define/map/map.prototype.assign or can-define/map/map.prototype.update instead');
+			canLogDev.warn('can-define/map/map.prototype.set is deprecated; please use can-define/map/map.prototype.assign or can-define/map/map.prototype.update instead');
 			//!steal-remove-end
 			if(value === true) {
 				updateDeep.call(this, prop);
