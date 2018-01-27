@@ -41,7 +41,7 @@
     "can-namespace": "^1.0.0",
     "can-observation": "^3.3.4",
     "can-reflect": "^1.2.1",
-    "can-simple-observable": "^1.0.0",
+    "can-simple-observable": "^2.0.0",
     "can-symbol": "^1.0.0",
     "can-test-helpers": "^1.1.1",
     "can-types": "^1.1.0",
