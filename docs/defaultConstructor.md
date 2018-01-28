@@ -1,22 +1,22 @@
-@function can-define.types.ValueConstructor Value
+@function can-define.types.defaultConstructor Default
 @parent can-define.behaviors
 
 Provides a constructor function to be used to provide a default value for a property.  
 
-@signature `Value`
+@signature `Default`
 
 A constructor function can be provided that is called to create a default value used for this property.
 This constructor will be invoked with `new` for each created instance. The default
 value is created on demand when the property is read for the first time.
 
-Specify `Value` like:
+Specify `Default` like:
 
 ```js
 prop: {
-    Value: Array
+    Default: Array
 },
 person: {
-	Value: Person
+	Default: Person
 }
 ```
 
@@ -31,8 +31,8 @@ var Address = DefineMap.extend({
 });
 
 var Direction = DefineMap.extend({
-    from: {Type: Address, Value: Address},
-    to: {Type: Address, Value: Address}
+    from: {Type: Address, Default: Address},
+    to: {Type: Address, Default: Address}
 });
 
 var direction = new Direction({

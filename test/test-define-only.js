@@ -1,10 +1,10 @@
 var QUnit = require("steal-qunit");
-var compute = require("can-compute");
+
 var define = require("can-define");
-var CanList = require("can-define/list/list");
-var canBatch = require("can-event/batch/batch");
+var queues = require("can-queues");
 var each = require("can-util/js/each/each");
 var canSymbol = require("can-symbol");
+var SimpleObservable = require("can-simple-observable");
 var testHelpers = require("can-test-helpers");
 
 QUnit.module("can-define");
@@ -39,10 +39,10 @@ QUnit.test("basics on a prototype", 5, function() {
 		QUnit.equal(oldVal, "Mohamed", "first old value");
 	});
 
-	canBatch.start();
+	queues.batch.start();
 	p.first = "Justin";
 	p.last = "Meyer";
-	canBatch.stop();
+	queues.batch.stop();
 
 });
 
@@ -83,61 +83,7 @@ QUnit.test('basics set', 2, function() {
 
 });
 
-QUnit.test("basic type", function() {
 
-	QUnit.expect(6);
-
-	var Typer = function(arrayWithAddedItem, listWithAddedItem) {
-		this.arrayWithAddedItem = arrayWithAddedItem;
-		this.listWithAddedItem = listWithAddedItem;
-	};
-
-	define(Typer.prototype, {
-		arrayWithAddedItem: {
-			type: function(value) {
-				if (value && value.push) {
-					value.push("item");
-				}
-				return value;
-			}
-		},
-		listWithAddedItem: {
-			type: function(value) {
-				if (value && value.push) {
-					value.push("item");
-				}
-				return value;
-			},
-			Type: CanList
-		}
-	});
-
-
-
-
-	var t = new Typer();
-	deepEqual(Object.keys(t), [], "no keys");
-
-	var array = [];
-	t.arrayWithAddedItem = array;
-
-	deepEqual(array, ["item"], "updated array");
-	QUnit.equal(t.arrayWithAddedItem, array, "leave value as array");
-
-	t.listWithAddedItem = [];
-
-	QUnit.ok(t.listWithAddedItem instanceof CanList, "convert to CanList");
-	QUnit.equal(t.listWithAddedItem[0], "item", "has item in it");
-
-	compute(function() {
-		return t.listWithAddedItem.attr("length");
-	}).addEventListener("change", function(ev, newVal) {
-		QUnit.equal(newVal, 2, "got a length change");
-	});
-
-	t.listWithAddedItem.push("another item");
-
-});
 
 QUnit.test("basic Type", function() {
 	var Foo = function(name) {
@@ -239,7 +185,7 @@ QUnit.test("basics value", function() {
 
 	define(Typer.prototype, {
 		prop: {
-			value: 'foo'
+			default: 'foo'
 		}
 	});
 	var t = new Typer();
@@ -254,7 +200,7 @@ QUnit.test("basics value", function() {
 
 	define(Typer2.prototype, {
 		prop: {
-			value: function() {
+			default: function() {
 				return [];
 			},
 			type: "*"
@@ -278,7 +224,7 @@ test("basics Value", function() {
 	define(Typer.prototype, {
 
 		prop: {
-			Value: Array,
+			Default: Array,
 			type: "*"
 		}
 
@@ -371,7 +317,6 @@ test("getter and setter work", function() {
 		equal(oldValue, 3, "got old value event");
 	});
 
-
 	p.page = 2;
 
 	equal(p.page, 2, "page set right");
@@ -382,15 +327,15 @@ test("getter and setter work", function() {
 
 test("getter with initial value", function() {
 
-	var comp = compute(1);
+	var comp = new SimpleObservable(1);
 
 	var Grabber = define.Constructor({
 		vals: {
 			type: "*",
-			Value: Array,
+			Default: Array,
 			get: function(current, setVal) {
 				if (setVal) {
-					current.push(comp());
+					current.push(comp.get());
 				}
 				return current;
 			}
@@ -419,86 +364,7 @@ test("value generator is not called if default passed", function () {
 	equal(tm.foo, 'baz');
 });*/
 
-test("Value generator can read other properties", function() {
-	var Map = define.Constructor({
-		letters: {
-			value: "ABC"
-		},
-		numbers: {
-			value: [1, 2, 3]
-		},
-		definedLetters: {
-			value: 'DEF'
-		},
-		definedNumbers: {
-			value: [4, 5, 6]
-		},
-		generatedLetters: {
-			value: function() {
-				return 'GHI';
-			}
-		},
-		generatedNumbers: {
-			value: function() {
-				return new CanList([7, 8, 9]);
-			}
-		},
 
-		// Get prototype defaults
-		firstLetter: {
-			value: function() {
-				return this.letters.substr(0, 1);
-			}
-		},
-		firstNumber: {
-			value: function() {
-				return this.numbers[0];
-			}
-		},
-
-		// Get defined simple `value` defaults
-		middleLetter: {
-			value: function() {
-				return this.definedLetters.substr(1, 1);
-			}
-		},
-		middleNumber: {
-			value: function() {
-				return this.definedNumbers[1];
-			}
-		},
-
-		// Get defined `value` function defaults
-		lastLetter: {
-			value: function() {
-				return this.generatedLetters.substr(2, 1);
-			}
-		},
-		lastNumber: {
-			value: function() {
-				return this.generatedNumbers[2];
-			}
-		}
-	});
-
-	var map = new Map();
-	var prefix = 'Was able to read dependent value from ';
-
-	equal(map.firstLetter, 'A',
-		prefix + 'traditional can.Map style property definition');
-	equal(map.firstNumber, 1,
-		prefix + 'traditional can.Map style property definition');
-
-	equal(map.middleLetter, 'E',
-		prefix + 'define plugin style default property definition');
-	equal(map.middleNumber, 5,
-		prefix + 'define plugin style default property definition');
-
-	equal(map.lastLetter, 'I',
-		prefix + 'define plugin style generated default property definition');
-	equal(map.lastNumber, 9,
-		prefix + 'define plugin style generated default property definition');
-});
 
 test('default behaviors with "*" work for attributes', function() {
 	expect(6);
@@ -511,7 +377,7 @@ test('default behaviors with "*" work for attributes', function() {
 			}
 		},
 		someNumber: {
-			value: '5'
+			default: '5'
 		},
 		number: {}
 	});
@@ -533,32 +399,32 @@ test("nested define", function() {
 
 	var Example = define.Constructor({
 		name: {
-			value: nailedIt
+			default: nailedIt
 		}
 	});
 
 	var NestedMap = define.Constructor({
 		isEnabled: {
-			value: true
+			default: true
 		},
 		test: {
-			Value: Example
+			Default: Example
 		},
 		examples: {
 			type: {
 				one: {
-					Value: Example
+					Default: Example
 				},
 				two: {
 					type: {
 						deep: {
-							Value: Example
+							Default: Example
 						}
 					},
-					Value: Object
+					Default: Object
 				}
 			},
-			Value: Object
+			Default: Object
 		}
 	});
 
@@ -576,22 +442,22 @@ test("nested define", function() {
 });
 
 test('Can make an attr alias a compute (#1470)', 9, function() {
-	var computeValue = compute(1);
+	var computeValue = new SimpleObservable(1);
 
 	var GetMap = define.Constructor({
 		value: {
 			set: function(newValue, setVal, oldValue) {
-				if (newValue.isComputed) {
+				if (newValue instanceof SimpleObservable) {
 					return newValue;
 				}
-				if (oldValue && oldValue.isComputed) {
-					oldValue(newValue);
+				if (oldValue && (oldValue instanceof SimpleObservable)) {
+					oldValue.set(newValue);
 					return oldValue;
 				}
 				return newValue;
 			},
 			get: function(value) {
-				return value && value.isComputed ? value() : value;
+				return value instanceof SimpleObservable ? value.get() : value;
 			}
 		}
 	});
@@ -626,52 +492,26 @@ test('Can make an attr alias a compute (#1470)', 9, function() {
 	});
 
 	// Try updating the compute's value
-	computeValue(2);
+	computeValue.set(2);
 
 	// Try setting the value of the property
 	getMap.value = 3;
 
 	equal(getMap.value, 3, "read value is 3");
-	equal(computeValue(), 3, "the compute value is 3");
+	equal(computeValue.get(), 3, "the compute value is 3");
 
 	// Try setting to a new comptue
-	var newComputeValue = compute(4);
+	var newComputeValue = new SimpleObservable(4);
 
 	getMap.value = newComputeValue;
 
 });
 
-test('value and get (#1521)', function() {
-	// problem here is that previously, can.Map would set `size:1` on
-	// the map. This would effectively set the "lastSetValue".
 
-	// in this new version, default values are not set.  They
-	// are only present. later.
-	// one option is that there's a "read-mode" for last-set.  Until it's
-	// been set, it should get it's value from any default value?
-
-	var MyMap = define.Constructor({
-		data: {
-			value: function() {
-				return new CanList(['test']);
-			}
-		},
-		size: {
-			value: 1,
-			get: function(val) {
-				var list = this.data;
-				var length = list.attr('length');
-				return val + length;
-			}
-		}
-	});
-
-	var map = new MyMap({});
-	equal(map.size, 2);
-});
 
 
 test("One event on getters (#1585)", function() {
+
 	var Person = define.Constructor({
 		name: "*",
 		id: "number"
@@ -679,7 +519,7 @@ test("One event on getters (#1585)", function() {
 
 	var AppState = define.Constructor({
 		person: {
-			get: function(lastSetValue, resolve) {
+			get: function appState_person_get(lastSetValue, resolve) {
 				if (lastSetValue) {
 					return lastSetValue;
 				} else if (this.personId) {
@@ -698,7 +538,7 @@ test("One event on getters (#1585)", function() {
 
 	var appState = new AppState();
 	var personEvents = 0;
-	appState.bind("person", function(ev, person) {
+	appState.bind("person", function addPersonEvents(ev, person) {
 		personEvents++;
 	});
 
@@ -722,7 +562,7 @@ test('Can read a defined property with a set/get method (#1648)', function() {
 
 	var Map = define.Constructor({
 		foo: {
-			value: '',
+			default: '',
 			set: function(setVal) {
 				return setVal;
 			},
@@ -749,7 +589,7 @@ test('Can bind to a defined property with a set/get method (#1648)', 3, function
 
 	var Map = define.Constructor({
 		foo: {
-			value: '',
+			default: '',
 			set: function(setVal) {
 				return setVal;
 			},
@@ -927,11 +767,11 @@ QUnit.test('Default values cannot be set (#8)', function() {
 	define(Person.prototype, {
 		first: {
 			type: 'string',
-			value: 'Chris'
+			default: 'Chris'
 		},
 		last: {
 			type: 'string',
-			value: 'Gomez'
+			default: 'Gomez'
 		},
 		fullName: {
 			get: function() {
@@ -954,10 +794,10 @@ QUnit.test('default type is setable', function() {
 	define(Person.prototype, {
 		'*': 'string',
 		first: {
-			value: 1
+			default: 1
 		},
 		last: {
-			value: 2
+			default: 2
 		}
 	});
 
@@ -979,27 +819,7 @@ QUnit.test("expandos are added in define.setup (#25)", function() {
 	map.prop = 5;
 });
 
-if (compute.prototype.trace) {
-	QUnit.test("logs work with maps", function() {
-		var MyMap = define.Constructor({
-			first: "string",
-			last: "string"
-		});
-		var m = new MyMap({
-			first: "J",
-			last: "M"
-		});
-		var fullName = compute(function() {
-			return m.first + m.last;
-		});
 
-		fullName.on("change", function() {});
-
-		var t = fullName.computeInstance.trace();
-		QUnit.equal(t.dependencies[0].obj, m);
-		QUnit.equal(t.dependencies[1].obj, m);
-	});
-}
 
 QUnit.test('Set property with type compute', function() {
 	var MyMap = define.Constructor({
@@ -1010,10 +830,10 @@ QUnit.test('Set property with type compute', function() {
 
 	var m = new MyMap();
 
-	m.computeProp = compute(0);
+	m.computeProp = new SimpleObservable(0);
 	equal(m.computeProp, 0, 'Property has correct value');
 
-	m.computeProp = compute(1);
+	m.computeProp = new SimpleObservable(1);
 	equal(m.computeProp, 1, 'Property has correct value');
 });
 
@@ -1021,7 +841,7 @@ QUnit.test('Compute type property can have a default value', function() {
 	var MyMap = define.Constructor({
 		computeProp: {
 			type: 'compute',
-			value: function() {
+			default: function() {
 				return 0;
 			}
 		}
@@ -1036,12 +856,12 @@ QUnit.test('Compute type property can have a default value', function() {
 
 QUnit.test('Compute type property with compute default value triggers change events when updated', function() {
 	var expected = 0;
-	var c = compute(0);
+	var c = new SimpleObservable(0);
 
 	var MyMap = define.Constructor({
 		computeProp: {
 			type: 'compute',
-			value: function() {
+			default: function() {
 				return c;
 			}
 		}
@@ -1049,7 +869,7 @@ QUnit.test('Compute type property with compute default value triggers change eve
 
 	var m = new MyMap();
 
-	c.bind('change', function(ev, newVal) {
+	c.on(function(newVal) {
 		equal(newVal, expected, 'Compute fired change event');
 	});
 
@@ -1061,16 +881,16 @@ QUnit.test('Compute type property with compute default value triggers change eve
 	m.computeProp = expected;
 
 	expected = 2;
-	c(expected);
+	c.set(expected);
 });
 
 QUnit.test('Compute type property can have a default value that is a compute', function() {
-	var c = compute(0);
+	var c = new SimpleObservable(0);
 
 	var MyMap = define.Constructor({
 		computeProp: {
 			type: 'compute',
-			value: function() {
+			default: function() {
 				return c;
 			}
 		}
@@ -1079,7 +899,7 @@ QUnit.test('Compute type property can have a default value that is a compute', f
 	var m = new MyMap();
 	equal(m.computeProp, 0, 'Property has correct value');
 
-	c(1);
+	c.set(1);
 	equal(m.computeProp, 1, 'Property has correct value');
 });
 
@@ -1091,18 +911,18 @@ QUnit.test('Extensions can modify definitions', function() {
 	define.extensions = function(objPrototype, prop, definition) {
 		if (definition.extended) {
 			return {
-				value: 'extended'
+				default: 'extended'
 			};
 		}
 	};
 
 	var MyMap = define.Constructor({
 		foo: {
-			value: 'defined',
+			default: 'defined',
 			extended: true,
 		},
 		bar: {
-			value: 'defined'
+			default: 'defined'
 		}
 	});
 
@@ -1228,10 +1048,10 @@ QUnit.test("shorthand getter (#56)", function() {
 
 	equal(p.fullName, "Mohamed Cherif", "fullName initialized right");
 
-	canBatch.start();
+	queues.batch.start();
 	p.first = "Justin";
 	p.last = "Meyer";
-	canBatch.stop();
+	queues.batch.stop();
 });
 
 QUnit.test("shorthand getter setter (#56)", function() {
@@ -1269,7 +1089,7 @@ QUnit.test("set and value work together (#87)", function(){
 
 	var Type = define.Constructor({
 		prop: {
-			value: 2,
+			default: 2,
 			set: function(num){
 				return num * num;
 			}
@@ -1287,13 +1107,13 @@ QUnit.test("async setter is provided", 5, function(){
 
 	var Type = define.Constructor({
 		prop: {
-			value: 2,
+			default: 2,
 			set: function(num, resolve){
 				resolve( num * num );
 			}
 		},
 		prop2: {
-			value: 3,
+			default: 3,
 			set: function(num, resolve){
 				RESOLVE = resolve;
 			}
@@ -1320,7 +1140,7 @@ QUnit.test("async setter is provided", 5, function(){
 QUnit.test('setter with default value causes an infinite loop (#142)', function(){
 	var A = define.Constructor({
 		val: {
-			value: 'hello',
+			default: 'hello',
 			set: function(val){
 				if(this.val) {}
 				return val;
@@ -1355,18 +1175,6 @@ QUnit.test('defined properties are configurable', function(){
 
 	var a = new A();
 	QUnit.equal(a.val, "bar", "It was redefined");
-});
-
-QUnit.test('define() should add a CID (#246)', function() {
-	var Greeting = function(message){
-		this.message = message;
-	};
-
-	define(Greeting.prototype, {
-		message: {type: "string"}
-	});
-	var g = new Greeting();
-	QUnit.ok(g._cid, "should have a CID property");
 });
 
 testHelpers.dev.devOnlyTest("Setting a value with only a get() generates a warning (#202)", function() {
@@ -1424,7 +1232,7 @@ testHelpers.dev.devOnlyTest("warn on using a Constructor for small-t type defini
 	define(VM.prototype, {
 		currency: {
 			type: Currency, // should be `Type: Currency`
-			value: function() {
+			default: function() {
 				return new Currency({});
 			}
 		}
@@ -1440,7 +1248,7 @@ testHelpers.dev.devOnlyTest("warn on using a Constructor for small-t type defini
 	define(VM2.prototype, {
 		currency: {
 			type: Currency, // should be `Type: Currency`
-			value: function() {
+			default: function() {
 				return new Currency({});
 			}
 		}

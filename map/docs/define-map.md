@@ -6,6 +6,7 @@
 @group can-define/map/map/events events
 @alias can.DefineMap
 @inherits can.Construct
+@templateRender true
 
 @description Create observable objects.
 
@@ -31,6 +32,43 @@ var person = new DefineMap({
 
 @body
 
+## Mixed-in instance methods and properties
+
+Instances of `DefineMap` have all methods and properties from
+[can-event-queue/map/map]:
+
+{{#each (getChildren [can-event-queue/map/map])}}
+- [{{name}}] - {{description}}{{/each}}
+
+Example:
+
+```js
+var MyType = DefineMap.extend({ prop: "string" });
+
+var myInstance = new MyType({prop: "VALUE"});
+
+myInstance.on("prop", function(event, newVal, oldVal){ ... });
+```
+
+
+## Mixed-in type methods and properties
+
+Extended `DefineMap` constructor functions have all methods and properties from
+[can-event-queue/type/type]:
+
+{{#each (getChildren [can-event-queue/type/type])}}
+- [{{name}}] - {{description}}{{/each}}
+
+Example:
+
+```js
+var MyType = DefineMap.extend({ ... });
+
+canReflect.onInstancePatches(MyType, function(instance, patches){
+
+});
+```
+
 ## Use
 
 `can-define/map/map` is used to create easily extensible observable types with well defined
@@ -43,7 +81,7 @@ var DefineMap = require("can-define/map/map");
 
 var Todo = DefineMap.extend({
 	name: "string",
-	completed: {type: "boolean", value: false},
+	completed: {type: "boolean", default: false},
 	toggle: function(){
 		this.completed = !this.completed;
 	}
@@ -219,7 +257,7 @@ todoVM.on("todo", function(ev, newVal){
 
 There's some functionality that a getter or an async getter can not describe
 declaratively.  For these situations, you can use [can-define.types.set] or
-even better, use the [can-define-stream] plugin.
+even better, use [can-define.types.value] or the [can-define-stream] plugin.
 
 For example, consider a __state__ and __city__ locator where you pick a United States
 __state__ like _Illinois_ and then a __city__ like _Chicago_.  In this example,
@@ -247,15 +285,43 @@ locator.state = "CA";
 locator.city //-> null;
 ```
 
-This isn't declarative anymore because changing state imperatively changes
-the value of `city`. The [can-define-stream] plugin can make this functionality
-entirely declarative.
+The problem with this code is that it relies on side effects to manage the behavior of
+`city`.  If someone wants to understand how `city` behaves, they might have search the entire
+map's code.  
+
+The [can-define.types.value] behavior and [can-define-stream-kefir] plugin allow you to consolidate the
+behavior of a property to a single place.  For example, the following implements `Locator` with [can-define.types.value]:
+
+```js
+var Locator = DefineMap.extend("Locator",{
+    state: "string",
+    city: {
+        value: function(prop) {
+            // When city is set, update `city` with the set value.
+            prop.listenTo(prop.lastSet, prop.resolve);
+
+            // When state is set, set `city` to null.
+            prop.listenTo("state", function(){
+                prop.resolve(null);
+            });
+
+            // Initialize the value to the `set` value.
+            prop.resolve( prop.lastSet.get() );
+        }
+    }
+});
+```
+
+While [functional reactive programming](https://en.wikipedia.org/wiki/Functional_reactive_programming) (FRP) can take time to
+master at first, once you do, your code will be much easier to understand and
+debug. The [can-define.types.value] behavior supports the basics of FRP programming - the ability to listen events and changes
+in other properties and `resolve` the property to a new value.  If you are looking for even more FRP capability,
+checkout [can-define-stream-kefir], which supports a full streaming library with many event-stream transformations:
 
 ```js
 var Locator = DefineMap.extend({
      state: "string",
      city: {
-         type: "string",
          stream: function(setStream) {
              return this.stream(".state").map(function(){
                  return null;
@@ -263,16 +329,6 @@ var Locator = DefineMap.extend({
          }
      }
 });
-
-var locator = new Locator({
-	state: "IL",
-	city: "Chicago"
-});
-
-locator.on("city", function(){});
-
-locator.state = "CA";
-locator.city //-> null;
 ```
 
 Notice, in the `can-define-stream` example, `city` must be bound for it to work.  

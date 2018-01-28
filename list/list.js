@@ -1,23 +1,23 @@
 var Construct = require("can-construct");
 var define = require("can-define");
 var make = define.make;
-var canEvent = require("can-event");
-var canBatch = require("can-event/batch/batch");
-var Observation = require("can-observation");
+var queues = require("can-queues");
+var addTypeEvents = require("can-event-queue/type/type");
+
+var ObservationRecorder = require("can-observation-recorder");
 var canLog = require("can-log");
 var canLogDev = require("can-log/dev/dev");
 var defineHelpers = require("../define-helpers/define-helpers");
+var dev = require("can-log/dev/dev");
+var ensureMeta = require("../ensure-meta");
 
 var assign = require("can-util/js/assign/assign");
 var diff = require("can-util/js/diff/diff");
 var each = require("can-util/js/each/each");
 var makeArray = require("can-util/js/make-array/make-array");
-var types = require("can-types");
 var ns = require("can-namespace");
 var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
-var CIDSet = require("can-util/js/cid-set/cid-set");
-var CIDMap = require("can-util/js/cid-map/cid-map");
 var singleReference = require("can-util/js/single-reference/single-reference");
 
 var splice = [].splice;
@@ -26,6 +26,9 @@ var runningNative = false;
 var identity = function(x) {
 	return x;
 };
+
+// symbols aren't enumerable ... we'd need a version of Object that treats them that way
+var localOnPatchesSymbol = "can.patches";
 
 var makeFilterCallback = function(props) {
 	return function(item) {
@@ -37,15 +40,21 @@ var makeFilterCallback = function(props) {
 		return true;
 	};
 };
+
+var onKeyValue = define.eventsProto[canSymbol.for("can.onKeyValue")];
+var offKeyValue = define.eventsProto[canSymbol.for("can.offKeyValue")];
+
 /** @add can-define/list/list */
 var DefineList = Construct.extend("DefineList",
 	/** @static */
 	{
 		setup: function(base) {
 			if (DefineList) {
-
+				addTypeEvents(this);
 				var prototype = this.prototype;
 				var result = define(prototype, prototype, base.prototype._define);
+				define.makeDefineInstanceKey(this, result);
+
 				var itemsDefinition = result.definitions["#"] || result.defaultDefinition;
 
 				if (itemsDefinition) {
@@ -95,24 +104,42 @@ var DefineList = Construct.extend("DefineList",
 			// `batchTrigger` direct add and remove events...
 
 			// Make sure this is not nested and not an expando
-			if (!~("" + attr).indexOf('.') && !isNaN(index)) {
+			if ( !isNaN(index)) {
 				var itemsDefinition = this._define.definitions["#"];
-
+				var patches;
 				if (how === 'add') {
 					if (itemsDefinition && typeof itemsDefinition.added === 'function') {
-						Observation.ignore(itemsDefinition.added).call(this, newVal, index);
+						ObservationRecorder.ignore(itemsDefinition.added).call(this, newVal, index);
 					}
-					canEvent.dispatch.call(this, how, [ newVal, index ]);
+
+					patches = [{type: "splice", insert: newVal, index: index, deleteCount: 0}];
+					this.dispatch({
+						type: how,
+						patches: patches,
+						//!steal-remove-start
+						reasonLog: [ canReflect.getName(this), "added", newVal, "at", index ],
+						//!steal-remove-end
+					}, [ newVal, index ]);
+
 				} else if (how === 'remove') {
 					if (itemsDefinition && typeof itemsDefinition.removed === 'function') {
-						Observation.ignore(itemsDefinition.removed).call(this, oldVal, index);
+						ObservationRecorder.ignore(itemsDefinition.removed).call(this, oldVal, index);
 					}
-					canEvent.dispatch.call(this, how, [ oldVal, index ]);
+
+					patches = [{type: "splice", index: index, deleteCount: oldVal.length}];
+					this.dispatch({
+						type: how,
+						patches: patches,
+						//!steal-remove-start
+						reasonLog: [ canReflect.getName(this), "remove", oldVal, "at", index ],
+						//!steal-remove-end
+					}, [ oldVal, index ]);
+
 				} else {
-					canEvent.dispatch.call(this, how, [ newVal, index ]);
+					this.dispatch(how, [ newVal, index ]);
 				}
 			} else {
-				canEvent.dispatch.call(this, {
+				this.dispatch({
 					type: "" + attr,
 					target: this
 				}, [ newVal, oldVal ]);
@@ -175,10 +202,14 @@ var DefineList = Construct.extend("DefineList",
 		 */
 		get: function(index) {
 			if (arguments.length) {
-				Observation.add(this, "" + index);
+				if(isNaN(index)) {
+					ObservationRecorder.add(this, index);
+				} else {
+					ObservationRecorder.add(this, "length");
+				}
 				return this[index];
 			} else {
-				return canReflect.unwrap(this, CIDMap);
+				return canReflect.unwrap(this, Map);
 			}
 		},
 		/**
@@ -465,7 +496,8 @@ var DefineList = Construct.extend("DefineList",
 			var args = makeArray(arguments),
 				added = [],
 				i, len, listIndex,
-				allSame = args.length > 2;
+				allSame = args.length > 2,
+				oldLength = this._length;
 
 			index = index || 0;
 
@@ -495,7 +527,7 @@ var DefineList = Construct.extend("DefineList",
 			var removed = splice.apply(this, args);
 			runningNative = false;
 
-			canBatch.start();
+			queues.batch.start();
 			if (howMany > 0) {
 				// tears down bubbling
 				this._triggerChange("" + index, "remove", undefined, removed);
@@ -504,9 +536,9 @@ var DefineList = Construct.extend("DefineList",
 				this._triggerChange("" + index, "add", added, removed);
 			}
 
-			canEvent.dispatch.call(this, 'length', [ this._length ]);
+			this.dispatch('length', [ this._length, oldLength ]);
 
-			canBatch.stop();
+			queues.batch.stop();
 			return removed;
 		},
 
@@ -535,9 +567,75 @@ var DefineList = Construct.extend("DefineList",
 		 *   @return {Array} An array with each item's serialied value.
 		 */
 		serialize: function() {
-			return canReflect.serialize(this, CIDMap);
+			return canReflect.serialize(this, Map);
+		},
+
+		// call `list.log()` to log all event changes
+		// pass `key` to only log the matching event, e.g: `list.log("add")`
+		log: function(key) {
+			//!steal-remove-start
+			var instance = this;
+
+			var quoteString = function quoteString(x) {
+				return typeof x === "string" ? JSON.stringify(x) : x;
+			};
+
+			var meta = ensureMeta(instance);
+			var allowed = meta.allowedLogKeysSet || new Set();
+			meta.allowedLogKeysSet = allowed;
+
+			if (key) {
+				allowed.add(key);
+			}
+
+			meta._log = function(event, data) {
+				var type = event.type;
+
+				if (type === "can.onPatches" || (key && !allowed.has(type))) {
+					return;
+				}
+
+				if (type === "add" || type === "remove") {
+					dev.log(
+						canReflect.getName(instance),
+						"\n how   ", quoteString(type),
+						"\n what  ", quoteString(data[0]),
+						"\n index ", quoteString(data[1])
+					);
+				} else {
+					// log `length` and `propertyName` events
+					dev.log(
+						canReflect.getName(instance),
+						"\n key ", quoteString(type),
+						"\n is  ", quoteString(data[0]),
+						"\n was ", quoteString(data[1])
+					);
+				}
+			};
+			//!steal-remove-end
 		}
+	}
+);
+
+for(var prop in define.eventsProto) {
+	Object.defineProperty(DefineList.prototype, prop, {
+		enumerable:false,
+		value: define.eventsProto[prop],
+		writable: true
 	});
+}
+
+var eventsProtoSymbols = ("getOwnPropertySymbols" in Object) ?
+  Object.getOwnPropertySymbols(define.eventsProto) :
+  [canSymbol.for("can.onKeyValue"), canSymbol.for("can.offKeyValue")];
+
+eventsProtoSymbols.forEach(function(sym) {
+  Object.defineProperty(DefineList.prototype, sym, {
+    enumerable:false,
+    value: define.eventsProto[sym],
+    writable: true
+  });
+});
 
 // Converts to an `array` of arguments.
 var getArgs = function(args) {
@@ -669,10 +767,10 @@ each({
 			runningNative = false;
 
 			if (!this.comparator || args.length) {
-				canBatch.start();
+				queues.batch.start();
 				this._triggerChange("" + len, "add", args, undefined);
-				canEvent.dispatch.call(this, 'length', [ this._length ]);
-				canBatch.stop();
+				this.dispatch('length', [ this._length, len ]);
+				queues.batch.stop();
 			}
 
 			return res;
@@ -766,6 +864,7 @@ each({
 
 			var args = getArgs(arguments),
 				len = where && this._length ? this._length - 1 : 0,
+				oldLength = this._length ? this._length : 0,
 				res;
 
 			// Call the original method.
@@ -778,10 +877,10 @@ each({
 			// `remove` - Items removed.
 			// `undefined` - The new values (there are none).
 			// `res` - The old, removed values (should these be unbound).
-			canBatch.start();
+			queues.batch.start();
 			this._triggerChange("" + len, "remove", undefined, [ res ]);
-			canEvent.dispatch.call(this, 'length', [ this._length ]);
-			canBatch.stop();
+			this.dispatch('length', [ this._length, oldLength ]);
+			queues.batch.stop();
 
 			return res;
 		};
@@ -1157,7 +1256,7 @@ assign(DefineList.prototype, {
 	 *
 	 */
 	join: function() {
-		Observation.add(this, "length");
+		ObservationRecorder.add(this, "length");
 		return [].join.apply(this, arguments);
 	},
 
@@ -1223,7 +1322,7 @@ assign(DefineList.prototype, {
 	 */
 	slice: function() {
 		// tells computes to listen on length for changes.
-		Observation.add(this, "length");
+		ObservationRecorder.add(this, "length");
 		var temp = Array.prototype.slice.apply(this, arguments);
 		return new this.constructor(temp);
 	},
@@ -1360,14 +1459,14 @@ assign(DefineList.prototype, {
 	replace: function(newList) {
 		var patches = diff(this, newList);
 
-		canBatch.start();
+		queues.batch.start();
 		for (var i = 0, len = patches.length; i < len; i++) {
 			this.splice.apply(this, [
 				patches[i].index,
 				patches[i].deleteCount
 			].concat(patches[i].insert));
 		}
-		canBatch.stop();
+		queues.batch.stop();
 
 		return this;
 	},
@@ -1420,11 +1519,11 @@ assign(DefineList.prototype, {
 		Array.prototype.sort.call(this, compareFunction);
 		var added = Array.prototype.slice.call(this);
 
-		canBatch.start();
-		canEvent.dispatch.call(this, 'remove', [ removed, 0 ]);
-		canEvent.dispatch.call(this, 'add', [ added, 0 ]);
-		canEvent.dispatch.call(this, 'length', [ this._length, this._length ]);
-		canBatch.stop();
+		queues.batch.start();
+		this.dispatch('remove', [ removed, 0 ]);
+		this.dispatch('add', [ added, 0 ]);
+		this.dispatch('length', [ this._length, this._length ]);
+		queues.batch.stop();
 		return this;
 	}
 });
@@ -1443,7 +1542,7 @@ for (var prop in define.eventsProto) {
 Object.defineProperty(DefineList.prototype, "length", {
 	get: function() {
 		if (!this.__inSetup) {
-			Observation.add(this, "length");
+			ObservationRecorder.add(this, "length");
 		}
 		return this._length;
 	},
@@ -1472,11 +1571,6 @@ Object.defineProperty(DefineList.prototype, "length", {
 	enumerable: true
 });
 
-Object.defineProperty(DefineList.prototype, "each", {
-	enumerable: false,
-	writable: true,
-	value: DefineList.prototype.forEach
-});
 DefineList.prototype.attr = function(prop, value) {
 	canLog.warn("DefineMap::attr shouldn't be called");
 	if (arguments.length === 0) {
@@ -1514,35 +1608,33 @@ canReflect.assignSymbols(DefineList.prototype,{
 
 	// Called for every reference to a property in a template
 	// if a key is a numerical index then translate to length event
-	"can.onKeyValue": function(key, handler) {
+	"can.onKeyValue": function(key, handler, queue) {
 		var translationHandler;
 		if (isNaN(key)) {
-			translationHandler = function(ev, newValue, oldValue) {
-				handler(newValue, oldValue);
-			};
-			this.addEventListener(key, translationHandler);
+			return onKeyValue.apply(this, arguments);
 		}
 		else {
 			translationHandler = function() {
 				handler(this[key]);
 			};
-
+			//!steal-remove-start
+			Object.defineProperty(translationHandler, "name", {
+				value: "translationHandler(" + key + ")::" + canReflect.getName(this) + ".onKeyValue('length'," + canReflect.getName(handler) + ")",
+			});
+			//!steal-remove-end
 			singleReference.set(handler, this, translationHandler, key);
-			this.addEventListener('length', translationHandler);
+			return onKeyValue.call(this, 'length',  translationHandler, queue);
 		}
 	},
 	// Called when a property reference is removed
-	"can.offKeyValue": function(key, handler) {
+	"can.offKeyValue": function(key, handler, queue) {
 		var translationHandler;
-		if (isNaN(key)) {
-			translationHandler = function(ev, newValue, oldValue) {
-				handler(newValue, oldValue);
-			};
-			this.removeEventListener(key, translationHandler);
+		if ( isNaN(key)) {
+			return offKeyValue.apply(this, arguments);
 		}
 		else {
 			translationHandler = singleReference.getAndDelete(handler, this, key);
-			this.removeEventListener('length', translationHandler);
+			return offKeyValue.call(this, 'length',  translationHandler, queue);
 		}
 	},
 
@@ -1563,14 +1655,14 @@ canReflect.assignSymbols(DefineList.prototype,{
 	},
 	// shape get/set
 	"can.assignDeep": function(source){
-		canBatch.start();
+		queues.batch.start();
 		canReflect.assignList(this, source);
-		canBatch.stop();
+		queues.batch.stop();
 	},
 	"can.updateDeep": function(source){
-		canBatch.start();
+		queues.batch.start();
 		this.replace(source);
-		canBatch.stop();
+		queues.batch.stop();
 	},
 
 	// observability
@@ -1581,22 +1673,33 @@ canReflect.assignSymbols(DefineList.prototype,{
 		var ret;
 		if(this._computed && this._computed[key] && this._computed[key].compute) {
 			ret = {};
-			ret.valueDependencies = new CIDSet();
-			ret.valueDependencies.add(this._computed[key].compute);
+			ret.valueDependencies = new Set([
+				this._computed[key].compute
+			]);
 		}
 		return ret;
 	},
-
-	// Deprecated
-	"can.onKeysAdded": function(handler) {
-		this[canSymbol.for("can.onKeyValue")]("add", handler);
+	/*"can.onKeysAdded": function(handler,queue) {
+		this[canSymbol.for("can.onKeyValue")]("add", handler,queue);
 	},
-	"can.onKeysRemoved": function(handler) {
-		this[canSymbol.for("can.onKeyValue")]("remove", handler);
-	},
+	"can.onKeysRemoved": function(handler,queue) {
+		this[canSymbol.for("can.onKeyValue")]("remove", handler,queue);
+	},*/
 	"can.splice": function(index, deleteCount, insert){
 		this.splice.apply(this, [index, deleteCount].concat(insert));
-	}
+	},
+	"can.onPatches": function(handler,queue){
+		this[canSymbol.for("can.onKeyValue")](localOnPatchesSymbol, handler,queue);
+	},
+	"can.offPatches": function(handler,queue) {
+		this[canSymbol.for("can.offKeyValue")](localOnPatchesSymbol, handler,queue);
+	},
+
+	//!steal-remove-start
+	"can.getName": function() {
+		return canReflect.getName(this.constructor) + "[]";
+	},
+	//!steal-remove-end
 });
 
 canReflect.setKeyValue(DefineList.prototype, canSymbol.iterator, function() {
@@ -1615,6 +1718,6 @@ canReflect.setKeyValue(DefineList.prototype, canSymbol.iterator, function() {
 	};
 });
 
-types.DefineList = DefineList;
-types.DefaultList = DefineList;
+define.DefineList = DefineList;
+
 module.exports = ns.DefineList = DefineList;

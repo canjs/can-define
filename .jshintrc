@@ -23,8 +23,11 @@
 		"stop": true,
 		"global": true,
 		"event": true,
-		"define": true
+		"define": true,
+		"Set": true,
+		"Map": true
 	},
+	"validthis": true,
 	"curly": true,
 	"eqeqeq": true,
 	"freeze": true,
