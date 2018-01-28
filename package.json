@@ -32,19 +32,18 @@
   "dependencies": {
     "can-construct": "^3.2.0",
     "can-define-lazy-value": "^1.0.0",
-    "can-event-queue": "<2.0.0",
-    "can-log": "^0.1.0",
+    "can-event-queue": "^1.0.0",
+    "can-log": "^1.0.0",
     "can-namespace": "^1.0.0",
-    "can-observation": "^4.0.0-pre.20",
-    "can-observation-recorder": "<2.0.0",
-    "can-queues": "<2.0.0",
+    "can-observation": "^4.0.0",
+    "can-observation-recorder": "^1.0.0",
+    "can-queues": "^1.0.0",
     "can-reflect": "^1.7.0",
-    "can-simple-observable": "^2.0.0-pre.32",
+    "can-simple-observable": "^2.0.0",
     "can-symbol": "^1.0.0",
     "can-util": "^3.9.0"
   },
   "devDependencies": {
-    "bit-docs": "^0.0.7",
     "can-reflect-tests": "<2.0.0",
     "can-test-helpers": "^1.1.0",
     "detect-cyclic-packages": "^1.1.0",
@@ -52,7 +51,6 @@
     "serve": "^6.0.1",
     "steal": "^1.0.7",
     "steal-qunit": "^1.0.0",
-    "steal-tools": "^1.4.0",
     "testee": "^0.7.0"
   }
 }
