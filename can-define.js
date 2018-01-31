@@ -37,7 +37,8 @@ var Object_defineNamedPrototypeProperty = Object.defineProperty;
 Object_defineNamedPrototypeProperty = function(obj, prop, definition) {
 	if (definition.get) {
 		Object.defineProperty(definition.get, "name", {
-			value: "get "+canReflect.getName(obj) + "."+prop
+			value: "get "+canReflect.getName(obj) + "."+prop,
+			writable: true
 		});
 	}
 	if (definition.set) {
