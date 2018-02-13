@@ -8,15 +8,17 @@ observable property.  These behaviors can be specified with as an `Object`, `Str
 @type {Object} Defines multiple behaviors for a single property.
 
 ```js
-propertyName: {
-  default: function(){ ... },
-  Default: Constructor,
-  type: function(){ ... },
-  Type: Constructor,
-  get: function(){ ... },
-  value: function(){ ... },
-  set: function(){ ... },
-  serialize: function(){ ... }
+{
+	propertyName: {
+	  default: function(){ ... },
+	  Default: Constructor,
+	  type: function(){ ... },
+	  Type: Constructor,
+	  get: function(){ ... },
+	  value: function(){ ... },
+	  set: function(){ ... },
+	  serialize: function(){ ... }
+	}
 }
 ```
 
@@ -32,7 +34,7 @@ propertyName: {
       address: {
         value: function(){
           return {city: "Chicago", state: "IL"};
-        };
+        }
       }
     });
     ```
@@ -149,68 +151,89 @@ propertyName: {
         }
       }
     });
+    ```
 
 @type {String} Defines a [can-define.types.type] converter as one of the named types in [can-define.types].
 
 ```js
-propertyName: "typeName"
+{
+	propertyName: "typeName"
+}
 ```
 
 @type {Constructor} Either creates a method or Defines a [can-define.types.typeConstructor Type] setting with a constructor function.  Constructor functions are identified with [can-reflect.isConstructorLike].
 
-```
-propertyName: Constructor
+```js
+{
+	propertyName: Constructor
+}
 ```
 OR
-```
-propertyName: function() {}
+```js
+{
+	propertyName: function() {}
+}
 ```
 
 For example:
 ```js
-subMap: DefineMap // <- sets Type to DefineMap
+{
+	subMap: DefineMap // <- sets Type to DefineMap
+}
 ```
 OR
 ```js
-increment: function() { ++this.count } // <- sets method prop
+{
+	increment: function() { ++this.count } // <- sets method prop
+}
 ```
 
 @type {Array} Defines an inline [can-define/list/list] Type setting. This is
 used as a shorthand for creating a property that is an [can-define/list/list] of another type.
 
 ```
-propertyName: [Constructor | propDefinitions]
+{
+	propertyName: [Constructor | propDefinitions]
+}
 ```
 
 For example:
 
 ```js
-users: [User],
-todos: [{complete: "boolean", name: "string"}]
+{
+	users: [User],
+	todos: [{complete: "boolean", name: "string"}]
+}
 ```
 
 @type {GETTER} Defines a property's [can-define.types.get] behavior with the
 [https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get syntax].
 
 ```js
-get propertyName(){ ... }
+{
+	get propertyName(){ ... }
+}
 ```
 
 For example:
 
 ```js
-get fullName() {
-    return this.first + " " + this.last;
+{
+	get fullName() {
+	    return this.first + " " + this.last;
+	}
 }
 ```
 
 This is a shorthand for providing an object with a `get` property like:
 
-```
-fullName: {
-    get: function(){
-        return this.first + " " + this.last;
-    }
+```js
+{
+	fullName: {
+	    get: function(){
+	        return this.first + " " + this.last;
+	    }
+	}
 }
 ```
 
@@ -221,28 +244,34 @@ or `resolve` arguments.
 [set syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set).
 
 ```js
-set propertyName(newValue){ ... }
+{
+	set propertyName(newValue){ ... }
+}
 ```
 
 For example:
 
 ```js
-set fullName(newValue) {
-    var parts = newVal.split(" ");
-    this.first = parts[0];
-    this.last = parts[1];
+{
+	set fullName(newValue) {
+	    var parts = newVal.split(" ");
+	    this.first = parts[0];
+	    this.last = parts[1];
+	}
 }
 ```
 
 This is a shorthand for providing an object with a `set` property like:
 
 ```
-fullName: {
-    set: function(newValue){
-        var parts = newVal.split(" ");
-        this.first = parts[0];
-        this.last = parts[1];
-    }
+{
+	fullName: {
+	    set: function(newValue){
+	        var parts = newVal.split(" ");
+	        this.first = parts[0];
+	        this.last = parts[1];
+	    }
+	}
 }
 ```
 
@@ -261,19 +290,19 @@ get converted to a `PropDefinition` as follows:
 
 ```js
 DefineMap.extend({
-  propertyA: Object      -> PropertyDefinition
-  propertyB: String      -> {type: String}
-  propertyC: Constructor -> {Type: Constructor}
-  propertyD: [PropDefs]  -> {Type: DefineList.extend({"#": PropDefs})>}
-  get propertyE(){...}   -> {get: propertyE(){...}}
-  set propertyF(){...}   -> {get: propertyF(){...}}
-  method: Function
-})
+  propertyA: Object,      // -> PropertyDefinition
+  propertyB: String,      // -> {type: String}
+  propertyC: Constructor, // -> {Type: Constructor}
+  propertyD: [PropDefs],  // -> {Type: DefineList.extend({"#": PropDefs})>}
+  get propertyE(){...},   // -> {get: propertyE(){...}}
+  set propertyF(value){...},   // -> {set: propertyF(value){...}}
+  method: Function,
+});
 ```
 
 Within a property definition, the available properties and their signatures look like:
 
-```js
+```
 DefineMap.extend({
   property: {
     get: function(lastSetValue, resolve){...},
@@ -305,7 +334,7 @@ var Person = DefineMap.extend("Person",{
 
 var person = new Person({
   addresses: [{street: "1134 Pinetree"}],
-  name: {first: "Kath", last: "Iann"}
+  name: {first: "Kath", last: "Iann"},
   cars: [{ make: "Nissan", year: 2010 }]
 });
 ```

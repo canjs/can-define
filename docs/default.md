@@ -9,8 +9,10 @@ is read for the first time.
 A function can be provided that returns the default value used for this property, like:
 
 ```js
-prop: {
-  default: function(){ return []; }
+{
+	prop: {
+		default: function(){ return []; }
+	}
 }
 ```
 
@@ -24,8 +26,10 @@ If the default value should be an object of some type, it should be specified as
 Any value can be provided as the default value used for this property, like:
 
 ```
-prop: {
-  default: 'foo'
+{
+	prop: {
+		default: 'foo'
+	}
 }
 ```
 
@@ -46,7 +50,7 @@ var Person = DefineMap.extend({
   address: {
     default: function(){
       return {city: "Chicago", state: "IL"};
-    };
+    }
   }
 });
 ```

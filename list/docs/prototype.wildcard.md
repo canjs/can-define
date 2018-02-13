@@ -12,8 +12,10 @@ makes every property run through the "observable" [can-define.types] converter.
 It looks like:
 
 ```js
-"*": {
-  type: "observable"
+{
+	"*": {
+	  type: "observable"
+	}
 }
 ```
 
@@ -23,7 +25,7 @@ Setting the wildcard is useful when all properties should be converted to a part
 var Person = DefineList.extend({ ... });
 
 var People = DefineList.extend({
-  "*": "string"
+  "*": "string",
   "#": Person
 });
 

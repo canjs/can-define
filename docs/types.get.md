@@ -14,11 +14,13 @@ other properties on the object, or the property value that was set on the object
 Specify `get` like:
 
 ```js
-propertyName: {
-    get: function(){ ... }
-},
-propertyName: {
-    get: function(lastSetValue) { ... }
+{
+	propertyName: {
+	    get: function(){ ... }
+	},
+	propertyName: {
+	    get: function(lastSetValue) { ... }
+	}
 }
 ```
 
@@ -38,8 +40,10 @@ Only observed properties (via [can-event.on], [can-event.addEventListener], etc)
 Specify `get` like:
 
 ```js
-propertyName: {
-  get: function(lastSetValue, resolve){ ... }
+{
+	propertyName: {
+	  get: function(lastSetValue, resolve){ ... }
+	}
 }
 ```
 
@@ -115,7 +119,7 @@ they are not bound to, the `get` function will be called each time.
 
 The following example will make multiple `Person.get` requests:
 
-```
+```js
 var state = new AppState({personId: 5});
 state.person //-> undefined
 
@@ -125,7 +129,7 @@ state.person //-> undefined
 
 However, by binding, the compute only reruns the `get` function once `personId` changes:
 
-```
+```js
 var state = new AppState({personId: 5});
 
 state.on("person", function(){})
@@ -139,7 +143,7 @@ state.person //-> Person<{id: 5}>
 A template like [can-stache] will automatically bind for you, so you can pass
 `state` to the template like the following without binding:
 
-```
+```js
 var template = stache("<span>{{person.fullName}}</span>");
 var state = new AppState({});
 var frag = template(state);
@@ -162,7 +166,7 @@ A getter can be used to derive a value from a set value. A getter's
 For example, a property might be set to a compute, but when read, provides the value
 of the compute.
 
-```
+```js
 var MyMap = DefineMap.extend({
     value: {
         get: function( lastSetValue ){
@@ -195,7 +199,7 @@ instance of `Store` is created.  However, as `locations` change,
 the [can-define/list/list] will be updated with the `id`s of the `locations`.
 
 
-```
+```js
 var Store = DefineMap.extend({
     locations: DefineList,
 	locationIds: {

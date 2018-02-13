@@ -18,16 +18,20 @@ The behavior of the setter depends on the number of arguments specified. This me
 setter like:
 
 ```js
-prop: {
-    set: function(){}
+{
+	prop: {
+	    set: function(){}
+	}
 }
 ```
 
 behaves differently than:
 
 ```js
-prop: {
-    set: function(newVal){}
+{
+	prop: {
+	    set: function(newVal){}
+	}
 }
 ```
 
@@ -62,25 +66,29 @@ The following makes setting a `page` property update the `offset`:
 
 
 ```js
-page: {
-    set: function(newVal){
-        this.offset =  (parseInt(newVal) - 1) * this.limit;
-    }
+{
+	page: {
+	    set: function(newVal){
+	        this.offset =  (parseInt(newVal) - 1) * this.limit;
+	    }
+	}
 }
 ```
 
 The following makes changing `makeId` un-define the `modelId` property:
 
 ```
-makeId: {
-    set: function(newValue){
-        // Check if we are changing.
-        if(newValue !== this.makeId) {
-            this.modelId = undefined;
-        }
-        // Must return value to set as we have a `newValue` argument.
-        return newValue;
-    }
+{
+	makeId: {
+	    set: function(newValue){
+	        // Check if we are changing.
+	        if(newValue !== this.makeId) {
+	            this.modelId = undefined;
+	        }
+	        // Must return value to set as we have a `newValue` argument.
+	        return newValue;
+	    }
+	}
 }
 ```
 
@@ -89,10 +97,12 @@ makeId: {
 The following shows an async setter:
 
 ```js
-prop: {
-    set: function( newVal, setVal){
-        $.get("/something", {}, setVal );
-    }
+{
+	prop: {
+	    set: function( newVal, setVal){
+	        $.get("/something", {}, setVal );
+	    }
+	}
 }
 ```
 

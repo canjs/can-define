@@ -61,12 +61,14 @@ derive the property value.  The following makes `property` behave like a
 normal object property that can be get or set:
 
 ```js
-property: {
-  value: function(prop) {
-      // Make sure the initial value is whatever was set.
-      resolve(prop.lastSet.get())
-      // When the property is set, update the read value.
-      listenTo(prop.lastSet,resolve);
-  }
+{
+	property: {
+	  value: function(prop) {
+	      // Make sure the initial value is whatever was set.
+	      resolve(prop.lastSet.get())
+	      // When the property is set, update the read value.
+	      listenTo(prop.lastSet,resolve);
+	  }
+	}
 }
 ```

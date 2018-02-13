@@ -11,8 +11,10 @@ makes every item run through the "observable" [can-define.types] converter.
 It looks like:
 
 ```js
-"#": {
-  type: "observable"
+{
+	"#": {
+	  type: "observable"
+	}
 }
 ```
 

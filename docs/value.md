@@ -115,13 +115,15 @@ behavior:
   normal object property that can be get or set:
 
   ```js
-  property: {
-    value: function(prop) {
-        // Set `property` initial value to set value.
-        prop.resolve(prop.lastSet.get())
-        // When the property is set, update `property`.
-        prop.listenTo(prop.lastSet,prop.resolve);
-    }
+  {
+	  property: {
+	    value: function(prop) {
+	        // Set `property` initial value to set value.
+	        prop.resolve(prop.lastSet.get())
+	        // When the property is set, update `property`.
+	        prop.listenTo(prop.lastSet,prop.resolve);
+	    }
+	  }
   }
   ```
 

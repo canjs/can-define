@@ -12,11 +12,13 @@ value is created on demand when the property is read for the first time.
 Specify `Default` like:
 
 ```js
-prop: {
+{
+  prop: {
     Default: Array
-},
-person: {
-	Default: Person
+  },
+  person: {
+    Default: Person
+  }
 }
 ```
 
