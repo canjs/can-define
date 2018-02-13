@@ -8,29 +8,29 @@
 Extends DefineList, or constructor functions derived from DefineList,
 to create a new constructor function.
 
-```javascript
+```js
 import DefineList from "can-define/list/list";
 
 const TodoList = DefineList.extend(
-  "TodoList",
-  {
-    "#": {type: {complete: "boolean", name: "string"}},
-    availableCount: "number",
-    completedCount: {
-      get: function(){
-        return this.filter({complete: true}).length;
-      }
-    },
-    completeAll: function(){
-      this.forEach(function(todo){
-        todo.complete = true;
-      })
-    }
-  });
+	"TodoList",
+	{
+		"#": {type: {complete: "boolean", name: "string"}},
+		availableCount: "number",
+		completedCount: {
+			get: function(){
+				return this.filter({complete: true}).length;
+			}
+		},
+		completeAll: function(){
+			this.forEach(function(todo){
+				todo.complete = true;
+			})
+		}
+	});
 
 const todos = new TodoList([
-  {name: "dishes", complete: false},
-  {name: "lawn", complete: false}
+	{name: "dishes", complete: false},
+	{name: "lawn", complete: false}
 ]);
 todos.availableCount = 100;
 

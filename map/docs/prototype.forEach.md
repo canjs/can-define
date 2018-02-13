@@ -8,7 +8,7 @@
 `forEach` iterates through the map instance, calling a function
 for each property value and key.
 
-```javascript
+```js
 map.forEach(function(value, propName){ /* ... */ });
 ```
 

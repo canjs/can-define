@@ -7,7 +7,7 @@
 @option {Boolean} If `true`, in development, instances of this object will be [sealed](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/seal).  In  [strict mode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode) errors will be thrown when undefined properties are set.  This is the default
 behavior of [can-define/map/map.extend extended DefineMaps]:
 
-```javascript
+```js
 "use strict";
 const Person = DefineMap.extend({});
 const me = new Person();
@@ -17,7 +17,7 @@ me.age = 33 //-> throws "TypeError: Can't add property age, object is not extens
 If `false`, the object will not be sealed.  This is the default behavior of
 unextended [can-define/map/map DefineMaps].  Use [can-define/map/map.prototype.get] and [can-define/map/map.prototype.set] to get and set values:
 
-```javascript
+```js
 const person = new DefineMap();
 person.set("first","Justin");
 person.set("last","Meyer");
@@ -28,7 +28,7 @@ person.get("last") //-> "Meyer"
 
 It is also possible to extend a sealed object and unseal it:
 
-```javascript
+```js
 "use strict";
 const Person = DefineMap.extend({});
 const Programmer = Person.extend({seal: false}, {});
@@ -38,17 +38,17 @@ me.age = 33; // no error thrown
 
 Set `seal` to `false` on objects that have an indeterminate number of properties:
 
-```javascript
+```js
 const Style = DefineMap.extend({
-  seal: false
+	seal: false
 },{
-  cssText: {
-    get: function(){
-      return _.map(this.get(), function(val, prop){
-        return prop+": "+val;
-      }).join(";")
-    }
-  }
+	cssText: {
+		get: function(){
+			return _.map(this.get(), function(val, prop){
+				return prop+": "+val;
+			}).join(";")
+		}
+	}
 });
 const style = new Style();
 style.set("color","green");

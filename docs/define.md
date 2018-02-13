@@ -12,15 +12,15 @@ and their behavior on a prototype object.
 
 Define observable properties, type conversion, and getter/setter logic on [https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain prototype objects].
 
-```javascript
+```js
 import define from "can-define";
 
 const Greeting = function(message){
-    this.message = message;
+	this.message = message;
 };
 
 define(Greeting.prototype,{
-    message: {type: "string"}
+	message: {type: "string"}
 });
 ```
 
@@ -47,35 +47,35 @@ to create completely customized types.
 The following creates a
 `Person` constructor function:
 
-```javascript
+```js
 import define from "can-define";
 
 const Person = function(first, last){
-  this.first = first;
-  this.last = last;
+	this.first = first;
+	this.last = last;
 };
 define(Person.prototype,{
-  first: { type: "string" },
-  last: { type: "string" },
-  fullName: {
-    get: function(){
-      return this.first+" "+this.last;
-    }
-  }
+	first: { type: "string" },
+	last: { type: "string" },
+	fullName: {
+		get: function(){
+			return this.first+" "+this.last;
+		}
+	}
 });
 ```
 
 This can be used to create `Person` instances with observable properties:
 
-```javascript
+```js
 const person = new Person("Justin", "Meyer");
 person.first    //-> "Justin"
 person.last     //-> "Meyer"
 person.fullName //-> "Justin Meyer"
 
 person.on("fullName", function(ev, newVal, oldVal){
-    newVal //-> "Ramiya Meyer"
-    oldVal //-> "Justin Meyer"
+	newVal //-> "Ramiya Meyer"
+	oldVal //-> "Justin Meyer"
 });
 
 person.first = "Ramiya"

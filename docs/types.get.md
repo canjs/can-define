@@ -13,14 +13,14 @@ other properties on the object, or the property value that was set on the object
 
 Specify `get` like:
 
-```javascript
+```js
 {
-  propertyName: {
-      get: function(){ /* ... */ }
-  },
-  propertyName: {
-      get: function(lastSetValue) { /* ... */ }
-  }
+	propertyName: {
+		get: function(){ /* ... */ }
+	},
+	propertyName: {
+		get: function(lastSetValue) { /* ... */ }
+	}
 }
 ```
 
@@ -39,11 +39,11 @@ Only observed properties (via [can-event.on], [can-event.addEventListener], etc)
 
 Specify `get` like:
 
-```javascript
+```js
 {
-  propertyName: {
-    get: function(lastSetValue, resolve){ /* ... */ }
-  }
+	propertyName: {
+		get: function(lastSetValue, resolve){ /* ... */ }
+	}
 }
 ```
 
@@ -73,15 +73,15 @@ from some other properties on the map.
 Whenever a getter is provided, it is wrapped in a [can-compute], which ensures
 that whenever its dependent properties change, a change event will fire for this property also.
 
-```javascript
+```js
 const Person = DefineMap.extend({
-    first: "string",
-    last: "string",
-  fullName: {
-    get: function () {
-      return this.first + " " + this.last;
-    }
-  }
+	first: "string",
+	last: "string",
+	fullName: {
+		get: function () {
+			return this.first + " " + this.last;
+		}
+	}
 });
 
 const p = new Person({first: "Justin", last: "Meyer"});
@@ -89,7 +89,7 @@ const p = new Person({first: "Justin", last: "Meyer"});
 p.fullName; // "Justin Meyer"
 
 p.on("fullName", function(ev, newVal){
-  newVal //-> "Lincoln Meyer";
+	newVal //-> "Lincoln Meyer";
 });
 
 p.first = "Lincoln";
@@ -100,17 +100,17 @@ p.first = "Lincoln";
 Often, a virtual property's value only becomes available after some period of time.  For example,
 given a `personId`, one might want to retrieve a related person:
 
-```javascript
+```js
 const AppState = DefineMap.extend({
-    personId: "number",
-    person: {
-        get: function(lastSetValue, resolve){
-          Person.get({id: this.personId})
-          .then(function(person){
-                       resolve(person);
-          });
-        }
-    }
+	personId: "number",
+	person: {
+		get: function(lastSetValue, resolve){
+			Person.get({id: this.personId})
+				.then(function(person){
+					resolve(person);
+				});
+		}
+	}
 });
 ```
 
@@ -119,7 +119,7 @@ they are not bound to, the `get` function will be called each time.
 
 The following example will make multiple `Person.get` requests:
 
-```javascript
+```js
 const state = new AppState({personId: 5});
 state.person //-> undefined
 
@@ -129,7 +129,7 @@ state.person //-> undefined
 
 However, by binding, the compute only reruns the `get` function once `personId` changes:
 
-```javascript
+```js
 const state = new AppState({personId: 5});
 
 state.on("person", function(){})
@@ -143,7 +143,7 @@ state.person //-> Person<{id: 5}>
 A template like [can-stache] will automatically bind for you, so you can pass
 `state` to the template like the following without binding:
 
-```javascript
+```js
 const template = stache("<span>{{person.fullName}}</span>");
 const state = new AppState({});
 const frag = template(state);
@@ -166,13 +166,13 @@ A getter can be used to derive a value from a set value. A getter's
 For example, a property might be set to a compute, but when read, provides the value
 of the compute.
 
-```javascript
+```js
 const MyMap = DefineMap.extend({
-    value: {
-        get: function( lastSetValue ){
-            return lastSetValue();
-        }
-    }
+	value: {
+		get: function( lastSetValue ){
+			return lastSetValue();
+		}
+	}
 });
 
 const map = new MyMap();
@@ -199,17 +199,17 @@ instance of `Store` is created.  However, as `locations` change,
 the [can-define/list/list] will be updated with the `id`s of the `locations`.
 
 
-```javascript
+```js
 const Store = DefineMap.extend({
-    locations: DefineList,
-  locationIds: {
-    Default: DefineList,
-    get: function(initialValue){
-      const ids = this.locations.map(function(location){
-        ids.push(location.id);
-      });
-      return initialValue.replace(ids);
-    }
-  }
+	locations: DefineList,
+	locationIds: {
+		Default: DefineList,
+		get: function(initialValue){
+			const ids = this.locations.map(function(location){
+				ids.push(location.id);
+			});
+			return initialValue.replace(ids);
+		}
+	}
 });
 ```

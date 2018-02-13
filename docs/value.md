@@ -16,25 +16,25 @@ dispatched on the map or other observables,
 to set a new value on the observable. For example, the following
 counts the number of times the `name` property changed:
 
-```javascript
+```js
 Person = DefineMap.extend("Person",{
-    name: "string",
-    nameChangeCount: {
-        value(prop){
-            let count = 0;
+	name: "string",
+	nameChangeCount: {
+		value(prop){
+			let count = 0;
 
-            prop.listenTo("name", () => {
-                prop.resolve(++count);
-            });
+			prop.listenTo("name", () => {
+				prop.resolve(++count);
+			});
 
-            prop.resolve(count);
-        }
-    }
+			prop.resolve(count);
+		}
+	}
 });
 
 const p = new Person();
 p.on("nameChangedCount", (ev, newVal)=> {
-    console.log("name changed", newVal, "times");
+	console.log("name changed", newVal, "times");
 });
 
 p.name = "Justin" // logs name changed 1 times
@@ -65,18 +65,18 @@ behavior:
 
   Examples:
 
-  ```javascript
-  // Binds to the map's `name` event:
-  prop.listenTo("name", handler)     
+  ```js
+// Binds to the map's `name` event:
+prop.listenTo("name", handler)     
 
-  // Binds to the todos `length` event:
-  prop.listenTo(todos, "length", handler)
+// Binds to the todos `length` event:
+prop.listenTo(todos, "length", handler)
 
-  // Binds to the `todos` `length` event in the mutate queue:
-  prop.listenTo(todos, "length", handler, "mutate")
+// Binds to the `todos` `length` event in the mutate queue:
+prop.listenTo(todos, "length", handler, "mutate")
 
-  // Binds to an `onValue` emitter:
-  prop.listenTo(observable, handler) //
+// Binds to an `onValue` emitter:
+prop.listenTo(observable, handler) //
   ```
 
 - __prop.stopListening(bindTarget, event, handler, queue)__ `{function(Any,String,Fuction,String)}`  A function that removes bindings
@@ -87,26 +87,26 @@ behavior:
 
   Examples:
 
-  ```javascript
-  // Unbind all handlers bound using `listenTo`:
-  prop.stopListening()    
+  ```js
+// Unbind all handlers bound using `listenTo`:
+prop.stopListening()    
 
-  // Unbind handlers to the map's `name` event:
-  prop.stopListening("name")   
+// Unbind handlers to the map's `name` event:
+prop.stopListening("name")   
 
-  // Unbind a specific handler on the map's `name` event
-  // registered in the "notify" queue.
-  prop.stopListening("name", handler)    
+// Unbind a specific handler on the map's `name` event
+// registered in the "notify" queue.
+prop.stopListening("name", handler)    
 
-  // Unbind all handlers bound to `todos` using `listenTo`:
-  prop.stopListening(todos)
+// Unbind all handlers bound to `todos` using `listenTo`:
+prop.stopListening(todos)
 
-  // Unbind all `length` handlers bound to `todos`
-  // using `listenTo`:
-  prop.stopListening(todos, "length")
+// Unbind all `length` handlers bound to `todos`
+// using `listenTo`:
+prop.stopListening(todos, "length")
 
-  // Unbind all handlers to an `onValue` emitter:
-  prop.stopListening(observable)
+// Unbind all handlers to an `onValue` emitter:
+prop.stopListening(observable)
   ```
 
 - __prop.lastSet__ `{can-simple-observable}` An observable value that gets set when this
@@ -114,17 +114,17 @@ behavior:
   derive the property value.  The following makes `property` behave like a
   normal object property that can be get or set:
 
-  ```javascript
+  ```js
   {
-    property: {
-      value: function(prop) {
-          // Set `property` initial value to set value.
-          prop.resolve(prop.lastSet.get())
-          // When the property is set, update `property`.
-          prop.listenTo(prop.lastSet,prop.resolve);
-      }
-    }
-  }
+	property: {
+		value: function(prop) {
+			// Set `property` initial value to set value.
+			prop.resolve(prop.lastSet.get())
+			// When the property is set, update `property`.
+			prop.listenTo(prop.lastSet,prop.resolve);
+		}
+	}
+}
   ```
 
 
@@ -135,26 +135,26 @@ remove all bindings.
 The following `time` property increments every second.  Notice how a function
 is returned to clear the interval when the property is returned:
 
-```javascript
+```js
 const Timer = DefineMap.extend("Timer",{
-    time: {
-        value(prop) {
-            prop.resolve(new Date());
+	time: {
+		value(prop) {
+			prop.resolve(new Date());
 
-            const interval = setInterval(() => {
-                prop.resolve(new Date())
-            },1000);
+			const interval = setInterval(() => {
+				prop.resolve(new Date())
+			},1000);
 
-            return () => {
-                clearInterval(interval);
-            };
-        }
-    }
+			return () => {
+				clearInterval(interval);
+			};
+		}
+	}
 });
 
 const timer = new Timer();
 timer.on("time", function(ev, newVal, oldVal){
-    console.log(newVal) //-> logs a new date every second
+	console.log(newVal) //-> logs a new date every second
 });
 ```
 
@@ -171,13 +171,13 @@ Lets first see an example where [can-define.types.get] should be used, the
 ubiquitous `fullName` property.  The following creates a `fullName` property
 that derives its value from the instantaneous `first` and `last` values:
 
-```javascript
+```js
 DefineMap.extend("Person", {
-    first: "string",
-    last: "string",
-    get fullName() {
-        return this.first + " " + this.last;
-    }
+	first: "string",
+	last: "string",
+	get fullName() {
+		return this.first + " " + this.last;
+	}
 });
 ```
 
@@ -187,23 +187,23 @@ passage of time.
 
 The following `fullNameChangeCount` increments every time `fullName` changes:
 
-```javascript
+```js
 DefineMap.extend("Person", {
-    first: "string",
-    last: "string",
-    fullName: {
-        get() {
-            return this.first + " " + this.last;
-        }
-    },
-    fullNameChangeCount: {
-        value(prop){
-            let count = 0;
-            prop.resolve(0);
-            prop.listenTo("fullName", ()=> {
-                prop.resolve(++count);
-            });
-        }
-    }
+	first: "string",
+	last: "string",
+	fullName: {
+		get() {
+			return this.first + " " + this.last;
+		}
+	},
+	fullNameChangeCount: {
+		value(prop){
+			let count = 0;
+			prop.resolve(0);
+			prop.listenTo("fullName", ()=> {
+				prop.resolve(++count);
+			});
+		}
+	}
 });
 ```

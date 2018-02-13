@@ -11,14 +11,14 @@ value is created on demand when the property is read for the first time.
 
 Specify `Default` like:
 
-```javascript
+```js
 {
-  prop: {
-    Default: Array
-  },
-  person: {
-    Default: Person
-  }
+	prop: {
+		Default: Array
+	},
+	person: {
+		Default: Person
+	}
 }
 ```
 
@@ -26,19 +26,19 @@ Specify `Default` like:
 
 ## Use
 
-```javascript
+```js
 const Address = DefineMap.extend({
-    street: {type: "string", value: "321 Longbow"},
-    city: {type: "string", value: "Dallas"}
+	street: {type: "string", value: "321 Longbow"},
+	city: {type: "string", value: "Dallas"}
 });
 
 const Direction = DefineMap.extend({
-    from: {Type: Address, Default: Address},
-    to: {Type: Address, Default: Address}
+	from: {Type: Address, Default: Address},
+	to: {Type: Address, Default: Address}
 });
 
 const direction = new Direction({
-    to: {street: "2070 N. Stave"}
+	to: {street: "2070 N. Stave"}
 });
 
 direction.from.street //-> "321 Longbow"

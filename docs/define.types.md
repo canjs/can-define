@@ -21,37 +21,37 @@ the `"htmlbool"` type converter.
 
 Use any of the type names on a [can-define.types.propDefinition]'s `type` or directly on the prototype of a [can-define/map/map DefineMap] or [can-define/map/map DefineList].
 
-```javascript
+```js
 import define from "can-define";
 import DefineMap from "can-define/map/map";
 
 const Animal = function(name){
-    this.name = name;
+	this.name = name;
 };
 define(Animal.prototype,{
-    name: {type: "string"}
+	name: {type: "string"}
 });
 
 const Person = DefineMap.extend({
-    name: "string"
+	name: "string"
 });
 ```
 
 You can also pass these functions in directly:
 
 
-```javascript
+```js
 import define from "can-define";
 import DefineMap from "can-define/map/map";
 
 const Animal = function(name){
-    this.name = name;
+	this.name = name;
 };
 define(Animal.prototype,{
-    name: {type: define.type.string}
+	name: {type: define.type.string}
 });
 
 const Person = DefineMap.extend({
-    name: define.type.string
+	name: define.type.string
 });
 ```

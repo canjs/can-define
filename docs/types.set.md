@@ -17,21 +17,21 @@ instance. It is typically used to:
 The behavior of the setter depends on the number of arguments specified. This means that a
 setter like:
 
-```javascript
+```js
 {
-  prop: {
-      set: function(){}
-  }
+	prop: {
+		set: function(){}
+	}
 }
 ```
 
 behaves differently than:
 
-```javascript
+```js
 {
-  prop: {
-      set: function(newVal){}
-  }
+	prop: {
+		set: function(newVal){}
+	}
 }
 ```
 
@@ -65,13 +65,13 @@ A property's `set` function can be used to customize the behavior of when an att
 The following makes setting a `page` property update the `offset`:
 
 
-```javascript
+```js
 {
-  page: {
-      set: function(newVal){
-          this.offset =  (parseInt(newVal) - 1) * this.limit;
-      }
-  }
+	page: {
+		set: function(newVal){
+			this.offset =  (parseInt(newVal) - 1) * this.limit;
+		}
+	}
 }
 ```
 
@@ -96,13 +96,13 @@ The following makes changing `makeId` un-define the `modelId` property:
 
 The following shows an async setter:
 
-```javascript
+```js
 {
-  prop: {
-      set: function( newVal, setVal){
-          $.get("/something", {}, setVal );
-      }
-  }
+	prop: {
+		set: function( newVal, setVal){
+			$.get("/something", {}, setVal );
+		}
+	}
 }
 ```
 
@@ -113,9 +113,9 @@ When a setter returns `undefined`, its behavior changes depending on the number 
 
 With 0 arguments, the original set value is set on the attribute.
 
-```javascript
+```js
 MyMap = DefineMap.extend({
-    prop: {set: function(){}}
+	prop: {set: function(){}}
 })
 
 const map = new MyMap({prop : "foo"});
@@ -125,9 +125,9 @@ map.prop //-> "foo"
 
 With 1 argument, an `undefined` return value will set the property to `undefined`.  
 
-```javascript
+```js
 MyMap = DefineMap.extend({
-    prop: {set: function(newVal){}}
+	prop: {set: function(newVal){}}
 })
 
 const map = new MyMap({prop : "foo"});
@@ -138,13 +138,13 @@ map.prop //-> undefined
 With 2 arguments, `undefined` leaves the property in place.  It is expected
 that `resolve` will be called:
 
-```javascript
+```js
 MyMap = DefineMap.extend({
-    prop: {
-        set: function(newVal, resolve){
-            setVal(newVal+"d");
-        }
-    }
+	prop: {
+		set: function(newVal, resolve){
+			setVal(newVal+"d");
+		}
+	}
 });
 
 const map = new MyMap({prop : "foo"});
@@ -158,18 +158,18 @@ A set function provides a useful hook for performing side effect logic as a cert
 
 For example, in the example below, Paginator DefineMap includes a `page` property, which derives its value entirely from other properties (limit and offset).  If something tries to set the `page` directly, the set method will set the value of `offset`:
 
-```javascript
+```js
 const Paginate = DefineMap.extend({
-    limit: 'number',
-    offset: 'number',
-    page: {
-        set: function (newVal) {
-            this.offset = (parseInt(newVal) - 1) * this.limit;
-        },
-        get: function () {
-            return Math.floor(this.offset / this.limit) + 1;
-        }
-    }
+	limit: 'number',
+	offset: 'number',
+	page: {
+		set: function (newVal) {
+			this.offset = (parseInt(newVal) - 1) * this.limit;
+		},
+		get: function () {
+			return Math.floor(this.offset / this.limit) + 1;
+		}
+	}
 });
 
 const p = new Paginate({limit: 10, offset: 20});
@@ -181,17 +181,17 @@ const p = new Paginate({limit: 10, offset: 20});
 
 By default, if a value returned from a setter is an object the effect will be to replace the property with the new object completely.
 
-```javascript
+```js
 const Contact = DefineMap.extend({
-    info: {
-        set: function(newVal){
-            return newVal;
-        }
-    }
+	info: {
+		set: function(newVal){
+			return newVal;
+		}
+	}
 });
 
 const alice = new Contact({
-  info: {name: 'Alice Liddell', email: 'alice@liddell.com'}
+	info: {name: 'Alice Liddell', email: 'alice@liddell.com'}
 });
 
 const info  = alice.info;
@@ -203,21 +203,21 @@ info === alice.info // -> false
 
 In contrast, you can merge properties with:
 
-```javascript
+```js
 Contact = DefineMap.extend({
-    info: {
-        set: function(newVal){
-            if(this.info) {
-                return this.info.set(newVal);
-            } else {
-                return newVal;
-            }
-        }
-    }
+	info: {
+		set: function(newVal){
+			if(this.info) {
+				return this.info.set(newVal);
+			} else {
+				return newVal;
+			}
+		}
+	}
 });
 
 const alice = new Contact({
-  info: {name: 'Alice Liddell', email: 'alice@liddell.com'}
+	info: {name: 'Alice Liddell', email: 'alice@liddell.com'}
 });
 
 const info  = alice.info;

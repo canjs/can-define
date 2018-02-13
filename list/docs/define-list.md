@@ -14,12 +14,12 @@
 
 Creates an instance of a DefineList or an extended DefineList with enumerated properties from `items`.
 
-```javascript
+```js
 import DefineList from "can-define/list/list";
 
 const people = new DefineList([
-  { first: "Justin", last: "Meyer" },
-  { first: "Paula", last: "Strozak" }
+	{ first: "Justin", last: "Meyer" },
+	{ first: "Paula", last: "Strozak" }
 ]);
 ```
 
@@ -38,7 +38,7 @@ Instances of `DefineList` have all methods and properties from
 
 Example:
 
-```javascript
+```js
 const MyList = DefineList.extend({ "#": "string" });
 
 const listInstance = new MyList(["a","b"]);
@@ -57,7 +57,7 @@ Extended `DefineList` constructor functions have all methods and properties from
 
 Example:
 
-```javascript
+```js
 const MyList = DefineList.extend({ "#": "string" });
 
 canReflect.onInstancePatches(MyList, function(instance, patches){
@@ -70,7 +70,7 @@ canReflect.onInstancePatches(MyList, function(instance, patches){
 The `can-define/list/list` module exports a `DefineList` constructor function.  It can be used
 with `new` to create observable lists that behave very similar to `Array`s.  For example:
 
-```javascript
+```js
 const list = new DefineList(["a","b", "c"]);
 list[0] //-> "a";
 
@@ -82,9 +82,9 @@ It can also be extended to define custom observable list types with
 [can-define/list/list.extend].  For example, the following defines a `StringList` type
 where every item is converted to a string by specifying the [can-define/list/list.prototype.wildcardItems items definition] `(#)`:
 
-```javascript
+```js
 const StringList = DefineList.extend({
-  "#": "string"
+	"#": "string"
 });
 
 const strings = new StringList([1,new Date(1475370478173),false]);
@@ -97,12 +97,12 @@ strings[2] //-> "false"
 Non-numeric properties can also be defined on custom DefineList type.  The following
 defines a `completed` property that returns the completed todos:
 
-```javascript
+```js
 const TodoList = DefineList.extend({
-  "#": Todo,
-  get completed(){
-    return this.filter({complete: true})
-  }
+	"#": Todo,
+	get completed(){
+		return this.filter({complete: true})
+	}
 });
 
 const todos = new TodoList([{complete: true}, {complete:false}]);
@@ -114,22 +114,22 @@ methods to listen to its [can-define/list/list/AddEvent],
 [can-define/list/list/LengthEvent], [can-define/list/list/RemoveEvent],
 and [can-define/list/list/PropertyNameEvent] events:
 
-```javascript
+```js
 const people = new DefineList(["alice","bob","eve"]);
 
 people.on("add", function(ev, items, index){
-  console.log("add", items, index);
+	console.log("add", items, index);
 }).on("remove", function(ev, items, index){
-  console.log("remove", items, index);
+	console.log("remove", items, index);
 }).on("length", function(ev, newVal, oldVal){
-  console.log("length", newVal, oldVal);
+	console.log("length", newVal, oldVal);
 })
 
 people.pop(); // remove ["eve"] 2
-              // length 2 3
+// length 2 3
 
 people.unshift("Xerxes"); // add ["Xerxes"] 1
-                          // length 3 2
+// length 3 2
 ```
 
 __NOTE:__ Only changes made to indexed values using the list's `set` method will dispatch change events.
