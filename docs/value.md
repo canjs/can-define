@@ -16,12 +16,12 @@ dispatched on the map or other observables,
 to set a new value on the observable. For example, the following
 counts the number of times the `name` property changed:
 
-```js
+```javascript
 Person = DefineMap.extend("Person",{
     name: "string",
     nameChangeCount: {
         value(prop){
-            var count = 0;
+            let count = 0;
 
             prop.listenTo("name", () => {
                 prop.resolve(++count);
@@ -32,7 +32,7 @@ Person = DefineMap.extend("Person",{
     }
 });
 
-var p = new Person();
+const p = new Person();
 p.on("nameChangedCount", (ev, newVal)=> {
     console.log("name changed", newVal, "times");
 });
@@ -65,7 +65,7 @@ behavior:
 
   Examples:
 
-  ```js
+  ```javascript
   // Binds to the map's `name` event:
   prop.listenTo("name", handler)     
 
@@ -87,7 +87,7 @@ behavior:
 
   Examples:
 
-  ```js
+  ```javascript
   // Unbind all handlers bound using `listenTo`:
   prop.stopListening()    
 
@@ -114,16 +114,16 @@ behavior:
   derive the property value.  The following makes `property` behave like a
   normal object property that can be get or set:
 
-  ```js
+  ```javascript
   {
-	  property: {
-	    value: function(prop) {
-	        // Set `property` initial value to set value.
-	        prop.resolve(prop.lastSet.get())
-	        // When the property is set, update `property`.
-	        prop.listenTo(prop.lastSet,prop.resolve);
-	    }
-	  }
+    property: {
+      value: function(prop) {
+          // Set `property` initial value to set value.
+          prop.resolve(prop.lastSet.get())
+          // When the property is set, update `property`.
+          prop.listenTo(prop.lastSet,prop.resolve);
+      }
+    }
   }
   ```
 
@@ -135,13 +135,13 @@ remove all bindings.
 The following `time` property increments every second.  Notice how a function
 is returned to clear the interval when the property is returned:
 
-```js
-var Timer = DefineMap.extend("Timer",{
+```javascript
+const Timer = DefineMap.extend("Timer",{
     time: {
         value(prop) {
             prop.resolve(new Date());
 
-            var interval = setInterval(() => {
+            const interval = setInterval(() => {
                 prop.resolve(new Date())
             },1000);
 
@@ -152,7 +152,7 @@ var Timer = DefineMap.extend("Timer",{
     }
 });
 
-var timer = new Timer();
+const timer = new Timer();
 timer.on("time", function(ev, newVal, oldVal){
     console.log(newVal) //-> logs a new date every second
 });
@@ -171,7 +171,7 @@ Lets first see an example where [can-define.types.get] should be used, the
 ubiquitous `fullName` property.  The following creates a `fullName` property
 that derives its value from the instantaneous `first` and `last` values:
 
-```js
+```javascript
 DefineMap.extend("Person", {
     first: "string",
     last: "string",
@@ -187,7 +187,7 @@ passage of time.
 
 The following `fullNameChangeCount` increments every time `fullName` changes:
 
-```js
+```javascript
 DefineMap.extend("Person", {
     first: "string",
     last: "string",
@@ -198,7 +198,7 @@ DefineMap.extend("Person", {
     },
     fullNameChangeCount: {
         value(prop){
-            var count = 0;
+            let count = 0;
             prop.resolve(0);
             prop.listenTo("fullName", ()=> {
                 prop.resolve(++count);

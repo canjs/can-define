@@ -12,7 +12,7 @@ will be automatically torn-down when the `value` property is unbound.  This `lis
 
 Examples:
 
-```js
+```javascript
 // Binds to the map's `name` event:
 listenTo("name", handler)     
 
@@ -33,7 +33,7 @@ registered by the `listenTo` argument.  This `stopListening` method is very simi
 
 Examples:
 
-```js
+```javascript
 // Unbind all handlers bound using `listenTo`:
 stopListening()    
 
@@ -60,15 +60,15 @@ property is set.  You can read its value or listen to when its value changes to
 derive the property value.  The following makes `property` behave like a
 normal object property that can be get or set:
 
-```js
+```javascript
 {
-	property: {
-	  value: function(prop) {
-	      // Make sure the initial value is whatever was set.
-	      resolve(prop.lastSet.get())
-	      // When the property is set, update the read value.
-	      listenTo(prop.lastSet,resolve);
-	  }
-	}
+  property: {
+    value: function(prop) {
+        // Make sure the initial value is whatever was set.
+        resolve(prop.lastSet.get())
+        // When the property is set, update the read value.
+        listenTo(prop.lastSet,resolve);
+    }
+  }
 }
 ```

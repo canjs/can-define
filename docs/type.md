@@ -8,13 +8,13 @@ Converts a value set on an instance into an appropriate value.
 Given the set value, transform it into a value appropriate to be set.
 `type` is called before [can-define.types.set].  
 
-```js
+```javascript
 {
-	age: {
-	    type: function(newValue, propertyName){
-	        return +newValue;
-	    }
-	}
+  age: {
+      type: function(newValue, propertyName){
+          return +newValue;
+      }
+  }
 }
 ```
 
@@ -27,11 +27,11 @@ Given the set value, transform it into a value appropriate to be set.
 
 Sets the type to a named type in [can-define.types].  The default typeName is `"observable"`.
 
-```js
+```javascript
 {
-	age: {
-	    type: "number"
-	}
+  age: {
+      type: "number"
+  }
 }
 ```
 
@@ -42,14 +42,14 @@ Sets the type to a named type in [can-define.types].  The default typeName is `"
 
   A [can-define.types.propDefinition] that defines an inline [can-define/map/map] type.  For example:
 
-  ```js
+  ```javascript
 {
-	  address: {
-	      type: {
-	          street: "string",
-	          city: "string"
-	      }
-	  }
+    address: {
+        type: {
+            street: "string",
+            city: "string"
+        }
+    }
 }
   ```
 
@@ -58,17 +58,17 @@ Sets the type to a named type in [can-define.types].  The default typeName is `"
   Defines an inline [can-define/list/list] type that's an array of `Type` or inline `propDefinition` [can-define/map/map]
   instances.  For example:
 
-```js
+```javascript
 {
-	  people: {
-	      type: [Person]
-	  },
-	  addresses: {
-	      type: [{
-	          street: "string",
-	          city: "string"
-	      }]
-	  }
+    people: {
+        type: [Person]
+    },
+    addresses: {
+        type: [{
+            street: "string",
+            city: "string"
+        }]
+    }
 }
 ```
 
@@ -89,7 +89,7 @@ as either:
 
 The following example converts the `count` property to a number and the `items` property to an array:
 
-```js
+```javascript
 DefineMap.extend({
     count: {type: "number"},
     items: {

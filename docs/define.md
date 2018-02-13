@@ -12,10 +12,10 @@ and their behavior on a prototype object.
 
 Define observable properties, type conversion, and getter/setter logic on [https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain prototype objects].
 
-```js
-var define = require("can-define");
+```javascript
+import define from "can-define";
 
-var Greeting = function(message){
+const Greeting = function(message){
     this.message = message;
 };
 
@@ -47,10 +47,10 @@ to create completely customized types.
 The following creates a
 `Person` constructor function:
 
-```js
-var define = require("can-define");
+```javascript
+import define from "can-define";
 
-var Person = function(first, last){
+const Person = function(first, last){
   this.first = first;
   this.last = last;
 };
@@ -67,8 +67,8 @@ define(Person.prototype,{
 
 This can be used to create `Person` instances with observable properties:
 
-```js
-var person = new Person("Justin", "Meyer");
+```javascript
+const person = new Person("Justin", "Meyer");
 person.first    //-> "Justin"
 person.last     //-> "Meyer"
 person.fullName //-> "Justin Meyer"

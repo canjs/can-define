@@ -10,20 +10,20 @@ default behavior for items in the list.  The default wildcard (`"#"`) definition
 makes every item run through the "observable" [can-define.types] converter.
 It looks like:
 
-```js
+```javascript
 {
-	"#": {
-	  type: "observable"
-	}
+  "#": {
+    type: "observable"
+  }
 }
 ```
 
 Setting the wildcard is useful when items should be converted to a particular type.
 
-```js
-var Person = DefineMap.extend({ ... });
+```javascript
+const Person = DefineMap.extend({ /* ... */ });
 
-var People = DefineList.extend({
+const People = DefineList.extend({
   "#": Person
 });
 ```
@@ -31,11 +31,11 @@ var People = DefineList.extend({
 The wildcard property has optional `added` and `removed` functions that will be called after
 an item is added or removed from the list with `this` being the list.
 
-```js
-var People = DefineList.extend({
+```javascript
+const People = DefineList.extend({
   "#": {
-  	added: function(itemsAdded, index) { ... },
-  	removed: function(itemsRemoved, index) { ... }
+    added: function(itemsAdded, index) { /* ... */ },
+    removed: function(itemsRemoved, index) { /* ... */ }
   }
 });
 ```

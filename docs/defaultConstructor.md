@@ -11,7 +11,7 @@ value is created on demand when the property is read for the first time.
 
 Specify `Default` like:
 
-```js
+```javascript
 {
   prop: {
     Default: Array
@@ -26,18 +26,18 @@ Specify `Default` like:
 
 ## Use
 
-```js
-var Address = DefineMap.extend({
+```javascript
+const Address = DefineMap.extend({
     street: {type: "string", value: "321 Longbow"},
     city: {type: "string", value: "Dallas"}
 });
 
-var Direction = DefineMap.extend({
+const Direction = DefineMap.extend({
     from: {Type: Address, Default: Address},
     to: {Type: Address, Default: Address}
 });
 
-var direction = new Direction({
+const direction = new Direction({
     to: {street: "2070 N. Stave"}
 });
 

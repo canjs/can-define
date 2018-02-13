@@ -7,27 +7,27 @@ observable property.  These behaviors can be specified with as an `Object`, `Str
 
 @type {Object} Defines multiple behaviors for a single property.
 
-```js
+```javascript
 {
-	propertyName: {
-	  default: function(){ ... },
-	  Default: Constructor,
-	  type: function(){ ... },
-	  Type: Constructor,
-	  get: function(){ ... },
-	  value: function(){ ... },
-	  set: function(){ ... },
-	  serialize: function(){ ... }
-	}
+  propertyName: {
+    default: function(){ /* ... */ },
+    Default: Constructor,
+    type: function(){ /* ... */ },
+    Type: Constructor,
+    get: function(){ /* ... */ },
+    value: function(){ /* ... */ },
+    set: function(){ /* ... */ },
+    serialize: function(){ /* ... */ }
+  }
 }
 ```
 
     @option {can-define.types.default} default Specifies the initial value of the property or
     a function that returns the initial value.
 
-    ```js
+    ```javascript
     // A default age of `0`:
-    var Person = DefineMap.extend({
+    const Person = DefineMap.extend({
       age: {
         value: 0
       },
@@ -42,9 +42,9 @@ observable property.  These behaviors can be specified with as an `Object`, `Str
     @option {can-define.types.defaultConstructor} Default Specifies a function that will be called with `new` whose result is
     set as the initial value of the attribute.
 
-    ```js
+    ```javascript
     // A default empty DefineList of hobbies:
-    var Person = DefineMap.extend({
+    const Person = DefineMap.extend({
       hobbies: {Default: DefineList}
     });
 
@@ -55,8 +55,8 @@ observable property.  These behaviors can be specified with as an `Object`, `Str
     property.  The type can be specified as either a function
     that returns the type coerced value or one of the [can-define.types] names.
 
-    ```js
-    var Person = DefineMap.extend({
+    ```javascript
+    const Person = DefineMap.extend({
       age: {type: "number"},
       hobbies: {
         type: function(newValue){
@@ -74,13 +74,13 @@ observable property.  These behaviors can be specified with as an `Object`, `Str
     the assigned property value as the first argument and called with new. For example, the following will call
     `new Address(newValue)` with whatever non null, undefined, or address type is set as a `Person`'s address property.
 
-    ```js
-    var Address = DefineMap.extend({
+    ```javascript
+    const Address = DefineMap.extend({
       street: "string",
       state: "string"    
     });
 
-    var Person = DefineMap.extend({
+    const Person = DefineMap.extend({
       address: {Type: Address}    
     });
     ```
@@ -91,7 +91,7 @@ observable property.  These behaviors can be specified with as an `Object`, `Str
     converted to an [can-compute.async async compute].  It should derive its value from other values on the object. The following
     defines a `page` getter that reads from a map's offset and limit:
 
-    ```js
+    ```javascript
     DefineMap.extend({
       page: {
         get: function (newVal) {
@@ -107,10 +107,10 @@ observable property.  These behaviors can be specified with as an `Object`, `Str
     property.  This should be used when [can-define.types.get] is unable to model the right behavior. The following
     counts the number of times the `page` property changes:
 
-    ```js
+    ```javascript
     DefineMap.extend({
       pageChangeCount: function(prop){
-        var count = 0;
+        let count = 0;
         // When page changes, update the count.
         prop.listenTo("page", function(){
           prop.resolve(++count);
@@ -126,7 +126,7 @@ observable property.  These behaviors can be specified with as an `Object`, `Str
     @option {can-define.types.set} set A set function that specifies what should happen when a property is set. `set` is called with the result of `type` or `Type`. The following
     defines a `page` setter that updates the map's offset:
 
-    ```js
+    ```javascript
     DefineMap.extend({
       page: {
         set: function(newVal){
@@ -142,8 +142,8 @@ observable property.  These behaviors can be specified with as an `Object`, `Str
     are computed and therefore are not added to the result.  Non-computed properties values are
     serialized if possible and added to the result.
 
-    ```js
-    var Todo = DefineMap.extend({
+    ```javascript
+    const Todo = DefineMap.extend({
       date: {
         type: "date",
         serialize: function(value) {
@@ -155,36 +155,36 @@ observable property.  These behaviors can be specified with as an `Object`, `Str
 
 @type {String} Defines a [can-define.types.type] converter as one of the named types in [can-define.types].
 
-```js
+```javascript
 {
-	propertyName: "typeName"
+  propertyName: "typeName"
 }
 ```
 
 @type {Constructor} Either creates a method or Defines a [can-define.types.typeConstructor Type] setting with a constructor function.  Constructor functions are identified with [can-reflect.isConstructorLike].
 
-```js
+```javascript
 {
-	propertyName: Constructor
+  propertyName: Constructor
 }
 ```
 OR
-```js
+```javascript
 {
-	propertyName: function() {}
+  propertyName: function() {}
 }
 ```
 
 For example:
-```js
+```javascript
 {
-	subMap: DefineMap // <- sets Type to DefineMap
+  subMap: DefineMap // <- sets Type to DefineMap
 }
 ```
 OR
-```js
+```javascript
 {
-	increment: function() { ++this.count } // <- sets method prop
+  increment: function() { ++this.count } // <- sets method prop
 }
 ```
 
@@ -199,41 +199,41 @@ used as a shorthand for creating a property that is an [can-define/list/list] of
 
 For example:
 
-```js
+```javascript
 {
-	users: [User],
-	todos: [{complete: "boolean", name: "string"}]
+  users: [User],
+  todos: [{complete: "boolean", name: "string"}]
 }
 ```
 
 @type {GETTER} Defines a property's [can-define.types.get] behavior with the
 [https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get syntax].
 
-```js
+```javascript
 {
-	get propertyName(){ ... }
+  get propertyName(){ /* ... */ }
 }
 ```
 
 For example:
 
-```js
+```javascript
 {
-	get fullName() {
-	    return this.first + " " + this.last;
-	}
+  get fullName() {
+      return this.first + " " + this.last;
+  }
 }
 ```
 
 This is a shorthand for providing an object with a `get` property like:
 
-```js
+```javascript
 {
-	fullName: {
-	    get: function(){
-	        return this.first + " " + this.last;
-	    }
-	}
+  fullName: {
+      get: function(){
+          return this.first + " " + this.last;
+      }
+  }
 }
 ```
 
@@ -243,21 +243,21 @@ or `resolve` arguments.
 @type {SETTER} Defines a property's [can-define.types.set] behavior with the
 [set syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set).
 
-```js
+```javascript
 {
-	set propertyName(newValue){ ... }
+  set propertyName(newValue){ /* ... */ }
 }
 ```
 
 For example:
 
-```js
+```javascript
 {
-	set fullName(newValue) {
-	    var parts = newVal.split(" ");
-	    this.first = parts[0];
-	    this.last = parts[1];
-	}
+  set fullName(newValue) {
+      const parts = newVal.split(" ");
+      this.first = parts[0];
+      this.last = parts[1];
+  }
 }
 ```
 
@@ -288,14 +288,14 @@ and directly represents a `PropDefinition` object.  The other forms
 get converted to a `PropDefinition` as follows:
 
 
-```js
+```javascript
 DefineMap.extend({
   propertyA: Object,      // -> PropertyDefinition
   propertyB: String,      // -> {type: String}
   propertyC: Constructor, // -> {Type: Constructor}
   propertyD: [PropDefs],  // -> {Type: DefineList.extend({"#": PropDefs})>}
-  get propertyE(){...},   // -> {get: propertyE(){...}}
-  set propertyF(value){...},   // -> {set: propertyF(value){...}}
+  get propertyE(){ /* ... */ },   // -> {get: propertyE(){ /* ... */ }}
+  set propertyF(value){ /* ... */ },   // -> {set: propertyF(value){ /* ... */ }}
   method: Function,
 });
 ```
@@ -322,8 +322,8 @@ DefineMap.extend({
 For example:
 
 
-```js
-var Person = DefineMap.extend("Person",{
+```javascript
+const Person = DefineMap.extend("Person",{
   // a `DefineList` of `Address`
   addresses: [Address],
   // A `DefineMap` with a `first` and `last` property
@@ -332,7 +332,7 @@ var Person = DefineMap.extend("Person",{
   cars: { Type: [{make: "string", year: "number"}] }
 });
 
-var person = new Person({
+const person = new Person({
   addresses: [{street: "1134 Pinetree"}],
   name: {first: "Kath", last: "Iann"},
   cars: [{ make: "Nissan", year: 2010 }]

@@ -14,13 +14,13 @@
 
 Creates an instance of a DefineList or an extended DefineList with enumerated properties from `items`.
 
-```js
-var DefineList = require("can-define/list/list");
+```javascript
+import DefineList from "can-define/list/list";
 
-var people = new DefineList([
+const people = new DefineList([
   { first: "Justin", last: "Meyer" },
   { first: "Paula", last: "Strozak" }
-])
+]);
 ```
 
   @param {Array} [items] An array of items to seed the list with.
@@ -38,12 +38,12 @@ Instances of `DefineList` have all methods and properties from
 
 Example:
 
-```js
-var MyList = DefineList.extend({ "#": "string" });
+```javascript
+const MyList = DefineList.extend({ "#": "string" });
 
-var listInstance = new MyList(["a","b"]);
+const listInstance = new MyList(["a","b"]);
 
-listInstance.on("length", function(event, newLength, oldLength){ ... });
+listInstance.on("length", function(event, newLength, oldLength){ /* ... */ });
 ```
 
 
@@ -57,8 +57,8 @@ Extended `DefineList` constructor functions have all methods and properties from
 
 Example:
 
-```js
-var MyList = DefineList.extend({ "#": "string" });
+```javascript
+const MyList = DefineList.extend({ "#": "string" });
 
 canReflect.onInstancePatches(MyList, function(instance, patches){
 
@@ -70,8 +70,8 @@ canReflect.onInstancePatches(MyList, function(instance, patches){
 The `can-define/list/list` module exports a `DefineList` constructor function.  It can be used
 with `new` to create observable lists that behave very similar to `Array`s.  For example:
 
-```js
-var list = new DefineList(["a","b", "c"]);
+```javascript
+const list = new DefineList(["a","b", "c"]);
 list[0] //-> "a";
 
 list.push("x");
@@ -82,12 +82,12 @@ It can also be extended to define custom observable list types with
 [can-define/list/list.extend].  For example, the following defines a `StringList` type
 where every item is converted to a string by specifying the [can-define/list/list.prototype.wildcardItems items definition] `(#)`:
 
-```js
-var StringList = DefineList.extend({
-	"#": "string"
+```javascript
+const StringList = DefineList.extend({
+  "#": "string"
 });
 
-var strings = new StringList([1,new Date(1475370478173),false]);
+const strings = new StringList([1,new Date(1475370478173),false]);
 
 strings[0] //-> "1"
 strings[1] //-> "Sat Oct 01 2016 20:07:58 GMT-0500 (CDT)"
@@ -97,15 +97,15 @@ strings[2] //-> "false"
 Non-numeric properties can also be defined on custom DefineList type.  The following
 defines a `completed` property that returns the completed todos:
 
-```js
-var TodoList = DefineList.extend({
-	"#": Todo,
-	get completed(){
-		return this.filter({complete: true})
-	}
+```javascript
+const TodoList = DefineList.extend({
+  "#": Todo,
+  get completed(){
+    return this.filter({complete: true})
+  }
 });
 
-var todos = new TodoList([{complete: true}, {complete:false}]);
+const todos = new TodoList([{complete: true}, {complete:false}]);
 todos.completed.length //-> 1
 ```
 
@@ -114,15 +114,15 @@ methods to listen to its [can-define/list/list/AddEvent],
 [can-define/list/list/LengthEvent], [can-define/list/list/RemoveEvent],
 and [can-define/list/list/PropertyNameEvent] events:
 
-```js
-var people = new DefineList(["alice","bob","eve"]);
+```javascript
+const people = new DefineList(["alice","bob","eve"]);
 
 people.on("add", function(ev, items, index){
-	console.log("add", items, index);
+  console.log("add", items, index);
 }).on("remove", function(ev, items, index){
-	console.log("remove", items, index);
+  console.log("remove", items, index);
 }).on("length", function(ev, newVal, oldVal){
-	console.log("length", newVal, oldVal);
+  console.log("length", newVal, oldVal);
 })
 
 people.pop(); // remove ["eve"] 2

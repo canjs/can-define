@@ -8,10 +8,10 @@
 Extends DefineList, or constructor functions derived from DefineList,
 to create a new constructor function.
 
-```js
-var DefineList = require("can-define/list/list");
+```javascript
+import DefineList from "can-define/list/list";
 
-var TodoList = DefineList.extend(
+const TodoList = DefineList.extend(
   "TodoList",
   {
     "#": {type: {complete: "boolean", name: "string"}},
@@ -28,7 +28,7 @@ var TodoList = DefineList.extend(
     }
   });
 
-var todos = new TodoList([
+const todos = new TodoList([
   {name: "dishes", complete: false},
   {name: "lawn", complete: false}
 ]);

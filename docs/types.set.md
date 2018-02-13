@@ -17,21 +17,21 @@ instance. It is typically used to:
 The behavior of the setter depends on the number of arguments specified. This means that a
 setter like:
 
-```js
+```javascript
 {
-	prop: {
-	    set: function(){}
-	}
+  prop: {
+      set: function(){}
+  }
 }
 ```
 
 behaves differently than:
 
-```js
+```javascript
 {
-	prop: {
-	    set: function(newVal){}
-	}
+  prop: {
+      set: function(newVal){}
+  }
 }
 ```
 
@@ -65,13 +65,13 @@ A property's `set` function can be used to customize the behavior of when an att
 The following makes setting a `page` property update the `offset`:
 
 
-```js
+```javascript
 {
-	page: {
-	    set: function(newVal){
-	        this.offset =  (parseInt(newVal) - 1) * this.limit;
-	    }
-	}
+  page: {
+      set: function(newVal){
+          this.offset =  (parseInt(newVal) - 1) * this.limit;
+      }
+  }
 }
 ```
 
@@ -96,13 +96,13 @@ The following makes changing `makeId` un-define the `modelId` property:
 
 The following shows an async setter:
 
-```js
+```javascript
 {
-	prop: {
-	    set: function( newVal, setVal){
-	        $.get("/something", {}, setVal );
-	    }
-	}
+  prop: {
+      set: function( newVal, setVal){
+          $.get("/something", {}, setVal );
+      }
+  }
 }
 ```
 
@@ -113,24 +113,24 @@ When a setter returns `undefined`, its behavior changes depending on the number 
 
 With 0 arguments, the original set value is set on the attribute.
 
-```js
+```javascript
 MyMap = DefineMap.extend({
     prop: {set: function(){}}
 })
 
-var map = new MyMap({prop : "foo"});
+const map = new MyMap({prop : "foo"});
 
 map.prop //-> "foo"
 ```
 
 With 1 argument, an `undefined` return value will set the property to `undefined`.  
 
-```js
+```javascript
 MyMap = DefineMap.extend({
     prop: {set: function(newVal){}}
 })
 
-var map = new MyMap({prop : "foo"});
+const map = new MyMap({prop : "foo"});
 
 map.prop //-> undefined
 ```
@@ -138,7 +138,7 @@ map.prop //-> undefined
 With 2 arguments, `undefined` leaves the property in place.  It is expected
 that `resolve` will be called:
 
-```js
+```javascript
 MyMap = DefineMap.extend({
     prop: {
         set: function(newVal, resolve){
@@ -147,7 +147,7 @@ MyMap = DefineMap.extend({
     }
 });
 
-var map = new MyMap({prop : "foo"});
+const map = new MyMap({prop : "foo"});
 
 map.prop //-> "food";
 ```
@@ -158,8 +158,8 @@ A set function provides a useful hook for performing side effect logic as a cert
 
 For example, in the example below, Paginator DefineMap includes a `page` property, which derives its value entirely from other properties (limit and offset).  If something tries to set the `page` directly, the set method will set the value of `offset`:
 
-```js
-var Paginate = DefineMap.extend({
+```javascript
+const Paginate = DefineMap.extend({
     limit: 'number',
     offset: 'number',
     page: {
@@ -172,7 +172,7 @@ var Paginate = DefineMap.extend({
     }
 });
 
-var p = new Paginate({limit: 10, offset: 20});
+const p = new Paginate({limit: 10, offset: 20});
 ```
 
 
@@ -181,20 +181,20 @@ var p = new Paginate({limit: 10, offset: 20});
 
 By default, if a value returned from a setter is an object the effect will be to replace the property with the new object completely.
 
-```js
-var Contact = DefineMap.extend({
+```javascript
+const Contact = DefineMap.extend({
     info: {
         set: function(newVal){
             return newVal;
         }
     }
-})
-
-var alice = new Contact({
-	info: {name: 'Alice Liddell', email: 'alice@liddell.com'}
 });
 
-var info  = alice.info;
+const alice = new Contact({
+  info: {name: 'Alice Liddell', email: 'alice@liddell.com'}
+});
+
+const info  = alice.info;
 
 alice.info = {name: 'Allison Wonderland', phone: '888-888-8888'};
 
@@ -203,7 +203,7 @@ info === alice.info // -> false
 
 In contrast, you can merge properties with:
 
-```js
+```javascript
 Contact = DefineMap.extend({
     info: {
         set: function(newVal){
@@ -216,11 +216,11 @@ Contact = DefineMap.extend({
     }
 });
 
-var alice = new Contact({
-	info: {name: 'Alice Liddell', email: 'alice@liddell.com'}
+const alice = new Contact({
+  info: {name: 'Alice Liddell', email: 'alice@liddell.com'}
 });
 
-var info  = alice.info;
+const info  = alice.info;
 
 alice.info = {name: 'Allison Wonderland', phone: '888-888-8888'};
 

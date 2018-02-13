@@ -9,22 +9,22 @@ Specifies if the property should be serialized.  By default, all properties exce
 ones with defined [can-define.types.get getters] are serialized. Prevent a property
 from being serialized like:
 
-```js
+```javascript
 {
-	propertyName: {
-	    serialize: false
-	}
+  propertyName: {
+      serialize: false
+  }
 }
 ```
 
 Make a [can-define.types.get getter] property part of the serialized result like:
 
-```js
+```javascript
 {
-	propertyName: {
-	    get: function(){ ... },
-	    serialize: true
-	}
+  propertyName: {
+      get: function(){ /* ... */ },
+      serialize: true
+  }
 }
 ```
 
@@ -56,15 +56,15 @@ each property will behave when the instance is serialized.  This can be useful f
 The following causes a locationIds property to be serialized into
 the comma separated ID values of the location property on this instance:
 
-```js
+```javascript
 {
-	locationIds: {
-	    serialize: function(){
-	        return this.locations.map(function(location){
-	            ids.push(location.id);
-	        }).join(',');
-	    }
-	}
+  locationIds: {
+      serialize: function(){
+          return this.locations.map(function(location){
+              ids.push(location.id);
+          }).join(',');
+      }
+  }
 }
 ```
 
@@ -72,17 +72,17 @@ Returning `undefined` for any property means this property will not be part of t
 object.  For example, if the property numPages is not greater than zero, the following example
 won't include it in the serialized object.
 
-```js
+```javascript
 {
-	prop: {
-	    numPages: {
-	        serialize: function( num ){
-	            if(num <= 0) {
-	            	return undefined;
-	            }
-	            return num;
-	        }
-	    }
-	}
+  prop: {
+      numPages: {
+          serialize: function( num ){
+              if(num <= 0) {
+                return undefined;
+              }
+              return num;
+          }
+      }
+  }
 }
 ```

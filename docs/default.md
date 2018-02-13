@@ -8,11 +8,11 @@ is read for the first time.
 
 A function can be provided that returns the default value used for this property, like:
 
-```js
+```javascript
 {
-	prop: {
-		default: function(){ return []; }
-	}
+  prop: {
+    default: function(){ return []; }
+  }
 }
 ```
 
@@ -41,9 +41,9 @@ Any value can be provided as the default value used for this property, like:
 
 The following defaults `age` to `0` and `address` to an object:
 
-```js
+```javascript
 // A default age of `0`:
-var Person = DefineMap.extend({
+const Person = DefineMap.extend({
   age: {
     default: 0
   },
