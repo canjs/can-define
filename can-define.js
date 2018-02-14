@@ -320,13 +320,13 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 		// Add `set` functionality to the eventSetter.
 		setter = make.set.setter(prop, definition.set, reader, eventsSetter, false);
 	}
-	// If there's neither `set` or `get`,
-	else if (!definition.get) {
+	// If there's neither `set` or `get` or `value` (resolver)
+	else if (dataProperty === "data") {
 		// make a set that produces events.
 		setter = eventsSetter;
 	}
 	// If there's zero-arg `get` but not `set`, warn on all sets in dev mode
-	else if (definition.get.length < 1) {
+	else if (definition.get && definition.get.length < 1) {
 		setter = function() {
 			//!steal-remove-start
 			canLogDev.warn("can-define: Set value for property " +

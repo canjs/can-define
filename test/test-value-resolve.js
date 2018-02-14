@@ -238,6 +238,33 @@ QUnit.test("location vm with setter", function(){
 
 });
 
+QUnit.test("events should not be fired when resolve is not called", function(){
+	var Numbers = DefineMap.extend("Numbers",{
+		oddNumber: {
+			value: function(prop) {
+				prop.resolve(5);
+
+				prop.listenTo(prop.lastSet, function(newVal){
+					if (newVal % 2) {
+						prop.resolve(newVal);
+					}
+				});
+			}
+		}
+	});
+
+	var nums = new Numbers({});
+
+	QUnit.equal(nums.oddNumber, 5, "initial value is 5");
+
+	nums.on("oddNumber", function(ev, newVal){
+		QUnit.equal(newVal % 2, 1, "event dispatched for " + newVal);
+	});
+
+	nums.oddNumber = 7;
+	nums.oddNumber = 8;
+});
+
 /*
 QUnit.test("fullName getter/setter the hard way", 3, function(){
     var Person = DefineMap.extend("Person", {
