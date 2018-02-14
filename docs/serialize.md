@@ -22,7 +22,7 @@ Make a [can-define.types.get getter] property part of the serialized result like
 ```js
 {
 	propertyName: {
-		get: function(){ /* ... */ },
+		get: function() { /* ... */ },
 		serialize: true
 	}
 }
@@ -59,10 +59,10 @@ the comma separated ID values of the location property on this instance:
 ```js
 {
 	locationIds: {
-		serialize: function(){
-			return this.locations.map(function(location){
-				ids.push(location.id);
-			}).join(',');
+		serialize: function() {
+			return this.locations.map( function( location ) {
+				ids.push( location.id );
+			} ).join( "," );
 		}
 	}
 }
@@ -76,8 +76,8 @@ won't include it in the serialized object.
 {
 	prop: {
 		numPages: {
-			serialize: function( num ){
-				if(num <= 0) {
+			serialize: function( num ) {
+				if ( num <= 0 ) {
 					return undefined;
 				}
 				return num;

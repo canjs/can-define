@@ -11,7 +11,9 @@ A function can be provided that returns the default value used for this property
 ```js
 {
 	prop: {
-		default: function(){ return []; }
+		default: function() {
+			return [];
+		}
 	}
 }
 ```
@@ -43,16 +45,16 @@ The following defaults `age` to `0` and `address` to an object:
 
 ```js
 // A default age of `0`:
-const Person = DefineMap.extend({
+const Person = DefineMap.extend( {
 	age: {
 		default: 0
 	},
 	address: {
-		default: function(){
-			return {city: "Chicago", state: "IL"};
+		default: function() {
+			return { city: "Chicago", state: "IL" };
 		}
 	}
-});
+} );
 ```
 
 ## Alternates

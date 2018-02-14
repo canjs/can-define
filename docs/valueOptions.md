@@ -14,16 +14,16 @@ Examples:
 
 ```js
 // Binds to the map's `name` event:
-listenTo("name", handler)     
+listenTo( "name", handler );
 
 // Binds to the todos `length` event:
-listenTo(todos, "length", handler)
+listenTo( todos, "length", handler );
 
 // Binds to the `todos` `length` event in the mutate queue:
-listenTo(todos, "length", handler, "mutate")
+listenTo( todos, "length", handler, "mutate" );
 
 // Binds to an `onValue` emitter:
-listenTo(observable, handler) //
+listenTo( observable, handler ); //
 ```
 
 @param {function(Any,String,Fuction,String)} stopListening(bindTarget,event,handler,queue) A function that removes bindings
@@ -35,24 +35,24 @@ Examples:
 
 ```js
 // Unbind all handlers bound using `listenTo`:
-stopListening()    
+stopListening();
 
 // Unbind handlers to the map's `name` event:
-stopListening("name")   
+stopListening( "name" );
 
 // Unbind a specific handler on the map's `name` event
 // registered in the "notify" queue.
-stopListening("name", handler)    
+stopListening( "name", handler );
 
 // Unbind all handlers bound to `todos` using `listenTo`:
-stopListening(todos)
+stopListening( todos );
 
 // Unbind all `length` handlers bound to `todos`
 // using `listenTo`:
-stopListening(todos, "length")
+stopListening( todos, "length" );
 
 // Unbind all handlers to an `onValue` emitter:
-stopListening(observable)
+stopListening( observable );
 ```
 
 @option {can-simple-observable} lastSet An observable value that gets set when this
@@ -63,11 +63,13 @@ normal object property that can be get or set:
 ```js
 {
 	property: {
-		value: function(prop) {
+		value: function( prop ) {
+
 			// Make sure the initial value is whatever was set.
-			resolve(prop.lastSet.get())
+			resolve( prop.lastSet.get() );
+
 			// When the property is set, update the read value.
-			listenTo(prop.lastSet,resolve);
+			listenTo( prop.lastSet, resolve );
 		}
 	}
 }

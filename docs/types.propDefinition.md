@@ -10,14 +10,14 @@ observable property.  These behaviors can be specified with as an `Object`, `Str
 ```js
 {
 	propertyName: {
-		default: function(){ /* ... */ },
+		default: function() { /* ... */ },
 		Default: Constructor,
-		type: function(){ /* ... */ },
+		type: function() { /* ... */ },
 		Type: Constructor,
-		get: function(){ /* ... */ },
-		value: function(){ /* ... */ },
-		set: function(){ /* ... */ },
-		serialize: function(){ /* ... */ }
+		get: function() { /* ... */ },
+		value: function() { /* ... */ },
+		set: function() { /* ... */ },
+		serialize: function() { /* ... */ }
 	}
 }
 ```
@@ -27,63 +27,63 @@ observable property.  These behaviors can be specified with as an `Object`, `Str
 
     ```js
 // A default age of `0`:
-const Person = DefineMap.extend({
+const Person = DefineMap.extend( {
 	age: {
 		value: 0
 	},
 	address: {
-		value: function(){
-			return {city: "Chicago", state: "IL"};
+		value: function() {
+			return { city: "Chicago", state: "IL" };
 		}
 	}
-});
-    ```
+} );
+```
 
     @option {can-define.types.defaultConstructor} Default Specifies a function that will be called with `new` whose result is
     set as the initial value of the attribute.
 
     ```js
 // A default empty DefineList of hobbies:
-const Person = DefineMap.extend({
-	hobbies: {Default: DefineList}
-});
+const Person = DefineMap.extend( {
+	hobbies: { Default: DefineList }
+} );
 
-new Person().hobbies //-> []
-    ```
+new Person().hobbies; //-> []
+```
 
     @option {can-define.types.type} type Specifies the type of the
     property.  The type can be specified as either a function
     that returns the type coerced value or one of the [can-define.types] names.
 
     ```js
-const Person = DefineMap.extend({
-	age: {type: "number"},
+const Person = DefineMap.extend( {
+	age: { type: "number" },
 	hobbies: {
-		type: function(newValue){
-			if(typeof newValue === "string") {
-				return newValue.split(",")
-			} else if( Array.isArray(newValue) ) {
+		type: function( newValue ) {
+			if ( typeof newValue === "string" ) {
+				return newValue.split( "," );
+			} else if ( Array.isArray( newValue ) ) {
 				return newValue;
 			}
 		}
 	}
-});
-    ```
+} );
+```
 
     @option {can-define.types.typeConstructor} Type A constructor function that takes
     the assigned property value as the first argument and called with new. For example, the following will call
     `new Address(newValue)` with whatever non null, undefined, or address type is set as a `Person`'s address property.
 
     ```js
-const Address = DefineMap.extend({
+const Address = DefineMap.extend( {
 	street: "string",
-	state: "string"    
-});
+	state: "string"
+} );
 
-const Person = DefineMap.extend({
-	address: {Type: Address}    
-});
-    ```
+const Person = DefineMap.extend( {
+	address: { Type: Address }
+} );
+```
 
 
 
@@ -92,14 +92,14 @@ const Person = DefineMap.extend({
     defines a `page` getter that reads from a map's offset and limit:
 
     ```js
-DefineMap.extend({
+DefineMap.extend( {
 	page: {
-		get: function (newVal) {
-			return Math.floor(this.offset / this.limit) + 1;
+		get: function( newVal ) {
+			return Math.floor( this.offset / this.limit ) + 1;
 		}
 	}
-});
-    ```
+} );
+```
 
     A `get` definition makes the property __computed__ which means it will not be enumerable by default.
 
@@ -108,18 +108,20 @@ DefineMap.extend({
     counts the number of times the `page` property changes:
 
     ```js
-DefineMap.extend({
-	pageChangeCount: function(prop){
+DefineMap.extend( {
+	pageChangeCount: function( prop ) {
 		let count = 0;
+
 		// When page changes, update the count.
-		prop.listenTo("page", function(){
-			prop.resolve(++count);
-		});
+		prop.listenTo( "page", function() {
+			prop.resolve( ++count );
+		} );
+
 		// Set initial count.
-		prop.resolve(count);
+		prop.resolve( count );
 	}
-});
-    ```
+} );
+```
 
     A `value` definition makes the property __computed__ which means it will not be enumerable by default.
 
@@ -127,14 +129,14 @@ DefineMap.extend({
     defines a `page` setter that updates the map's offset:
 
     ```js
-DefineMap.extend({
+DefineMap.extend( {
 	page: {
-		set: function(newVal){
-			this.offset = (parseInt(newVal) - 1) * this.limit;
+		set: function( newVal ) {
+			this.offset = ( parseInt( newVal ) - 1 ) * this.limit;
 		}
 	}
-});
-    ```
+} );
+```
 
     @option {can-define.types.serialize} serialize Specifies the behavior of the property when [can-define/map/map::serialize serialize] is called.
 
@@ -143,15 +145,15 @@ DefineMap.extend({
     serialized if possible and added to the result.
 
     ```js
-const Todo = DefineMap.extend({
+const Todo = DefineMap.extend( {
 	date: {
 		type: "date",
-		serialize: function(value) {
+		serialize: function( value ) {
 			return value.getTime();
 		}
 	}
-});
-    ```
+} );
+```
 
 @type {String} Defines a [can-define.types.type] converter as one of the named types in [can-define.types].
 
@@ -184,7 +186,9 @@ For example:
 OR
 ```js
 {
-	increment: function() { ++this.count } // <- sets method prop
+	increment: function() {
+		++this.count;
+	} // <- sets method prop
 }
 ```
 
@@ -201,8 +205,8 @@ For example:
 
 ```js
 {
-	users: [User],
-	todos: [{complete: "boolean", name: "string"}]
+	users: [ User ],
+	todos: [ { complete: "boolean", name: "string" } ]
 }
 ```
 
@@ -211,7 +215,7 @@ For example:
 
 ```js
 {
-	get propertyName(){ /* ... */ }
+	get propertyName() { /* ... */ }
 }
 ```
 
@@ -230,7 +234,7 @@ This is a shorthand for providing an object with a `get` property like:
 ```js
 {
 	fullName: {
-		get: function(){
+		get: function() {
 			return this.first + " " + this.last;
 		}
 	}
@@ -245,7 +249,7 @@ or `resolve` arguments.
 
 ```js
 {
-	set propertyName(newValue){ /* ... */ }
+	set propertyName( newValue ) { /* ... */ }
 }
 ```
 
@@ -253,10 +257,10 @@ For example:
 
 ```js
 {
-	set fullName(newValue) {
-		const parts = newVal.split(" ");
-		this.first = parts[0];
-		this.last = parts[1];
+	set fullName( newValue ) {
+		const parts = newVal.split( " " );
+		this.first = parts[ 0 ];
+		this.last = parts[ 1 ];
 	}
 }
 ```
@@ -289,15 +293,15 @@ get converted to a `PropDefinition` as follows:
 
 
 ```js
-DefineMap.extend({
+DefineMap.extend( {
 	propertyA: Object,      // -> PropertyDefinition
 	propertyB: String,      // -> {type: String}
 	propertyC: Constructor, // -> {Type: Constructor}
-	propertyD: [PropDefs],  // -> {Type: DefineList.extend({"#": PropDefs})>}
-	get propertyE(){ /* ... */ },   // -> {get: propertyE(){ /* ... */ }}
-	set propertyF(value){ /* ... */ },   // -> {set: propertyF(value){ /* ... */ }}
-	method: Function,
-});
+	propertyD: [ PropDefs ],  // -> {Type: DefineList.extend({"#": PropDefs})>}
+	get propertyE() { /* ... */ },   // -> {get: propertyE(){ /* ... */ }}
+	set propertyF( value ) { /* ... */ },   // -> {set: propertyF(value){ /* ... */ }}
+	method: Function
+} );
 ```
 
 Within a property definition, the available properties and their signatures look like:
@@ -323,18 +327,21 @@ For example:
 
 
 ```js
-const Person = DefineMap.extend("Person",{
-	// a `DefineList` of `Address`
-	addresses: [Address],
-	// A `DefineMap` with a `first` and `last` property
-	name: { type: {first: "string", last: "string"} },
-	// A `DefineList of a ``DefineMap` with a `make` and `year` property.
-	cars: { Type: [{make: "string", year: "number"}] }
-});
+const Person = DefineMap.extend( "Person", {
 
-const person = new Person({
-	addresses: [{street: "1134 Pinetree"}],
-	name: {first: "Kath", last: "Iann"},
-	cars: [{ make: "Nissan", year: 2010 }]
-});
+	// a `DefineList` of `Address`
+	addresses: [ Address ],
+
+	// A `DefineMap` with a `first` and `last` property
+	name: { type: { first: "string", last: "string" } },
+
+	// A `DefineList of a ``DefineMap` with a `make` and `year` property.
+	cars: { Type: [ { make: "string", year: "number" } ] }
+} );
+
+const person = new Person( {
+	addresses: [ { street: "1134 Pinetree" } ],
+	name: { first: "Kath", last: "Iann" },
+	cars: [ { make: "Nissan", year: 2010 } ]
+} );
 ```

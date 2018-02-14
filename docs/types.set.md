@@ -20,7 +20,7 @@ setter like:
 ```js
 {
 	prop: {
-		set: function(){}
+		set: function() {}
 	}
 }
 ```
@@ -30,7 +30,7 @@ behaves differently than:
 ```js
 {
 	prop: {
-		set: function(newVal){}
+		set: function( newVal ) {}
 	}
 }
 ```
@@ -68,8 +68,8 @@ The following makes setting a `page` property update the `offset`:
 ```js
 {
 	page: {
-		set: function(newVal){
-			this.offset =  (parseInt(newVal) - 1) * this.limit;
+		set: function( newVal ) {
+			this.offset =  ( parseInt( newVal ) - 1 ) * this.limit;
 		}
 	}
 }
@@ -99,8 +99,8 @@ The following shows an async setter:
 ```js
 {
 	prop: {
-		set: function( newVal, setVal){
-			$.get("/something", {}, setVal );
+		set: function( newVal, setVal ) {
+			$.get( "/something", {}, setVal );
 		}
 	}
 }
@@ -114,42 +114,42 @@ When a setter returns `undefined`, its behavior changes depending on the number 
 With 0 arguments, the original set value is set on the attribute.
 
 ```js
-MyMap = DefineMap.extend({
-	prop: {set: function(){}}
-})
+MyMap = DefineMap.extend( {
+	prop: { set: function() {} }
+} );
 
-const map = new MyMap({prop : "foo"});
+const map = new MyMap( { prop: "foo" } );
 
-map.prop //-> "foo"
+map.prop; //-> "foo"
 ```
 
 With 1 argument, an `undefined` return value will set the property to `undefined`.  
 
 ```js
-MyMap = DefineMap.extend({
-	prop: {set: function(newVal){}}
-})
+MyMap = DefineMap.extend( {
+	prop: { set: function( newVal ) {} }
+} );
 
-const map = new MyMap({prop : "foo"});
+const map = new MyMap( { prop: "foo" } );
 
-map.prop //-> undefined
+map.prop; //-> undefined
 ```
 
 With 2 arguments, `undefined` leaves the property in place.  It is expected
 that `resolve` will be called:
 
 ```js
-MyMap = DefineMap.extend({
+MyMap = DefineMap.extend( {
 	prop: {
-		set: function(newVal, resolve){
-			setVal(newVal+"d");
+		set: function( newVal, resolve ) {
+			setVal( newVal + "d" );
 		}
 	}
-});
+} );
 
-const map = new MyMap({prop : "foo"});
+const map = new MyMap( { prop: "foo" } );
 
-map.prop //-> "food";
+map.prop; //-> "food";
 ```
 
 ## Side effects
@@ -159,20 +159,20 @@ A set function provides a useful hook for performing side effect logic as a cert
 For example, in the example below, Paginator DefineMap includes a `page` property, which derives its value entirely from other properties (limit and offset).  If something tries to set the `page` directly, the set method will set the value of `offset`:
 
 ```js
-const Paginate = DefineMap.extend({
-	limit: 'number',
-	offset: 'number',
+const Paginate = DefineMap.extend( {
+	limit: "number",
+	offset: "number",
 	page: {
-		set: function (newVal) {
-			this.offset = (parseInt(newVal) - 1) * this.limit;
+		set: function( newVal ) {
+			this.offset = ( parseInt( newVal ) - 1 ) * this.limit;
 		},
-		get: function () {
-			return Math.floor(this.offset / this.limit) + 1;
+		get: function() {
+			return Math.floor( this.offset / this.limit ) + 1;
 		}
 	}
-});
+} );
 
-const p = new Paginate({limit: 10, offset: 20});
+const p = new Paginate( { limit: 10, offset: 20 } );
 ```
 
 
@@ -182,49 +182,49 @@ const p = new Paginate({limit: 10, offset: 20});
 By default, if a value returned from a setter is an object the effect will be to replace the property with the new object completely.
 
 ```js
-const Contact = DefineMap.extend({
+const Contact = DefineMap.extend( {
 	info: {
-		set: function(newVal){
+		set: function( newVal ) {
 			return newVal;
 		}
 	}
-});
+} );
 
-const alice = new Contact({
-	info: {name: 'Alice Liddell', email: 'alice@liddell.com'}
-});
+const alice = new Contact( {
+	info: { name: "Alice Liddell", email: "alice@liddell.com" }
+} );
 
 const info  = alice.info;
 
-alice.info = {name: 'Allison Wonderland', phone: '888-888-8888'};
+alice.info = { name: "Allison Wonderland", phone: "888-888-8888" };
 
-info === alice.info // -> false
+info === alice.info; // -> false
 ```
 
 In contrast, you can merge properties with:
 
 ```js
-Contact = DefineMap.extend({
+Contact = DefineMap.extend( {
 	info: {
-		set: function(newVal){
-			if(this.info) {
-				return this.info.set(newVal);
+		set: function( newVal ) {
+			if ( this.info ) {
+				return this.info.set( newVal );
 			} else {
 				return newVal;
 			}
 		}
 	}
-});
+} );
 
-const alice = new Contact({
-	info: {name: 'Alice Liddell', email: 'alice@liddell.com'}
-});
+const alice = new Contact( {
+	info: { name: "Alice Liddell", email: "alice@liddell.com" }
+} );
 
 const info  = alice.info;
 
-alice.info = {name: 'Allison Wonderland', phone: '888-888-8888'};
+alice.info = { name: "Allison Wonderland", phone: "888-888-8888" };
 
-info === alice.info // -> true
+info === alice.info; // -> true
 ```
 
 ## Batched Changes

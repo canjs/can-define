@@ -17,10 +17,10 @@ Creates an instance of a DefineList or an extended DefineList with enumerated pr
 ```js
 import DefineList from "can-define/list/list";
 
-const people = new DefineList([
+const people = new DefineList( [
 	{ first: "Justin", last: "Meyer" },
 	{ first: "Paula", last: "Strozak" }
-]);
+] );
 ```
 
   @param {Array} [items] An array of items to seed the list with.
@@ -39,11 +39,11 @@ Instances of `DefineList` have all methods and properties from
 Example:
 
 ```js
-const MyList = DefineList.extend({ "#": "string" });
+const MyList = DefineList.extend( { "#": "string" } );
 
-const listInstance = new MyList(["a","b"]);
+const listInstance = new MyList( [ "a", "b" ] );
 
-listInstance.on("length", function(event, newLength, oldLength){ /* ... */ });
+listInstance.on( "length", function( event, newLength, oldLength ) { /* ... */ } );
 ```
 
 
@@ -58,11 +58,11 @@ Extended `DefineList` constructor functions have all methods and properties from
 Example:
 
 ```js
-const MyList = DefineList.extend({ "#": "string" });
+const MyList = DefineList.extend( { "#": "string" } );
 
-canReflect.onInstancePatches(MyList, function(instance, patches){
+canReflect.onInstancePatches( MyList, function( instance, patches ) {
 
-});
+} );
 ```
 
 ## Use
@@ -71,11 +71,11 @@ The `can-define/list/list` module exports a `DefineList` constructor function.  
 with `new` to create observable lists that behave very similar to `Array`s.  For example:
 
 ```js
-const list = new DefineList(["a","b", "c"]);
-list[0] //-> "a";
+const list = new DefineList( [ "a", "b", "c" ] );
+list[ 0 ]; //-> "a";
 
-list.push("x");
-list.pop() //-> "x"
+list.push( "x" );
+list.pop(); //-> "x"
 ```
 
 It can also be extended to define custom observable list types with
@@ -83,30 +83,30 @@ It can also be extended to define custom observable list types with
 where every item is converted to a string by specifying the [can-define/list/list.prototype.wildcardItems items definition] `(#)`:
 
 ```js
-const StringList = DefineList.extend({
+const StringList = DefineList.extend( {
 	"#": "string"
-});
+} );
 
-const strings = new StringList([1,new Date(1475370478173),false]);
+const strings = new StringList( [ 1, new Date( 1475370478173 ), false ] );
 
-strings[0] //-> "1"
-strings[1] //-> "Sat Oct 01 2016 20:07:58 GMT-0500 (CDT)"
-strings[2] //-> "false"
+strings[ 0 ]; //-> "1"
+strings[ 1 ]; //-> "Sat Oct 01 2016 20:07:58 GMT-0500 (CDT)"
+strings[ 2 ]; //-> "false"
 ```
 
 Non-numeric properties can also be defined on custom DefineList type.  The following
 defines a `completed` property that returns the completed todos:
 
 ```js
-const TodoList = DefineList.extend({
+const TodoList = DefineList.extend( {
 	"#": Todo,
-	get completed(){
-		return this.filter({complete: true})
+	get completed() {
+		return this.filter( { complete: true } );
 	}
-});
+} );
 
-const todos = new TodoList([{complete: true}, {complete:false}]);
-todos.completed.length //-> 1
+const todos = new TodoList( [ { complete: true }, { complete: false } ] );
+todos.completed.length; //-> 1
 ```
 
 Finally, DefineList instances are observable, so you can use the [can-event]
@@ -115,20 +115,20 @@ methods to listen to its [can-define/list/list/AddEvent],
 and [can-define/list/list/PropertyNameEvent] events:
 
 ```js
-const people = new DefineList(["alice","bob","eve"]);
+const people = new DefineList( [ "alice", "bob", "eve" ] );
 
-people.on("add", function(ev, items, index){
-	console.log("add", items, index);
-}).on("remove", function(ev, items, index){
-	console.log("remove", items, index);
-}).on("length", function(ev, newVal, oldVal){
-	console.log("length", newVal, oldVal);
-})
+people.on( "add", function( ev, items, index ) {
+	console.log( "add", items, index );
+} ).on( "remove", function( ev, items, index ) {
+	console.log( "remove", items, index );
+} ).on( "length", function( ev, newVal, oldVal ) {
+	console.log( "length", newVal, oldVal );
+} );
 
 people.pop(); // remove ["eve"] 2
 // length 2 3
 
-people.unshift("Xerxes"); // add ["Xerxes"] 1
+people.unshift( "Xerxes" ); // add ["Xerxes"] 1
 // length 3 2
 ```
 

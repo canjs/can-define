@@ -21,21 +21,21 @@ It looks like:
 Setting the wildcard is useful when items should be converted to a particular type.
 
 ```js
-const Person = DefineMap.extend({ /* ... */ });
+const Person = DefineMap.extend( { /* ... */ } );
 
-const People = DefineList.extend({
+const People = DefineList.extend( {
 	"#": Person
-});
+} );
 ```
 
 The wildcard property has optional `added` and `removed` functions that will be called after
 an item is added or removed from the list with `this` being the list.
 
 ```js
-const People = DefineList.extend({
+const People = DefineList.extend( {
 	"#": {
-		added: function(itemsAdded, index) { /* ... */ },
-		removed: function(itemsRemoved, index) { /* ... */ }
+		added: function( itemsAdded, index ) { /* ... */ },
+		removed: function( itemsRemoved, index ) { /* ... */ }
 	}
-});
+} );
 ```

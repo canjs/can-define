@@ -43,13 +43,13 @@ instances.  For example:
 ```js
 {
 	people: {
-		Type: [Person]
+		Type: [ Person ]
 	},
 	addresses: {
-		Type: [{
+		Type: [ {
 			street: "string",
 			city: "string"
-		}]
+		} ]
 	}
 }
 ```
@@ -60,18 +60,18 @@ instances.  For example:
 ## Use
 
 ```js
-const Address = DefineMap.extend({
+const Address = DefineMap.extend( {
 	street: "string",
 	city: "string"
-});
+} );
 
-const Direction = DefineMap.extend({
-	from: {Type: Address},
+const Direction = DefineMap.extend( {
+	from: { Type: Address },
 	to: Address
-});
+} );
 
-const direction = new Direction({
-	from: {street: "2060 N. Stave", city: "Chicago"},
-	to: new Address({street: "123 Greenview", city: "Libertyville"})
-});
+const direction = new Direction( {
+	from: { street: "2060 N. Stave", city: "Chicago" },
+	to: new Address( { street: "123 Greenview", city: "Libertyville" } )
+} );
 ```

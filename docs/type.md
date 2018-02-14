@@ -11,7 +11,7 @@ Given the set value, transform it into a value appropriate to be set.
 ```js
 {
 	age: {
-		type: function(newValue, propertyName){
+		type: function( newValue, propertyName ) {
 			return +newValue;
 		}
 	}
@@ -51,7 +51,7 @@ Sets the type to a named type in [can-define.types].  The default typeName is `"
 		}
 	}
 }
-  ```
+```
 
   @signature `[Type|propDefinition]`
 
@@ -61,13 +61,13 @@ Sets the type to a named type in [can-define.types].  The default typeName is `"
 ```js
 {
 	people: {
-		type: [Person]
+		type: [ Person ]
 	},
 	addresses: {
-		type: [{
+		type: [ {
 			street: "string",
 			city: "string"
-		}]
+		} ]
 	}
 }
 ```
@@ -90,18 +90,18 @@ as either:
 The following example converts the `count` property to a number and the `items` property to an array:
 
 ```js
-DefineMap.extend({
-	count: {type: "number"},
+DefineMap.extend( {
+	count: { type: "number" },
 	items: {
-		type: function(newValue){
-			if(typeof newValue === "string") {
-				return newValue.split(",")
-			} else if( Array.isArray(newValue) ) {
+		type: function( newValue ) {
+			if ( typeof newValue === "string" ) {
+				return newValue.split( "," );
+			} else if ( Array.isArray( newValue ) ) {
 				return newValue;
 			}
 		}
 	}
-});
+} );
 ```
 
 When a user tries to set those properties like:

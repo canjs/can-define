@@ -19,10 +19,10 @@ Calling `new DefineMap(props)` creates a new instance of DefineMap or an [can-de
 ```js
 import DefineMap from "can-define/map/map";
 
-const person = new DefineMap({
+const person = new DefineMap( {
 	first: "Justin",
 	last: "Meyer"
-});
+} );
 ```
 
   Custom `DefineMap` types, with special properties and behaviors, can be defined with [can-define/map/map.extend].
@@ -43,11 +43,11 @@ Instances of `DefineMap` have all methods and properties from
 Example:
 
 ```js
-const MyType = DefineMap.extend({ prop: "string" });
+const MyType = DefineMap.extend( { prop: "string" } );
 
-const myInstance = new MyType({prop: "VALUE"});
+const myInstance = new MyType( { prop: "VALUE" } );
 
-myInstance.on("prop", function(event, newVal, oldVal){ /* ... */ });
+myInstance.on( "prop", function( event, newVal, oldVal ) { /* ... */ } );
 ```
 
 
@@ -62,11 +62,11 @@ Extended `DefineMap` constructor functions have all methods and properties from
 Example:
 
 ```js
-const MyType = DefineMap.extend({ /* ... */ });
+const MyType = DefineMap.extend( { /* ... */ } );
 
-canReflect.onInstancePatches(MyType, function(instance, patches){
+canReflect.onInstancePatches( MyType, function( instance, patches ) {
 
-});
+} );
 ```
 
 ## Use
@@ -79,13 +79,13 @@ For example, a `Todo` type, with a `name` property, `completed` property, and a 
 ```js
 import DefineMap from "can-define/map/map";
 
-const Todo = DefineMap.extend({
+const Todo = DefineMap.extend( {
 	name: "string",
-	completed: {type: "boolean", default: false},
-	toggle: function(){
+	completed: { type: "boolean", default: false },
+	toggle: function() {
 		this.completed = !this.completed;
 	}
-});
+} );
 ```
 
 The _Object_ passed to `.extend` defines the properties and methods that will be
@@ -104,18 +104,18 @@ calling `new Todo()` as follows:
 ```js
 const myTodo = new Todo();
 myTodo.name = "Do the dishes";
-myTodo.completed //-> false
+myTodo.completed; //-> false
 
 myTodo.toggle();
-myTodo.completed //-> true
+myTodo.completed; //-> true
 ```  
 
 You can also pass initial properties and their values when initializing a `DefineMap`:
 
 ```js
-const anotherTodo = new Todo({name: "Mow lawn", completed: true});
+const anotherTodo = new Todo( { name: "Mow lawn", completed: true } );
 myTodo.name = "Mow lawn";
-myTodo.completed //-> true
+myTodo.completed; //-> true
 ```  
 
 ## Declarative properties
@@ -125,43 +125,43 @@ that functionally derive their value from other property values.  This is done b
 defining [can-define.types.get getter] properties like `fullName` as follows:
 
 ```js
-const Person = DefineMap.extend({
+const Person = DefineMap.extend( {
 	first: "string",
 	last: "string",
 	fullName: {
-		get : function(){
+		get: function() {
 			return this.first + " " + this.last;
 		}
 	}
-});
+} );
 ```
 
 `fullName` can also be defined with the ES5 shorthand getter syntax:
 
 ```js
-const Person = DefineMap.extend({
+const Person = DefineMap.extend( {
 	first: "string",
 	last: "string",
-	get fullName(){
+	get fullName() {
 		return this.first + " " + this.last;
 	}
-});
+} );
 ```
 
 Now, when a `person` is created, there is a `fullName` property available like:
 
 ```js
-const me = new Person({first: "Harry", last: "Potter"});
-me.fullName //-> "Harry Potter"
+const me = new Person( { first: "Harry", last: "Potter" } );
+me.fullName; //-> "Harry Potter"
 ```
 
 This property can be bound to like any other property:
 
 ```js
-me.on("fullName", function(ev, newValue, oldValue){
-	newValue //-> Harry Henderson
-	oldValue //-> Harry Potter
-});
+me.on( "fullName", function( ev, newValue, oldValue ) {
+	newValue; //-> Harry Henderson
+	oldValue; //-> Harry Potter
+} );
 
 me.last = "Henderson";
 ```
@@ -171,41 +171,41 @@ the value of the `getter` is cached and only updates when one of its source
 observables change.  For example:
 
 ```js
-const Person = DefineMap.extend({
+const Person = DefineMap.extend( {
 	first: "string",
 	last: "string",
-	get fullName(){
-		console.log("calculating fullName");
+	get fullName() {
+		console.log( "calculating fullName" );
 		return this.first + " " + this.last;
 	}
-});
+} );
 
-const hero = new Person({first: "Wonder", last: "Woman"});
-
-// console.logs "calculating fullName"
-hero.fullName //-> Wonder Woman
+const hero = new Person( { first: "Wonder", last: "Woman" } );
 
 // console.logs "calculating fullName"
-hero.fullName //-> Wonder Woman
+hero.fullName; //-> Wonder Woman
 
 // console.logs "calculating fullName"
-hero.on("fullName", function(){});
-
-hero.fullName //-> "Wonder Woman"
+hero.fullName; //-> Wonder Woman
 
 // console.logs "calculating fullName"
-hero.first = "Bionic"
+hero.on( "fullName", function() {} );
+
+hero.fullName; //-> "Wonder Woman"
 
 // console.logs "calculating fullName"
-hero.last = "Man"
+hero.first = "Bionic";
 
-hero.fullName //-> "Bionic Man"
+// console.logs "calculating fullName"
+hero.last = "Man";
+
+hero.fullName; //-> "Bionic Man"
 ```
 
 If you want to prevent repeat updates, use [can-event/batch/batch]:
 
 ```js
-hero.fullName //-> "Bionic Man"
+hero.fullName; //-> "Bionic Man"
 
 import canBatch from "can-event/batch/batch";
 
@@ -227,14 +227,14 @@ to make a `todo` property available:
 ```js
 import ajax from "can-util/dom/ajax/ajax";
 
-const TodoViewModel = DefineMap.extend({
+const TodoViewModel = DefineMap.extend( {
 	todoId: "number",
 	todo: {
-		get: function(lastSetValue, resolve){
-			ajax({url: "/todos/"+this.todoId}).then(resolve)
+		get: function( lastSetValue, resolve ) {
+			ajax( { url: "/todos/" + this.todoId } ).then( resolve );
 		}
 	}
-});
+} );
 ```
 
 Asynchronous getters only are passed a `resolve` argument when bound.  Typically in an application,
@@ -243,14 +243,14 @@ look like:
 
 ```js
 import fixture from "can-fixture";
-fixture("GET /todos/5", function(){
-	return {id: 5, name: "take out trash"}
-});
+fixture( "GET /todos/5", function() {
+	return { id: 5, name: "take out trash" };
+} );
 
-const todoVM = new TodoViewModel({id: 5});
-todoVM.on("todo", function(ev, newVal){
-	assert.equal(newVal.name, "take out trash");
-});
+const todoVM = new TodoViewModel( { id: 5 } );
+todoVM.on( "todo", function( ev, newVal ) {
+	assert.equal( newVal.name, "take out trash" );
+} );
 ```
 
 ### Getter limitations
@@ -266,23 +266,23 @@ we want to clear the choice of __city__ whenever the __state__ changes.
 This can be implemented with [can-define.types.set] like:
 
 ```js
-Locator = DefineMap.extend({
+Locator = DefineMap.extend( {
 	state: {
 		type: "string",
-		set: function(){
+		set: function() {
 			this.city = null;
 		}
 	},
 	city: "string"
-});
+} );
 
-const locator = new Locator({
+const locator = new Locator( {
 	state: "IL",
 	city: "Chicago"
-});
+} );
 
 locator.state = "CA";
-locator.city //-> null;
+locator.city; //-> null;
 ```
 
 The problem with this code is that it relies on side effects to manage the behavior of
@@ -293,23 +293,24 @@ The [can-define.types.value] behavior and [can-define-stream-kefir] plugin allow
 behavior of a property to a single place.  For example, the following implements `Locator` with [can-define.types.value]:
 
 ```js
-const Locator = DefineMap.extend("Locator",{
+const Locator = DefineMap.extend( "Locator", {
 	state: "string",
 	city: {
-		value: function(prop) {
+		value: function( prop ) {
+
 			// When city is set, update `city` with the set value.
-			prop.listenTo(prop.lastSet, prop.resolve);
+			prop.listenTo( prop.lastSet, prop.resolve );
 
 			// When state is set, set `city` to null.
-			prop.listenTo("state", function(){
-				prop.resolve(null);
-			});
+			prop.listenTo( "state", function() {
+				prop.resolve( null );
+			} );
 
 			// Initialize the value to the `set` value.
 			prop.resolve( prop.lastSet.get() );
 		}
 	}
-});
+} );
 ```
 
 While [functional reactive programming](https://en.wikipedia.org/wiki/Functional_reactive_programming) (FRP) can take time to
@@ -319,16 +320,16 @@ in other properties and `resolve` the property to a new value.  If you are looki
 checkout [can-define-stream-kefir], which supports a full streaming library with many event-stream transformations:
 
 ```js
-const Locator = DefineMap.extend({
+const Locator = DefineMap.extend( {
 	state: "string",
 	city: {
-		stream: function(setStream) {
-			return this.stream(".state").map(function(){
+		stream: function( setStream ) {
+			return this.stream( ".state" ).map( function() {
 				return null;
-			}).merge(setStream);
+			} ).merge( setStream );
 		}
 	}
-});
+} );
 ```
 
 Notice, in the `can-define-stream` example, `city` must be bound for it to work.  
@@ -344,15 +345,15 @@ will throw an error in files that are in [strict mode](https://developer.mozilla
 
 import DefineMap from "can-define/map/map";
 
-const MyType = DefineMap.extend({
+const MyType = DefineMap.extend( {
 	myProp: "string"
-});
+} );
 
 const myType = new MyType();
 
 myType.myProp = "value"; // no error thrown
 
-myType.otherProp = "value" // throws Error!
+myType.otherProp = "value"; // throws Error!
 ```
 
 Read the [can-define/map/map.seal] documentation for more information on this behavior.

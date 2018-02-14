@@ -27,20 +27,20 @@ Specify `Default` like:
 ## Use
 
 ```js
-const Address = DefineMap.extend({
-	street: {type: "string", value: "321 Longbow"},
-	city: {type: "string", value: "Dallas"}
-});
+const Address = DefineMap.extend( {
+	street: { type: "string", value: "321 Longbow" },
+	city: { type: "string", value: "Dallas" }
+} );
 
-const Direction = DefineMap.extend({
-	from: {Type: Address, Default: Address},
-	to: {Type: Address, Default: Address}
-});
+const Direction = DefineMap.extend( {
+	from: { Type: Address, Default: Address },
+	to: { Type: Address, Default: Address }
+} );
 
-const direction = new Direction({
-	to: {street: "2070 N. Stave"}
-});
+const direction = new Direction( {
+	to: { street: "2070 N. Stave" }
+} );
 
-direction.from.street //-> "321 Longbow"
-direction.to.street   //-> "2070 N. Stave"
+direction.from.street; //-> "321 Longbow"
+direction.to.street;   //-> "2070 N. Stave"
 ```

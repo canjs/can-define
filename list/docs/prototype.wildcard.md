@@ -22,15 +22,15 @@ It looks like:
 Setting the wildcard is useful when all properties should be converted to a particular type.
 
 ```js
-const Person = DefineList.extend({ /* ... */ });
+const Person = DefineList.extend( { /* ... */ } );
 
-const People = DefineList.extend({
+const People = DefineList.extend( {
 	"*": "string",
 	"#": Person
-});
+} );
 
 const people = new People();
 
-people.set("age", 21);
-people.age //-> "21"
+people.set( "age", 21 );
+people.age; //-> "21"
 ```

@@ -25,16 +25,16 @@ Use any of the type names on a [can-define.types.propDefinition]'s `type` or dir
 import define from "can-define";
 import DefineMap from "can-define/map/map";
 
-const Animal = function(name){
+const Animal = function( name ) {
 	this.name = name;
 };
-define(Animal.prototype,{
-	name: {type: "string"}
-});
+define( Animal.prototype, {
+	name: { type: "string" }
+} );
 
-const Person = DefineMap.extend({
+const Person = DefineMap.extend( {
 	name: "string"
-});
+} );
 ```
 
 You can also pass these functions in directly:
@@ -44,14 +44,14 @@ You can also pass these functions in directly:
 import define from "can-define";
 import DefineMap from "can-define/map/map";
 
-const Animal = function(name){
+const Animal = function( name ) {
 	this.name = name;
 };
-define(Animal.prototype,{
-	name: {type: define.type.string}
-});
+define( Animal.prototype, {
+	name: { type: define.type.string }
+} );
 
-const Person = DefineMap.extend({
+const Person = DefineMap.extend( {
 	name: define.type.string
-});
+} );
 ```

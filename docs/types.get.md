@@ -16,10 +16,10 @@ Specify `get` like:
 ```js
 {
 	propertyName: {
-		get: function(){ /* ... */ }
+		get: function() { /* ... */ }
 	},
 	propertyName: {
-		get: function(lastSetValue) { /* ... */ }
+		get: function( lastSetValue ) { /* ... */ }
 	}
 }
 ```
@@ -42,7 +42,7 @@ Specify `get` like:
 ```js
 {
 	propertyName: {
-		get: function(lastSetValue, resolve){ /* ... */ }
+		get: function( lastSetValue, resolve ) { /* ... */ }
 	}
 }
 ```
@@ -74,23 +74,23 @@ Whenever a getter is provided, it is wrapped in a [can-compute], which ensures
 that whenever its dependent properties change, a change event will fire for this property also.
 
 ```js
-const Person = DefineMap.extend({
+const Person = DefineMap.extend( {
 	first: "string",
 	last: "string",
 	fullName: {
-		get: function () {
+		get: function() {
 			return this.first + " " + this.last;
 		}
 	}
-});
+} );
 
-const p = new Person({first: "Justin", last: "Meyer"});
+const p = new Person( { first: "Justin", last: "Meyer" } );
 
 p.fullName; // "Justin Meyer"
 
-p.on("fullName", function(ev, newVal){
-	newVal //-> "Lincoln Meyer";
-});
+p.on( "fullName", function( ev, newVal ) {
+	newVal; //-> "Lincoln Meyer";
+} );
 
 p.first = "Lincoln";
 ```
@@ -101,17 +101,17 @@ Often, a virtual property's value only becomes available after some period of ti
 given a `personId`, one might want to retrieve a related person:
 
 ```js
-const AppState = DefineMap.extend({
+const AppState = DefineMap.extend( {
 	personId: "number",
 	person: {
-		get: function(lastSetValue, resolve){
-			Person.get({id: this.personId})
-				.then(function(person){
-					resolve(person);
-				});
+		get: function( lastSetValue, resolve ) {
+			Person.get( { id: this.personId } )
+				.then( function( person ) {
+					resolve( person );
+				} );
 		}
 	}
-});
+} );
 ```
 
 Asynchronous properties should be bound to before reading their value.  If
@@ -120,39 +120,39 @@ they are not bound to, the `get` function will be called each time.
 The following example will make multiple `Person.get` requests:
 
 ```js
-const state = new AppState({personId: 5});
-state.person //-> undefined
+const state = new AppState( { personId: 5 } );
+state.person; //-> undefined
 
 // called sometime later /* ... */
-state.person //-> undefined
+state.person; //-> undefined
 ```
 
 However, by binding, the compute only reruns the `get` function once `personId` changes:
 
 ```js
-const state = new AppState({personId: 5});
+const state = new AppState( { personId: 5 } );
 
-state.on("person", function(){})
+state.on( "person", function() {} );
 
-state.person //-> undefined
+state.person; //-> undefined
 
 // called sometime later
-state.person //-> Person<{id: 5}>
+state.person; //-> Person<{id: 5}>
 ```
 
 A template like [can-stache] will automatically bind for you, so you can pass
 `state` to the template like the following without binding:
 
 ```js
-const template = stache("<span>{{person.fullName}}</span>");
-const state = new AppState({});
-const frag = template(state);
+const template = stache( "<span>{{person.fullName}}</span>" );
+const state = new AppState( {} );
+const frag = template( state );
 
 state.personId = 5;
-frag.childNodes[0].innerHTML //=> ""
+frag.childNodes[ 0 ].innerHTML; //=> ""
 
 // sometime later
-frag.childNodes[0].innerHTML //=> "Lincoln Meyer"
+frag.childNodes[ 0 ].innerHTML; //=> "Lincoln Meyer"
 ```
 
 The magic tags are updated as `personId`, `person`, and `fullName` change.
@@ -167,21 +167,21 @@ For example, a property might be set to a compute, but when read, provides the v
 of the compute.
 
 ```js
-const MyMap = DefineMap.extend({
+const MyMap = DefineMap.extend( {
 	value: {
-		get: function( lastSetValue ){
+		get: function( lastSetValue ) {
 			return lastSetValue();
 		}
 	}
-});
+} );
 
 const map = new MyMap();
-const compute = compute(1);
+const compute = compute( 1 );
 map.value = compute;
 
-map.value //-> 1
-compute(2);
-map.value //-> 2
+map.value; //-> 1
+compute( 2 );
+map.value; //-> 2
 ```
 
 This technique should only be used when the `lastSetValue` is some form of
@@ -200,16 +200,16 @@ the [can-define/list/list] will be updated with the `id`s of the `locations`.
 
 
 ```js
-const Store = DefineMap.extend({
+const Store = DefineMap.extend( {
 	locations: DefineList,
 	locationIds: {
 		Default: DefineList,
-		get: function(initialValue){
-			const ids = this.locations.map(function(location){
-				ids.push(location.id);
-			});
-			return initialValue.replace(ids);
+		get: function( initialValue ) {
+			const ids = this.locations.map( function( location ) {
+				ids.push( location.id );
+			} );
+			return initialValue.replace( ids );
 		}
 	}
-});
+} );
 ```

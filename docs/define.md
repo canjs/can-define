@@ -15,13 +15,13 @@ Define observable properties, type conversion, and getter/setter logic on [https
 ```js
 import define from "can-define";
 
-const Greeting = function(message){
+const Greeting = function( message ) {
 	this.message = message;
 };
 
-define(Greeting.prototype,{
-	message: {type: "string"}
-});
+define( Greeting.prototype, {
+	message: { type: "string" }
+} );
 ```
 
 @param {Object} prototype The prototype object of a constructor function or [class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/class). The prototype
@@ -50,35 +50,35 @@ The following creates a
 ```js
 import define from "can-define";
 
-const Person = function(first, last){
+const Person = function( first, last ) {
 	this.first = first;
 	this.last = last;
 };
-define(Person.prototype,{
+define( Person.prototype, {
 	first: { type: "string" },
 	last: { type: "string" },
 	fullName: {
-		get: function(){
-			return this.first+" "+this.last;
+		get: function() {
+			return this.first + " " + this.last;
 		}
 	}
-});
+} );
 ```
 
 This can be used to create `Person` instances with observable properties:
 
 ```js
-const person = new Person("Justin", "Meyer");
-person.first    //-> "Justin"
-person.last     //-> "Meyer"
-person.fullName //-> "Justin Meyer"
+const person = new Person( "Justin", "Meyer" );
+person.first;    //-> "Justin"
+person.last;     //-> "Meyer"
+person.fullName; //-> "Justin Meyer"
 
-person.on("fullName", function(ev, newVal, oldVal){
-	newVal //-> "Ramiya Meyer"
-	oldVal //-> "Justin Meyer"
-});
+person.on( "fullName", function( ev, newVal, oldVal ) {
+	newVal; //-> "Ramiya Meyer"
+	oldVal; //-> "Justin Meyer"
+} );
 
-person.first = "Ramiya"
+person.first = "Ramiya";
 ```
 
 The observable properties call [can-observation.add Observation.add] so they can be observed by
