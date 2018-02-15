@@ -9,8 +9,12 @@ is read for the first time.
 A function can be provided that returns the default value used for this property, like:
 
 ```js
-prop: {
-  default: function(){ return []; }
+{
+	prop: {
+		default: function() {
+			return [];
+		}
+	}
 }
 ```
 
@@ -24,8 +28,10 @@ If the default value should be an object of some type, it should be specified as
 Any value can be provided as the default value used for this property, like:
 
 ```
-prop: {
-  default: 'foo'
+{
+	prop: {
+		default: 'foo'
+	}
 }
 ```
 
@@ -39,16 +45,16 @@ The following defaults `age` to `0` and `address` to an object:
 
 ```js
 // A default age of `0`:
-var Person = DefineMap.extend({
-  age: {
-    default: 0
-  },
-  address: {
-    default: function(){
-      return {city: "Chicago", state: "IL"};
-    };
-  }
-});
+const Person = DefineMap.extend( {
+	age: {
+		default: 0
+	},
+	address: {
+		default: function() {
+			return { city: "Chicago", state: "IL" };
+		}
+	}
+} );
 ```
 
 ## Alternates

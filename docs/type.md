@@ -9,10 +9,12 @@ Given the set value, transform it into a value appropriate to be set.
 `type` is called before [can-define.types.set].  
 
 ```js
-age: {
-    type: function(newValue, propertyName){
-        return +newValue;
-    }
+{
+	age: {
+		type: function( newValue, propertyName ) {
+			return +newValue;
+		}
+	}
 }
 ```
 
@@ -26,8 +28,10 @@ age: {
 Sets the type to a named type in [can-define.types].  The default typeName is `"observable"`.
 
 ```js
-age: {
-    type: "number"
+{
+	age: {
+		type: "number"
+	}
 }
 ```
 
@@ -39,30 +43,34 @@ age: {
   A [can-define.types.propDefinition] that defines an inline [can-define/map/map] type.  For example:
 
   ```js
-  address: {
-      type: {
-          street: "string",
-          city: "string"
-      }
-  }
-  ```
+{
+	address: {
+		type: {
+			street: "string",
+			city: "string"
+		}
+	}
+}
+```
 
   @signature `[Type|propDefinition]`
 
   Defines an inline [can-define/list/list] type that's an array of `Type` or inline `propDefinition` [can-define/map/map]
   instances.  For example:
 
-  ```js
-  people: {
-      type: [Person]
-  },
-  addresses: {
-      type: [{
-          street: "string",
-          city: "string"
-      }]
-  }
-  ```
+```js
+{
+	people: {
+		type: [ Person ]
+	},
+	addresses: {
+		type: [ {
+			street: "string",
+			city: "string"
+		} ]
+	}
+}
+```
 
 
 @body
@@ -82,18 +90,18 @@ as either:
 The following example converts the `count` property to a number and the `items` property to an array:
 
 ```js
-DefineMap.extend({
-    count: {type: "number"},
-    items: {
-        type: function(newValue){
-            if(typeof newValue === "string") {
-                return newValue.split(",")
-            } else if( Array.isArray(newValue) ) {
-                return newValue;
-            }
-        }
-    }
-});
+DefineMap.extend( {
+	count: { type: "number" },
+	items: {
+		type: function( newValue ) {
+			if ( typeof newValue === "string" ) {
+				return newValue.split( "," );
+			} else if ( Array.isArray( newValue ) ) {
+				return newValue;
+			}
+		}
+	}
+} );
 ```
 
 When a user tries to set those properties like:

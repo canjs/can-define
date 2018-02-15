@@ -17,28 +17,28 @@ to set a new value on the observable. For example, the following
 counts the number of times the `name` property changed:
 
 ```js
-Person = DefineMap.extend("Person",{
-    name: "string",
-    nameChangeCount: {
-        value(prop){
-            var count = 0;
+Person = DefineMap.extend( "Person", {
+	name: "string",
+	nameChangeCount: {
+		value( prop ) {
+			let count = 0;
 
-            prop.listenTo("name", () => {
-                prop.resolve(++count);
-            });
+			prop.listenTo( "name", () => {
+				prop.resolve( ++count );
+			} );
 
-            prop.resolve(count);
-        }
-    }
-});
+			prop.resolve( count );
+		}
+	}
+} );
 
-var p = new Person();
-p.on("nameChangedCount", (ev, newVal)=> {
-    console.log("name changed", newVal, "times");
-});
+const p = new Person();
+p.on( "nameChangedCount", ( ev, newVal )=> {
+	console.log( "name changed", newVal, "times" );
+} );
 
-p.name = "Justin" // logs name changed 1 times
-p.name = "Ramiya" // logs name changed 2 times
+p.name = "Justin"; // logs name changed 1 times
+p.name = "Ramiya"; // logs name changed 2 times
 ```
 
 If the property defined by `value` is unbound, the `value` function will be called each time. Use `prop.resolve` synchronously
@@ -66,18 +66,18 @@ behavior:
   Examples:
 
   ```js
-  // Binds to the map's `name` event:
-  prop.listenTo("name", handler)     
+// Binds to the map's `name` event:
+prop.listenTo( "name", handler );
 
-  // Binds to the todos `length` event:
-  prop.listenTo(todos, "length", handler)
+// Binds to the todos `length` event:
+prop.listenTo( todos, "length", handler );
 
-  // Binds to the `todos` `length` event in the mutate queue:
-  prop.listenTo(todos, "length", handler, "mutate")
+// Binds to the `todos` `length` event in the mutate queue:
+prop.listenTo( todos, "length", handler, "mutate" );
 
-  // Binds to an `onValue` emitter:
-  prop.listenTo(observable, handler) //
-  ```
+// Binds to an `onValue` emitter:
+prop.listenTo( observable, handler ); //
+```
 
 - __prop.stopListening(bindTarget, event, handler, queue)__ `{function(Any,String,Fuction,String)}`  A function that removes bindings
   registered by the `prop.listenTo` argument.  This `prop.stopListening` method is very similar to the [can-event-queue/map/map.stopListening] method available on [can-define/map/map DefineMap].  It differs only that it:
@@ -88,26 +88,26 @@ behavior:
   Examples:
 
   ```js
-  // Unbind all handlers bound using `listenTo`:
-  prop.stopListening()    
+// Unbind all handlers bound using `listenTo`:
+prop.stopListening();
 
-  // Unbind handlers to the map's `name` event:
-  prop.stopListening("name")   
+// Unbind handlers to the map's `name` event:
+prop.stopListening( "name" );
 
-  // Unbind a specific handler on the map's `name` event
-  // registered in the "notify" queue.
-  prop.stopListening("name", handler)    
+// Unbind a specific handler on the map's `name` event
+// registered in the "notify" queue.
+prop.stopListening( "name", handler );
 
-  // Unbind all handlers bound to `todos` using `listenTo`:
-  prop.stopListening(todos)
+// Unbind all handlers bound to `todos` using `listenTo`:
+prop.stopListening( todos );
 
-  // Unbind all `length` handlers bound to `todos`
-  // using `listenTo`:
-  prop.stopListening(todos, "length")
+// Unbind all `length` handlers bound to `todos`
+// using `listenTo`:
+prop.stopListening( todos, "length" );
 
-  // Unbind all handlers to an `onValue` emitter:
-  prop.stopListening(observable)
-  ```
+// Unbind all handlers to an `onValue` emitter:
+prop.stopListening( observable );
+```
 
 - __prop.lastSet__ `{can-simple-observable}` An observable value that gets set when this
   property is set.  You can read its value or listen to when its value changes to
@@ -115,15 +115,19 @@ behavior:
   normal object property that can be get or set:
 
   ```js
-  property: {
-    value: function(prop) {
-        // Set `property` initial value to set value.
-        prop.resolve(prop.lastSet.get())
-        // When the property is set, update `property`.
-        prop.listenTo(prop.lastSet,prop.resolve);
-    }
-  }
-  ```
+  {
+	property: {
+		value: function( prop ) {
+
+			// Set `property` initial value to set value.
+			prop.resolve( prop.lastSet.get() );
+
+			// When the property is set, update `property`.
+			prop.listenTo( prop.lastSet, prop.resolve );
+		}
+	}
+}
+```
 
 
 @return {function} An optional teardown function. If provided, the teardown function
@@ -134,26 +138,26 @@ The following `time` property increments every second.  Notice how a function
 is returned to clear the interval when the property is returned:
 
 ```js
-var Timer = DefineMap.extend("Timer",{
-    time: {
-        value(prop) {
-            prop.resolve(new Date());
+const Timer = DefineMap.extend( "Timer", {
+	time: {
+		value( prop ) {
+			prop.resolve( new Date() );
 
-            var interval = setInterval(() => {
-                prop.resolve(new Date())
-            },1000);
+			const interval = setInterval( () => {
+				prop.resolve( new Date() );
+			}, 1000 );
 
-            return () => {
-                clearInterval(interval);
-            };
-        }
-    }
-});
+			return () => {
+				clearInterval( interval );
+			};
+		}
+	}
+} );
 
-var timer = new Timer();
-timer.on("time", function(ev, newVal, oldVal){
-    console.log(newVal) //-> logs a new date every second
-});
+const timer = new Timer();
+timer.on( "time", function( ev, newVal, oldVal ) {
+	console.log( newVal ); //-> logs a new date every second
+} );
 ```
 
 
@@ -170,13 +174,13 @@ ubiquitous `fullName` property.  The following creates a `fullName` property
 that derives its value from the instantaneous `first` and `last` values:
 
 ```js
-DefineMap.extend("Person", {
-    first: "string",
-    last: "string",
-    get fullName() {
-        return this.first + " " + this.last;
-    }
-});
+DefineMap.extend( "Person", {
+	first: "string",
+	last: "string",
+	get fullName() {
+		return this.first + " " + this.last;
+	}
+} );
 ```
 
 [can-define.types.get] is great for these types of values. But [can-define.types.get]
@@ -186,22 +190,22 @@ passage of time.
 The following `fullNameChangeCount` increments every time `fullName` changes:
 
 ```js
-DefineMap.extend("Person", {
-    first: "string",
-    last: "string",
-    fullName: {
-        get() {
-            return this.first + " " + this.last;
-        }
-    },
-    fullNameChangeCount: {
-        value(prop){
-            var count = 0;
-            prop.resolve(0);
-            prop.listenTo("fullName", ()=> {
-                prop.resolve(++count);
-            });
-        }
-    }
-});
+DefineMap.extend( "Person", {
+	first: "string",
+	last: "string",
+	fullName: {
+		get() {
+			return this.first + " " + this.last;
+		}
+	},
+	fullNameChangeCount: {
+		value( prop ) {
+			let count = 0;
+			prop.resolve( 0 );
+			prop.listenTo( "fullName", ()=> {
+				prop.resolve( ++count );
+			} );
+		}
+	}
+} );
 ```

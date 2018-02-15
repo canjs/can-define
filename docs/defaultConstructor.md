@@ -12,11 +12,13 @@ value is created on demand when the property is read for the first time.
 Specify `Default` like:
 
 ```js
-prop: {
-    Default: Array
-},
-person: {
-	Default: Person
+{
+	prop: {
+		Default: Array
+	},
+	person: {
+		Default: Person
+	}
 }
 ```
 
@@ -25,20 +27,20 @@ person: {
 ## Use
 
 ```js
-var Address = DefineMap.extend({
-    street: {type: "string", value: "321 Longbow"},
-    city: {type: "string", value: "Dallas"}
-});
+const Address = DefineMap.extend( {
+	street: { type: "string", value: "321 Longbow" },
+	city: { type: "string", value: "Dallas" }
+} );
 
-var Direction = DefineMap.extend({
-    from: {Type: Address, Default: Address},
-    to: {Type: Address, Default: Address}
-});
+const Direction = DefineMap.extend( {
+	from: { Type: Address, Default: Address },
+	to: { Type: Address, Default: Address }
+} );
 
-var direction = new Direction({
-    to: {street: "2070 N. Stave"}
-});
+const direction = new Direction( {
+	to: { street: "2070 N. Stave" }
+} );
 
-direction.from.street //-> "321 Longbow"
-direction.to.street   //-> "2070 N. Stave"
+direction.from.street; //-> "321 Longbow"
+direction.to.street;   //-> "2070 N. Stave"
 ```

@@ -10,17 +10,21 @@ ones with defined [can-define.types.get getters] are serialized. Prevent a prope
 from being serialized like:
 
 ```js
-propertyName: {
-    serialize: false
+{
+	propertyName: {
+		serialize: false
+	}
 }
 ```
 
 Make a [can-define.types.get getter] property part of the serialized result like:
 
 ```js
-propertyName: {
-    get: function(){ ... },
-    serialize: true
+{
+	propertyName: {
+		get: function() { /* ... */ },
+		serialize: true
+	}
 }
 ```
 
@@ -53,12 +57,14 @@ The following causes a locationIds property to be serialized into
 the comma separated ID values of the location property on this instance:
 
 ```js
-locationIds: {
-    serialize: function(){
-        return this.locations.map(function(location){
-            ids.push(location.id);
-        }).join(',');
-    }
+{
+	locationIds: {
+		serialize: function() {
+			return this.locations.map( function( location ) {
+				ids.push( location.id );
+			} ).join( "," );
+		}
+	}
 }
 ```
 
@@ -67,14 +73,16 @@ object.  For example, if the property numPages is not greater than zero, the fol
 won't include it in the serialized object.
 
 ```js
-prop: {
-    numPages: {
-        serialize: function( num ){
-            if(num <= 0) {
-            	return undefined;
-            }
-            return num;
-        }
-    }
+{
+	prop: {
+		numPages: {
+			serialize: function( num ) {
+				if ( num <= 0 ) {
+					return undefined;
+				}
+				return num;
+			}
+		}
+	}
 }
 ```

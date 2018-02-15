@@ -11,29 +11,31 @@ makes every item run through the "observable" [can-define.types] converter.
 It looks like:
 
 ```js
-"#": {
-  type: "observable"
+{
+	"#": {
+		type: "observable"
+	}
 }
 ```
 
 Setting the wildcard is useful when items should be converted to a particular type.
 
 ```js
-var Person = DefineMap.extend({ ... });
+const Person = DefineMap.extend( { /* ... */ } );
 
-var People = DefineList.extend({
-  "#": Person
-});
+const People = DefineList.extend( {
+	"#": Person
+} );
 ```
 
 The wildcard property has optional `added` and `removed` functions that will be called after
 an item is added or removed from the list with `this` being the list.
 
 ```js
-var People = DefineList.extend({
-  "#": {
-  	added: function(itemsAdded, index) { ... },
-  	removed: function(itemsRemoved, index) { ... }
-  }
-});
+const People = DefineList.extend( {
+	"#": {
+		added: function( itemsAdded, index ) { /* ... */ },
+		removed: function( itemsRemoved, index ) { /* ... */ }
+	}
+} );
 ```

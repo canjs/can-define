@@ -9,8 +9,10 @@ value.
 A constructor function can be provided that is called to convert incoming values set on this property, like:
 
 ```js
-prop: {
-  Type: Person
+{
+	prop: {
+		Type: Person
+	}
 }
 ```    
 
@@ -23,11 +25,13 @@ new instance to be set.
 A [can-define.types.propDefinition] that defines an inline [can-define/map/map] type.  For example:
 
 ```js
-address: {
-    Type: {
-        street: "string",
-        city: "string"
-    }
+{
+	address: {
+		Type: {
+			street: "string",
+			city: "string"
+		}
+	}
 }
 ```
 
@@ -37,14 +41,16 @@ Defines an inline [can-define/list/list] type that's an array of `Type` or inlin
 instances.  For example:
 
 ```js
-people: {
-    Type: [Person]
-},
-addresses: {
-    Type: [{
-        street: "string",
-        city: "string"
-    }]
+{
+	people: {
+		Type: [ Person ]
+	},
+	addresses: {
+		Type: [ {
+			street: "string",
+			city: "string"
+		} ]
+	}
 }
 ```
 
@@ -54,18 +60,18 @@ addresses: {
 ## Use
 
 ```js
-var Address = DefineMap.extend({
-    street: "string",
-    city: "string"
-});
+const Address = DefineMap.extend( {
+	street: "string",
+	city: "string"
+} );
 
-var Direction = DefineMap.extend({
-    from: {Type: Address},
-    to: Address
-});
+const Direction = DefineMap.extend( {
+	from: { Type: Address },
+	to: Address
+} );
 
-var direction = new Direction({
-    from: {street: "2060 N. Stave", city: "Chicago"},
-    to: new Address({street: "123 Greenview", city: "Libertyville"})
-});
+const direction = new Direction( {
+	from: { street: "2060 N. Stave", city: "Chicago" },
+	to: new Address( { street: "123 Greenview", city: "Libertyville" } )
+} );
 ```
