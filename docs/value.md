@@ -66,18 +66,18 @@ behavior:
   Examples:
 
   ```js
-// Binds to the map's `name` event:
-prop.listenTo( "name", handler );
+  // Binds to the map's `name` event:
+  prop.listenTo( "name", handler );
 
-// Binds to the todos `length` event:
-prop.listenTo( todos, "length", handler );
+  // Binds to the todos `length` event:
+  prop.listenTo( todos, "length", handler );
 
-// Binds to the `todos` `length` event in the mutate queue:
-prop.listenTo( todos, "length", handler, "mutate" );
+  // Binds to the `todos` `length` event in the mutate queue:
+  prop.listenTo( todos, "length", handler, "mutate" );
 
-// Binds to an `onValue` emitter:
-prop.listenTo( observable, handler ); //
-```
+  // Binds to an `onValue` emitter:
+  prop.listenTo( observable, handler ); //
+  ```
 
 - __prop.stopListening(bindTarget, event, handler, queue)__ `{function(Any,String,Fuction,String)}`  A function that removes bindings
   registered by the `prop.listenTo` argument.  This `prop.stopListening` method is very similar to the [can-event-queue/map/map.stopListening] method available on [can-define/map/map DefineMap].  It differs only that it:
@@ -97,14 +97,14 @@ prop.listenTo( observable, handler ); //
   // Unbind a specific handler on the map's `name` event
   // registered in the "notify" queue.
   prop.stopListening( "name", handler );
-  
+
   // Unbind all handlers bound to `todos` using `listenTo`:
   prop.stopListening( todos );
 
   // Unbind all `length` handlers bound to `todos`
   // using `listenTo`:
   prop.stopListening( todos, "length" );
-  
+
   // Unbind all handlers to an `onValue` emitter:
   prop.stopListening( observable );
   ```
