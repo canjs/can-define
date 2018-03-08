@@ -88,26 +88,26 @@ prop.listenTo( observable, handler ); //
   Examples:
 
   ```js
-// Unbind all handlers bound using `listenTo`:
-prop.stopListening();
+  // Unbind all handlers bound using `listenTo`:
+  prop.stopListening();
 
-// Unbind handlers to the map's `name` event:
-prop.stopListening( "name" );
+  // Unbind handlers to the map's `name` event:
+  prop.stopListening( "name" );
 
-// Unbind a specific handler on the map's `name` event
-// registered in the "notify" queue.
-prop.stopListening( "name", handler );
+  // Unbind a specific handler on the map's `name` event
+  // registered in the "notify" queue.
+  prop.stopListening( "name", handler );
+  
+  // Unbind all handlers bound to `todos` using `listenTo`:
+  prop.stopListening( todos );
 
-// Unbind all handlers bound to `todos` using `listenTo`:
-prop.stopListening( todos );
-
-// Unbind all `length` handlers bound to `todos`
-// using `listenTo`:
-prop.stopListening( todos, "length" );
-
-// Unbind all handlers to an `onValue` emitter:
-prop.stopListening( observable );
-```
+  // Unbind all `length` handlers bound to `todos`
+  // using `listenTo`:
+  prop.stopListening( todos, "length" );
+  
+  // Unbind all handlers to an `onValue` emitter:
+  prop.stopListening( observable );
+  ```
 
 - __prop.lastSet__ `{can-simple-observable}` An observable value that gets set when this
   property is set.  You can read its value or listen to when its value changes to
@@ -117,17 +117,17 @@ prop.stopListening( observable );
   ```js
   {
 	property: {
-		value: function( prop ) {
+      value: function( prop ) {
 
-			// Set `property` initial value to set value.
-			prop.resolve( prop.lastSet.get() );
+        // Set `property` initial value to set value.
+        prop.resolve( prop.lastSet.get() );
 
-			// When the property is set, update `property`.
-			prop.listenTo( prop.lastSet, prop.resolve );
-		}
-	}
-}
-```
+        // When the property is set, update `property`.
+        prop.listenTo( prop.lastSet, prop.resolve );
+      }
+    }
+  }
+  ```
 
 
 @return {function} An optional teardown function. If provided, the teardown function
