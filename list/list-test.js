@@ -1438,3 +1438,20 @@ QUnit.test("DefineList has defineInstanceKey symbol", function(){
 	t.prop = "5";
 	QUnit.equal(t.prop, 5, "value set");
 });
+
+QUnit.test(".sort() produces patches (can-stache#498)", function(){
+	var list = new DefineList(["b","a"]);
+	var PATCHES = [
+		[ 	{index: 0, deleteCount: 2, type: "splice"}],
+		[  {index: 0, insert: ["a","b"], deleteCount: 0, type: "splice"} ]
+	];
+	var calledPatches = [];
+	var handler = function patchesHandler(patches){
+		calledPatches.push(patches);
+	};
+
+	list[canSymbol.for("can.onPatches")](handler,"notify");
+	list.sort();
+
+	QUnit.deepEqual(calledPatches, PATCHES);
+});

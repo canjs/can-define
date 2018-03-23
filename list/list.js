@@ -1515,15 +1515,9 @@ assign(DefineList.prototype, {
 	 * ```
 	 */
 	sort: function(compareFunction) {
-		var removed = Array.prototype.slice.call(this);
-		Array.prototype.sort.call(this, compareFunction);
-		var added = Array.prototype.slice.call(this);
-
-		queues.batch.start();
-		this.dispatch('remove', [ removed, 0 ]);
-		this.dispatch('add', [ added, 0 ]);
-		this.dispatch('length', [ this._length, this._length ]);
-		queues.batch.stop();
+		var sorting = Array.prototype.slice.call(this);
+		Array.prototype.sort.call(sorting, compareFunction);
+		this.splice.apply(this, [0,sorting.length].concat(sorting) );
 		return this;
 	}
 });
