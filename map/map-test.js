@@ -1204,3 +1204,50 @@ QUnit.test("value as a string breaks", function(){
 	var my = new MyMap();
 	QUnit.equal(my.prop, "a string", "works");
 });
+
+QUnit.test("valueBind method works", function() {
+	var firstMap = new DefineMap({
+		prop: "hello"
+	});
+	var getAndSetProp = firstMap.valueBind("prop");
+
+	// Test getting the value
+	QUnit.equal(canReflect.getValue(getAndSetProp), "hello", "getting works");
+
+	// Test setting the value
+	canReflect.setValue(getAndSetProp, "aloha");
+	QUnit.equal(firstMap.prop, "aloha", "setting works");
+});
+
+QUnit.test("valueFrom method works", function() {
+	var firstMap = new DefineMap({
+		prop: "hello"
+	});
+	var getProp = firstMap.valueFrom("prop");
+
+	// Test getting the value
+	QUnit.equal(canReflect.getValue(getProp), "hello", "getting works");
+
+	// Setting the value shouldn’t work
+	var errorThrown;
+	try {
+		canReflect.setValue(getProp, "aloha");
+	} catch (error) {
+		errorThrown = true;
+	}
+	QUnit.ok(errorThrown, "setting doesn’t work");
+});
+
+QUnit.test("valueTo method works", function() {
+	var firstMap = new DefineMap({
+		prop: "hello"
+	});
+	var setProp = firstMap.valueTo("prop");
+
+	// Getting the value shouldn’t work
+	QUnit.equal(canReflect.getValue(setProp), undefined, "getting doesn’t work");
+
+	// Test setting the value
+	canReflect.setValue(setProp, "aloha");
+	QUnit.equal(firstMap.prop, "aloha", "setting works");
+});
