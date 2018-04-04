@@ -3,6 +3,7 @@ var Construct = require("can-construct");
 var define = require("can-define");
 var defineHelpers = require("../define-helpers/define-helpers");
 var ObservationRecorder = require("can-observation-recorder");
+var SetterObservable = require("can-simple-observable/setter/setter");
 var ns = require("can-namespace");
 var canLog = require("can-log");
 var canLogDev = require("can-log/dev/dev");
@@ -412,6 +413,28 @@ var DefineMap = Construct.extend("DefineMap",{
 	})(),
 	"*": {
 		type: define.types.observable
+	},
+
+	valueBind: function(prop) {
+		return new SetterObservable(function() {
+			return this.get(prop);
+		}.bind(this), function(newValue) {
+			this.set(prop, newValue);
+		}.bind(this));
+	},
+
+	valueFrom: function(prop) {
+		return new SetterObservable(function() {
+			return this.get(prop);
+		}.bind(this));
+	},
+
+	valueTo: function(prop) {
+		return new SetterObservable(function() {
+			// This line intentionally left blank :)
+		}, function(newValue) {
+			this.set(prop, newValue);
+		}.bind(this));
 	},
 
 	// call `map.log()` to log all event changes
