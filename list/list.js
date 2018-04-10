@@ -43,6 +43,23 @@ var makeFilterCallback = function(props) {
 
 var onKeyValue = define.eventsProto[canSymbol.for("can.onKeyValue")];
 var offKeyValue = define.eventsProto[canSymbol.for("can.offKeyValue")];
+var getSchemaSymbol = canSymbol.for("can.getSchema");
+
+function getSchema() {
+	var definitions = this.prototype._define.definitions;
+	var schema = {
+		type: "list",
+		keys: {}
+	};
+	schema = define.updateSchemaKeys(schema, definitions);
+	if(schema.keys["#"]) {
+		schema.values = definitions["#"].Type;
+		delete schema.keys["#"];
+	}
+
+	return schema;
+}
+
 
 /** @add can-define/list/list */
 var DefineList = Construct.extend("DefineList",
@@ -64,6 +81,7 @@ var DefineList = Construct.extend("DefineList",
 						this.prototype.__type = make.set.type("*", itemsDefinition.type, identity);
 					}
 				}
+				this[getSchemaSymbol] = getSchema;
 			}
 		}
 	},

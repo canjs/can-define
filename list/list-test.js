@@ -1455,3 +1455,18 @@ QUnit.test(".sort() produces patches (can-stache#498)", function(){
 
 	QUnit.deepEqual(calledPatches, PATCHES);
 });
+
+QUnit.test("canReflect.getSchema", function(){
+	var MyType = DefineMap.extend({
+		id: {identity: true, type: "number"},
+		name: "string"
+	});
+	var MyList = DefineList.extend({
+		count: "number",
+		"#": MyType
+	});
+
+	var schema = canReflect.getSchema(MyList);
+
+	QUnit.equal(schema.values, MyType);
+});

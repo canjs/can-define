@@ -61,6 +61,19 @@ function getKeyValue(key) {
 		return this[key];
 	}
 }
+
+var getSchemaSymbol = canSymbol.for("can.getSchema");
+
+function getSchema() {
+	var definitions = this.prototype._define.definitions;
+	var schema = {
+		type: "map",
+		identity: [],
+		keys: {}
+	};
+	return define.updateSchemaKeys(schema, definitions);
+}
+
 var DefineMap = Construct.extend("DefineMap",{
 	setup: function(base){
 		var key,
@@ -88,6 +101,7 @@ var DefineMap = Construct.extend("DefineMap",{
 			}
 		}
 		define.defineConfigurableAndNotEnumerable(prototype, "constructor", this);
+		this[getSchemaSymbol] = getSchema;
 	}
 },{
 	// setup for only dynamic DefineMap instances
