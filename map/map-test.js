@@ -1204,3 +1204,19 @@ QUnit.test("value as a string breaks", function(){
 	var my = new MyMap();
 	QUnit.equal(my.prop, "a string", "works");
 });
+
+QUnit.test("canReflect.getSchema", function(){
+	var MyType = DefineMap.extend({
+		id: {identity: true, type: "number"},
+		name: "string"
+	});
+
+	var schema = canReflect.getSchema(MyType);
+
+	QUnit.deepEqual(schema.identity, ["id"], "right identity");
+	QUnit.deepEqual(Object.keys(schema.keys), ["id","name"], "right key names");
+
+	QUnit.equal( canReflect.convert("1", schema.keys.id), 1, "converted to number");
+
+	QUnit.equal( canReflect.convert(3, schema.keys.id), "3", "converted to number");
+});
