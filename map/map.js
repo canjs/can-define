@@ -477,6 +477,20 @@ canReflect.assignSymbols(DefineMap.prototype,{
 	},
 
 	// -shape
+	"can.getOwnKeys": function() {
+		var keys = canReflect.getOwnEnumerableKeys(this);
+		var computedKeys = canReflect.getOwnKeys(this._computed);
+
+		var key;
+		for (var i=0; i<computedKeys.length; i++) {
+			key = computedKeys[i];
+			if (keys.indexOf(key) < 0) {
+				keys.push(key);
+			}
+		}
+
+		return keys;
+	},
 	"can.getOwnEnumerableKeys": function(){
 		ObservationRecorder.add(this, 'can.keys');
 		return keysForDefinition(this._define.definitions).concat(keysForDefinition(this._instanceDefinitions) );

@@ -1197,6 +1197,59 @@ canTestHelpers.devOnlyTest("can.hasKey and can.hasOwnKey (#303)", function(asser
 	assert.equal(vm[hasOwnKeySymbol]("anotherProp"), false, "vm.hasOwnKey('anotherProp') false");
 });
 
+canTestHelpers.devOnlyTest("getOwnKeys, getOwnEnumerableKeys (#326)", function(assert) {
+	var getOwnEnumerableKeysSymbol = canSymbol.for("can.getOwnEnumerableKeys"),
+		getOwnKeysSymbol = canSymbol.for("can.getOwnKeys");
+
+	var Parent = DefineMap.extend({
+		parentProp: "any",
+
+		get parentDerivedProp() {
+			if (this.parentProp) {
+				return "parentDerived";
+			}
+		},
+
+		parentValueProp: {
+			value: function(prop) {
+				if (this.parentProp) {
+					prop.resolve(this.parentProp);
+				}
+
+				prop.listenTo("parentProp", prop.resolve);
+			}
+		}
+	});
+
+	var VM = Parent.extend({
+		prop: "any",
+
+		get derivedProp() {
+			if (this.prop) {
+				return "derived";
+			}
+		},
+
+		valueProp: {
+			value: function(prop) {
+				if (this.prop) {
+					prop.resolve(this.prop);
+				}
+
+				prop.listenTo("prop", prop.resolve);
+			}
+		}
+	});
+
+	var vm = new VM();
+
+	// getOwnEnumerableKeys
+	assert.deepEqual( vm[getOwnEnumerableKeysSymbol](), [ "prop", "valueProp", "parentProp", "parentValueProp" ], "vm.getOwnEnumerableKeys()");
+
+	// getOwnKeys
+	assert.deepEqual( vm[getOwnKeysSymbol](), [ "prop", "valueProp", "parentProp", "parentValueProp", "derivedProp", "parentDerivedProp" ], "vm.getOwnKeys()");
+});
+
 QUnit.test("value as a string breaks", function(){
 	var MyMap = DefineMap.extend({
 		prop: {value: "a string"}
