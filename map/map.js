@@ -173,7 +173,7 @@ var DefineMap = Construct.extend("DefineMap",{
 	 * @function can-define/map/map.prototype.set set
 	 * @parent can-define/map/map.prototype
 	 *
-	 * @deprecated {3.10.1} Using .set with {Object} `props` has been deprecated in favour of `assign` and `update`
+	 * @deprecated {3.10.1} Passing an {Object} to `.set` has been deprecated in favor of [can-define/map/map.prototype.assign] or [can-define/map/map.prototype.update]. `map.set(propName, value)` is _not_ deprecated.
 	 *
 	 * @description Sets multiple properties on a map instance or a property that wasn't predefined.
 	 *
