@@ -25,6 +25,7 @@ var defaults = require("can-util/js/defaults/defaults");
 var stringToAny = require("can-util/js/string-to-any/string-to-any");
 var defineLazyValue = require("can-define-lazy-value");
 
+var newSymbol = canSymbol.for("can.new");
 
 var eventsProto, define,
 	make, makeDefinition, getDefinitionsAndMethods, getDefinitionOrMethod;
@@ -595,8 +596,8 @@ make = {
 					return setter;
 				} else {
 					return function setter(newValue){
-						return set.call(this, canReflect.convert(newValue, type))
-					}
+						return set.call(this, canReflect.convert(newValue, type));
+					};
 				}
 			}
 			// If type is a nested object: `type: {foo: "string", bar: "number"}`
@@ -1034,8 +1035,6 @@ define.Iterator.prototype.next = function(){
 		done: false
 	};
 };
-
-var newSymbol = canSymbol.for("can.new");
 
 
 var MaybeNumber = canReflect.assignSymbols({},{
