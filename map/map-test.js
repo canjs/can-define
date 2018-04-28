@@ -1261,7 +1261,8 @@ QUnit.test("value as a string breaks", function(){
 QUnit.test("canReflect.getSchema", function(){
 	var MyType = DefineMap.extend({
 		id: {identity: true, type: "number"},
-		name: "string"
+		name: "string",
+		foo: {serialize: false}
 	});
 
 	var schema = canReflect.getSchema(MyType);
@@ -1272,4 +1273,7 @@ QUnit.test("canReflect.getSchema", function(){
 	QUnit.equal( canReflect.convert("1", schema.keys.id), 1, "converted to number");
 
 	QUnit.equal( canReflect.convert(3, schema.keys.id), "3", "converted to number");
+
+
+
 });

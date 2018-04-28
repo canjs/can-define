@@ -1190,15 +1190,16 @@ define.types = {
 define.updateSchemaKeys = function(schema, definitions) {
 	for(var prop in definitions) {
 		var definition = definitions[prop];
-
-		if(definition.type) {
-			schema.keys[prop] = definition.type;
-		} else {
-			schema.keys[prop] = function(val){ return val; };
-		}
-		 // some unknown type
-		if(definitions[prop].identity === true) {
-			schema.identity.push(prop);
+		if(definition.serialize !== false ) {
+			if(definition.type) {
+				schema.keys[prop] = definition.type;
+			} else {
+				schema.keys[prop] = function(val){ return val; };
+			}
+			 // some unknown type
+			if(definitions[prop].identity === true) {
+				schema.identity.push(prop);
+			}
 		}
 	}
 	return schema;
