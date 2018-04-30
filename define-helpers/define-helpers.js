@@ -2,7 +2,9 @@ var define = require("can-define");
 var canReflect = require("can-reflect");
 var queues = require("can-queues");
 
-
+var returnFirstArg = function(arg){
+	return arg;
+};
 var defineHelpers = {
 	// returns `true` if the value was defined and set
 	defineExpando: function(map, prop, value) {
@@ -28,7 +30,12 @@ var defineHelpers = {
 			var defaultDefinition = map._define.defaultDefinition || {type: define.types.observable};
 			define.property(map, prop, defaultDefinition, {},{});
 			// possibly convert value to List or DefineMap
-			map._data[prop] = defaultDefinition.type ? defaultDefinition.type(value) : define.types.observable(value);
+			if(defaultDefinition.type) {
+				map._data[prop] = define.make.set.type(prop, defaultDefinition.type, returnFirstArg).call(map, value);
+			} else {
+				map._data[prop] = define.types.observable(value);
+			}
+
 			instanceDefines[prop] = defaultDefinition;
 			queues.batch.start();
 			map.dispatch({

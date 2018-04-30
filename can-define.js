@@ -25,10 +25,15 @@ var defaults = require("can-util/js/defaults/defaults");
 var stringToAny = require("can-util/js/string-to-any/string-to-any");
 var defineLazyValue = require("can-define-lazy-value");
 
+var newSymbol = canSymbol.for("can.new");
 
 var eventsProto, define,
-	make, makeDefinition, getDefinitionsAndMethods,
-	isDefineType, getDefinitionOrMethod;
+	make, makeDefinition, getDefinitionsAndMethods, getDefinitionOrMethod;
+
+
+var isDefineType = function(func){
+	return func && (func.canDefineType === true || (typeof func === "object" && func[newSymbol]) );
+};
 
 var peek = ObservationRecorder.ignore(canReflect.getValue.bind(canReflect));
 
@@ -208,7 +213,7 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 	var type = definition.type;
 
 	//!steal-remove-start
-	if (type && canReflect.isConstructorLike(type)) {
+	if (type && canReflect.isConstructorLike(type) && !isDefineType(type)) {
 		canLogDev.warn(
 			"can-define: the definition for " +
 			prop +
@@ -582,15 +587,24 @@ make = {
 			};
 		},
 		type: function(prop, type, set) {
-
+			function setter(newValue) {
+				return set.call(this, type.call(this, newValue, prop));
+			}
+			if(isDefineType(type)) {
+				// TODO: remove this `canDefineType` check in a future release.
+				if(type.canDefineType) {
+					return setter;
+				} else {
+					return function setter(newValue){
+						return set.call(this, canReflect.convert(newValue, type));
+					};
+				}
+			}
+			// If type is a nested object: `type: {foo: "string", bar: "number"}`
 			if (typeof type === "object") {
-
 				return make.set.Type(prop, type, set);
-
 			} else {
-				return function(newValue) {
-					return set.call(this, type.call(this, newValue, prop));
-				};
+				return setter;
 			}
 		},
 		Type: function(prop, Type, set) {
@@ -731,7 +745,7 @@ var addBehaviorToDefinition = function(definition, behavior, value) {
 		var behaviorDef = value;
 		if(typeof behaviorDef === "string") {
 			behaviorDef = define.types[behaviorDef];
-			if(typeof behaviorDef === "object") {
+			if(typeof behaviorDef === "object" && !isDefineType(behaviorDef)) {
 				assign(definition, behaviorDef);
 				behaviorDef = behaviorDef[behavior];
 			}
@@ -1022,33 +1036,25 @@ define.Iterator.prototype.next = function(){
 	};
 };
 
-isDefineType = function(func){
-	return func && func.canDefineType === true;
-};
 
-function isObservableValue(obj){
-	return canReflect.isValueLike(obj) && canReflect.isObservableLike(obj);
-}
-
-define.types = {
-	'date': function(str) {
-		var type = typeof str;
-		if (type === 'string') {
-			str = Date.parse(str);
-			return isNaN(str) ? null : new Date(str);
-		} else if (type === 'number') {
-			return new Date(str);
-		} else {
-			return str;
-		}
-	},
-	'number': function(val) {
+var MaybeNumber = canReflect.assignSymbols({},{
+	"can.new": function(val){
 		if (val == null) {
 			return val;
 		}
 		return +(val);
 	},
-	'boolean': function(val) {
+	"can.getSchema": function(){
+		return {
+			type: "Or",
+			values: [Number, undefined, null]
+		};
+	}
+});
+
+// make an enum type!
+var MaybeBoolean = canReflect.assignSymbols({},{
+	"can.new": function(val){
 		if(val == null) {
 			return val;
 		}
@@ -1057,6 +1063,75 @@ define.types = {
 		}
 		return true;
 	},
+	"can.getSchema": function(){
+		return {
+			type: "Or",
+			values: [true, false, undefined, null]
+		};
+	}
+});
+
+var MaybeString = canReflect.assignSymbols({},{
+	"can.new": function(val){
+		if (val == null) {
+			return val;
+		}
+		return '' + val;
+	},
+	"can.getSchema": function(){
+		return {
+			type: "Or",
+			values: [String, undefined, null]
+		};
+	}
+});
+
+function toDate(str) {
+	var type = typeof str;
+	if (type === 'string') {
+		str = Date.parse(str);
+		return isNaN(str) ? null : new Date(str);
+	} else if (type === 'number') {
+		return new Date(str);
+	} else {
+		return str;
+	}
+}
+
+function DateStringSet(dateStr){
+	this.setValue = dateStr;
+	var date = toDate(dateStr);
+	this.value = date == null ? date : date.getTime();
+}
+DateStringSet.prototype.valueOf = function(){
+	return this.value;
+};
+canReflect.assignSymbols(DateStringSet.prototype,{
+	"can.serialize": function(){
+		return this.setValue;
+	}
+});
+
+var MaybeDate = canReflect.assignSymbols({},{
+	"can.new": toDate,
+	"can.getSchema": function(){
+		return {
+			type: "Or",
+			values: [Date, undefined, null]
+		};
+	},
+	"can.ComparisonSetType": DateStringSet
+});
+
+function isObservableValue(obj){
+	return canReflect.isValueLike(obj) && canReflect.isObservableLike(obj);
+}
+
+define.types = {
+	// To be made into a type ... this is both lazy {time: '123-456'}
+	'date': MaybeDate,
+	'number': MaybeNumber,
+	'boolean': MaybeBoolean,
 	'observable': function(newVal) {
 			if(Array.isArray(newVal) && define.DefineList) {
 					newVal = new define.DefineList(newVal);
@@ -1093,12 +1168,7 @@ define.types = {
 	'any': function(val) {
 		return val;
 	},
-	'string': function(val) {
-		if (val == null) {
-			return val;
-		}
-		return '' + val;
-	},
+	'string': MaybeString,
 
 	'compute': {
 		set: function(newValue, setVal, setErr, oldValue) {
@@ -1120,15 +1190,16 @@ define.types = {
 define.updateSchemaKeys = function(schema, definitions) {
 	for(var prop in definitions) {
 		var definition = definitions[prop];
-
-		if(definition.type) {
-			schema.keys[prop] = definition.type;
-		} else {
-			schema.keys[prop] = function(val){ return val; };
-		}
-		 // some unknown type
-		if(definitions[prop].identity === true) {
-			schema.identity.push(prop);
+		if(definition.serialize !== false ) {
+			if(definition.type) {
+				schema.keys[prop] = definition.type;
+			} else {
+				schema.keys[prop] = function(val){ return val; };
+			}
+			 // some unknown type
+			if(definitions[prop].identity === true) {
+				schema.identity.push(prop);
+			}
 		}
 	}
 	return schema;
