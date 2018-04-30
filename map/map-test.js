@@ -1276,7 +1276,7 @@ QUnit.test("canReflect.getSchema", function(){
 
 });
 
-QUnit.test("use can.new for conversion", function(){
+QUnit.test("use can.new and can.serialize for conversion", function(){
 	var Status = canReflect.assignSymbols({},{
         "can.new": function(val){
 
@@ -1287,7 +1287,10 @@ QUnit.test("use can.new for conversion", function(){
                 type: "Or",
                 values: ["new","assigned","complete"]
             };
-        }
+        },
+		"can.serialize": function(){
+			return this.toUpperCase();
+		}
     });
 
     var Todo = DefineMap.extend("Todo",{
@@ -1296,5 +1299,7 @@ QUnit.test("use can.new for conversion", function(){
 
 
 	var todo = new Todo({status: "NEW"});
-	QUnit.equal(todo.status, "new", "converted");
+	QUnit.equal(todo.status, "new", "converted during set");
+
+	QUnit.deepEqual(todo.serialize(),{status: "NEW"}, "serialized to upper case");
 });

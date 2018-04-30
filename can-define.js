@@ -25,7 +25,8 @@ var defaults = require("can-util/js/defaults/defaults");
 var stringToAny = require("can-util/js/string-to-any/string-to-any");
 var defineLazyValue = require("can-define-lazy-value");
 
-var newSymbol = canSymbol.for("can.new");
+var newSymbol = canSymbol.for("can.new"),
+	serializeSymbol = canSymbol.for("can.serialize");
 
 var eventsProto, define,
 	make, makeDefinition, getDefinitionsAndMethods, getDefinitionOrMethod;
@@ -795,8 +796,17 @@ getDefinitionOrMethod = function(prop, value, defaultDefinition){
 	if(typeof value === "string") {
 		definition = {type: value};
 	}
-	else if(isDefineType(value)) {
-		definition = {type: value};
+	else if(value && (value[serializeSymbol] || value[newSymbol]) ) {
+		definition = {};
+		var serialize = value[serializeSymbol];
+		if(serialize) {
+			definition.serialize = function(val){
+				return serialize.call(val);
+			};
+		}
+		if(value[newSymbol]) {
+			definition.type = value[newSymbol];
+		}
 	}
 	else if(typeof value === "function") {
 		if(canReflect.isConstructorLike(value)) {
