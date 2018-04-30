@@ -795,11 +795,12 @@ getDefinitionOrMethod = function(prop, value, defaultDefinition){
 	if(typeof value === "string") {
 		definition = {type: value};
 	}
+	else if(isDefineType(value)) {
+		definition = {type: value};
+	}
 	else if(typeof value === "function") {
 		if(canReflect.isConstructorLike(value)) {
 			definition = {Type: value};
-		} else if(isDefineType(value)) {
-			definition = {type: value};
 		}
 		// or leaves as a function
 	} else if( Array.isArray(value) ) {

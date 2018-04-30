@@ -1274,6 +1274,27 @@ QUnit.test("canReflect.getSchema", function(){
 
 	QUnit.equal( canReflect.convert(3, schema.keys.id), "3", "converted to number");
 
+});
+
+QUnit.test("use can.new for conversion", function(){
+	var Status = canReflect.assignSymbols({},{
+        "can.new": function(val){
+
+            return val.toLowerCase();
+        },
+        "can.getSchema": function(){
+            return {
+                type: "Or",
+                values: ["new","assigned","complete"]
+            };
+        }
+    });
+
+    var Todo = DefineMap.extend("Todo",{
+        status: Status
+    });
 
 
+	var todo = new Todo({status: "NEW"});
+	QUnit.equal(todo.status, "new", "converted");
 });
