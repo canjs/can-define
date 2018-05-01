@@ -1047,14 +1047,15 @@ define.Iterator.prototype.next = function(){
 	};
 };
 
+function toNumber(val) {
+	if (val == null) {
+		return val;
+	}
+	return +(val);
+}
 
-var MaybeNumber = canReflect.assignSymbols({},{
-	"can.new": function(val){
-		if (val == null) {
-			return val;
-		}
-		return +(val);
-	},
+var MaybeNumber = canReflect.assignSymbols(toNumber,{
+	"can.new": toNumber,
 	"can.getSchema": function(){
 		return {
 			type: "Or",
@@ -1063,17 +1064,19 @@ var MaybeNumber = canReflect.assignSymbols({},{
 	}
 });
 
+function toBoolean(val) {
+	if(val == null) {
+		return val;
+	}
+	if (val === 'false' || val === '0' || !val) {
+		return false;
+	}
+	return true;
+}
+
 // make an enum type!
-var MaybeBoolean = canReflect.assignSymbols({},{
-	"can.new": function(val){
-		if(val == null) {
-			return val;
-		}
-		if (val === 'false' || val === '0' || !val) {
-			return false;
-		}
-		return true;
-	},
+var MaybeBoolean = canReflect.assignSymbols(toBoolean,{
+	"can.new": toBoolean,
 	"can.getSchema": function(){
 		return {
 			type: "Or",
@@ -1082,13 +1085,15 @@ var MaybeBoolean = canReflect.assignSymbols({},{
 	}
 });
 
-var MaybeString = canReflect.assignSymbols({},{
-	"can.new": function(val){
-		if (val == null) {
-			return val;
-		}
-		return '' + val;
-	},
+function toString(val) {
+	if (val == null) {
+		return val;
+	}
+	return '' + val;
+}
+
+var MaybeString = canReflect.assignSymbols(toString,{
+	"can.new": toString,
 	"can.getSchema": function(){
 		return {
 			type: "Or",
@@ -1123,7 +1128,7 @@ canReflect.assignSymbols(DateStringSet.prototype,{
 	}
 });
 
-var MaybeDate = canReflect.assignSymbols({},{
+var MaybeDate = canReflect.assignSymbols(toDate,{
 	"can.new": toDate,
 	"can.getSchema": function(){
 		return {
@@ -1160,7 +1165,7 @@ define.types = {
 			return new define.DefaultMap(newVal);
 		}
 		else {
-			return define.types.string(newVal);
+			return canReflect.convert( newVal, define.types.string);
 		}
 	},
 	/**

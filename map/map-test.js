@@ -1302,4 +1302,30 @@ QUnit.test("use can.new and can.serialize for conversion", function(){
 	QUnit.equal(todo.status, "new", "converted during set");
 
 	QUnit.deepEqual(todo.serialize(),{status: "NEW"}, "serialized to upper case");
+
+	var Todo2 = DefineMap.extend("Todo",{
+		due: "date"
+	});
+
+	var date = new Date(2018,3,30);
+
+	var todo2 = new Todo2({
+		due: date.toString()
+	});
+
+	QUnit.ok(todo2.due instanceof Date, "converted to a date instance");
+
+	var res = todo2.serialize();
+
+	QUnit.deepEqual(res,{due: date}, "serialized to a date?");
+});
+
+QUnit.test("make sure stringOrObservable works", function(){
+	var Type = DefineMap.extend({
+		val : "stringOrObservable"
+	});
+
+	var type  = new Type({val: "foo"});
+
+	QUnit.equal(type.val, "foo", "works");
 });
