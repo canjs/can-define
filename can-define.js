@@ -33,7 +33,7 @@ var eventsProto, define,
 
 
 var isDefineType = function(func){
-	return func && (func.canDefineType === true || (typeof func === "object" && func[newSymbol]) );
+	return func && (func.canDefineType === true || func[newSymbol] );
 };
 
 var peek = ObservationRecorder.ignore(canReflect.getValue.bind(canReflect));
