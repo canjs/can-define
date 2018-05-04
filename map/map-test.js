@@ -980,7 +980,7 @@ canTestHelpers.devOnlyTest("log multiple property changes", function(assert) {
 canTestHelpers.devOnlyTest("Setting a value with an object type generates a warning (#148)", function() {
 	QUnit.expect(1);
 
-	var message = "can-define: The value for options is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.";
+	var message = "can-define: The default value for options is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.";
 	var finishErrorCheck = canTestHelpers.willWarn(message);
 
 	//should issue a warning
@@ -1013,10 +1013,10 @@ canTestHelpers.devOnlyTest("Setting a value with an object type generates a warn
 	QUnit.equal(finishErrorCheck(), 2);
 });
 
-canTestHelpers.devOnlyTest("Setting a value to a constructor type generates a warning", function() {
+canTestHelpers.devOnlyTest("Setting a default value to a constructor type generates a warning", function() {
 	QUnit.expect(1);
 
-	var message = "can-define: The \"value\" for options is set to a constructor. Did you mean \"Value\" instead?";
+	var message = "can-define: The \"default\" for options is set to a constructor. Did you mean \"Default\" instead?";
 	var finishErrorCheck = canTestHelpers.willWarn(message);
 
 	//should issue a warning
