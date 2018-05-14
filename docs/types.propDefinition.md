@@ -17,7 +17,8 @@ observable property.  These behaviors can be specified with as an `Object`, `Str
 		get: function() { /* ... */ },
 		value: function() { /* ... */ },
 		set: function() { /* ... */ },
-		serialize: function() { /* ... */ }
+		serialize: function() { /* ... */ },
+		identity: Boolean
 	}
 }
 ```
@@ -153,6 +154,16 @@ const Todo = DefineMap.extend( {
 		}
 	}
 } );
+```
+
+    @option {can-define.types.identity} identity Specifies the property that uniquely identifies instances of the type.
+
+    ```js
+const Grade = DefineMap.extend("Grade",{
+	classId: {type: "number", identity: true},
+	studentId: {type: "number", identity: true},
+	grade: "string"
+});
 ```
 
 @type {String} Defines a [can-define.types.type] converter as one of the named types in [can-define.types].

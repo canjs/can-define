@@ -81,5 +81,5 @@ person.on( "fullName", function( ev, newVal, oldVal ) {
 person.first = "Ramiya";
 ```
 
-The observable properties call [can-observation.add Observation.add] so they can be observed by
+The observable properties call [can-observation-recorder.add ObservationRecorder.add] so they can be observed by
 [can-compute].
