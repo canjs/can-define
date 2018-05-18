@@ -2,10 +2,10 @@ var QUnit = require("steal-qunit");
 
 var define = require("can-define");
 var queues = require("can-queues");
-var each = require("can-util/js/each/each");
 var canSymbol = require("can-symbol");
 var SimpleObservable = require("can-simple-observable");
 var testHelpers = require("can-test-helpers");
+var canReflect = require("can-reflect");
 
 QUnit.module("can-define");
 
@@ -936,7 +936,7 @@ QUnit.test('Extensions can modify definitions', function() {
 
 
 QUnit.test("Properties are enumerable", function() {
-	QUnit.expect(4);
+	QUnit.expect(1);
 
 	function VM(foo) {
 		this.foo = foo;
@@ -949,17 +949,16 @@ QUnit.test("Properties are enumerable", function() {
 	var vm = new VM("bar");
 	vm.baz = "qux";
 
-	var i = 0;
-	each(vm, function(value, key) {
-		if (i === 0) {
-			QUnit.equal(key, "foo");
-			QUnit.equal(value, "bar");
-		} else {
-			QUnit.equal(key, "baz");
-			QUnit.equal(value, "qux");
-		}
-		i++;
+	var copy = {};
+	for(var key in vm) {
+		copy[key] = vm[key];
+
+	}
+	QUnit.deepEqual(copy,{
+		foo: "bar",
+		baz: "qux"
 	});
+
 });
 
 QUnit.test("Doesn't override canSymbol.iterator if already on the prototype", function() {
@@ -992,9 +991,8 @@ QUnit.test("Doesn't override canSymbol.iterator if already on the prototype", fu
 	var map = new MyMap();
 	map.foo = "bar";
 
-	each(map, function(value, key) {
-		QUnit.equal(value, "worked");
-		QUnit.equal(key, "it");
+	canReflect.eachIndex(map, function(value) {
+		QUnit.deepEqual(value, ["it","worked"]);
 	});
 });
 

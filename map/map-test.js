@@ -2,11 +2,10 @@ var QUnit = require("steal-qunit");
 var DefineMap = require("can-define/map/map");
 var define = require("can-define");
 var Observation = require("can-observation");
-var each = require("can-util/js/each/each");
-var assign = require("can-util/js/assign/assign");
+var assign = require("can-assign");
 var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
-var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
+var isPlainObject = canReflect.isPlainObject;
 var canTestHelpers = require("can-test-helpers/lib/dev");
 var DefineList = require("can-define/list/list");
 var dev = require("can-log/dev/dev");
@@ -312,7 +311,7 @@ QUnit.test("Properties are enumerable", function(){
   var vm = new VM({ foo: "bar", baz: "qux" });
 
   var i = 0;
-  each(vm, function(value, key){
+  canReflect.eachKey(vm, function(value, key){
 	if(i === 0) {
 	  QUnit.equal(key, "foo");
 	  QUnit.equal(value, "bar");
@@ -338,7 +337,7 @@ QUnit.test("Getters are not enumerable", function(){
 
   var map = new MyMap({ foo: "bar" });
 
-  each(map, function(value, key){
+  canReflect.eachKey(map, function(value, key){
 	QUnit.equal(key, "foo");
 	QUnit.equal(value, "bar");
   });

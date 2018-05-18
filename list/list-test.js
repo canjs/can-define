@@ -9,7 +9,7 @@ var canSymbol = require("can-symbol");
 var dev = require("can-log/dev/dev");
 var canTestHelpers = require("can-test-helpers/lib/dev");
 
-var assign = require("can-util/js/assign/assign");
+var assign = require("can-assign");
 
 QUnit.module("can-define/list/list");
 

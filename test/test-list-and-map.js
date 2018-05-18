@@ -1,8 +1,9 @@
 var DefineMap = require("can-define/map/map");
 var DefineList = require("can-define/list/list");
-var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
-var Observation = require("can-observation");
 var canReflect = require("can-reflect");
+var isPlainObject = canReflect.isPlainObject;
+var Observation = require("can-observation");
+
 var define = require("can-define");
 
 var QUnit = require("steal-qunit");
