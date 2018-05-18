@@ -11,14 +11,12 @@ var defineHelpers = require("../define-helpers/define-helpers");
 var dev = require("can-log/dev/dev");
 var ensureMeta = require("../ensure-meta");
 
-var assign = require("can-util/js/assign/assign");
-var diff = require("can-util/js/diff/diff");
-var each = require("can-util/js/each/each");
-var makeArray = require("can-util/js/make-array/make-array");
+var assign = require("can-assign");
+var diff = require("can-diff/list/list");
 var ns = require("can-namespace");
 var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
-var singleReference = require("can-util/js/single-reference/single-reference");
+var singleReference = require("can-single-reference");
 
 var splice = [].splice;
 var runningNative = false;
@@ -511,7 +509,7 @@ var DefineList = Construct.extend("DefineList",
 		 *
 		 */
 		splice: function(index, howMany) {
-			var args = makeArray(arguments),
+			var args = canReflect.toArray(arguments),
 				added = [],
 				i, len, listIndex,
 				allSame = args.length > 2,
@@ -659,10 +657,10 @@ eventsProtoSymbols.forEach(function(sym) {
 var getArgs = function(args) {
 	return args[0] && Array.isArray(args[0]) ?
 		args[0] :
-		makeArray(args);
+		canReflect.toArray(args);
 };
 // Create `push`, `pop`, `shift`, and `unshift`
-each({
+canReflect.eachKey({
 		/**
 		 * @function can-define/list/list.prototype.push push
 		 * @description Add elements to the end of a list.
@@ -795,7 +793,7 @@ each({
 		};
 	});
 
-each({
+canReflect.eachKey({
 		/**
 		 * @function can-define/list/list.prototype.pop pop
 		 * @description Remove an element from the end of a DefineList.
@@ -904,7 +902,7 @@ each({
 		};
 	});
 
-each({
+canReflect.eachKey({
 	/**
 	 * @function can-define/list/list.prototype.map map
 	 * @description Map the values in this list to another list.
@@ -1379,11 +1377,11 @@ assign(DefineList.prototype, {
 		var args = [];
 		// Go through each of the passed `arguments` and
 		// see if it is list-like, an array, or something else
-		each(arguments, function(arg) {
+		canReflect.eachIndex(arguments, function(arg) {
 			if (canReflect.isListLike(arg)) {
 				// If it is list-like we want convert to a JS array then
 				// pass each item of the array to this.__type
-				var arr = Array.isArray(arg) ? arg : makeArray(arg);
+				var arr = Array.isArray(arg) ? arg : canReflect.toArray(arg);
 				arr.forEach(function(innerArg) {
 					args.push(this.__type(innerArg));
 				}, this);
@@ -1398,7 +1396,7 @@ assign(DefineList.prototype, {
 		// as well (We know it should be list-like), then
 		// concat with our passed in args, then pass it to
 		// list constructor to make it back into a list
-		return new this.constructor(Array.prototype.concat.apply(makeArray(this), args));
+		return new this.constructor(Array.prototype.concat.apply(canReflect.toArray(this), args));
 	},
 
 	/**

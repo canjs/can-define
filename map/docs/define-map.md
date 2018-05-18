@@ -225,7 +225,7 @@ view-models.  For example, a `view-model` might take a `todoId` value, and want
 to make a `todo` property available:
 
 ```js
-import ajax from "can-util/dom/ajax/ajax";
+import ajax from "can-ajax";
 
 const TodoViewModel = DefineMap.extend( {
 	todoId: "number",

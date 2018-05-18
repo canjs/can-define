@@ -15,15 +15,16 @@ var eventQueue = require("can-event-queue/map/map");
 var addTypeEvents = require("can-event-queue/type/type");
 var queues = require("can-queues");
 
-var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
-var assign = require("can-util/js/assign/assign");
+var assign = require("can-assign");
 var canLogDev = require("can-log/dev/dev");
 
-var isPlainObject = require("can-util/js/is-plain-object/is-plain-object");
-var each = require("can-util/js/each/each");
-var defaults = require("can-util/js/defaults/defaults");
-var stringToAny = require("can-util/js/string-to-any/string-to-any");
+var stringToAny = require("can-string-to-any");
 var defineLazyValue = require("can-define-lazy-value");
+
+var MaybeBoolean = require("can-data-types/maybe-boolean/maybe-boolean"),
+    MaybeDate = require("can-data-types/maybe-date/maybe-date"),
+    MaybeNumber = require("can-data-types/maybe-number/maybe-number"),
+    MaybeString = require("can-data-types/maybe-string/maybe-string");
 
 var newSymbol = canSymbol.for("can.new"),
 	serializeSymbol = canSymbol.for("can.serialize");
@@ -118,7 +119,7 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 
 	// Goes through each property definition and creates
 	// a `getter` and `setter` function for `Object.defineProperty`.
-	each(result.definitions, function(definition, property){
+	canReflect.eachKey(result.definitions, function(definition, property){
 		define.property(objPrototype, property, definition, dataInitializers, computedInitializers, result.defaultDefinition);
 	});
 
@@ -176,7 +177,7 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 	});
 
 	// Places Symbol.iterator or @@iterator on the prototype
-	// so that this can be iterated with for/of and can-util/js/each/each
+	// so that this can be iterated with for/of and canReflect.eachIndex
 	var iteratorSymbol = canSymbol.iterator || canSymbol.for("iterator");
 	if(!objPrototype[iteratorSymbol]) {
 		defineConfigurableAndNotEnumerable(objPrototype, iteratorSymbol, function(){
@@ -763,11 +764,11 @@ var addBehaviorToDefinition = function(definition, behavior, value) {
 makeDefinition = function(prop, def, defaultDefinition) {
 	var definition = {};
 
-	each(def, function(value, behavior) {
+	canReflect.eachKey(def, function(value, behavior) {
 		addBehaviorToDefinition(definition, behavior, value);
 	});
 	// only add default if it doesn't exist
-	each(defaultDefinition, function(value, prop){
+	canReflect.eachKey(defaultDefinition, function(value, prop){
 		if(definition[prop] === undefined) {
 			if(prop !== "type" && prop !== "Type") {
 				definition[prop] = value;
@@ -779,10 +780,11 @@ makeDefinition = function(prop, def, defaultDefinition) {
 	if(typeof def.type !== 'string') {
 		// if there's no type definition, take it from the defaultDefinition
 		if(!definition.type && !definition.Type) {
-			defaults(definition, defaultDefinition);
+            var defaultsCopy = canReflect.assignMap({},defaultDefinition);
+            definition = canReflect.assignMap(defaultsCopy, definition);
 		}
 
-		if( isEmptyObject(definition) ) {
+		if( canReflect.size(definition) === 0 ) {
 			definition.type = define.types["*"];
 		}
 	}
@@ -815,7 +817,7 @@ getDefinitionOrMethod = function(prop, value, defaultDefinition){
 		// or leaves as a function
 	} else if( Array.isArray(value) ) {
 		definition = {Type: value};
-	} else if( isPlainObject(value) ){
+	} else if( canReflect.isPlainObject(value) ){
 		definition = value;
 	}
 
@@ -855,7 +857,7 @@ getDefinitionsAndMethods = function(defines, baseDefines) {
 			return;
 		} else {
 			var result = getDefinitionOrMethod(prop, value, defaultDefinition);
-			if(result && typeof result === "object" && !isEmptyObject(result)) {
+			if(result && typeof result === "object" && canReflect.size(result) > 0) {
 				definitions[prop] = result;
 			}
 			else {
@@ -976,7 +978,7 @@ define.setup = function(props, sealed) {
 			map[prop] = define.types.observable(value);
 		}
 	});
-	if(!isEmptyObject(instanceDefinitions)) {
+	if(canReflect.size(instanceDefinitions) > 0) {
 		defineConfigurableAndNotEnumerable(this, "_instanceDefinitions", instanceDefinitions);
 	}
 	// only seal in dev mode for performance reasons.
@@ -1047,97 +1049,7 @@ define.Iterator.prototype.next = function(){
 	};
 };
 
-function toNumber(val) {
-	if (val == null) {
-		return val;
-	}
-	return +(val);
-}
 
-var MaybeNumber = canReflect.assignSymbols(toNumber,{
-	"can.new": toNumber,
-	"can.getSchema": function(){
-		return {
-			type: "Or",
-			values: [Number, undefined, null]
-		};
-	}
-});
-
-function toBoolean(val) {
-	if(val == null) {
-		return val;
-	}
-	if (val === 'false' || val === '0' || !val) {
-		return false;
-	}
-	return true;
-}
-
-// make an enum type!
-var MaybeBoolean = canReflect.assignSymbols(toBoolean,{
-	"can.new": toBoolean,
-	"can.getSchema": function(){
-		return {
-			type: "Or",
-			values: [true, false, undefined, null]
-		};
-	}
-});
-
-function toString(val) {
-	if (val == null) {
-		return val;
-	}
-	return '' + val;
-}
-
-var MaybeString = canReflect.assignSymbols(toString,{
-	"can.new": toString,
-	"can.getSchema": function(){
-		return {
-			type: "Or",
-			values: [String, undefined, null]
-		};
-	}
-});
-
-function toDate(str) {
-	var type = typeof str;
-	if (type === 'string') {
-		str = Date.parse(str);
-		return isNaN(str) ? null : new Date(str);
-	} else if (type === 'number') {
-		return new Date(str);
-	} else {
-		return str;
-	}
-}
-
-function DateStringSet(dateStr){
-	this.setValue = dateStr;
-	var date = toDate(dateStr);
-	this.value = date == null ? date : date.getTime();
-}
-DateStringSet.prototype.valueOf = function(){
-	return this.value;
-};
-canReflect.assignSymbols(DateStringSet.prototype,{
-	"can.serialize": function(){
-		return this.setValue;
-	}
-});
-
-var MaybeDate = canReflect.assignSymbols(toDate,{
-	"can.new": toDate,
-	"can.getSchema": function(){
-		return {
-			type: "Or",
-			values: [Date, undefined, null]
-		};
-	},
-	"can.ComparisonSetType": DateStringSet
-});
 
 function isObservableValue(obj){
 	return canReflect.isValueLike(obj) && canReflect.isObservableLike(obj);
@@ -1152,7 +1064,7 @@ define.types = {
 			if(Array.isArray(newVal) && define.DefineList) {
 					newVal = new define.DefineList(newVal);
 			}
-			else if(isPlainObject(newVal) &&  define.DefineMap) {
+			else if(canReflect.isPlainObject(newVal) &&  define.DefineMap) {
 					newVal = new define.DefineMap(newVal);
 			}
 			return newVal;
@@ -1161,7 +1073,7 @@ define.types = {
 		if(Array.isArray(newVal)) {
 			return new define.DefaultList(newVal);
 		}
-		else if(isPlainObject(newVal)) {
+		else if(canReflect.isPlainObject(newVal)) {
 			return new define.DefaultMap(newVal);
 		}
 		else {

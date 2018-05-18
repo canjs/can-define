@@ -30,8 +30,11 @@
   },
   "homepage": "https://github.com/canjs/can-define",
   "dependencies": {
+    "can-assign": "^1.1.1",
     "can-construct": "^3.2.0",
+    "can-data-types": "<2.0.0",
     "can-define-lazy-value": "^1.0.0",
+    "can-diff": "^1.0.0",
     "can-event-queue": "^1.0.0",
     "can-log": "^1.0.0",
     "can-namespace": "^1.0.0",
@@ -40,8 +43,9 @@
     "can-queues": "^1.0.0",
     "can-reflect": "^1.7.0",
     "can-simple-observable": "^2.0.0",
-    "can-symbol": "^1.0.0",
-    "can-util": "^3.9.0"
+    "can-single-reference": "^1.0.0",
+    "can-string-to-any": "^1.0.1",
+    "can-symbol": "^1.0.0"
   },
   "devDependencies": {
     "can-reflect-tests": "<2.0.0",

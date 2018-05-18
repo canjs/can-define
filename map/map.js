@@ -65,7 +65,8 @@ function getKeyValue(key) {
 var getSchemaSymbol = canSymbol.for("can.getSchema");
 
 function getSchema() {
-	var definitions = this.prototype._define.definitions;
+	var def = this.prototype._define;
+	var definitions = def ? def.definitions : {};
 	var schema = {
 		type: "map",
 		identity: [],
