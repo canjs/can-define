@@ -292,11 +292,11 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 		//!steal-remove-start
 		// If value is an object or array, give a warning
 		if (definition.default !== null && typeof definition.default === 'object') {
-			canLogDev.warn("can-define: The value for " + prop + " is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.");
+			canLogDev.warn("can-define: The default value for " + prop + " is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.");
 		}
 		// If value is a constructor, give a warning
 		if (definition.default && canReflect.isConstructorLike(definition.default)) {
-			canLogDev.warn("can-define: The \"value\" for " + prop + " is set to a constructor. Did you mean \"Value\" instead?");
+			canLogDev.warn("can-define: The \"default\" for " + prop + " is set to a constructor. Did you mean \"Default\" instead?");
 		}
 		//!steal-remove-end
 
