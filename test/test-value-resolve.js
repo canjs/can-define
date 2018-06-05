@@ -4,6 +4,7 @@ require("can-define/list/list");
 var DefineMap = require("can-define/map/map");
 var canReflect = require("can-reflect");
 var queues = require("can-queues");
+var ObservationRecorder = require("can-observation-recorder");
 
 // Tests events directly on the Constructor function for define.Constructor, DefineMap and DefineList
 QUnit.module("can-define value with resolve");
@@ -263,6 +264,27 @@ QUnit.test("events should not be fired when resolve is not called", function(){
 
 	nums.oddNumber = 7;
 	nums.oddNumber = 8;
+});
+
+QUnit.test("reading properties does not leak out", function(){
+    var Type = DefineMap.extend({
+        prop: {
+            value: function(prop){
+                prop.resolve(this.value);
+            }
+        },
+        value: {default: "hi"}
+    });
+
+    var t = new Type()
+
+    ObservationRecorder.start();
+
+    t.on("prop", function(){});
+
+    var records = ObservationRecorder.stop();
+
+    QUnit.equal(records.keyDependencies.size, 0, "there are no key dependencies");
 });
 
 /*
