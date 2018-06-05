@@ -276,7 +276,7 @@ QUnit.test("reading properties does not leak out", function(){
         value: {default: "hi"}
     });
 
-    var t = new Type()
+    var t = new Type();
 
     ObservationRecorder.start();
 
