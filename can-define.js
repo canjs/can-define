@@ -32,10 +32,10 @@ var newSymbol = canSymbol.for("can.new"),
 var eventsProto, define,
 	make, makeDefinition, getDefinitionsAndMethods, getDefinitionOrMethod;
 
-
-var isDefineType = function(func){
+// UTILITIES
+function isDefineType(func){
 	return func && (func.canDefineType === true || func[newSymbol] );
-};
+}
 
 var peek = ObservationRecorder.ignore(canReflect.getValue.bind(canReflect));
 
@@ -58,23 +58,22 @@ Object_defineNamedPrototypeProperty = function(obj, prop, definition) {
 //!steal-remove-end
 
 
-var defineConfigurableAndNotEnumerable = function(obj, prop, value) {
+function defineConfigurableAndNotEnumerable(obj, prop, value) {
 	Object.defineProperty(obj, prop, {
 		configurable: true,
 		enumerable: false,
 		writable: true,
 		value: value
 	});
-};
+}
 
-var eachPropertyDescriptor = function(map, cb){
+function eachPropertyDescriptor(map, cb){
 	for(var prop in map) {
 		if(map.hasOwnProperty(prop)) {
 			cb.call(map, prop, Object.getOwnPropertyDescriptor(map,prop));
 		}
 	}
-};
-
+}
 
 function cleanUpDefinition(prop, definition, shouldWarn){
 	// cleanup `value` -> `default`
@@ -105,7 +104,12 @@ function cleanUpDefinition(prop, definition, shouldWarn){
 	}
 }
 
-module.exports = define = ns.define = function(objPrototype, defines, baseDefine) {
+function isValueResolver(definition) {
+	// there's a function and it has one argument
+	return typeof definition.value === "function" && definition.value.length;
+}
+
+module.exports = define = ns.define = function(typePrototype, defines, baseDefine) {
 	// default property definitions on _data
 	var prop,
 		dataInitializers = Object.create(baseDefine ? baseDefine.dataInitializers : null),
@@ -120,18 +124,18 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 	// Goes through each property definition and creates
 	// a `getter` and `setter` function for `Object.defineProperty`.
 	canReflect.eachKey(result.definitions, function(definition, property){
-		define.property(objPrototype, property, definition, dataInitializers, computedInitializers, result.defaultDefinition);
+		define.property(typePrototype, property, definition, dataInitializers, computedInitializers, result.defaultDefinition);
 	});
 
 	// Places a `_data` on the prototype that when first called replaces itself
 	// with a `_data` object local to the instance.  It also defines getters
 	// for any value that has a default value.
-	if(objPrototype.hasOwnProperty("_data")) {
+	if(typePrototype.hasOwnProperty("_data")) {
 		for (prop in dataInitializers) {
-			defineLazyValue(objPrototype._data, prop, dataInitializers[prop].bind(objPrototype), true);
+			defineLazyValue(typePrototype._data, prop, dataInitializers[prop].bind(typePrototype), true);
 		}
 	} else {
-		defineLazyValue(objPrototype, "_data", function() {
+		defineLazyValue(typePrototype, "_data", function() {
 			var map = this;
 			var data = {};
 			for (var prop in dataInitializers) {
@@ -144,12 +148,12 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 	// Places a `_computed` on the prototype that when first called replaces itself
 	// with a `_computed` object local to the instance.  It also defines getters
 	// that will create the property's compute when read.
-	if(objPrototype.hasOwnProperty("_computed")) {
+	if(typePrototype.hasOwnProperty("_computed")) {
 		for (prop in computedInitializers) {
-			defineLazyValue(objPrototype._computed, prop, computedInitializers[prop].bind(objPrototype));
+			defineLazyValue(typePrototype._computed, prop, computedInitializers[prop].bind(typePrototype));
 		}
 	} else {
-		defineLazyValue(objPrototype, "_computed", function() {
+		defineLazyValue(typePrototype, "_computed", function() {
 			var map = this;
 			var data = Object.create(null);
 			for (var prop in computedInitializers) {
@@ -161,7 +165,7 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 
 	// Add necessary event methods to this object.
 	for (prop in eventsProto) {
-		Object.defineProperty(objPrototype, prop, {
+		Object.defineProperty(typePrototype, prop, {
 			enumerable: false,
 			value: eventsProto[prop],
 			configurable: true,
@@ -169,7 +173,7 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 		});
 	}
 	// add so instance defs can be dynamically added
-	Object.defineProperty(objPrototype,"_define",{
+	Object.defineProperty(typePrototype,"_define",{
 		enumerable: false,
 		value: result,
 		configurable: true,
@@ -179,16 +183,14 @@ module.exports = define = ns.define = function(objPrototype, defines, baseDefine
 	// Places Symbol.iterator or @@iterator on the prototype
 	// so that this can be iterated with for/of and canReflect.eachIndex
 	var iteratorSymbol = canSymbol.iterator || canSymbol.for("iterator");
-	if(!objPrototype[iteratorSymbol]) {
-		defineConfigurableAndNotEnumerable(objPrototype, iteratorSymbol, function(){
+	if(!typePrototype[iteratorSymbol]) {
+		defineConfigurableAndNotEnumerable(typePrototype, iteratorSymbol, function(){
 			return new define.Iterator(this);
 		});
 	}
 
 	return result;
 };
-
-define.extensions = function () {};
 
 var onlyType = function(obj){
 	for(var prop in obj) {
@@ -199,13 +201,14 @@ var onlyType = function(obj){
 	return true;
 };
 
-function isValueResolver(definition) {
-	// there's a function and it has one argument
-	return typeof definition.value === "function" && definition.value.length;
-}
+define.extensions = function () {};
 
-
-define.property = function(objPrototype, prop, definition, dataInitializers, computedInitializers, defaultDefinition) {
+// typePrototype - the prototype of the type we are defining `prop` on.
+// `definition` - the user provided definition
+define.property = function(typePrototype, prop, definition, dataInitializers, computedInitializers, defaultDefinition) {
+    if(typeof definition !== "object") {
+        debugger;
+    }
 	var propertyDefinition = define.extensions.apply(this, arguments);
 
 	if (propertyDefinition) {
@@ -219,7 +222,7 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 		canLogDev.warn(
 			"can-define: the definition for " +
 			prop +
-			(objPrototype.constructor.shortName ? " on " + objPrototype.constructor.shortName : "") +
+			(typePrototype.constructor.shortName ? " on " + typePrototype.constructor.shortName : "") +
 			" uses a constructor for \"type\". Did you mean \"Type\"?"
 		);
 	}
@@ -227,7 +230,7 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 
 	// Special case definitions that have only `type: "*"`.
 	if (type && onlyType(definition) && type === define.types["*"]) {
-		Object_defineNamedPrototypeProperty(objPrototype, prop, {
+		Object_defineNamedPrototypeProperty(typePrototype, prop, {
 			get: make.get.data(prop),
 			set: make.set.events(prop, make.get.data(prop), make.set.data(prop), make.eventType.data(prop)),
 			enumerable: true,
@@ -254,17 +257,17 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 	//!steal-remove-start
 	if (definition.get) {
 		Object.defineProperty(definition.get, "name", {
-			value: canReflect.getName(objPrototype) + "'s " + prop + " getter",
+			value: canReflect.getName(typePrototype) + "'s " + prop + " getter",
 		});
 	}
 	if (definition.set) {
 		Object.defineProperty(definition.set, "name", {
-			value: canReflect.getName(objPrototype) + "'s " + prop + " setter",
+			value: canReflect.getName(typePrototype) + "'s " + prop + " setter",
 		});
 	}
 	if(isValueResolver(definition)) {
 		Object.defineProperty(definition.value, "name", {
-			value: canReflect.getName(objPrototype) + "'s " + prop + " value",
+			value: canReflect.getName(typePrototype) + "'s " + prop + " value",
 		});
 	}
 	//!steal-remove-end
@@ -338,7 +341,7 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 			//!steal-remove-start
 			canLogDev.warn("can-define: Set value for property " +
 				prop +
-				(objPrototype.constructor.shortName ? " on " + objPrototype.constructor.shortName : "") +
+				(typePrototype.constructor.shortName ? " on " + typePrototype.constructor.shortName : "") +
 				" ignored, as its definition has a zero-argument getter and no setter");
 			//!steal-remove-end
 		};
@@ -354,7 +357,7 @@ define.property = function(objPrototype, prop, definition, dataInitializers, com
 	}
 
 	// Define the property.
-	Object_defineNamedPrototypeProperty(objPrototype, prop, {
+	Object_defineNamedPrototypeProperty(typePrototype, prop, {
 		get: getter,
 		set: setter,
 		enumerable: "serialize" in definition ? !!definition.serialize : !definition.get,
@@ -761,6 +764,9 @@ var addBehaviorToDefinition = function(definition, behavior, value) {
 	}
 };
 
+// This is called by `define.property` AND `getDefinitionOrMethod` (which is called by `define`)
+// Currently, this is adding default behavior
+// copying `type` over, and even cleaning up the final definition object
 makeDefinition = function(prop, def, defaultDefinition) {
 	var definition = {};
 
@@ -792,12 +798,17 @@ makeDefinition = function(prop, def, defaultDefinition) {
 	return definition;
 };
 
+// called by `can.defineInstanceKey` and `getDefinitionsAndMethods`
+// returns the value or the definition object.
+// calls makeDefinition
+// This is dealing with a string value
 getDefinitionOrMethod = function(prop, value, defaultDefinition){
 	// Clean up the value to make it a definition-like object
 	var definition;
 	if(typeof value === "string") {
 		definition = {type: value};
 	}
+    // copies a `Type`'s methods over
 	else if(value && (value[serializeSymbol] || value[newSymbol]) ) {
 		definition = {};
 		var serialize = value[serializeSymbol];
@@ -828,7 +839,7 @@ getDefinitionOrMethod = function(prop, value, defaultDefinition){
 		return value;
 	}
 };
-
+// called by can.define
 getDefinitionsAndMethods = function(defines, baseDefines) {
 	// make it so the definitions include base definitions on the proto
 	var definitions = Object.create(baseDefines ? baseDefines.definitions : null);
@@ -867,6 +878,7 @@ getDefinitionsAndMethods = function(defines, baseDefines) {
 				}
 				//!steal-remove-start
 				else if (typeof result !== 'undefined') {
+                    // Ex: {prop: 0}
 					canLogDev.error(prop + (this.constructor.shortName ? " on " + this.constructor.shortName : "") + " does not match a supported propDefinition. See: https://canjs.com/doc/can-define.types.propDefinition.html");
 				}
 				//!steal-remove-end
@@ -942,19 +954,6 @@ canReflect.assignSymbols(eventsProto,{
 		return eventQueue[offKeyValueSymbol].apply(this, arguments);
 	}
 });
-
-/*canReflect.set(eventsProto, canSymbol.for("can.onKeyValue"), function(key, handler, queue){
-	var translationHandler = function(ev, newValue, oldValue){
-		handler(newValue, oldValue);
-	};
-	singleReference.set(handler, this, translationHandler, key);
-
-	this.addEventListener(key, translationHandler, queue);
-});
-
-canReflect.set(eventsProto, canSymbol.for("can.offKeyValue"), function(key, handler, queue){
-	this.removeEventListener(key, singleReference.getAndDelete(handler, this, key), queue );
-});*/
 
 delete eventsProto.one;
 
