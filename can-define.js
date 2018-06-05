@@ -206,9 +206,6 @@ define.extensions = function () {};
 // typePrototype - the prototype of the type we are defining `prop` on.
 // `definition` - the user provided definition
 define.property = function(typePrototype, prop, definition, dataInitializers, computedInitializers, defaultDefinition) {
-    if(typeof definition !== "object") {
-        debugger;
-    }
 	var propertyDefinition = define.extensions.apply(this, arguments);
 
 	if (propertyDefinition) {
