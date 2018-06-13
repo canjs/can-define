@@ -778,6 +778,23 @@ makeDefinition = function(prop, def, defaultDefinition) {
 			}
 		}
 	});
+
+	// normalize Type that implements can.new
+	if(def.Type) {
+		var value = def.Type;
+
+		var serialize = value[serializeSymbol];
+		if(serialize) {
+			definition.serialize = function(val){
+				return serialize.call(val);
+			};
+		}
+		if(value[newSymbol]) {
+			definition.type = value[newSymbol];
+			delete definition.Type;
+		}
+	}
+
 	// We only want to add a defaultDefinition if def.type is not a string
 	// if def.type is a string it is handled in addDefinition
 	if(typeof def.type !== 'string') {
@@ -807,16 +824,7 @@ getDefinitionOrMethod = function(prop, value, defaultDefinition){
 	}
     // copies a `Type`'s methods over
 	else if(value && (value[serializeSymbol] || value[newSymbol]) ) {
-		definition = {};
-		var serialize = value[serializeSymbol];
-		if(serialize) {
-			definition.serialize = function(val){
-				return serialize.call(val);
-			};
-		}
-		if(value[newSymbol]) {
-			definition.type = value[newSymbol];
-		}
+		definition = { Type: value };
 	}
 	else if(typeof value === "function") {
 		if(canReflect.isConstructorLike(value)) {

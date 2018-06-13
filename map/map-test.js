@@ -1328,3 +1328,49 @@ QUnit.test("make sure stringOrObservable works", function(){
 
 	QUnit.equal(type.val, "foo", "works");
 });
+
+QUnit.test("primitive types work with val: Type", function(){
+	var UpperCase = {};
+	UpperCase[canSymbol.for("can.new")] = function(val){
+		return val.toUpperCase();
+	};
+
+	var Type = DefineMap.extend({
+		val: UpperCase
+	});
+
+	var type = new Type({ val: "works" });
+	QUnit.equal(type.val, "WORKS", "it worked");
+});
+
+QUnit.test("primitive types work with val: {Type: Type}", function(){
+	var UpperCase = {};
+	UpperCase[canSymbol.for("can.new")] = function(val){
+		return val.toUpperCase();
+	};
+
+	var Type = DefineMap.extend({
+		val: {
+			Type: UpperCase
+		}
+	});
+
+	var type = new Type({ val: "works" });
+	QUnit.equal(type.val, "WORKS", "it worked");
+});
+
+QUnit.test("primitive types work with val: {type: Type}", function(){
+	var UpperCase = {};
+	UpperCase[canSymbol.for("can.new")] = function(val){
+		return val.toUpperCase();
+	};
+
+	var Type = DefineMap.extend({
+		val: {
+			type: UpperCase
+		}
+	});
+
+	var type = new Type({ val: "works" });
+	QUnit.equal(type.val, "WORKS", "it worked");
+});
