@@ -5,7 +5,7 @@ Event fired when items are added to the list.
 
 @signature `handler(event, added, index)`
 
-Handlers registered with [can-event] methods on `list` will be called back when
+Handlers registered with [can-event-queue/map/map] methods on `list` will be called back when
 items are added to a list.
 
 ```

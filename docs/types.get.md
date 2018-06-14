@@ -35,7 +35,7 @@ Specify `get` like:
 Asynchronously defines the behavior when a value is read on an instance. Used to provide property values that
 are available asynchronously.
 
-Only observed properties (via [can-event.on], [can-event.addEventListener], etc) will be passed the `resolve` function.  It will be `undefined` if the value is not observed. This is for memory safety.
+Only observed properties (via [can-event-queue/map/map.on], [can-event-queue/map/map.addEventListener], etc) will be passed the `resolve` function.  It will be `undefined` if the value is not observed. This is for memory safety.
 
 Specify `get` like:
 

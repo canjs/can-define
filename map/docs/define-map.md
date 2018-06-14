@@ -202,7 +202,7 @@ hero.last = "Man";
 hero.fullName; //-> "Bionic Man"
 ```
 
-If you want to prevent repeat updates, use [can-event/batch/batch]:
+If you want to prevent repeat updates, use [can-queues.batch.start]:
 
 ```js
 hero.fullName; //-> "Bionic Man"

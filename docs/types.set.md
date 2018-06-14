@@ -229,4 +229,4 @@ info === alice.info; // -> true
 
 ## Batched Changes
 
-By default, calls to `set` methods are wrapped in a call to [can-event/batch/batch.start canBatch.start] and [can-event/batch/batch.stop canBatch.stop], so if a set method has side effects that set more than one property, all these sets are wrapped in a single batch for better performance.
+By default, calls to `set` methods are wrapped in a call to [can-queues.batch.start] and [can-queues.batch.stop], so if a set method has side effects that set more than one property, all these sets are wrapped in a single batch for better performance.
