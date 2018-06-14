@@ -480,13 +480,15 @@ canReflect.assignSymbols(DefineMap.prototype,{
 	// -shape
 	"can.getOwnKeys": function() {
 		var keys = canReflect.getOwnEnumerableKeys(this);
-		var computedKeys = canReflect.getOwnKeys(this._computed);
+		if(this._computed) {
+			var computedKeys = canReflect.getOwnKeys(this._computed);
 
-		var key;
-		for (var i=0; i<computedKeys.length; i++) {
-			key = computedKeys[i];
-			if (keys.indexOf(key) < 0) {
-				keys.push(key);
+			var key;
+			for (var i=0; i<computedKeys.length; i++) {
+				key = computedKeys[i];
+				if (keys.indexOf(key) < 0) {
+					keys.push(key);
+				}
 			}
 		}
 

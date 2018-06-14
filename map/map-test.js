@@ -1374,3 +1374,10 @@ QUnit.test("primitive types work with val: {type: Type}", function(){
 	var type = new Type({ val: "works" });
 	QUnit.equal(type.val, "WORKS", "it worked");
 });
+
+QUnit.test("ownKeys works on basic DefineMaps", function(){
+	var map = new DefineMap({ first: "Jane", last: "Doe" });
+	var keys = canReflect.getOwnKeys(map);
+
+	QUnit.equal(keys.length, 2, "There are 2 keys");
+});
