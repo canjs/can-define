@@ -26,7 +26,7 @@ define( Greeting.prototype, {
 
 @param {Object} prototype The prototype object of a constructor function or [class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/class). The prototype
 object will have getter/setters defined on it that carry out the defined behavior.  The prototype will also contain
-all of [can-event]'s methods.
+all of [can-event-queue/map/map]'s methods.
 
 @param {Object<String,can-define.types.propDefinition>} propDefinitions An object of
 properties and their definitions.

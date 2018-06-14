@@ -5,8 +5,8 @@ Event fired when items are removed from the list.
 
 @signature `handler(event, removed, index)`
 
-Handlers registered with [can-event] methods on `list` will be called back when
-items are removed to a list.
+Handlers registered with [can-event-queue/map/map] methods on `list` will be called back when
+items are removed from a list.
 
 ```
 list.on("remove", function(event, removed, index){ ... });

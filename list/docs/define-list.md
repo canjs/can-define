@@ -109,7 +109,7 @@ const todos = new TodoList( [ { complete: true }, { complete: false } ] );
 todos.completed.length; //-> 1
 ```
 
-Finally, DefineList instances are observable, so you can use the [can-event]
+Finally, DefineList instances are observable, so you can use the [can-event-queue/map/map]
 methods to listen to its [can-define/list/list/AddEvent],
 [can-define/list/list/LengthEvent], [can-define/list/list/RemoveEvent],
 and [can-define/list/list/PropertyNameEvent] events:
