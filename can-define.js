@@ -41,20 +41,22 @@ var peek = ObservationRecorder.ignore(canReflect.getValue.bind(canReflect));
 
 var Object_defineNamedPrototypeProperty = Object.defineProperty;
 //!steal-remove-start
-Object_defineNamedPrototypeProperty = function(obj, prop, definition) {
-	if (definition.get) {
-		Object.defineProperty(definition.get, "name", {
-			value: "get "+canReflect.getName(obj) + "."+prop,
-			writable: true
-		});
-	}
-	if (definition.set) {
-		Object.defineProperty(definition.set, "name", {
-			value:  "set "+canReflect.getName(obj) + "."+prop
-		});
-	}
-	return Object.defineProperty(obj, prop, definition);
-};
+if(process.env.NODE_ENV !== 'production') {
+	Object_defineNamedPrototypeProperty = function(obj, prop, definition) {
+		if (definition.get) {
+			Object.defineProperty(definition.get, "name", {
+				value: "get "+canReflect.getName(obj) + "."+prop,
+				writable: true
+			});
+		}
+		if (definition.set) {
+			Object.defineProperty(definition.set, "name", {
+				value:  "set "+canReflect.getName(obj) + "."+prop
+			});
+		}
+		return Object.defineProperty(obj, prop, definition);
+	};
+}
 //!steal-remove-end
 
 
@@ -80,10 +82,12 @@ function cleanUpDefinition(prop, definition, shouldWarn){
 	if(definition.value !== undefined && ( typeof definition.value !== "function" || definition.value.length === 0) ){
 
 		//!steal-remove-start
-		if(shouldWarn) {
-			canLogDev.warn(
-				"can-define: Change the 'value' definition for " + prop + " to 'default'."
-			);
+		if(process.env.NODE_ENV !== 'production') {
+			if(shouldWarn) {
+				canLogDev.warn(
+					"can-define: Change the 'value' definition for " + prop + " to 'default'."
+				);
+			}
 		}
 		//!steal-remove-end
 
@@ -93,10 +97,12 @@ function cleanUpDefinition(prop, definition, shouldWarn){
 	// cleanup `Value` -> `DEFAULT`
 	if(definition.Value !== undefined  ){
 		//!steal-remove-start
-		if(shouldWarn) {
-			canLogDev.warn(
-				"can-define: Change the 'Value' definition for " + prop + " to 'Default'."
-			);
+		if(process.env.NODE_ENV !== 'production') {
+			if(shouldWarn) {
+				canLogDev.warn(
+					"can-define: Change the 'Value' definition for " + prop + " to 'Default'."
+				);
+			}
 		}
 		//!steal-remove-end
 		definition.Default = definition.Value;
@@ -215,13 +221,15 @@ define.property = function(typePrototype, prop, definition, dataInitializers, co
 	var type = definition.type;
 
 	//!steal-remove-start
-	if (type && canReflect.isConstructorLike(type) && !isDefineType(type)) {
-		canLogDev.warn(
-			"can-define: the definition for " +
-			prop +
-			(typePrototype.constructor.shortName ? " on " + typePrototype.constructor.shortName : "") +
-			" uses a constructor for \"type\". Did you mean \"Type\"?"
-		);
+	if(process.env.NODE_ENV !== 'production') {
+		if (type && canReflect.isConstructorLike(type) && !isDefineType(type)) {
+			canLogDev.warn(
+				"can-define: the definition for " +
+				prop +
+				(typePrototype.constructor.shortName ? " on " + typePrototype.constructor.shortName : "") +
+				" uses a constructor for \"type\". Did you mean \"Type\"?"
+			);
+		}
 	}
 	//!steal-remove-end
 
@@ -252,20 +260,22 @@ define.property = function(typePrototype, prop, definition, dataInitializers, co
 		getInitialValue;
 
 	//!steal-remove-start
-	if (definition.get) {
-		Object.defineProperty(definition.get, "name", {
-			value: canReflect.getName(typePrototype) + "'s " + prop + " getter",
-		});
-	}
-	if (definition.set) {
-		Object.defineProperty(definition.set, "name", {
-			value: canReflect.getName(typePrototype) + "'s " + prop + " setter",
-		});
-	}
-	if(isValueResolver(definition)) {
-		Object.defineProperty(definition.value, "name", {
-			value: canReflect.getName(typePrototype) + "'s " + prop + " value",
-		});
+	if(process.env.NODE_ENV !== 'production') {
+		if (definition.get) {
+			Object.defineProperty(definition.get, "name", {
+				value: canReflect.getName(typePrototype) + "'s " + prop + " getter",
+			});
+		}
+		if (definition.set) {
+			Object.defineProperty(definition.set, "name", {
+				value: canReflect.getName(typePrototype) + "'s " + prop + " setter",
+			});
+		}
+		if(isValueResolver(definition)) {
+			Object.defineProperty(definition.value, "name", {
+				value: canReflect.getName(typePrototype) + "'s " + prop + " value",
+			});
+		}
 	}
 	//!steal-remove-end
 
@@ -290,13 +300,15 @@ define.property = function(typePrototype, prop, definition, dataInitializers, co
 	else if ((definition.default !== undefined || definition.Default !== undefined)) {
 
 		//!steal-remove-start
-		// If value is an object or array, give a warning
-		if (definition.default !== null && typeof definition.default === 'object') {
-			canLogDev.warn("can-define: The default value for " + prop + " is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.");
-		}
-		// If value is a constructor, give a warning
-		if (definition.default && canReflect.isConstructorLike(definition.default)) {
-			canLogDev.warn("can-define: The \"default\" for " + prop + " is set to a constructor. Did you mean \"Default\" instead?");
+			if(process.env.NODE_ENV !== 'production') {
+			// If value is an object or array, give a warning
+			if (definition.default !== null && typeof definition.default === 'object') {
+				canLogDev.warn("can-define: The default value for " + prop + " is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.");
+			}
+			// If value is a constructor, give a warning
+			if (definition.default && canReflect.isConstructorLike(definition.default)) {
+				canLogDev.warn("can-define: The \"default\" for " + prop + " is set to a constructor. Did you mean \"Default\" instead?");
+			}
 		}
 		//!steal-remove-end
 
@@ -336,10 +348,12 @@ define.property = function(typePrototype, prop, definition, dataInitializers, co
 	else if (definition.get && definition.get.length < 1) {
 		setter = function() {
 			//!steal-remove-start
-			canLogDev.warn("can-define: Set value for property " +
-				prop +
-				(typePrototype.constructor.shortName ? " on " + typePrototype.constructor.shortName : "") +
-				" ignored, as its definition has a zero-argument getter and no setter");
+			if(process.env.NODE_ENV !== 'production') {
+				canLogDev.warn("can-define: Set value for property " +
+					prop +
+					(typePrototype.constructor.shortName ? " on " + typePrototype.constructor.shortName : "") +
+					" ignored, as its definition has a zero-argument getter and no setter");
+			}
 			//!steal-remove-end
 		};
 	}
@@ -421,9 +435,11 @@ make = {
 			var map = this;
 			var computeObj = make.computeObj(map, prop, new ResolverObservable(definition.value, map));
 			//!steal-remove-start
-			Object.defineProperty(computeObj.handler, "name", {
-				value: canReflect.getName(definition.value).replace('value', 'event emitter')
-			});
+			if(process.env.NODE_ENV !== 'production') {
+				Object.defineProperty(computeObj.handler, "name", {
+					value: canReflect.getName(definition.value).replace('value', 'event emitter')
+				});
+			}
 			//!steal-remove-end
 			return computeObj;
 		};
@@ -447,9 +463,11 @@ make = {
 			computeObj = make.computeObj(map, prop, observable);
 
 			//!steal-remove-start
-			Object.defineProperty(computeObj.handler, "name", {
-				value: canReflect.getName(get).replace('getter', 'event emitter')
-			});
+			if(process.env.NODE_ENV !== 'production') {
+				Object.defineProperty(computeObj.handler, "name", {
+					value: canReflect.getName(get).replace('getter', 'event emitter')
+				});
+			}
 			//!steal-remove-end
 
 			return computeObj;
@@ -475,16 +493,22 @@ make = {
 				else {
 					var current = getCurrent.call(this);
 					if (newVal !== current) {
+						var dispatched;
 						setData.call(this, newVal);
 
-						this.dispatch({
+						dispatched = {
 							patches: [{type: "set", key: prop, value: newVal}],
 							type: prop,
-							target: this,
-							//!steal-remove-start
-							reasonLog: [ canReflect.getName(this) + "'s", prop, "changed to", newVal, "from", current ],
-							//!steal-remove-end
-						}, [newVal, current]);
+							target: this
+						};
+
+						//!steal-remove-start
+						if(process.env.NODE_ENV !== 'production') {
+							dispatched.reasonLog = [ canReflect.getName(this) + "'s", prop, "changed to", newVal, "from", current ];
+						}
+						//!steal-remove-end
+
+						this.dispatch(dispatched, [newVal, current]);
 					}
 				}
 			};
@@ -509,7 +533,9 @@ make = {
 
 						setterCalled = true;
 						//!steal-remove-start
-						clearTimeout(asyncTimer);
+						if(process.env.NODE_ENV !== 'production') {
+							clearTimeout(asyncTimer);
+						}
 						//!steal-remove-end
 					}, current);
 
@@ -543,9 +569,11 @@ make = {
 						// we are expecting something
 						else {
 							//!steal-remove-start
-							asyncTimer = setTimeout(function() {
-								canLogDev.warn('can/map/setter.js: Setter "' + prop + '" did not return a value or call the setter callback.');
-							}, canLogDev.warnTimeout);
+							if(process.env.NODE_ENV !== 'production') {
+								asyncTimer = setTimeout(function() {
+									canLogDev.warn('can/map/setter.js: Setter "' + prop + '" did not return a value or call the setter callback.');
+								}, canLogDev.warnTimeout);
+							}
 							//!steal-remove-end
 							queues.batch.stop();
 							return;
@@ -575,9 +603,11 @@ make = {
 						// we are expecting something
 						else {
 							//!steal-remove-start
-							asyncTimer = setTimeout(function() {
-								canLogDev.warn('can/map/setter.js: Setter "' + prop + '" did not return a value or call the setter callback.');
-							}, canLogDev.warnTimeout);
+							if(process.env.NODE_ENV !== 'production') {
+								asyncTimer = setTimeout(function() {
+									canLogDev.warn('can/map/setter.js: Setter "' + prop + '" did not return a value or call the setter callback.');
+								}, canLogDev.warnTimeout);
+							}
 							//!steal-remove-end
 							queues.batch.stop();
 							return;
@@ -883,8 +913,10 @@ getDefinitionsAndMethods = function(defines, baseDefines) {
 				}
 				//!steal-remove-start
 				else if (typeof result !== 'undefined') {
-                    // Ex: {prop: 0}
-					canLogDev.error(prop + (this.constructor.shortName ? " on " + this.constructor.shortName : "") + " does not match a supported propDefinition. See: https://canjs.com/doc/can-define.types.propDefinition.html");
+					if(process.env.NODE_ENV !== 'production') {
+                    	// Ex: {prop: 0}
+						canLogDev.error(prop + (this.constructor.shortName ? " on " + this.constructor.shortName : "") + " does not match a supported propDefinition. See: https://canjs.com/doc/can-define.types.propDefinition.html");
+					}
 				}
 				//!steal-remove-end
 			}
@@ -987,10 +1019,12 @@ define.setup = function(props, sealed) {
 	}
 	// only seal in dev mode for performance reasons.
 	//!steal-remove-start
-	this._data;
-	this._computed;
-	if(sealed !== false) {
-		Object.seal(this);
+	if(process.env.NODE_ENV !== 'production') {
+		this._data;
+		this._computed;
+		if(sealed !== false) {
+			Object.seal(this);
+		}
 	}
 	//!steal-remove-end
 };
