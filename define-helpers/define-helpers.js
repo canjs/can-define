@@ -1,3 +1,4 @@
+"use strict";
 var define = require("can-define");
 var canReflect = require("can-reflect");
 var queues = require("can-queues");

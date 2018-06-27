@@ -1,3 +1,4 @@
+"use strict";
 var Construct = require("can-construct");
 var define = require("can-define");
 var make = define.make;
