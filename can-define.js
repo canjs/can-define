@@ -300,7 +300,7 @@ define.property = function(typePrototype, prop, definition, dataInitializers, co
 	else if ((definition.default !== undefined || definition.Default !== undefined)) {
 
 		//!steal-remove-start
-			if(process.env.NODE_ENV !== 'production') {
+		if (process.env.NODE_ENV !== 'production') {
 			// If value is an object or array, give a warning
 			if (definition.default !== null && typeof definition.default === 'object') {
 				canLogDev.warn("can-define: The default value for " + prop + " is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.");
