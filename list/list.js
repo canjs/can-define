@@ -8,8 +8,8 @@ var ObservationRecorder = require("can-observation-recorder");
 var canLog = require("can-log");
 var canLogDev = require("can-log/dev/dev");
 var defineHelpers = require("../define-helpers/define-helpers");
-var dev = require("can-log/dev/dev");
-var ensureMeta = require("../ensure-meta");
+//var dev = require("can-log/dev/dev");
+//var ensureMeta = require("../ensure-meta");
 
 var assign = require("can-assign");
 var diff = require("can-diff/list/list");
@@ -17,6 +17,12 @@ var ns = require("can-namespace");
 var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
 var singleReference = require("can-single-reference");
+
+//!steal-remove-start
+if(process.env.NODE_ENV !== 'production') {
+	var defineLog = require("../define-log/define-log");
+}
+//!steal-remove-end
 
 var splice = [].splice;
 var runningNative = false;
@@ -593,53 +599,6 @@ var DefineList = Construct.extend("DefineList",
 		 */
 		serialize: function() {
 			return canReflect.serialize(this, Map);
-		},
-
-		// call `list.log()` to log all event changes
-		// pass `key` to only log the matching event, e.g: `list.log("add")`
-		log: function(key) {
-			//!steal-remove-start
-			if(process.env.NODE_ENV !== 'production') {
-				var instance = this;
-
-				var quoteString = function quoteString(x) {
-					return typeof x === "string" ? JSON.stringify(x) : x;
-				};
-
-				var meta = ensureMeta(instance);
-				var allowed = meta.allowedLogKeysSet || new Set();
-				meta.allowedLogKeysSet = allowed;
-
-				if (key) {
-					allowed.add(key);
-				}
-
-				meta._log = function(event, data) {
-					var type = event.type;
-
-					if (type === "can.onPatches" || (key && !allowed.has(type))) {
-						return;
-					}
-
-					if (type === "add" || type === "remove") {
-						dev.log(
-							canReflect.getName(instance),
-							"\n how   ", quoteString(type),
-							"\n what  ", quoteString(data[0]),
-							"\n index ", quoteString(data[1])
-						);
-					} else {
-						// log `length` and `propertyName` events
-						dev.log(
-							canReflect.getName(instance),
-							"\n key ", quoteString(type),
-							"\n is  ", quoteString(data[0]),
-							"\n was ", quoteString(data[1])
-						);
-					}
-				};
-			}
-			//!steal-remove-end
 		}
 	}
 );
@@ -1743,6 +1702,54 @@ canReflect.setKeyValue(DefineList.prototype, canSymbol.iterator, function() {
 		}.bind(this)
 	};
 });
+
+//!steal-remove-start
+if(process.env.NODE_ENV !== 'production') {
+	// call `list.log()` to log all event changes
+	// pass `key` to only log the matching event, e.g: `list.log("add")`
+	/*DefineList.prototype.log = function(key) {
+		var instance = this;
+
+		var quoteString = function quoteString(x) {
+			return typeof x === "string" ? JSON.stringify(x) : x;
+		};
+
+		var meta = ensureMeta(instance);
+		var allowed = meta.allowedLogKeysSet || new Set();
+		meta.allowedLogKeysSet = allowed;
+
+		if (key) {
+			allowed.add(key);
+		}
+
+		meta._log = function(event, data) {
+			var type = event.type;
+
+			if (type === "can.onPatches" || (key && !allowed.has(type))) {
+				return;
+			}
+
+			if (type === "add" || type === "remove") {
+				dev.log(
+					canReflect.getName(instance),
+					"\n how   ", quoteString(type),
+					"\n what  ", quoteString(data[0]),
+					"\n index ", quoteString(data[1])
+				);
+			} else {
+				// log `length` and `propertyName` events
+				dev.log(
+					canReflect.getName(instance),
+					"\n key ", quoteString(type),
+					"\n is  ", quoteString(data[0]),
+					"\n was ", quoteString(data[1])
+				);
+			}
+		};
+	};*/
+	DefineList.prototype.log = defineLog;
+}
+//!steal-remove-end
 
 define.DefineList = DefineList;
 

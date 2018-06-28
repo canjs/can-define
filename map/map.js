@@ -9,9 +9,15 @@ var canLogDev = require("can-log/dev/dev");
 var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
 var queues = require("can-queues");
-var ensureMeta = require("../ensure-meta");
-var dev = require("can-log/dev/dev");
+//var ensureMeta = require("../ensure-meta");
+//var dev = require("can-log/dev/dev");
 var addTypeEvents = require("can-event-queue/type/type");
+
+//!steal-remove-start
+if(process.env.NODE_ENV !== 'production') {
+	var defineLog = require("../define-log/define-log");
+}
+//!steal-remove-end
 
 var keysForDefinition = function(definitions) {
 	var keys = [];
@@ -429,41 +435,6 @@ var DefineMap = Construct.extend("DefineMap",{
 	})(),
 	"*": {
 		type: define.types.observable
-	},
-
-	// call `map.log()` to log all event changes
-	// pass `key` to only log the matching property, e.g: `map.log("foo")`
-	log: function(key) {
-		//!steal-remove-start
-		if(process.env.NODE_ENV !== 'production') {
-			var instance = this;
-
-			var quoteString = function quoteString(x) {
-				return typeof x === "string" ? JSON.stringify(x) : x;
-			};
-
-			var meta = ensureMeta(instance);
-			var allowed = meta.allowedLogKeysSet || new Set();
-			meta.allowedLogKeysSet = allowed;
-
-			if (key) {
-				allowed.add(key);
-			}
-
-			meta._log = function(event, data) {
-				var type = event.type;
-				if (type === "can.keys" || (key && !allowed.has(type))) {
-					return;
-				}
-				dev.log(
-					canReflect.getName(instance),
-					"\n key ", quoteString(type),
-					"\n is  ", quoteString(data[0]),
-					"\n was ", quoteString(data[1])
-				);
-			};
-		}
-		//!steal-remove-end
 	}
 });
 
@@ -567,6 +538,44 @@ eventsProtoSymbols.forEach(function(sym) {
     writable: true
   });
 });
+
+
+//!steal-remove-start
+if(process.env.NODE_ENV !== 'production') {
+	// call `map.log()` to log all event changes
+	// pass `key` to only log the matching property, e.g: `map.log("foo")`
+	/*DefineMap.prototype.log = function(key) {
+		var instance = this;
+
+		var quoteString = function quoteString(x) {
+			return typeof x === "string" ? JSON.stringify(x) : x;
+		};
+
+		var meta = ensureMeta(instance);
+		var allowed = meta.allowedLogKeysSet || new Set();
+		meta.allowedLogKeysSet = allowed;
+
+		if (key) {
+			allowed.add(key);
+		}
+
+		meta._log = function(event, data) {
+			var type = event.type;
+			if (type === "can.keys" || (key && !allowed.has(type))) {
+				return;
+			}
+			dev.log(
+				canReflect.getName(instance),
+				"\n key ", quoteString(type),
+				"\n is  ", quoteString(data[0]),
+				"\n was ", quoteString(data[1])
+			);
+		};
+	};*/
+
+	DefineMap.prototype.log = defineLog;
+}
+//!steal-remove-end
 
 // tells `can-define` to use this
 define.DefineMap = DefineMap;
