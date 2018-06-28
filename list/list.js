@@ -8,8 +8,6 @@ var ObservationRecorder = require("can-observation-recorder");
 var canLog = require("can-log");
 var canLogDev = require("can-log/dev/dev");
 var defineHelpers = require("../define-helpers/define-helpers");
-//var dev = require("can-log/dev/dev");
-//var ensureMeta = require("../ensure-meta");
 
 var assign = require("can-assign");
 var diff = require("can-diff/list/list");

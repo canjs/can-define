@@ -9,8 +9,6 @@ var canLogDev = require("can-log/dev/dev");
 var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
 var queues = require("can-queues");
-//var ensureMeta = require("../ensure-meta");
-//var dev = require("can-log/dev/dev");
 var addTypeEvents = require("can-event-queue/type/type");
 
 //!steal-remove-start
