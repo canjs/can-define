@@ -544,35 +544,6 @@ eventsProtoSymbols.forEach(function(sym) {
 if(process.env.NODE_ENV !== 'production') {
 	// call `map.log()` to log all event changes
 	// pass `key` to only log the matching property, e.g: `map.log("foo")`
-	/*DefineMap.prototype.log = function(key) {
-		var instance = this;
-
-		var quoteString = function quoteString(x) {
-			return typeof x === "string" ? JSON.stringify(x) : x;
-		};
-
-		var meta = ensureMeta(instance);
-		var allowed = meta.allowedLogKeysSet || new Set();
-		meta.allowedLogKeysSet = allowed;
-
-		if (key) {
-			allowed.add(key);
-		}
-
-		meta._log = function(event, data) {
-			var type = event.type;
-			if (type === "can.keys" || (key && !allowed.has(type))) {
-				return;
-			}
-			dev.log(
-				canReflect.getName(instance),
-				"\n key ", quoteString(type),
-				"\n is  ", quoteString(data[0]),
-				"\n was ", quoteString(data[1])
-			);
-		};
-	};*/
-
 	DefineMap.prototype.log = defineLog;
 }
 //!steal-remove-end
