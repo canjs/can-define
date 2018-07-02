@@ -174,22 +174,7 @@ var DefineMap = Construct.extend("DefineMap",{
 	 * @function can-define/map/map.prototype.set set
 	 * @parent can-define/map/map.prototype
 	 *
-	 * @deprecated {3.10.1} Passing an {Object} to `.set` has been deprecated in favor of [can-define/map/map.prototype.assign] or [can-define/map/map.prototype.update]. `map.set(propName, value)` is _not_ deprecated.
-	 *
-	 * @description Sets multiple properties on a map instance or a property that wasn't predefined.
-	 *
-	 * @signature `map.set(props [,removeProps])`
-	 *
-	 * Assigns each value in `props` to a property on this map instance named after the
-	 * corresponding key in `props`, effectively merging `props` into the Map. If `removeProps` is true, properties not in
-	 * `props` will be set to `undefined`.
-	 *
-	 *   @param {Object} props A collection of key-value pairs to set.
-	 *   If any properties already exist on the map, they will be overwritten.
-	 *
-	 *   @param {Boolean} [removeProps=false] Whether to set keys not present in `props` to `undefined`.
-	 *
-	 *   @return {can-define/map/map} The map instance for chaining.
+	 * @description Sets a property that wasn't predefined.
 	 *
 	 * @signature `map.set(propName, value)`
 	 *
