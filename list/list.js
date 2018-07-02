@@ -232,7 +232,9 @@ var DefineList = Construct.extend("DefineList",
 		 * @function can-define/list/list.prototype.set set
 		 * @parent can-define/list/list.prototype
 		 *
-		 * @description Sets an item or property or properties on a list.
+		 * @deprecated {3.10.1} Using .set with {Object} `props` has been deprecated in favour of `assign` and `update`
+		 *
+		 * @description Sets an item or property or items or properties on a list.
 		 *
 		 * @signature `list.set(prop, value)`
 		 *
@@ -247,6 +249,19 @@ var DefineList = Construct.extend("DefineList",
 		 *
 		 *   @param {Number} prop A property name.
 		 *   @param {*} value The value to add to the list.
+		 *   @return {can-define/list/list} The list instance.
+		 *
+		 * @signature `list.set(newProps)`
+		 *
+		 * Updates the properties on the list with `newProps`.
+		 *
+		 * ```js
+		 * var list = new DefineList(["A","B"]);
+		 * list.set({count: 1000, skip: 2});
+		 * list.get("count") //-> 1000
+		 * ```
+		 *
+		 *   @param {Object} newProps An object of properties and values to set on the list.
 		 *   @return {can-define/list/list} The list instance.
 		 *
 		 * @signature `list.set(index, value)`
