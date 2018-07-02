@@ -16,12 +16,6 @@ var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
 var singleReference = require("can-single-reference");
 
-//!steal-remove-start
-if(process.env.NODE_ENV !== 'production') {
-	var defineLog = require("../define-log/define-log");
-}
-//!steal-remove-end
-
 var splice = [].splice;
 var runningNative = false;
 
@@ -1705,7 +1699,7 @@ canReflect.setKeyValue(DefineList.prototype, canSymbol.iterator, function() {
 if(process.env.NODE_ENV !== 'production') {
 	// call `list.log()` to log all event changes
 	// pass `key` to only log the matching event, e.g: `list.log("add")`
-	DefineList.prototype.log = defineLog;
+	DefineList.prototype.log = defineHelpers.log;
 }
 //!steal-remove-end
 

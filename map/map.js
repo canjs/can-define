@@ -11,12 +11,6 @@ var canSymbol = require("can-symbol");
 var queues = require("can-queues");
 var addTypeEvents = require("can-event-queue/type/type");
 
-//!steal-remove-start
-if(process.env.NODE_ENV !== 'production') {
-	var defineLog = require("../define-log/define-log");
-}
-//!steal-remove-end
-
 var keysForDefinition = function(definitions) {
 	var keys = [];
 	for(var prop in definitions) {
@@ -542,7 +536,7 @@ eventsProtoSymbols.forEach(function(sym) {
 if(process.env.NODE_ENV !== 'production') {
 	// call `map.log()` to log all event changes
 	// pass `key` to only log the matching property, e.g: `map.log("foo")`
-	DefineMap.prototype.log = defineLog;
+	DefineMap.prototype.log = defineHelpers.log;
 }
 //!steal-remove-end
 
