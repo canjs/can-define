@@ -8,8 +8,6 @@ var ObservationRecorder = require("can-observation-recorder");
 var canLog = require("can-log");
 var canLogDev = require("can-log/dev/dev");
 var defineHelpers = require("../define-helpers/define-helpers");
-var dev = require("can-log/dev/dev");
-var ensureMeta = require("../ensure-meta");
 
 var assign = require("can-assign");
 var diff = require("can-diff/list/list");
@@ -122,20 +120,24 @@ var DefineList = Construct.extend("DefineList",
 			// Make sure this is not nested and not an expando
 			if ( !isNaN(index)) {
 				var itemsDefinition = this._define.definitions["#"];
-				var patches;
+				var patches, dispatched;
 				if (how === 'add') {
 					if (itemsDefinition && typeof itemsDefinition.added === 'function') {
 						ObservationRecorder.ignore(itemsDefinition.added).call(this, newVal, index);
 					}
 
 					patches = [{type: "splice", insert: newVal, index: index, deleteCount: 0}];
-					this.dispatch({
+					dispatched = {
 						type: how,
-						patches: patches,
-						//!steal-remove-start
-						reasonLog: [ canReflect.getName(this), "added", newVal, "at", index ],
-						//!steal-remove-end
-					}, [ newVal, index ]);
+						patches: patches
+					};
+
+					//!steal-remove-start
+					if(process.env.NODE_ENV !== 'production') {
+						dispatched.reasonLog = [ canReflect.getName(this), "added", newVal, "at", index ];
+					}
+					//!steal-remove-end
+					this.dispatch(dispatched, [ newVal, index ]);
 
 				} else if (how === 'remove') {
 					if (itemsDefinition && typeof itemsDefinition.removed === 'function') {
@@ -143,13 +145,16 @@ var DefineList = Construct.extend("DefineList",
 					}
 
 					patches = [{type: "splice", index: index, deleteCount: oldVal.length}];
-					this.dispatch({
+					dispatched = {
 						type: how,
-						patches: patches,
-						//!steal-remove-start
-						reasonLog: [ canReflect.getName(this), "remove", oldVal, "at", index ],
-						//!steal-remove-end
-					}, [ oldVal, index ]);
+						patches: patches
+					};
+					//!steal-remove-start
+					if(process.env.NODE_ENV !== 'production') {
+						dispatched.reasonLog = [ canReflect.getName(this), "remove", oldVal, "at", index ];
+					}
+					//!steal-remove-end
+					this.dispatch(dispatched, [ oldVal, index ]);
 
 				} else {
 					this.dispatch(how, [ newVal, index ]);
@@ -319,7 +324,9 @@ var DefineList = Construct.extend("DefineList",
 			// otherwise we are setting multiple
 			else {
 				//!steal-remove-start
-				canLogDev.warn('can-define/list/list.prototype.set is deprecated; please use can-define/list/list.prototype.assign or can-define/list/list.prototype.update instead');
+				if(process.env.NODE_ENV !== 'production') {
+					canLogDev.warn('can-define/list/list.prototype.set is deprecated; please use can-define/list/list.prototype.assign or can-define/list/list.prototype.update instead');
+				}
 				//!steal-remove-end
 
 				//we are deprecating this in #245
@@ -584,51 +591,6 @@ var DefineList = Construct.extend("DefineList",
 		 */
 		serialize: function() {
 			return canReflect.serialize(this, Map);
-		},
-
-		// call `list.log()` to log all event changes
-		// pass `key` to only log the matching event, e.g: `list.log("add")`
-		log: function(key) {
-			//!steal-remove-start
-			var instance = this;
-
-			var quoteString = function quoteString(x) {
-				return typeof x === "string" ? JSON.stringify(x) : x;
-			};
-
-			var meta = ensureMeta(instance);
-			var allowed = meta.allowedLogKeysSet || new Set();
-			meta.allowedLogKeysSet = allowed;
-
-			if (key) {
-				allowed.add(key);
-			}
-
-			meta._log = function(event, data) {
-				var type = event.type;
-
-				if (type === "can.onPatches" || (key && !allowed.has(type))) {
-					return;
-				}
-
-				if (type === "add" || type === "remove") {
-					dev.log(
-						canReflect.getName(instance),
-						"\n how   ", quoteString(type),
-						"\n what  ", quoteString(data[0]),
-						"\n index ", quoteString(data[1])
-					);
-				} else {
-					// log `length` and `propertyName` events
-					dev.log(
-						canReflect.getName(instance),
-						"\n key ", quoteString(type),
-						"\n is  ", quoteString(data[0]),
-						"\n was ", quoteString(data[1])
-					);
-				}
-			};
-			//!steal-remove-end
 		}
 	}
 );
@@ -1605,8 +1567,7 @@ DefineList.prototype.items = function() {
 	return this.get();
 };
 
-
-canReflect.assignSymbols(DefineList.prototype,{
+var defineListProto = {
 	// type
 	"can.isMoreListLikeThanMapLike": true,
 	"can.isMapLike": true,
@@ -1628,9 +1589,11 @@ canReflect.assignSymbols(DefineList.prototype,{
 				handler(this[key]);
 			};
 			//!steal-remove-start
-			Object.defineProperty(translationHandler, "name", {
-				value: "translationHandler(" + key + ")::" + canReflect.getName(this) + ".onKeyValue('length'," + canReflect.getName(handler) + ")",
-			});
+			if(process.env.NODE_ENV !== 'production') {
+				Object.defineProperty(translationHandler, "name", {
+					value: "translationHandler(" + key + ")::" + canReflect.getName(this) + ".onKeyValue('length'," + canReflect.getName(handler) + ")",
+				});
+			}
 			//!steal-remove-end
 			singleReference.set(handler, this, translationHandler, key);
 			return onKeyValue.call(this, 'length',  translationHandler, queue);
@@ -1703,14 +1666,18 @@ canReflect.assignSymbols(DefineList.prototype,{
 	},
 	"can.offPatches": function(handler,queue) {
 		this[canSymbol.for("can.offKeyValue")](localOnPatchesSymbol, handler,queue);
-	},
+	}
+};
 
-	//!steal-remove-start
-	"can.getName": function() {
+//!steal-remove-start
+if(process.env.NODE_ENV !== 'production') {
+	defineListProto["can.getName"] = function() {
 		return canReflect.getName(this.constructor) + "[]";
-	},
-	//!steal-remove-end
-});
+	};
+}
+//!steal-remove-end
+
+canReflect.assignSymbols(DefineList.prototype, defineListProto);
 
 canReflect.setKeyValue(DefineList.prototype, canSymbol.iterator, function() {
 	var index = -1;
@@ -1727,6 +1694,14 @@ canReflect.setKeyValue(DefineList.prototype, canSymbol.iterator, function() {
 		}.bind(this)
 	};
 });
+
+//!steal-remove-start
+if(process.env.NODE_ENV !== 'production') {
+	// call `list.log()` to log all event changes
+	// pass `key` to only log the matching event, e.g: `list.log("add")`
+	DefineList.prototype.log = defineHelpers.log;
+}
+//!steal-remove-end
 
 define.DefineList = DefineList;
 

@@ -9,8 +9,6 @@ var canLogDev = require("can-log/dev/dev");
 var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
 var queues = require("can-queues");
-var ensureMeta = require("../ensure-meta");
-var dev = require("can-log/dev/dev");
 var addTypeEvents = require("can-event-queue/type/type");
 
 var keysForDefinition = function(definitions) {
@@ -203,7 +201,9 @@ var DefineMap = Construct.extend("DefineMap",{
 	set: function(prop, value){
 		if(typeof prop === "object") {
 			//!steal-remove-start
-			canLogDev.warn('can-define/map/map.prototype.set is deprecated; please use can-define/map/map.prototype.assign or can-define/map/map.prototype.update instead');
+			if(process.env.NODE_ENV !== 'production') {
+				canLogDev.warn('can-define/map/map.prototype.set is deprecated; please use can-define/map/map.prototype.assign or can-define/map/map.prototype.update instead');
+			}
 			//!steal-remove-end
 			if(value === true) {
 				updateDeep.call(this, prop);
@@ -427,43 +427,10 @@ var DefineMap = Construct.extend("DefineMap",{
 	})(),
 	"*": {
 		type: define.types.observable
-	},
-
-	// call `map.log()` to log all event changes
-	// pass `key` to only log the matching property, e.g: `map.log("foo")`
-	log: function(key) {
-		//!steal-remove-start
-		var instance = this;
-
-		var quoteString = function quoteString(x) {
-			return typeof x === "string" ? JSON.stringify(x) : x;
-		};
-
-		var meta = ensureMeta(instance);
-		var allowed = meta.allowedLogKeysSet || new Set();
-		meta.allowedLogKeysSet = allowed;
-
-		if (key) {
-			allowed.add(key);
-		}
-
-		meta._log = function(event, data) {
-			var type = event.type;
-			if (type === "can.keys" || (key && !allowed.has(type))) {
-				return;
-			}
-			dev.log(
-				canReflect.getName(instance),
-				"\n key ", quoteString(type),
-				"\n is  ", quoteString(data[0]),
-				"\n was ", quoteString(data[1])
-			);
-		};
-		//!steal-remove-end
 	}
 });
 
-canReflect.assignSymbols(DefineMap.prototype,{
+var defineMapProto = {
 	// -type-
 	"can.isMapLike": true,
 	"can.isListLike":  false,
@@ -524,14 +491,18 @@ canReflect.assignSymbols(DefineMap.prototype,{
 			]);
 		}
 		return ret;
-	},
+	}
+};
 
-	//!steal-remove-start
-	"can.getName": function() {
+//!steal-remove-start
+if(process.env.NODE_ENV !== 'production') {
+	defineMapProto["can.getName"] = function() {
 		return canReflect.getName(this.constructor) + "{}";
-	},
-	//!steal-remove-end
-});
+	};
+}
+//!steal-remove-end
+
+canReflect.assignSymbols(DefineMap.prototype, defineMapProto);
 
 canReflect.setKeyValue(DefineMap.prototype, canSymbol.iterator, function() {
 	return new define.Iterator(this);
@@ -559,6 +530,15 @@ eventsProtoSymbols.forEach(function(sym) {
     writable: true
   });
 });
+
+
+//!steal-remove-start
+if(process.env.NODE_ENV !== 'production') {
+	// call `map.log()` to log all event changes
+	// pass `key` to only log the matching property, e.g: `map.log("foo")`
+	DefineMap.prototype.log = defineHelpers.log;
+}
+//!steal-remove-end
 
 // tells `can-define` to use this
 define.DefineMap = DefineMap;
