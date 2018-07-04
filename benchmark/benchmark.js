@@ -1,3 +1,4 @@
+"use strict";
 var DefineMap = require("can-define/map/");
 
 
