@@ -14,7 +14,7 @@
     "start": "serve -p 8080",
     "testee": "testee test/test.html --browsers firefox",
     "test": "npm run detect-cycle && npm run jshint && npm run testee",
-    "detect-cycle": "detect-cyclic-packages --ignore done-serve"
+    "detect-cycle": "detect-cyclic-packages"
   },
   "repository": {
     "type": "git",
@@ -52,7 +52,7 @@
     "can-test-helpers": "^1.1.0",
     "detect-cyclic-packages": "^1.1.0",
     "jshint": "^2.9.1",
-    "serve": "^7.0.0",
+    "serve": "^9.0.0",
     "steal": "^1.0.7",
     "steal-qunit": "^1.0.0",
     "testee": "^0.7.0"
