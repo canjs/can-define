@@ -1383,6 +1383,7 @@ QUnit.test("ownKeys works on basic DefineMaps", function(){
 });
 
 QUnit.test("deleteKey works (#351)", function(){
+
 	var map = new DefineMap({foo: "bar"});
 
 	QUnit.deepEqual( canReflect.getOwnKeys(map), ["foo"] );
@@ -1405,6 +1406,13 @@ QUnit.test("deleteKey works (#351)", function(){
 	QUnit.deepEqual( canReflect.getOwnKeys(map), [] );
 
 	map.set("foo", "bar");
+
+	// With sealed
+	var map = new DefineMap({foo: "bar"}, true);
+
+	map.deleteKey("foo");
+
+	QUnit.equal(map.foo, undefined, "prop set to undefined");
 });
 
 QUnit.test("type called with `this` as the map (#349)", function(){
