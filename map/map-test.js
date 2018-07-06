@@ -1381,3 +1381,21 @@ QUnit.test("ownKeys works on basic DefineMaps", function(){
 
 	QUnit.equal(keys.length, 2, "There are 2 keys");
 });
+
+QUnit.test("deleteKey works", function(){
+	var map = new DefineMap({foo: "bar"});
+
+	QUnit.deepEqual( canReflect.getOwnKeys(map), ["foo"] );
+
+	map.set("zed", "ted");
+
+	QUnit.deepEqual( canReflect.getOwnKeys(map), ["foo","zed"] );
+
+	map.deleteKey("zed");
+
+	QUnit.deepEqual( canReflect.getOwnKeys(map), ["foo"] );
+
+	map.deleteKey("foo");
+
+	QUnit.deepEqual( canReflect.getOwnKeys(map), [] );
+});

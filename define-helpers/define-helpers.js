@@ -103,7 +103,7 @@ var defineHelpers = {
 			var type = event.type;
 
 			if (
-				type === "can.onPatches" || (key && !allowed.has(type)) || 
+				type === "can.onPatches" || (key && !allowed.has(type)) ||
 				type === "can.keys" || (key && !allowed.has(type))
 				) {
 				return;
@@ -126,6 +126,30 @@ var defineHelpers = {
 				);
 			}
 		};
+	},
+	deleteKey: function(prop){
+		var instanceDefines = this._instanceDefinitions;
+		if(instanceDefines && Object.prototype.hasOwnProperty.call(instanceDefines, prop)) {
+			delete instanceDefines[prop];
+			queues.batch.start();
+			this.dispatch({
+				type: "can.keys",
+				target: this
+			});
+			var oldValue = this._data[prop];
+			if(oldValue !== undefined) {
+				delete this._data[prop];
+				this.dispatch({
+					type: prop,
+					target: this,
+					patches: [{type: "delete", key: prop}],
+				},[undefined,oldValue]);
+			}
+			queues.batch.stop();
+		} else {
+			this.set(prop, undefined);
+		}
+		return this;
 	}
 };
 module.exports = defineHelpers;
