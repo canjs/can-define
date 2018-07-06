@@ -706,12 +706,12 @@ make = {
 					if (typeof value === "function") {
 						value = value.call(this);
 					}
-					value = typeConvert(value);
+					value = typeConvert.call(this, value);
 				}
 				else {
 					var Default = definition.Default;
 					if (Default) {
-						value = typeConvert(new Default());
+						value = typeConvert.call(this,new Default());
 					}
 				}
 				if(definition.set) {
