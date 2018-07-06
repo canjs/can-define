@@ -1408,7 +1408,7 @@ QUnit.test("deleteKey works (#351)", function(){
 	map.set("foo", "bar");
 
 	// With sealed
-	var map = new DefineMap({foo: "bar"}, true);
+	map = new DefineMap({foo: "bar"}, true);
 
 	map.deleteKey("foo");
 
