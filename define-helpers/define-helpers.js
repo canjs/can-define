@@ -25,6 +25,7 @@ var defineHelpers = {
 			Object.defineProperty(map, "_instanceDefinitions", {
 				configurable: true,
 				enumerable: false,
+				writable: true,
 				value: {}
 			});
 			instanceDefines = map._instanceDefinitions;
@@ -139,6 +140,7 @@ var defineHelpers = {
 			var oldValue = this._data[prop];
 			if(oldValue !== undefined) {
 				delete this._data[prop];
+				delete this[prop];
 				this.dispatch({
 					type: prop,
 					target: this,

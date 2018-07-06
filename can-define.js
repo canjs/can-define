@@ -1044,7 +1044,8 @@ define.makeSimpleGetterSetter = function(prop){
 			set: function(newVal){
 				return setter.call(this, define.types.observable(newVal));
 			},
-			enumerable: true
+			enumerable: true,
+            configurable: true
 		};
 	}
 	return simpleGetterSetters[prop];

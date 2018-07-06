@@ -1397,7 +1397,14 @@ QUnit.test("deleteKey works (#351)", function(){
 
 	map.deleteKey("foo");
 
+	var pd = Object.getOwnPropertyDescriptor(map, "foo");
+
+
+	QUnit.ok(!pd, "no property descriptor");
+
 	QUnit.deepEqual( canReflect.getOwnKeys(map), [] );
+
+	map.set("foo", "bar");
 });
 
 QUnit.test("type called with `this` as the map (#349)", function(){
