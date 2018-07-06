@@ -412,7 +412,7 @@ var DefineMap = Construct.extend("DefineMap",{
 	serialize: function () {
 		return canReflect.serialize(this, Map);
 	},
-
+	deleteKey: defineHelpers.deleteKey,
 	forEach: (function(){
 
 		var forEach = function(list, cb, thisarg){
@@ -439,10 +439,7 @@ var defineMapProto = {
 	// -get/set-
 	"can.getKeyValue": getKeyValue,
 	"can.setKeyValue": setKeyValue,
-	"can.deleteKeyValue": function(prop) {
-		this.set(prop, undefined);
-		return this;
-	},
+	"can.deleteKeyValue": defineHelpers.deleteKey,
 
 	// -shape
 	"can.getOwnKeys": function() {
