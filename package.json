@@ -43,7 +43,7 @@
     "can-queues": "^1.0.0",
     "can-reflect": "^1.15.0",
     "can-simple-observable": "^2.0.5",
-    "can-single-reference": "^1.0.0",
+    "can-single-reference": "^1.2.0",
     "can-string-to-any": "^1.0.1",
     "can-symbol": "^1.0.0"
   },
