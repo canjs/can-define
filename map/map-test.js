@@ -473,18 +473,15 @@ QUnit.test("copying with assign() excludes special keys", function() {
 
 	var a = {
 		_data: {},
-		constructor: function() {},
-		__bindEvents: {},
 		"foo": "bar",
-		"existing": "newVal"
+		"existing": "neVal"
 	};
 
 	var b = new DefineMap({
 		"existing": "oldVal"
 	});
-	assign(b, a);
+	canReflect.assignMap(b, a);
 
-	QUnit.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
 	QUnit.notEqual(a._data, b._data, "_data prop not copied");
 	QUnit.equal(a.foo, b.foo, "New props copied");
 	QUnit.equal(a.existing, b.existing, "Existing props copied");
