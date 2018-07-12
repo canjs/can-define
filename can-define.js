@@ -54,10 +54,10 @@ if(process.env.NODE_ENV !== 'production') {
 				value:  "set "+canReflect.getName(obj) + "."+prop
 			});
 		}
-    var desc = Object.getOwnPropertyDescriptor(obj, prop);
-    if(!desc || desc.writable !== false){
-      return Object.defineProperty(obj, prop, definition);
-    }
+		var desc = Object.getOwnPropertyDescriptor(obj, prop);
+		if(desc === undefined || desc.writable !== false){
+			return Object.defineProperty(obj, prop, definition);
+		}
 		return obj;
 	};
 }
