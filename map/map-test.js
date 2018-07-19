@@ -979,7 +979,7 @@ canTestHelpers.devOnlyTest("log multiple property changes", function(assert) {
 canTestHelpers.devOnlyTest("Setting a value with an object type generates a warning (#148)", function() {
 	QUnit.expect(1);
 
-	var message = "can-define: The default value for options is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.";
+	var message = "can-define: The default value for DefineMap{}.options is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.";
 	var finishErrorCheck = canTestHelpers.willWarn(message);
 
 	//should issue a warning
@@ -1015,7 +1015,7 @@ canTestHelpers.devOnlyTest("Setting a value with an object type generates a warn
 canTestHelpers.devOnlyTest("Setting a default value to a constructor type generates a warning", function() {
 	QUnit.expect(1);
 
-	var message = "can-define: The \"default\" for options is set to a constructor. Did you mean \"Default\" instead?";
+	var message = "can-define: The \"default\" for DefineMap{}.options is set to a constructor. Did you mean \"Default\" instead?";
 	var finishErrorCheck = canTestHelpers.willWarn(message);
 
 	//should issue a warning
@@ -1048,11 +1048,11 @@ canTestHelpers.devOnlyTest("can.getName symbol behavior", function(assert) {
 
 canTestHelpers.devOnlyTest("Error on not using a constructor or string on short-hand definitions (#278)", function() {
 	expect(5);
-	var message = /.+ on .+ does not match a supported propDefinition. See: https:\/\/canjs.com\/doc\/can-define.types.propDefinition.html/i;
+	var message = /does not match a supported propDefinition. See: https:\/\/canjs.com\/doc\/can-define.types.propDefinition.html/i;
 
 	var finishErrorCheck = canTestHelpers.willError(message, function(actual, match) {
 		var rightProp = /prop0[15]/;
-		QUnit.ok(rightProp.test(actual.slice(0, 6)));
+		QUnit.ok(rightProp.test(actual.split(" ")[0]));
 		QUnit.ok(match);
 	});
 
