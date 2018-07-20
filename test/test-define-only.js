@@ -1180,8 +1180,9 @@ testHelpers.dev.devOnlyTest("Setting a value with only a get() generates a warni
 
 	var VM = function() {};
 
-	var message = "can-define: Set value for property "+canReflect.getName(VM)+".derivedProp ignored, as its definition has a zero-argument getter and no setter";
+	var message = "can-define: Set value for property "+canReflect.getName(VM.prototype)+".derivedProp ignored, as its definition has a zero-argument getter and no setter";
 	var finishErrorCheck = testHelpers.dev.willWarn(message, function(actualMessage, success) {
+
 		QUnit.equal(actualMessage, message, "Warning is expected message");
 		QUnit.ok(success);
 	});
@@ -1205,7 +1206,7 @@ testHelpers.dev.devOnlyTest("Setting a value with only a get() generates a warni
 
 	QUnit.equal(finishErrorCheck(), 1);
 
-	message = "can-define: Set value for property "+canReflect.getName(VM)+"{}.derivedProp ignored, as its definition has a zero-argument getter and no setter";
+	message = "can-define: Set value for property "+canReflect.getName(VM.prototype)+".derivedProp ignored, as its definition has a zero-argument getter and no setter";
 	finishErrorCheck = testHelpers.dev.willWarn(message, function(actualMessage, success) {
 		QUnit.equal(actualMessage, message, "Warning is expected message");
 		QUnit.ok(success);
