@@ -1178,13 +1178,16 @@ QUnit.test('defined properties are configurable', function(){
 testHelpers.dev.devOnlyTest("Setting a value with only a get() generates a warning (#202)", function() {
 	QUnit.expect(7);
 
-	var message = "can-define: Set value for property derivedProp ignored, as its definition has a zero-argument getter and no setter";
+	var VM = function() {};
+
+	var message = "can-define: Set value for property "+canReflect.getName(VM.prototype)+".derivedProp ignored, as its definition has a zero-argument getter and no setter";
 	var finishErrorCheck = testHelpers.dev.willWarn(message, function(actualMessage, success) {
+
 		QUnit.equal(actualMessage, message, "Warning is expected message");
 		QUnit.ok(success);
 	});
 
-	var VM = function() {};
+
 	define(VM.prototype, {
 		derivedProp: {
 			get: function() {
@@ -1203,7 +1206,7 @@ testHelpers.dev.devOnlyTest("Setting a value with only a get() generates a warni
 
 	QUnit.equal(finishErrorCheck(), 1);
 
-	message = "can-define: Set value for property derivedProp on VM ignored, as its definition has a zero-argument getter and no setter";
+	message = "can-define: Set value for property "+canReflect.getName(VM.prototype)+".derivedProp ignored, as its definition has a zero-argument getter and no setter";
 	finishErrorCheck = testHelpers.dev.willWarn(message, function(actualMessage, success) {
 		QUnit.equal(actualMessage, message, "Warning is expected message");
 		QUnit.ok(success);
@@ -1216,7 +1219,7 @@ testHelpers.dev.devOnlyTest("Setting a value with only a get() generates a warni
 testHelpers.dev.devOnlyTest("warn on using a Constructor for small-t type definintions", function() {
 	QUnit.expect(2);
 
-	var message = "can-define: the definition for currency uses a constructor for \"type\". Did you mean \"Type\"?";
+	var message = 'can-define: the definition for VM{}.currency uses a constructor for "type". Did you mean "Type"?';
 	var finishErrorCheck = testHelpers.dev.willWarn(message);
 
 	function Currency() {
@@ -1238,11 +1241,11 @@ testHelpers.dev.devOnlyTest("warn on using a Constructor for small-t type defini
 
 	QUnit.equal(finishErrorCheck(), 1);
 
-	message = "can-define: the definition for currency on VM2 uses a constructor for \"type\". Did you mean \"Type\"?";
+	message = 'can-define: the definition for VM2{}.currency uses a constructor for "type". Did you mean "Type"?';
 	finishErrorCheck = testHelpers.dev.willWarn(message);
 
 	function VM2() {}
-	VM2.shortName = "VM2";
+
 	define(VM2.prototype, {
 		currency: {
 			type: Currency, // should be `Type: Currency`
@@ -1252,5 +1255,27 @@ testHelpers.dev.devOnlyTest("warn on using a Constructor for small-t type defini
 		}
 	});
 
+	QUnit.equal(finishErrorCheck(), 1);
+});
+
+testHelpers.dev.devOnlyTest("warn with constructor for Value instead of Default (#340)", function() {
+	QUnit.expect(1);
+
+	var message = "can-define: Change the 'Value' definition for VM{}.currency to 'Default'.";
+	var finishErrorCheck = testHelpers.dev.willWarn(message);
+
+	function Currency() {
+		return this;
+	}
+	Currency.prototype = {
+		symbol: "USD"
+	};
+
+	function VM() {}
+	define(VM.prototype, {
+		currency: {
+			Value: Currency
+		}
+	});
 	QUnit.equal(finishErrorCheck(), 1);
 });

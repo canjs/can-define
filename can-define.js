@@ -81,7 +81,7 @@ function eachPropertyDescriptor(map, cb){
 	}
 }
 
-function cleanUpDefinition(prop, definition, shouldWarn){
+function cleanUpDefinition(prop, definition, shouldWarn, typePrototype){
 	// cleanup `value` -> `default`
 	if(definition.value !== undefined && ( typeof definition.value !== "function" || definition.value.length === 0) ){
 
@@ -89,7 +89,7 @@ function cleanUpDefinition(prop, definition, shouldWarn){
 		if(process.env.NODE_ENV !== 'production') {
 			if(shouldWarn) {
 				canLogDev.warn(
-					"can-define: Change the 'value' definition for " + prop + " to 'default'."
+					"can-define: Change the 'value' definition for " + canReflect.getName(typePrototype)+"."+prop + " to 'default'."
 				);
 			}
 		}
@@ -104,7 +104,7 @@ function cleanUpDefinition(prop, definition, shouldWarn){
 		if(process.env.NODE_ENV !== 'production') {
 			if(shouldWarn) {
 				canLogDev.warn(
-					"can-define: Change the 'Value' definition for " + prop + " to 'Default'."
+					"can-define: Change the 'Value' definition for " + canReflect.getName(typePrototype)+"."+prop + " to 'Default'."
 				);
 			}
 		}
@@ -126,7 +126,7 @@ module.exports = define = ns.define = function(typePrototype, defines, baseDefin
 		// computed property definitions on _computed
 		computedInitializers = Object.create(baseDefine ? baseDefine.computedInitializers : null);
 
-	var result = getDefinitionsAndMethods(defines, baseDefine);
+	var result = getDefinitionsAndMethods(defines, baseDefine, typePrototype);
 	result.dataInitializers = dataInitializers;
 	result.computedInitializers = computedInitializers;
 
@@ -219,7 +219,7 @@ define.property = function(typePrototype, prop, definition, dataInitializers, co
 	var propertyDefinition = define.extensions.apply(this, arguments);
 
 	if (propertyDefinition) {
-		definition = makeDefinition(prop, propertyDefinition, defaultDefinition || {});
+		definition = makeDefinition(prop, propertyDefinition, defaultDefinition || {}, typePrototype);
 	}
 
 	var type = definition.type;
@@ -228,9 +228,8 @@ define.property = function(typePrototype, prop, definition, dataInitializers, co
 	if(process.env.NODE_ENV !== 'production') {
 		if (type && canReflect.isConstructorLike(type) && !isDefineType(type)) {
 			canLogDev.warn(
-				"can-define: the definition for " +
-				prop +
-				(typePrototype.constructor.shortName ? " on " + typePrototype.constructor.shortName : "") +
+				"can-define: the definition for " + canReflect.getName(typePrototype) + "."+
+                prop +
 				" uses a constructor for \"type\". Did you mean \"Type\"?"
 			);
 		}
@@ -307,11 +306,11 @@ define.property = function(typePrototype, prop, definition, dataInitializers, co
 		if (process.env.NODE_ENV !== 'production') {
 			// If value is an object or array, give a warning
 			if (definition.default !== null && typeof definition.default === 'object') {
-				canLogDev.warn("can-define: The default value for " + prop + " is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.");
+				canLogDev.warn("can-define: The default value for " + canReflect.getName(typePrototype)+"."+prop + " is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.");
 			}
 			// If value is a constructor, give a warning
 			if (definition.default && canReflect.isConstructorLike(definition.default)) {
-				canLogDev.warn("can-define: The \"default\" for " + prop + " is set to a constructor. Did you mean \"Default\" instead?");
+				canLogDev.warn("can-define: The \"default\" for " + canReflect.getName(typePrototype)+"."+prop + " is set to a constructor. Did you mean \"Default\" instead?");
 			}
 		}
 		//!steal-remove-end
@@ -354,8 +353,7 @@ define.property = function(typePrototype, prop, definition, dataInitializers, co
 			//!steal-remove-start
 			if(process.env.NODE_ENV !== 'production') {
 				canLogDev.warn("can-define: Set value for property " +
-					prop +
-					(typePrototype.constructor.shortName ? " on " + typePrototype.constructor.shortName : "") +
+					canReflect.getName(typePrototype)+"."+ prop +
 					" ignored, as its definition has a zero-argument getter and no setter");
 			}
 			//!steal-remove-end
@@ -384,9 +382,9 @@ define.makeDefineInstanceKey = function(constructor) {
 		var defineResult = this.prototype._define;
 		if(typeof value === "object") {
 			// change `value` to default.
-			cleanUpDefinition(property, value, false);
+			cleanUpDefinition(property, value, false, this);
 		}
-		var definition = getDefinitionOrMethod(property, value, defineResult.defaultDefinition);
+		var definition = getDefinitionOrMethod(property, value, defineResult.defaultDefinition, this);
 		if(definition && typeof definition === "object") {
 			define.property(constructor.prototype, property, definition, defineResult.dataInitializers, defineResult.computedInitializers, defineResult.defaultDefinition);
 			defineResult.definitions[property] = definition;
@@ -398,7 +396,7 @@ define.makeDefineInstanceKey = function(constructor) {
 
 // Makes a simple constructor function.
 define.Constructor = function(defines, sealed) {
-	var constructor = function(props) {
+	var constructor = function DefineConstructor(props) {
 		Object.defineProperty(this,"__inSetup",{
 			configurable: true,
 			enumerable: false,
@@ -575,7 +573,7 @@ make = {
 							//!steal-remove-start
 							if(process.env.NODE_ENV !== 'production') {
 								asyncTimer = setTimeout(function() {
-									canLogDev.warn('can/map/setter.js: Setter "' + prop + '" did not return a value or call the setter callback.');
+									canLogDev.warn('can-define: Setter "' + canReflect.getName(self)+"."+prop + '" did not return a value or call the setter callback.');
 								}, canLogDev.warnTimeout);
 							}
 							//!steal-remove-end
@@ -609,7 +607,7 @@ make = {
 							//!steal-remove-start
 							if(process.env.NODE_ENV !== 'production') {
 								asyncTimer = setTimeout(function() {
-									canLogDev.warn('can/map/setter.js: Setter "' + prop + '" did not return a value or call the setter callback.');
+									canLogDev.warn('can/map/setter.js: Setter "' + canReflect.getName(self)+"."+prop + '" did not return a value or call the setter callback.');
 								}, canLogDev.warnTimeout);
 							}
 							//!steal-remove-end
@@ -798,7 +796,7 @@ var addBehaviorToDefinition = function(definition, behavior, value) {
 // This is called by `define.property` AND `getDefinitionOrMethod` (which is called by `define`)
 // Currently, this is adding default behavior
 // copying `type` over, and even cleaning up the final definition object
-makeDefinition = function(prop, def, defaultDefinition) {
+makeDefinition = function(prop, def, defaultDefinition, typePrototype) {
 	var definition = {};
 
 	canReflect.eachKey(def, function(value, behavior) {
@@ -842,7 +840,7 @@ makeDefinition = function(prop, def, defaultDefinition) {
 			definition.type = define.types["*"];
 		}
 	}
-	cleanUpDefinition(prop, definition, true);
+	cleanUpDefinition(prop, definition, true, typePrototype);
 	return definition;
 };
 
@@ -850,7 +848,7 @@ makeDefinition = function(prop, def, defaultDefinition) {
 // returns the value or the definition object.
 // calls makeDefinition
 // This is dealing with a string value
-getDefinitionOrMethod = function(prop, value, defaultDefinition){
+getDefinitionOrMethod = function(prop, value, defaultDefinition, typePrototype){
 	// Clean up the value to make it a definition-like object
 	var definition;
 	if(typeof value === "string") {
@@ -872,14 +870,14 @@ getDefinitionOrMethod = function(prop, value, defaultDefinition){
 	}
 
 	if(definition) {
-		return makeDefinition(prop, definition, defaultDefinition);
+		return makeDefinition(prop, definition, defaultDefinition, typePrototype);
 	}
 	else {
 		return value;
 	}
 };
 // called by can.define
-getDefinitionsAndMethods = function(defines, baseDefines) {
+getDefinitionsAndMethods = function(defines, baseDefines, typePrototype) {
 	// make it so the definitions include base definitions on the proto
 	var definitions = Object.create(baseDefines ? baseDefines.definitions : null);
 	var methods = {};
@@ -906,7 +904,7 @@ getDefinitionsAndMethods = function(defines, baseDefines) {
 			methods[prop] = value;
 			return;
 		} else {
-			var result = getDefinitionOrMethod(prop, value, defaultDefinition);
+			var result = getDefinitionOrMethod(prop, value, defaultDefinition, typePrototype);
 			if(result && typeof result === "object" && canReflect.size(result) > 0) {
 				definitions[prop] = result;
 			}
@@ -919,7 +917,7 @@ getDefinitionsAndMethods = function(defines, baseDefines) {
 				else if (typeof result !== 'undefined') {
 					if(process.env.NODE_ENV !== 'production') {
                     	// Ex: {prop: 0}
-						canLogDev.error(prop + (this.constructor.shortName ? " on " + this.constructor.shortName : "") + " does not match a supported propDefinition. See: https://canjs.com/doc/can-define.types.propDefinition.html");
+						canLogDev.error(canReflect.getName(typePrototype)+"."+prop + " does not match a supported propDefinition. See: https://canjs.com/doc/can-define.types.propDefinition.html");
 					}
 				}
 				//!steal-remove-end
