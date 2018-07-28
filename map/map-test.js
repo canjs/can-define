@@ -479,7 +479,7 @@ QUnit.test("copying with assign() excludes special keys", function() {
 
 	var b = new DefineMap({
 		"existing": "oldVal"
-	});
+	}, false);
 	canReflect.assignMap(b, a);
 
 	QUnit.notEqual(a._data, b._data, "_data prop not copied");

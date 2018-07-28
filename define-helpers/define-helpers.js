@@ -11,6 +11,10 @@ var returnFirstArg = function(arg){
 var defineHelpers = {
 	// returns `true` if the value was defined and set
 	defineExpando: function(map, prop, value) {
+		if(define._specialKeys[prop]) {
+			// ignores _data and _computed
+			return true;
+		}
 		// first check if it's already a constructor define
 		var constructorDefines = map._define.definitions;
 		if(constructorDefines && constructorDefines[prop]) {

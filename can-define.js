@@ -54,11 +54,7 @@ if(process.env.NODE_ENV !== 'production') {
 				value:  "set "+canReflect.getName(obj) + "."+prop
 			});
 		}
-		var desc = Object.getOwnPropertyDescriptor(obj, prop);
-		if(desc === undefined || desc.writable !== false){
-			return Object.defineProperty(obj, prop, definition);
-		}
-		return obj;
+		return Object.defineProperty(obj, prop, definition);
 	};
 }
 //!steal-remove-end
@@ -1035,6 +1031,7 @@ define.eventsProto = eventsProto;
 define.defineConfigurableAndNotEnumerable = defineConfigurableAndNotEnumerable;
 define.make = make;
 define.getDefinitionOrMethod = getDefinitionOrMethod;
+define._specialKeys = {_data: true, _computed: true};
 var simpleGetterSetters = {};
 define.makeSimpleGetterSetter = function(prop){
 	if(simpleGetterSetters[prop] === undefined) {
