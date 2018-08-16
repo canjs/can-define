@@ -155,7 +155,7 @@ map.prop; //-> "food";
 
 A set function provides a useful hook for performing side effect logic as a certain property is being changed.
 
-For example, in the example below, Paginator DefineMap includes a `page` property, which derives its value entirely from other properties (limit and offset).  If something tries to set the `page` directly, the set method will set the value of `offset`:
+In the example below, Paginator DefineMap includes a `page` property, which derives its value entirely from other properties (limit and offset).  If something tries to set the `page` directly, the set method will set the value of `offset`:
 
 ```js
 const Paginate = DefineMap.extend( {
