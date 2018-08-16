@@ -134,8 +134,8 @@ MyMap = DefineMap.extend({
     }
 });
 
-var myMap = new MyMap();
-var c = compute(5);
+const myMap = new MyMap();
+const c = compute(5);
 
 myMap.value = c;
 myMap.value //-> 5
@@ -144,7 +144,7 @@ c(6);
 myMap.value //-> 6
 
 //Be sure if setting to pass the new compute
-var c2 = compute("a");
+const c2 = compute("a");
 myMap.value = c2;
 myMap.value //-> "a"
 ```
