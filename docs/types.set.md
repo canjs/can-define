@@ -14,8 +14,7 @@ instance. It is typically used to:
  - Add or update other properties as side effects
  - Coerce the set value into an appropriate action
 
-The behavior of the setter depends on the number of arguments specified. This means that a
-setter like:
+The behavior of the setter depends on the number of arguments specified. This means that a setter like:
 
 ```js
 {
@@ -58,7 +57,7 @@ arguments the setter declares:
 
 ## Use
 
-A property's `set` function can be used to customize the behavior of when an attribute value is set.  Lets see some common cases:
+A property's `set` function can be used to customize the behavior of when an attribute value is set.  Let'ss see some common cases:
 
 #### Side effects
 
