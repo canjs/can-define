@@ -127,7 +127,7 @@ When a user tries to set this property, the resulting value will remain an array
 Setting type as `compute` allows for resolving a computed property with the .attr()
 method.
 
-```
+```js
 MyMap = DefineMap.extend({
     value: {
         type: "compute"
