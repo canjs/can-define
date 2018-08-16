@@ -57,7 +57,7 @@ arguments the setter declares:
 
 ## Use
 
-A property's `set` function can be used to customize the behavior of when an attribute value is set.  Let'ss see some common cases:
+A property's `set` function can be used to customize the behavior of when an attribute value is set.  Let's see some common cases:
 
 #### Side effects
 
@@ -76,7 +76,7 @@ The following makes setting a `page` property update the `offset`:
 
 The following makes changing `makeId` un-define the `modelId` property:
 
-```
+```js
 {
 	makeId: {
 	    set: function(newValue){
