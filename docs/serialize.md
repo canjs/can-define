@@ -44,7 +44,7 @@ Specifies the serialized value of a property.
 
 [can-define/map/map.prototype.serialize] is useful for serializing an instance into
 a more JSON-friendly form.  This can be used for many reasons, including saving a
-[can-connect]ed instance on the server or serializing [can-route.map can-route.map]'s internal
+[can-connect]ed instance on the server or serializing [can-route.data can-route.data]'s internal
 map for display in the hash or pushstate URL.
 
 The serialize property allows an opportunity to define how
