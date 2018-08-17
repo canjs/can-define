@@ -78,7 +78,7 @@ behavior:
   prop.listenTo( todos, "length", handler, "mutate" );
 
   // Binds to an `onValue` emitter:
-  prop.listenTo( observable, handler ); //
+  prop.listenTo( observable, handler );
   ```
 
 - __prop.stopListening(bindTarget, event, handler, queue)__ `{function(Any,String,Fuction,String)}`  A function that removes bindings
