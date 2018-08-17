@@ -41,7 +41,7 @@ For example, the following counts the number of times the `name` property change
   p.name = "Justin"; // logs name changed 1 times
   p.name = "Ramiya"; // logs name changed 2 times
   ```
-  @codepen
+  <!-- @codepen -->
 
 If the property defined by `value` is unbound, the `value` function will be called each time. Use `prop.resolve` synchronously
 to provide a value.
@@ -161,7 +161,7 @@ timer.on( "time", function( ev, newVal, oldVal ) {
 	console.log( newVal ); //-> logs a new date every second
 } );
   ```
-  @codepen
+  <!-- @codepen -->
 
 @body
 
@@ -192,7 +192,9 @@ passage of time.
 The following `fullNameChangeCount` increments every time `fullName` changes:
 
 ```js
-DefineMap.extend( "Person", {
+import { DefineMap } from "can";
+
+const Person = DefineMap.extend( "Person", {
 	first: "string",
 	last: "string",
 	fullName: {
@@ -204,10 +206,16 @@ DefineMap.extend( "Person", {
 		value( prop ) {
 			let count = 0;
 			prop.resolve( 0 );
-			prop.listenTo( "fullName", ()=> {
+			prop.listenTo( "fullName", () => {
 				prop.resolve( ++count );
 			} );
 		}
 	}
 } );
+
+const p = new Person({ first: "John", last: "Smith" });
+p.first = "Justin";
+p.last = "Meyer";
+console.log(p.fullNameChangeCount); //-> 2
 ```
+<!-- @codepen -->
