@@ -15,32 +15,33 @@ the map or other observables, `prop.stopListening` to stop listening to those
 events if needed, and `prop.resolve` to set a new value on the observable.
 For example, the following counts the number of times the `name` property changed:
 
-```js
-import { DefineMap } from 'can';
+  ```js
+  import { DefineMap } from "can";
 
-const Person = DefineMap.extend( "Person", {
-	name: "string",
-	nameChangeCount: {
-		value( prop ) {
-			let count = 0;
+  const Person = DefineMap.extend( "Person", {
+    name: "string",
+    nameChangeCount: {
+      value( prop ) {
+        let count = 0;
 
-			prop.listenTo( "name", () => {
-				prop.resolve( ++count );
-			} );
+        prop.listenTo( "name", () => {
+          prop.resolve( ++count );
+        } );
 
-			prop.resolve( count );
-		}
-	}
-} );
+        prop.resolve( count );
+      }
+    }
+  } );
 
-const p = new Person();
-p.on( "nameChangedCount", ( ev, newVal )=> {
-	console.log( "name changed", newVal, "times" );
-} );
+  const p = new Person();
+  p.on( "nameChangedCount", ( ev, newVal )=> {
+    console.log( "name changed", newVal, "times" );
+  } );
 
-p.name = "Justin"); // logs name changed 1 times
-p.name = "Ramiya"; // logs name changed 2 times
-```
+  p.name = "Justin"; // logs name changed 1 times
+  p.name = "Ramiya"; // logs name changed 2 times
+  ```
+  @codepen
 
 If the property defined by `value` is unbound, the `value` function will be called each time. Use `prop.resolve` synchronously
 to provide a value.
