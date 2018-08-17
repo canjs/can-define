@@ -34,7 +34,7 @@ For example, the following counts the number of times the `name` property change
   } );
 
   const p = new Person();
-  p.on( "nameChangedCount", ( ev, newVal )=> {
+  p.on( "nameChangedCount", ( ev, newVal ) => {
     console.log( "name changed", newVal, "times" );
   } );
 
