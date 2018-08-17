@@ -128,7 +128,9 @@ Setting type as `compute` allows for resolving a computed property with the .att
 method.
 
 ```js
-MyMap = DefineMap.extend({
+import { DefineMap } from "can";
+
+const MyMap = DefineMap.extend({
     value: {
         type: "compute"
     }
@@ -138,13 +140,14 @@ const myMap = new MyMap();
 const c = compute(5);
 
 myMap.value = c;
-myMap.value //-> 5
+console.log(myMap.value); //-> 5
 
 c(6);
-myMap.value //-> 6
+console.log(myMap.value); //-> 6
 
 //Be sure if setting to pass the new compute
 const c2 = compute("a");
 myMap.value = c2;
-myMap.value //-> "a"
+console.log(myMap.value); //-> "a"
 ```
+@codepen
