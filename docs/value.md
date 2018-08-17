@@ -176,14 +176,20 @@ Our next example shows how [can-define.types.get] should be used with the
 that derives its value from the instantaneous `first` and `last` values:
 
 ```js
-DefineMap.extend( "Person", {
+import { DefineMap } from "can";
+
+const Person = DefineMap.extend( "Person", {
 	first: "string",
 	last: "string",
 	get fullName() {
 		return this.first + " " + this.last;
 	}
 } );
+
+const p = new Person({ first: "John", last: "Smith" });
+console.log(p.fullName); //-> "John Smith"
 ```
+@codepen
 
 [can-define.types.get] is great for these types of values. But [can-define.types.get]
 is unable to derive property values based on the change of values or the
