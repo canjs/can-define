@@ -196,6 +196,8 @@ console.log(p.page); //-> 13
 By default, if a value returned from a setter is an object the effect will be to replace the property with the new object completely.
 
 ```js
+import { DefineMap } from "can";
+
 const Contact = DefineMap.extend( {
 	info: {
 		set: function( newVal ) {
@@ -208,17 +210,20 @@ const alice = new Contact( {
 	info: { name: "Alice Liddell", email: "alice@liddell.com" }
 } );
 
-const info  = alice.info;
+const info = alice.info;
 
 alice.info = { name: "Allison Wonderland", phone: "888-888-8888" };
 
-info === alice.info; // -> false
+console.log(info === alice.info); // -> false
 ```
+@codepen
 
 In contrast, you can merge properties with:
 
 ```js
-Contact = DefineMap.extend( {
+import { DefineMap } from "can";
+
+const Contact = DefineMap.extend( {
 	info: {
 		set: function( newVal ) {
 			if ( this.info ) {
@@ -234,12 +239,13 @@ const alice = new Contact( {
 	info: { name: "Alice Liddell", email: "alice@liddell.com" }
 } );
 
-const info  = alice.info;
+const info = alice.info;
 
 alice.info = { name: "Allison Wonderland", phone: "888-888-8888" };
 
-info === alice.info; // -> true
+console.log(info === alice.info); // -> true
 ```
+@codepen
 
 ## Batched Changes
 
