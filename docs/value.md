@@ -9,15 +9,16 @@ The `value` behavior is used to compose a property value from events dispatched
 by other properties on the map. It's similar to [can-define.types.get], but can
 be used to build property behaviors that [can-define.types.get] can not provide.
 
-`value` enables techniques very similar to using
-event streams and functional reactive programming. Use `prop.listenTo` to listen to events
-dispatched on the map or other observables,
-`prop.stopListening` to stop listening to those events if needed, and `prop.resolve`
-to set a new value on the observable. For example, the following
-counts the number of times the `name` property changed:
+`value` enables techniques very similar to using event streams and functional
+reactive programming. Use `prop.listenTo` to listen to events dispatched on
+the map or other observables, `prop.stopListening` to stop listening to those
+events if needed, and `prop.resolve` to set a new value on the observable.
+For example, the following counts the number of times the `name` property changed:
 
 ```js
-Person = DefineMap.extend( "Person", {
+import { DefineMap } from 'can';
+
+const Person = DefineMap.extend( "Person", {
 	name: "string",
 	nameChangeCount: {
 		value( prop ) {
@@ -37,7 +38,7 @@ p.on( "nameChangedCount", ( ev, newVal )=> {
 	console.log( "name changed", newVal, "times" );
 } );
 
-p.name = "Justin"; // logs name changed 1 times
+p.name = "Justin"); // logs name changed 1 times
 p.name = "Ramiya"; // logs name changed 2 times
 ```
 
