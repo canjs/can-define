@@ -113,43 +113,52 @@ When a setter returns `undefined`, its behavior changes depending on the number 
 With 0 arguments, the original set value is set on the attribute.
 
 ```js
-MyMap = DefineMap.extend( {
+import { DefineMap } from "can";
+
+const MyMap = DefineMap.extend( {
 	prop: { set: function() {} }
 } );
 
 const map = new MyMap( { prop: "foo" } );
 
-map.prop; //-> "foo"
+console.log(map.prop); //-> "foo"
 ```
+@codepen
 
 With 1 argument, an `undefined` return value will set the property to `undefined`.  
 
 ```js
-MyMap = DefineMap.extend( {
+import { DefineMap } from "can";
+
+const MyMap = DefineMap.extend( {
 	prop: { set: function( newVal ) {} }
 } );
 
 const map = new MyMap( { prop: "foo" } );
 
-map.prop; //-> undefined
+console.log(map.prop); //-> undefined
 ```
+@codepen
 
 With 2 arguments, `undefined` leaves the property in place.  It is expected
 that `resolve` will be called:
 
 ```js
-MyMap = DefineMap.extend( {
+import { DefineMap } from "can";
+
+const MyMap = DefineMap.extend( {
 	prop: {
 		set: function( newVal, resolve ) {
-			setVal( newVal + "d" );
+			resolve( newVal + "d" );
 		}
 	}
 } );
 
 const map = new MyMap( { prop: "foo" } );
 
-map.prop; //-> "food";
+console.log(map.prop); //-> "food";
 ```
+@codepen
 
 ## Side effects
 
