@@ -139,7 +139,7 @@ remove all bindings.
 The following `time` property increments every second.  Notice how a function
 is returned to clear the interval when the property is returned:
 
-```js
+  ```js
 const Timer = DefineMap.extend( "Timer", {
 	time: {
 		value( prop ) {
@@ -160,8 +160,8 @@ const timer = new Timer();
 timer.on( "time", function( ev, newVal, oldVal ) {
 	console.log( newVal ); //-> logs a new date every second
 } );
-```
-
+  ```
+  @codepen
 
 @body
 
