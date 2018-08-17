@@ -60,6 +60,8 @@ instances.  For example:
 ## Use
 
 ```js
+import { DefineMap } from "can";
+
 const Address = DefineMap.extend( {
 	street: "string",
 	city: "string"
@@ -75,3 +77,4 @@ const direction = new Direction( {
 	to: new Address( { street: "123 Greenview", city: "Libertyville" } )
 } );
 ```
+@codepen
