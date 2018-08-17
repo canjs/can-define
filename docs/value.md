@@ -171,8 +171,8 @@ The `value` behavior should be used where the [can-define.types.get] behavior ca
 not derive a property value from instantaneous values.  This often happens in situations
 where the fact that something changes needs to saved in the state of the application.
 
-Let's first see an example where [can-define.types.get] should be used, the
-ubiquitous `fullName` property.  The following creates a `fullName` property
+Our next example shows how [can-define.types.get] should be used with the
+`fullName` property.  The following creates a `fullName` property
 that derives its value from the instantaneous `first` and `last` values:
 
 ```js
