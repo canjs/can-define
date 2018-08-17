@@ -37,7 +37,7 @@ A [can-define.types.propDefinition] that defines an inline [can-define/map/map] 
 
 @signature `[Type|propDefinition]`
 
-Defines an inline [can-define/list/list] type that's an array of `Type` or inline `propDefinition` [can-define/map/map]
+Defines an inline [can-define/list/list] type that's an array of `Type` or inline [can-define.types.propDefinition] [can-define/map/map]
 instances.  For example:
 
 ```js
