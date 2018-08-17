@@ -16,7 +16,7 @@ A constructor function can be provided that is called to convert incoming values
 }
 ```    
 
-`Type` is called before [can-define.types.type] and before [can-define.types.set]. It checks if the incoming value
+The `Type` constructor is called before the [can-define.types.type] property and before [can-define.types.set]. It checks if the incoming value
 is an [instanceof](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/instanceof) `Type`. If it is, or if it is `null` or `undefined`, it passes the original value through.  If not, it passes the original value to `new Type(originalValue)` and returns the
 new instance to be set.
 
