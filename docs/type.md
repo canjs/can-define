@@ -87,10 +87,12 @@ as either:
 
 ### Basic Example
 
-The following example converts the `count` property to a number and the `items` property to an array:
+The following example converts the `count` property to a number and the `items` property to an array.
 
 ```js
-DefineMap.extend( {
+import { DefineMap } from "can";
+
+const Map = DefineMap.extend( {
 	count: { type: "number" },
 	items: {
 		type: function( newValue ) {
@@ -102,13 +104,13 @@ DefineMap.extend( {
 		}
 	}
 } );
+
+const map = new Map();
+map.assign({ count: "4", items: "1,2,3" });
+
+console.log(map.count, map.items); //-> 4 ["1", "2", "3"]
 ```
-
-When a user tries to set those properties like:
-
-    map.set({count: "4", items: "1,2,3"});
-
-The number converter will be used to turn count into 4, and the items type converter function will be used to turn items into [1,2,3].
+@codepen
 
 ### Preventing Arrays and Objects from Automatic Conversion
 
@@ -127,24 +129,28 @@ When a user tries to set this property, the resulting value will remain an array
 Setting type as `compute` allows for resolving a computed property with the .attr()
 method.
 
-```
-MyMap = DefineMap.extend({
+```js
+import { DefineMap } from "can";
+
+const MyMap = DefineMap.extend({
     value: {
         type: "compute"
     }
 });
 
-var myMap = new MyMap();
-var c = compute(5);
+const myMap = new MyMap();
+const c = compute(5);
 
 myMap.value = c;
-myMap.value //-> 5
+console.log(myMap.value); //-> 5
 
 c(6);
-myMap.value //-> 6
+console.log(myMap.value); //-> 6
 
 //Be sure if setting to pass the new compute
-var c2 = compute("a");
+const c2 = compute("a");
 myMap.value = c2;
-myMap.value //-> "a"
+console.log(myMap.value); //-> "a"
 ```
+<!-- `compute` is undefined -->
+<!-- @codepen -->

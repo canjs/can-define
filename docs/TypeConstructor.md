@@ -16,7 +16,7 @@ A constructor function can be provided that is called to convert incoming values
 }
 ```    
 
-`Type` is called before [can-define.types.type] and before [can-define.types.set]. It checks if the incoming value
+The `Type` constructor is called before the [can-define.types.type] property and before [can-define.types.set]. It checks if the incoming value
 is an [instanceof](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/instanceof) `Type`. If it is, or if it is `null` or `undefined`, it passes the original value through.  If not, it passes the original value to `new Type(originalValue)` and returns the
 new instance to be set.
 
@@ -37,7 +37,7 @@ A [can-define.types.propDefinition] that defines an inline [can-define/map/map] 
 
 @signature `[Type|propDefinition]`
 
-Defines an inline [can-define/list/list] type that's an array of `Type` or inline `propDefinition` [can-define/map/map]
+Defines an inline [can-define/list/list] type that's an array of `Type` or inline [can-define.types.propDefinition] [can-define/map/map]
 instances.  For example:
 
 ```js
@@ -60,6 +60,8 @@ instances.  For example:
 ## Use
 
 ```js
+import { DefineMap } from "can";
+
 const Address = DefineMap.extend( {
 	street: "string",
 	city: "string"
@@ -75,3 +77,4 @@ const direction = new Direction( {
 	to: new Address( { street: "123 Greenview", city: "Libertyville" } )
 } );
 ```
+@codepen

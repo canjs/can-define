@@ -11,37 +11,38 @@ type.  `identity` configures the result of [can-reflect.getIdentity].
 The following specifies that the `id` property values uniquely identifies `Todo`
 instances:
 
-```js
-import {DefineMap, Reflect} from "can";
+  ```js
+  import { DefineMap, Reflect } from "can";
 
-const Todo = DefineMap.extend("Todo",{
-    id: {type: "number", identity: true},
-    name: "string",
-    complete: "boolean"
-});
+  const Todo = DefineMap.extend("Todo",{
+      id: {type: "number", identity: true},
+      name: "string",
+      complete: "boolean"
+  });
 
-var todo = new Todo({id: 6, name: "mow lawn"});
+  var todo = new Todo({id: 6, name: "mow lawn"});
 
-Reflect.getIdentity(todo) //-> 6
-```
+  console.log(Reflect.getIdentity(todo)); //-> 6
+  ```
+  @codepen
 
 `identity` can be `true` for multiple properties. If multiple identity properties
 are specified, a sorted JSON string is returned:
 
-```js
-import {DefineMap, Reflect} from "can";
+  ```js
+  import { DefineMap, Reflect } from "can";
 
-const Grade = DefineMap.extend("Grade",{
-    classId: {type: "number", identity: true},
-    studentId: {type: "number", identity: true},
-    grade: "string"
-});
+  const Grade = DefineMap.extend("Grade",{
+      classId: {type: "number", identity: true},
+      studentId: {type: "number", identity: true},
+      grade: "string"
+  });
 
-var grade = new Grade({classId: 5, studentId: 7, grade: "A+"});
+  var grade = new Grade({classId: 5, studentId: 7, grade: "A+"});
 
-Reflect.getIdentity(grade) //-> '{"classId":5,"studentId":7}'
-```
-
+  console.log(Reflect.getIdentity(grade)); //-> '{"classId":5,"studentId":7}'
+  ```
+  @codepen
 
 
 @body
