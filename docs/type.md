@@ -152,4 +152,5 @@ const c2 = compute("a");
 myMap.value = c2;
 console.log(myMap.value); //-> "a"
 ```
-@codepen
+<!-- `compute` is undefined -->
+<!-- @codepen -->
