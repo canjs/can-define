@@ -1470,3 +1470,19 @@ QUnit.test("canReflect.getSchema", function(){
 
 	QUnit.equal(schema.values, MyType);
 });
+
+QUnit.test("Bound serialized lists update when they change length", function(){
+	QUnit.expect(1);
+	var list = new DefineList(["eggs"]);
+	var obs = new Observation(function(){
+		return list.serialize();
+	});
+
+	function onChange(val) {
+		QUnit.deepEqual(val, ["eggs", "toast"]);
+	}
+
+	canReflect.onValue(obs, onChange);
+	list.push("toast");
+	canReflect.offValue(obs, onChange);
+});
