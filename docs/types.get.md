@@ -74,6 +74,8 @@ Whenever a getter is provided, it is wrapped in a [can-compute], which ensures
 that whenever its dependent properties change, a change event will fire for this property also.
 
 ```js
+import { DefineMap } from "can";
+
 const Person = DefineMap.extend( {
 	first: "string",
 	last: "string",
@@ -86,14 +88,15 @@ const Person = DefineMap.extend( {
 
 const p = new Person( { first: "Justin", last: "Meyer" } );
 
-p.fullName; // "Justin Meyer"
+console.log(p.fullName); //-> "Justin Meyer"
 
 p.on( "fullName", function( ev, newVal ) {
-	newVal; //-> "Lincoln Meyer";
+	console.log(newVal); //-> "Lincoln Meyer";
 } );
 
 p.first = "Lincoln";
 ```
+@codepen
 
 ## Asynchronous virtual properties
 
@@ -101,6 +104,8 @@ Often, a virtual property's value only becomes available after some period of ti
 given a `personId`, one might want to retrieve a related person:
 
 ```js
+import { DefineMap } from "can";
+
 const AppState = DefineMap.extend( {
 	personId: "number",
 	person: {
@@ -167,6 +172,8 @@ For example, a property might be set to a compute, but when read, provides the v
 of the compute.
 
 ```js
+import { DefineMap } from "can";
+
 const MyMap = DefineMap.extend( {
 	value: {
 		get: function( lastSetValue ) {
@@ -183,6 +190,7 @@ map.value; //-> 1
 compute( 2 );
 map.value; //-> 2
 ```
+<!--@codepen-->
 
 This technique should only be used when the `lastSetValue` is some form of
 observable, that when it changes, can update the `getter` value.
@@ -200,8 +208,10 @@ the [can-define/list/list] will be updated with the `id`s of the `locations`.
 
 
 ```js
+import { DefineMap, DefineList } from "can";
+
 const Store = DefineMap.extend( {
-	locations: DefineList,
+	locations: { Default: DefineList },
 	locationIds: {
 		Default: DefineList,
 		get: function( initialValue ) {
@@ -212,4 +222,10 @@ const Store = DefineMap.extend( {
 		}
 	}
 } );
+
+const s = new Store();
+console.log(s.locationIds[0]); //-> undefined
+s.locations.push({ id: 1 });
+console.log(s.locationIds[0]); //-> 1
 ```
+@codepen
