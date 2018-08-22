@@ -128,7 +128,7 @@ console.log(pages.page) //-> 3
     counts the number of times the `page` property changes:
 
     ```js
-import { DefineMap } from "Can";
+import { DefineMap } from "can";
 
 const book = DefineMap.extend( {
 	pageChangeCount: function( prop ) {
