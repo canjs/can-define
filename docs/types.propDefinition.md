@@ -76,8 +76,8 @@ const Person = DefineMap.extend( {
 	}
 } );
 
-const person = new Person({ age: 20 });
-console.log(person.age);
+const person = new Person({ age: 20, hobbies: "1,2,3" });
+console.log(person.age, person.hobbies); //-> 20, [1,2,3]
 ```
 
     @option {can-define.types.typeConstructor} Type A constructor function that takes the assigned property value as the first argument and called with new. For example, the following will call `new Address(newValue)` with whatever non null, undefined, or address type is set as a `Person`'s address property.
