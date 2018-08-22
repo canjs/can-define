@@ -1682,15 +1682,15 @@ canReflect.assignSymbols(DefineList.prototype, defineListProto);
 
 canReflect.setKeyValue(DefineList.prototype, canSymbol.iterator, function() {
 	var index = -1;
-	if(typeof this._length !== "number") {
-		this._length = 0;
+	if(typeof this.length !== "number") {
+		this.length = 0;
 	}
 	return {
 		next: function() {
 			index++;
 			return {
 				value: this[index],
-				done: index >= this._length
+				done: index >= this.length
 			};
 		}.bind(this)
 	};
