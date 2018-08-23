@@ -220,8 +220,9 @@ const Person = DefineMap.extend( "Person", {
 } );
 
 const p = new Person({ first: "John", last: "Smith" });
+p.on("fullNameChangeCount", () => {});
 p.first = "Justin";
 p.last = "Meyer";
 console.log(p.fullNameChangeCount); //-> 2
 ```
-<!-- @codepen -->
+@codepen
