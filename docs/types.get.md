@@ -211,12 +211,12 @@ the [can-define/list/list] will be updated with the `id`s of the `locations`.
 import { DefineMap, DefineList } from "can";
 
 const Store = DefineMap.extend( {
-	locations: { Default: DefineList },
+	locations: new DefineList,
 	locationIds: {
 		Default: DefineList,
 		get: function( initialValue ) {
 			const ids = this.locations.map( function( location ) {
-				ids.push( location.id );
+				return location.id;
 			} );
 			return initialValue.replace( ids );
 		}
