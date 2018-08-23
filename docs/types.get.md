@@ -172,25 +172,25 @@ For example, a property might be set to a compute, but when read, provides the v
 of the compute.
 
 ```js
-import { DefineMap } from "can";
+import { DefineMap, SimpleObservable, Reflect } from "can";
 
 const MyMap = DefineMap.extend( {
-	value: {
-		get: function( lastSetValue ) {
-			return lastSetValue();
-		}
-	}
+    value: {
+        get: function( lastSetValue ) {
+            return lastSetValue.value;
+        }
+    }
 } );
 
 const map = new MyMap();
-const compute = compute( 1 );
-map.value = compute;
+const observable = new SimpleObservable( 1 );
+map.value = observable;
 
-map.value; //-> 1
-compute( 2 );
-map.value; //-> 2
+console.log(map.value); //-> 1
+Reflect.setValue(observable, 2);
+console.log(map.value); //-> 2
 ```
-<!--@codepen-->
+@codepen
 
 This technique should only be used when the `lastSetValue` is some form of
 observable, that when it changes, can update the `getter` value.
