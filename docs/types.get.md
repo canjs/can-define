@@ -25,7 +25,7 @@ Specify `get` like:
 ```
 
   @param {*} [lastSetValue] The value last set by `instance.propertyName = value`.  Typically, _lastSetValue_
-  should be an observable value, like a [can-compute] or promise. If it's not, it's likely
+  should be an observable value, like a [can-simple-observable] or promise. If it's not, it's likely
   that a [can-define.types.set] should be used instead.
 
   @return {*} The value of the property.
@@ -74,6 +74,8 @@ Whenever a getter is provided, it is wrapped in a [can-compute], which ensures
 that whenever its dependent properties change, a change event will fire for this property also.
 
 ```js
+import { DefineMap } from "can";
+
 const Person = DefineMap.extend( {
 	first: "string",
 	last: "string",
@@ -86,14 +88,15 @@ const Person = DefineMap.extend( {
 
 const p = new Person( { first: "Justin", last: "Meyer" } );
 
-p.fullName; // "Justin Meyer"
+console.log(p.fullName); //-> "Justin Meyer"
 
 p.on( "fullName", function( ev, newVal ) {
-	newVal; //-> "Lincoln Meyer";
+	console.log(newVal); //-> "Lincoln Meyer";
 } );
 
 p.first = "Lincoln";
 ```
+@codepen
 
 ## Asynchronous virtual properties
 
@@ -101,6 +104,8 @@ Often, a virtual property's value only becomes available after some period of ti
 given a `personId`, one might want to retrieve a related person:
 
 ```js
+import { DefineMap } from "can";
+
 const AppState = DefineMap.extend( {
 	personId: "number",
 	person: {
@@ -167,22 +172,25 @@ For example, a property might be set to a compute, but when read, provides the v
 of the compute.
 
 ```js
+import { DefineMap, SimpleObservable, Reflect } from "can";
+
 const MyMap = DefineMap.extend( {
-	value: {
-		get: function( lastSetValue ) {
-			return lastSetValue();
-		}
-	}
+    value: {
+        get: function( lastSetValue ) {
+            return lastSetValue.value;
+        }
+    }
 } );
 
 const map = new MyMap();
-const compute = compute( 1 );
-map.value = compute;
+const observable = new SimpleObservable( 1 );
+map.value = observable;
 
-map.value; //-> 1
-compute( 2 );
-map.value; //-> 2
+console.log(map.value); //-> 1
+Reflect.setValue(observable, 2);
+console.log(map.value); //-> 2
 ```
+@codepen
 
 This technique should only be used when the `lastSetValue` is some form of
 observable, that when it changes, can update the `getter` value.
@@ -200,16 +208,24 @@ the [can-define/list/list] will be updated with the `id`s of the `locations`.
 
 
 ```js
+import { DefineMap, DefineList } from "can";
+
 const Store = DefineMap.extend( {
-	locations: DefineList,
+	locations: { Default: DefineList },
 	locationIds: {
 		Default: DefineList,
 		get: function( initialValue ) {
 			const ids = this.locations.map( function( location ) {
-				ids.push( location.id );
+				return location.id;
 			} );
 			return initialValue.replace( ids );
 		}
 	}
 } );
+
+const s = new Store();
+console.log(s.locationIds[0]); //-> undefined
+s.locations.push({ id: 1 });
+console.log(s.locationIds[0]); //-> 1
 ```
+@codepen

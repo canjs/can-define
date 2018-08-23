@@ -27,6 +27,8 @@ Specify `Default` like:
 ## Use
 
 ```js
+import { DefineMap } from "can";
+
 const Address = DefineMap.extend( {
 	street: { type: "string", value: "321 Longbow" },
 	city: { type: "string", value: "Dallas" }
@@ -41,6 +43,7 @@ const direction = new Direction( {
 	to: { street: "2070 N. Stave" }
 } );
 
-direction.from.street; //-> "321 Longbow"
-direction.to.street;   //-> "2070 N. Stave"
+console.log(direction.from.street); //-> "321 Longbow"
+console.log(direction.to.street);   //-> "2070 N. Stave"
 ```
+@codepen

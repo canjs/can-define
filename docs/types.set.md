@@ -65,19 +65,30 @@ The following makes setting a `page` property update the `offset`:
 
 
 ```js
-{
-	page: {
-		set: function( newVal ) {
-			this.offset =  ( parseInt( newVal ) - 1 ) * this.limit;
-		}
-	}
-}
+import { DefineMap } from "can";
+
+const Pages = DefineMap.extend( {
+    limit: { default: 5 },
+    offset: { default: 0 },
+    page: {
+        set: function( newVal ) {
+            this.offset =  ( parseInt( newVal ) - 1 ) * this.limit;
+        }
+    }
+} );
+const book = new Pages();
+book.page = 10;
+console.log(book.offset); //-> 45
 ```
+@codepen
 
 The following makes changing `makeId` un-define the `modelId` property:
 
 ```js
-{
+import { DefineMap } from "can";
+
+const Car = DefineMap.extend( {
+	modelId: { default: undefined },
 	makeId: {
 	    set: function(newValue){
 	        // Check if we are changing.
@@ -88,8 +99,14 @@ The following makes changing `makeId` un-define the `modelId` property:
 	        return newValue;
 	    }
 	}
-}
+} );
+
+const myCar = new Car({ makeId: "GMC", modelId: "Jimmy" });
+console.log(myCar.modelId) ;//-> "Jimmy"
+myCar.makeId = "Chevrolet";
+console.log(myCar.modelId); //-> undefined
 ```
+@codepen
 
 #### Asynchronous Setter
 

@@ -82,8 +82,8 @@ as either:
 
 - A type function that returns the type coerced value.
 - A named type in [can-define.types].
-- An object that gets converted into an inline `DefineMap`.
-- An array that gets converted to an inline `DefineList`.
+- An object that gets converted into an inline `[can-define/map/map DefineMap]`.
+- An array that gets converted to an inline `[can-define/list/list DefineList]`.
 
 ### Basic Example
 
