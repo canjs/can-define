@@ -31,10 +31,10 @@ import { DefineMap } from "can";
 // A default age of `0`:
 const Person = DefineMap.extend( {
     age: {
-        value: 0
+        default: 0
     },
     address: {
-        value: function() {
+        default: function() {
             return { city: "Chicago", state: "IL" };
         }
     }
