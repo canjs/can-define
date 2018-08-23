@@ -25,7 +25,7 @@ Specify `get` like:
 ```
 
   @param {*} [lastSetValue] The value last set by `instance.propertyName = value`.  Typically, _lastSetValue_
-  should be an observable value, like a [can-compute] or promise. If it's not, it's likely
+  should be an observable value, like a [can-simple-observable] or promise. If it's not, it's likely
   that a [can-define.types.set] should be used instead.
 
   @return {*} The value of the property.
