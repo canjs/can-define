@@ -528,43 +528,6 @@ assign(DefineList.prototype, {
 		// list constructor to make it back into a list
 		return new this.constructor(Array.prototype.concat.apply(canReflect.toArray(this), args));
 	},
-
-	/**
-	 * @function can-define/list/list.prototype.forEach forEach
-	 * @description Call a function for each element of a DefineList.
-	 * @signature `list.forEach(callback[, thisArg])`
-	 *
-	 * Loops through the values of the list, calling `callback` for each one until the list ends
-	 * or `false` is returned.
-	 *
-	 * ```
-	 * list.forEach(function(item, index, list){ ... })
-	 * ```
-	 *
-	 * @param {function(item, index, list)} callback A function to call with each element of the DefineList.
-	 * The three parameters that callback gets passed are:
-	 *    - item - the element at index.
-	 *    - index - the current element of the list.
-	 *    - list - the DefineList the elements are coming from.
-	 *
-	 * If the callback returns `false` the looping stops.
-	 *
-	 * @param {Object} [thisArg] The object to use as `this` inside the callback.
-	 * @return {can-define/list/list} The list instance.
-	 * @body
-	 *
-	 * ## Use
-	 *
-	 * `forEach` calls a callback for each element in the DefineList.
-	 *
-	 * ```
-	 * var list = new DefineList([1, 2, 3]);
-	 * list.forEach(function(element, index, list) {
-	 *     list.get(index, element * element);
-	 * });
-	 * list.get(); // [1, 4, 9]
-	 * ```
-	 */
 	forEach: function(cb, thisarg) {
 		var item;
 		for (var i = 0, len = this.length; i < len; i++) {
