@@ -470,7 +470,6 @@ function a(fnLength, fnName) {
 	};
 });
 
-
 assign(DefineList.prototype, {
 	indexOf: function(item, fromIndex) {
 		for (var i = fromIndex || 0, len = this.length; i < len; i++) {
@@ -489,25 +488,6 @@ assign(DefineList.prototype, {
 		}
 		return -1;
 	},
-
-	/**
-	 * @function can-define/list/list.prototype.join join
-	 * @description Join a DefineList's elements into a string.
-	 * @signature `list.join(separator)`
-	 *
-	 * `join` turns a DefineList into a string by inserting _separator_ between the string representations
-	 * of all the elements of the DefineList.
-	 *
-	 * ```
-	 * var list = new DefineList(['Alice', 'Bob', 'Eve']);
-	 * list.join(', '); // 'Alice, Bob, Eve'
-	 * ```
-	 *
-	 * @param {String} separator The string to seperate elements.
-	 *
-	 * @return {String} The joined string.
-	 *
-	 */
 	join: function() {
 		ObservationRecorder.add(this, "length");
 		return [].join.apply(this, arguments);
