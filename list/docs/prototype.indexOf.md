@@ -6,9 +6,9 @@
 
   ```js
 import { DefineList } from "can";
-const list = new DefineList(['Alice', 'Bob', 'Eve']);
-console.log(list.indexOf('Alice')); //-> 0
-console.log(list.indexOf('Charlie')); //-> -1
+const list = new DefineList(["Alice", "Bob", "Eve"]);
+console.log(list.indexOf("Alice")); //-> 0
+console.log(list.indexOf("Charlie")); //-> -1
   ```
   @codepen
 

@@ -480,27 +480,6 @@ assign(DefineList.prototype, {
 		}
 		return -1;
 	},
-
-		/**
-	 * @function can-define/list/list.prototype.lastIndexOf lastIndexOf
-	 * @description Look for an item in a DefineList starting from the end.
-	 * @signature `list.lastIndexOf(item)`
-	 *
-	 * `lastIndexOf` finds the last position of a given item in the DefineList.
-	 *
-	 * ```
-	 * var list = new DefineList(['Alice', 'Bob', 'Alice', 'Eve']);
-	 * list.lastIndexOf('Alice');   // 2
-	 * list.lastIndexOf('Charlie'); // -1
-	 * ```
-	 *
-	 *   @param {*} item The item to find.
-	 *
-	 *   @return {Number} The position of the item in the DefineList, or -1 if the item is not found.
-	 *
-	 * @body
-	 *
-	 */
 	lastIndexOf: function(item, fromIndex) {
 		fromIndex = typeof fromIndex === "undefined" ? this.length - 1: fromIndex;
 		for (var i = fromIndex; i >= 0; i--) {
