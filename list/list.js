@@ -433,8 +433,6 @@ canReflect.eachKey({
 
 canReflect.eachKey({
 	"map": 3,
-	/**
-	 */
 	"filter": 3,
 	/**
 	 * @function can-define/list/list.prototype.reduce reduce
