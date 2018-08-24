@@ -394,45 +394,6 @@ canReflect.eachKey({
 	});
 
 canReflect.eachKey({
-		/**
-		 * @function can-define/list/list.prototype.pop pop
-		 * @description Remove an element from the end of a DefineList.
-		 * @signature `list.pop()`
-		 *
-		 * `pop` removes an element from the end of a DefineList.
-		 *
-		 * ```js
-		 * var names = new DefineList(['Alice', 'Bob', 'Eve']);
-		 * names.pop() //-> 'Eve'
-		 * ```
-		 *
-		 *   @return {*} The element just popped off the DefineList, or `undefined` if the DefineList was empty
-		 *
-		 * @body
-		 *
-		 * ## Use
-		 *
-		 * `pop` is the opposite action from [can-define/list/list::push push]:
-		 *
-		 * ```
-		 * var list = new DefineList(['Alice', 'Bob', 'Eve']);
-		 *
-		 * list.pop(); // 'Eve'
-		 * list.pop(); // 'Bob'
-		 * list.pop(); // 'Alice'
-		 * list.pop(); // undefined
-		 * ```
-		 *
-		 * ## Events
-		 *
-		 * `pop` causes _remove_ and _length_ events to be fired if the DefineList is not empty
-		 * when it is called.
-		 *
-		 * ## See also
-		 *
-		 * `pop` has its counterpart in [can-define/list/list::push push], or you may be
-		 * looking for [can-define/list/list::unshift unshift] and its counterpart [can-define/list/list::shift shift].
-		 */
 	pop: "length",
 		/**
 		 * @function can-define/list/list.prototype.shift shift
