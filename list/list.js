@@ -249,28 +249,6 @@ var DefineList = Construct.extend("DefineList",
 			}
 			return this;
 		},
-		/**
-		 * @function can-define/list/list.prototype.updateDeep updateDeep
-		 * @parent can-define/list/list.prototype
-		 *
-		 * Sets an item or property or items or properties on a list.
-		 *
-		 * @signature `list.updateDeep(newProps)`
-		 *
-		 * Recursively updates the properties on the list with `newProps`. Properties not in `newProps` will be set to `undefined`.
-		 *
-		 * ```js
-		 * var list = new DefineList(["A","B"]);
-		 * list.assign({count: 0, skip: 2, foo: {bar: 'zed', a: 'b'}});
-		 * list.updateDeep({foo: {bar: 'yay'}});
-		 *
-		 * list.get("count") //-> undefined
-		 * list.get("skip") //-> undefined
-		 * list.get("foo") // -> {bar: 'yay', a: undefined}
-		 * ```
-		 *   @param {Array} newProps Properties that need to be updated on the list instance
-		 *   @return {can-define/list/list} The list instance.
-		 */
 		updateDeep: function(prop) {
 			if (canReflect.isListLike(prop)) {
 				canReflect.updateDeepList(this, prop);
