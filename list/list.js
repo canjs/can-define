@@ -492,27 +492,6 @@ assign(DefineList.prototype, {
 		ObservationRecorder.add(this, "length");
 		return [].join.apply(this, arguments);
 	},
-
-	/**
-	 * @function can-define/list/list.prototype.reverse reverse
-	 * @description Reverse the order of a DefineList.
-	 * @signature `list.reverse()`
-	 *
-	 * Reverses the elements of the DefineList in place.
-	 *
-	 * ```
-	 * var list = new DefineList(['Alice', 'Bob', 'Eve']);
-	 * var reversedList = list.reverse();
-	 *
-	 * reversedList; //-> DefineList['Eve', 'Bob', 'Alice'];
-	 * list === reversedList; // true
-	 * ```
-	 *
-	 * @return {can-define/list/list} The DefineList, for chaining.
-	 *
-	 * @body
-	 *
-	 */
 	reverse: function() {
 		// this shouldn't be observable
 		var list = [].reverse.call(this._items());
