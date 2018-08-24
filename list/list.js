@@ -357,48 +357,6 @@ var getArgs = function(args) {
 canReflect.eachKey({
 	push: "length",
 		/**
-		 * @function can-define/list/list.prototype.unshift unshift
-		 * @description Add items to the beginning of a DefineList.
-		 * @signature `list.unshift(...items)`
-		 *
-		 * `unshift` adds items onto the beginning of a DefineList.
-		 *
-		 * ```
-		 * var list = new DefineList(['Alice']);
-		 *
-		 * list.unshift('Bob', 'Eve');
-		 * list; // DefineList['Bob', 'Eve', 'Alice']
-		 * ```
-		 *
-		 * @param {*} items The items to add to the DefineList.
-		 *
-		 * @return {Number} The new length of the DefineList.
-		 *
-		 * @body
-		 *
-		 * ## Use
-		 *
-		 *
-		 *
-		 * If you have an array you want to concatenate to the beginning
-		 * of the DefineList, you can use `apply`:
-		 *
-		 * ```
-		 * var names = ['Bob', 'Eve'],
-		 *     list = new DefineList(['Alice']);
-		 *
-		 * list.unshift.apply(list, names);
-		 * list.get(); // ['Bob', 'Eve', 'Alice']
-		 * ```
-		 *
-		 * ## Events
-		 *
-		 * `unshift` causes _add_ and _length_ events to be fired.
-		 *
-		 * ## See also
-		 *
-		 * `unshift` has a counterpart in [can-define/list/list::shift shift], or you may be
-		 * looking for [can-define/list/list::push push] and its counterpart [can-define/list/list::pop pop].
 		 */
 	unshift: 0
 },
