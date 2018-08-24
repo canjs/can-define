@@ -503,9 +503,6 @@ assign(DefineList.prototype, {
 		var temp = Array.prototype.slice.apply(this, arguments);
 		return new this.constructor(temp);
 	},
-
-	/**
-	 */
 	concat: function() {
 		var args = [];
 		// Go through each of the passed `arguments` and
