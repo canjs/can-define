@@ -5,8 +5,6 @@
 
 Removes `howMany` items at `index` and adds `newItems` in their place.
 
-
-
 @param {Number} index Where to start removing or inserting elements.
 
 @param {Number} [howMany] The number of elements to remove
