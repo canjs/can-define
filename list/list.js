@@ -356,8 +356,6 @@ var getArgs = function(args) {
 // Create `push`, `pop`, `shift`, and `unshift`
 canReflect.eachKey({
 	push: "length",
-		/**
-		 */
 	unshift: 0
 },
 	// Adds a method
