@@ -472,26 +472,6 @@ function a(fnLength, fnName) {
 
 
 assign(DefineList.prototype, {
-	/**
-	 * @function can-define/list/list.prototype.indexOf indexOf
-	 * @description Look for an item in a DefineList.
-	 * @signature `list.indexOf(item)`
-	 *
-	 * `indexOf` finds the position of a given item in the DefineList.
-	 *
-	 * ```
-	 * var list = new DefineList(['Alice', 'Bob', 'Eve']);
-	 * list.indexOf('Alice');   // 0
-	 * list.indexOf('Charlie'); // -1
-	 * ```
-	 *
-	 *   @param {*} item The item to find.
-	 *
-	 *   @return {Number} The position of the item in the DefineList, or -1 if the item is not found.
-	 *
-	 * @body
-	 *
-	 */
 	indexOf: function(item, fromIndex) {
 		for (var i = fromIndex || 0, len = this.length; i < len; i++) {
 			if (this.get(i) === item) {
