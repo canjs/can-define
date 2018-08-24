@@ -432,8 +432,6 @@ canReflect.eachKey({
 	});
 
 canReflect.eachKey({
-	/**
-	 */
 	"map": 3,
 	/**
 	 * @function can-define/list/list.prototype.filter filter
