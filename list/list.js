@@ -395,38 +395,6 @@ canReflect.eachKey({
 
 canReflect.eachKey({
 	pop: "length",
-		/**
-		 * @function can-define/list/list.prototype.shift shift
-		 * @description Remove an item from the front of a list.
-		 * @signature `list.shift()`
-		 *
-		 * `shift` removes an element from the beginning of a DefineList.
-		 *
-		 * ```
-		 * var list = new DefineList(['Alice','Adam']);
-		 * list.shift(); //-> 'Alice'
-		 * list.shift(); //-> 'Adam'
-		 * list.shift(); //-> undefined
-		 * ```
-		 *
-		 * @return {*} The element just shifted off the DefineList, or `undefined` if the DefineList is empty
-		 *
-		 * @body
-		 *
-		 * ## Use
-		 *
-		 * `shift` is the opposite action from `[can-define/list/list::unshift unshift]`:
-		 *
-		 * ## Events
-		 *
-		 * `pop` causes _remove_ and _length_ events to be fired if the DefineList is not empty
-		 * when it is called.
-		 *
-		 * ## See also
-		 *
-		 * `shift` has a counterpart in [can-define/list/list::unshift unshift], or you may be
-		 * looking for [can-define/list/list::push push] and its counterpart [can-define/list/list::pop pop].
-		 */
 	shift: 0
 },
 	// Creates a `remove` type method
