@@ -233,26 +233,6 @@ var DefineList = Construct.extend("DefineList",
 			}
 			return this;
 		},
-		/**
-		 * @function can-define/list/list.prototype.update update
-		 * @parent can-define/list/list.prototype
-		 *
-		 * Sets an item or property or items or properties on a list.
-		 *
-		 * @signature `list.update(newProps)`
-		 *
-		 * Updates the properties on the list with `newProps`. Properties not in `newProps` will be set to `undefined`.
-		 *
-		 * ```js
-		 * var list = new DefineList(["A","B"]);
-		 * list.assign({count: 0, skip: 2});
-		 * list.update({count: 1000});
-		 * list.get("count") //-> 1000
-		 * list.get("skip") //-> undefined
-		 * ```
-		 *   @param {Array} newProps Properties that need to be updated to the list instance
-		 *   @return {can-define/list/list} The list instance.
-		 */
 		update: function(prop) {
 			if (canReflect.isListLike(prop)) {
 				canReflect.updateList(this, prop);
