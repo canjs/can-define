@@ -9,7 +9,7 @@ import { DefineList } from "can";
 const list = new DefineList(["Alice", "Bob", "Eve"]);
 const reversedList = list.reverse();
 
-console.log(reversedList.get()); //-> ["Eve", "Bob", "Alice"];
+console.log(reversedList.get()); //-> ["Eve", "Bob", "Alice"]
 console.log(list === reversedList); //-> true
   ```
   @codepen
