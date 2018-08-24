@@ -355,56 +355,6 @@ var getArgs = function(args) {
 };
 // Create `push`, `pop`, `shift`, and `unshift`
 canReflect.eachKey({
-		/**
-		 * @function can-define/list/list.prototype.push push
-		 * @description Add elements to the end of a list.
-		 * @signature `list.push(...elements)`
-		 *
-		 * `push` adds elements onto the end of a DefineList.
-		 *
-		 * ```
-		 * var names = new DefineList(['Alice']);
-		 * names.push('Bob', 'Eve');
-		 * names //-> DefineList['Alice','Bob', 'Eve']
-		 * ```
-		 *
-		 *   @param {*} elements the elements to add to the DefineList
-		 *
-		 *   @return {Number} the new length of the DefineList
-		 *
-		 * @body
-		 *
-		 * ## Use
-		 *
-		 * `push` adds elements onto the end of a DefineList here is an example:
-		 *
-		 * ```
-		 * var list = new DefineList(['Alice']);
-		 *
-		 * list.push('Bob', 'Eve');
-		 * list.get(); // ['Alice', 'Bob', 'Eve']
-		 * ```
-		 *
-		 * If you have an array you want to concatenate to the end
-		 * of the DefineList, you can use `apply`:
-		 *
-		 * ```
-		 * var names = ['Bob', 'Eve'],
-		 *     list = new DefineList(['Alice']);
-		 *
-		 * list.push.apply(list, names);
-		 * list.get(); // ['Alice', 'Bob', 'Eve']
-		 * ```
-		 *
-		 * ## Events
-		 *
-		 * `push` causes _add_, and _length_ events to be fired.
-		 *
-		 * ## See also
-		 *
-		 * `push` has a counterpart in [can-define/list/list::pop pop], or you may be
-		 * looking for [can-define/list/list::unshift unshift] and its counterpart [can-define/list/list::shift shift].
-		 */
 	push: "length",
 		/**
 		 * @function can-define/list/list.prototype.unshift unshift
