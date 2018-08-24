@@ -8,6 +8,7 @@ Tests each item in `list` by calling `callback` on it.  If `callback` returns tr
 `list`, `every` returns `true`.
 
   ```js
+import { DefineList } from "can";
 const names = new DefineList(["alice","adam","zack","zeffer"]);
 const aNames = names.every((name) => {
     return name[0] === "a";
@@ -34,6 +35,7 @@ Tests each item in `list` by comparing its properties to `props`.  If `props` ma
 `list`, `every` returns `true`.
 
   ```js
+import { DefineList } from "can";
 const todos = new DefineList([
     {name: "dishes", complete: false},
     {name: "lawn", complete: true}
