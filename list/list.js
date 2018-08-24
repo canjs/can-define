@@ -433,37 +433,6 @@ canReflect.eachKey({
 
 canReflect.eachKey({
 	/**
-	 * @function can-define/list/list.prototype.map map
-	 * @description Map the values in this list to another list.
-	 *
-	 * @signature `list.map(callback[, thisArg])`
-	 *
-	 * Loops through the values of the list, calling `callback` for each one until the list
-	 * ends.  The return values of `callback` are used to populate the returned list.
-	 *
-	 * ```js
-	 * var todos = new DefineList([
-	 *   {name: "dishes", complete: false},
-	 *   {name: "lawn", complete: true}
-	 * ]);
-	 * var names = todos.map(function(todo){
-	 *   return todo.name;
-	 * });
-	 * names //-> DefineList["dishes","lawn"]
-	 * ```
-	 *
-	 * @param {function(item, index, list)} callback A function to call with each element of the DefineList.
-	 * The three parameters that callback gets passed are:
-	 *    - item (*) - the element at index.
-	 *    - index (Integer) - the index of the current element of the list.
-	 *    - list (DefineList) - the `DefineList` the elements are coming from.
-	 *
-	 * The return value of `callback`, including `undefined` values are used to populate the resulting list.
-	 *
-	 * @param {Object} [thisArg] The object to use as `this` inside the callback.
-	 * @return {can-define/list/list} a new `DefineList` with the results of the map transform.
-	 * @body
-	 *
 	 */
 	"map": 3,
 	/**
