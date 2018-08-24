@@ -497,41 +497,6 @@ assign(DefineList.prototype, {
 		var list = [].reverse.call(this._items());
 		return this.replace(list);
 	},
-
-	/**
-	 * @function can-define/list/list.prototype.slice slice
-	 * @description Make a copy of a part of a DefineList.
-	 * @signature `list.slice([start[, end]])`
-	 *
-	 * `slice` creates a copy of a portion of the DefineList.
-	 *
-	 * ```js
-	 * var list = new DefineList(['Alice', 'Bob', 'Charlie', 'Daniel', 'Eve']);
-	 * var newList = list.slice(1, 4);
-	 * newList //-> DefineList['Bob', 'Charlie', 'Daniel']
-	 * ```
-	 *
-	 * @param {Number} [start=0] The index to start copying from. Defaults to `0`.
-	 *
-	 * @param {Number} [end] The first index not to include in the copy
-	 * If _end_ is not supplied, `slice` will copy until the end of the list.
-	 *
-	 * @return {can-define/list/list} A new `DefineList` with the extracted elements.
-	 *
-	 * @body
-	 *
-	 * ## Use
-	 *
-	 * `slice` is the simplest way to copy a DefineList:
-	 *
-	 * ```
-	 * var list = new DefineList(['Alice', 'Bob', 'Eve']);
-	 * var copy = list.slice();
-	 *
-	 * copy           //-> DefineList['Alice', 'Bob', 'Eve']
-	 * list === copy; //-> false
-	 * ```
-	 */
 	slice: function() {
 		// tells computes to listen on length for changes.
 		ObservationRecorder.add(this, "length");
