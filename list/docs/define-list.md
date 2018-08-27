@@ -60,7 +60,7 @@ Example:
 ```js
 const MyList = DefineList.extend( { "#": "string" } );
 
-canReflect.onInstancePatches( MyList, function( instance, patches ) {
+canReflect.onInstancePatches( MyList, ( instance, patches ) => {
 
 } );
 ```
@@ -71,33 +71,43 @@ The `can-define/list/list` module exports a `DefineList` constructor function.  
 with `new` to create observable lists that behave very similar to `Array`s.  For example:
 
 ```js
+import { DefineList } from "can";
 const list = new DefineList( [ "a", "b", "c" ] );
-list[ 0 ]; //-> "a";
+console.log(list[ 0 ]); //-> "a";
 
 list.push( "x" );
-list.pop(); //-> "x"
+console.log(list.pop()); //-> "x"
 ```
+@codepen
 
 It can also be extended to define custom observable list types with
 [can-define/list/list.extend].  For example, the following defines a `StringList` type
 where every item is converted to a string by specifying the [can-define/list/list.prototype.wildcardItems items definition] `(#)`:
 
 ```js
+import { DefineList } from "can";
 const StringList = DefineList.extend( {
 	"#": "string"
 } );
 
 const strings = new StringList( [ 1, new Date( 1475370478173 ), false ] );
 
-strings[ 0 ]; //-> "1"
-strings[ 1 ]; //-> "Sat Oct 01 2016 20:07:58 GMT-0500 (CDT)"
-strings[ 2 ]; //-> "false"
+console.log(strings[ 0 ]); //-> "1"
+console.log(strings[ 1 ]); //-> "Sat Oct 01 2016 20:07:58 GMT-0500 (CDT)"
+console.log(strings[ 2 ]); //-> "false"
 ```
+@codepen
 
 Non-numeric properties can also be defined on custom DefineList type.  The following
 defines a `completed` property that returns the completed todos:
 
 ```js
+import { DefineList, DefineMap } from "can";
+
+const Todo = DefineMap.extend("Todo", {
+    complete: { type: "boolean", default: false },
+});
+
 const TodoList = DefineList.extend( {
 	"#": Todo,
 	get completed() {
@@ -106,8 +116,9 @@ const TodoList = DefineList.extend( {
 } );
 
 const todos = new TodoList( [ { complete: true }, { complete: false } ] );
-todos.completed.length; //-> 1
+console.log(todos.completed.length); //-> 1
 ```
+@codepen
 
 Finally, DefineList instances are observable, so you can use the [can-event-queue/map/map]
 methods to listen to its [can-define/list/list/AddEvent],
@@ -115,13 +126,14 @@ methods to listen to its [can-define/list/list/AddEvent],
 and [can-define/list/list/PropertyNameEvent] events:
 
 ```js
+import { DefineList } from "can";
 const people = new DefineList( [ "alice", "bob", "eve" ] );
 
-people.on( "add", function( ev, items, index ) {
+people.on( "add", ( ev, items, index ) => {
 	console.log( "add", items, index );
-} ).on( "remove", function( ev, items, index ) {
+} ).on( "remove", ( ev, items, index ) => {
 	console.log( "remove", items, index );
-} ).on( "length", function( ev, newVal, oldVal ) {
+} ).on( "length", ( ev, newVal, oldVal ) => {
 	console.log( "length", newVal, oldVal );
 } );
 
@@ -131,6 +143,7 @@ people.pop(); // remove ["eve"] 2
 people.unshift( "Xerxes" ); // add ["Xerxes"] 1
 // length 3 2
 ```
+@codepen
 
 __NOTE:__ Only changes made to indexed values using the list's `set` method will dispatch change events.
 👍  `defineList.set(0, 'newValue'); // will dispatch event`
