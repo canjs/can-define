@@ -80,7 +80,7 @@ function eachPropertyDescriptor(map, cb){
 function getEveryPropertyAndSymbol(obj) {
 	var props = Object.getOwnPropertyNames(obj);
 	var symbols = ("getOwnPropertySymbols" in Object) ?
-	  Object.getOwnPropertySymbols(obj) : []
+	  Object.getOwnPropertySymbols(obj) : [];
 	return props.concat(symbols);
 }
 
