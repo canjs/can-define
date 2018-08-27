@@ -1,4 +1,6 @@
 @function can-define/list/list.prototype.lastIndexOf lastIndexOf
+@parent can-define/list/list.prototype
+
 @description Look for an item in a DefineList starting from the end.
 @signature `list.lastIndexOf(item)`
 

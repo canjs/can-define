@@ -1,4 +1,6 @@
 @function can-define/list/list.prototype.forEach forEach
+@parent can-define/list/list.prototype
+
 @description Call a function for each element of a DefineList.
 @signature `list.forEach(callback[, thisArg])`
 

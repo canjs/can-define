@@ -1,4 +1,6 @@
 @function can-define/list/list.prototype.indexOf indexOf
+@parent can-define/list/list.prototype
+
 @description Look for an item in a DefineList.
 @signature `list.indexOf(item)`
 

@@ -1,4 +1,6 @@
 @function can-define/list/list.prototype.map map
+@parent can-define/list/list.prototype
+
 @description Map the values in this list to another list.
 
 @signature `list.map(callback[, thisArg])`
