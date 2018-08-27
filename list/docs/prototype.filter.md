@@ -1,4 +1,5 @@
 @function can-define/list/list.prototype.filter filter
+@parent can-define/list/list.prototype
 
 Filter a list to a new list of the matched items.
 

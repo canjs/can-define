@@ -1,4 +1,6 @@
 @function can-define/list/list.prototype.reverse reverse
+@parent can-define/list/list.prototype
+
 @description Reverse the order of a DefineList.
 @signature `list.reverse()`
 

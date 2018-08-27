@@ -1,4 +1,6 @@
 @function can-define/list/list.prototype.join join
+@parent can-define/list/list.prototype
+
 @description Join a DefineList"s elements into a string.
 @signature `list.join(separator)`
 

@@ -1,4 +1,6 @@
 @function can-define/list/list.prototype.sort sort
+@parent can-define/list/list.prototype
+
 @description Sort the properties of a list.
 
 @signature `list.sort([compareFunction])`

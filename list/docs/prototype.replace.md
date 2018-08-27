@@ -1,4 +1,7 @@
 @function can-define/list/list.prototype.replace replace
+@parent can-define/list/list.prototype
+@hide
+
 @description Replace all the elements of a DefineList.
 @signature `list.replace(collection)`
 

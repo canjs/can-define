@@ -1,4 +1,6 @@
 @function can-define/list/list.prototype.reduceRight reduceRight
+@parent can-define/list/list.prototype
+
 @description Map the values in this list to a single value from right to left
 
 @signature `list.reduceRight(callback, initialValue, [, thisArg])`

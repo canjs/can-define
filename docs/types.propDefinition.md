@@ -26,23 +26,23 @@ observable property.  These behaviors can be specified with as an `Object`, `Str
     @option {can-define.types.default} default Specifies the initial value of the property or a function that returns the initial value.
 
     ```js
-import { DefineMap } from "can";
-
-// A default age of `0`:
-const Person = DefineMap.extend( {
-    age: {
-        default: 0
-    },
-    address: {
-        default: function() {
-            return { city: "Chicago", state: "IL" };
+    import { DefineMap } from "can";
+    
+    // A default age of `0`:
+    const Person = DefineMap.extend( {
+        age: {
+            default: 0
+        },
+        address: {
+            default: function() {
+                return { city: "Chicago", state: "IL" };
+            }
         }
-    }
-} );
-
-const person = new Person();
-console.log(person.age); //->  0
-```
+    } );
+    
+    const person = new Person();
+    console.log(person.age); //->  0
+    ```
 
     @option {can-define.types.defaultConstructor} Default Specifies a function that will be called with `new` whose result is set as the initial value of the attribute.
 

@@ -1,4 +1,6 @@
 @function can-define/list/list.prototype.shift shift
+@parent can-define/list/list.prototype
+
 @description Remove an item from the front of a list.
 @signature `list.shift()`
 

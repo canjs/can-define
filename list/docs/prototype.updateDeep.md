@@ -1,23 +1,44 @@
 @function can-define/list/list.prototype.updateDeep updateDeep
 @parent can-define/list/list.prototype
 
-Sets an item or property or items or properties on a list.
+Recursively updates a list with new values or new property values.
 
-@signature `list.updateDeep(newProps)`
+@signature `list.updateDeep(newItems)`
 
-Recursively updates the properties on the list with `newProps`. Properties not in `newProps` will be set to `undefined`.
+  Similar to [can-define/list/list.prototype.update .update()], `.updateDeep()` will
+  overwrite values within `list` with values from `newItems`.  Where `update()` will replace
+  values or properties one level deep, `.updateDeep()` will overwrite values or
+  properties on objects and lists recursively.
+
+  The following will:
+
+  - remove `payal` from `people`,
+  - set `justin`'s `name` to `"JUSTIN"`, and
+  - remove `justin`'s `age` property:
 
   ```js
-import { DefineList } from "can";
-const list = new DefineList(["A","B"]);
-list.assign({count: 0, skip: 2, foo: {bar: 'zed', a: 'b'}});
-list.updateDeep({foo: {bar: 'yay'}});
+  import { DefineMap, DefineList } from "can";
 
-console.log(list.get("count")); //-> undefined
-console.log(list.get("skip")); //-> undefined
-console.log(list.get("foo")); // -> { bar: 'yay' }
+  const justin = new DefineMap({name: "Justin", age: 35}),
+        payal = new DefineMap({name: "Payal", age: 35});
+
+  const people = new DefineList([justin, payal]);
+
+  people.updateDeep([
+  	{name: "JUSTIN"}
+  ]);
+
+  console.log(people.serialize()) //-> [
+  //   {name: "Justin"}
+  // ]
   ```
   @codepen
 
-  @param {Array} newProps Properties that need to be updated on the list instance
+  Use [can-define/list/list.prototype.assignDeep .assignDeep()] if you want recursive updating that doesn't remove properties.  Use [can-diff/merge-deep/merge-deep]
+  if you want recursive updating that is [can-reflect.getIdentity identity] aware.
+
+
+  @param {Array|Object} newItems A list or array of values, or an object of property values.
+  If an object is passed, the properties of the list will be updated with the values
+  in  `newItems`.
   @return {can-define/list/list} The list instance.

@@ -1,4 +1,6 @@
 @function can-define/list/list.prototype.slice slice
+@parent can-define/list/list.prototype
+
 @description Make a copy of a part of a DefineList.
 @signature `list.slice([start[, end]])`
 

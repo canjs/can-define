@@ -1,4 +1,5 @@
 @function can-define/list/list.prototype.every every
+@parent can-define/list/list.prototype
 
 Return true if every item in a list matches a predicate.
 
