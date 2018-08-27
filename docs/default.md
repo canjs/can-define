@@ -27,7 +27,7 @@ If the default value should be an object of some type, it should be specified as
 
 Any value can be provided as the default value used for this property, like:
 
-```
+```js
 {
 	prop: {
 		default: 'foo'
@@ -44,6 +44,7 @@ Any value can be provided as the default value used for this property, like:
 The following defaults `age` to `0` and `address` to an object:
 
 ```js
+import { DefineMap } from "can"
 // A default age of `0`:
 const Person = DefineMap.extend( {
 	age: {
@@ -55,7 +56,11 @@ const Person = DefineMap.extend( {
 		}
 	}
 } );
+
+const person = new Person();
+console.log(person.age); //-> 0
 ```
+@codepen
 
 ## Alternates
 

@@ -23,47 +23,46 @@ observable property.  These behaviors can be specified with as an `Object`, `Str
 }
 ```
 
-  @option {can-define.types.default} default Specifies the initial value of the property or
-    a function that returns the initial
-    value.
-    ```js
-    import {DefineMap} from "can";
+    @option {can-define.types.default} default Specifies the initial value of the property or a function that returns the initial value.
 
+    ```js
+    import { DefineMap } from "can";
+    
+    // A default age of `0`:
     const Person = DefineMap.extend( {
-  	  // A default age of `0`:
-  	  age: {
-  	  	default: 0
-  	  },
-  	  address: {
-  	  	default: function() {
-  	  		return { city: "Chicago", state: "IL" };
-  	  	}
-  	  }
+        age: {
+            default: 0
+        },
+        address: {
+            default: function() {
+                return { city: "Chicago", state: "IL" };
+            }
+        }
     } );
     
-    var person = new Person();
-    console.log(person.age)     //-> 0
-    console.log(person.address) //-> DefineMap{city:"Chicago",state:"IL"}
+    const person = new Person();
+    console.log(person.age); //->  0
     ```
-    @codepen foo
 
-  @option {can-define.types.defaultConstructor} Default Specifies a function that will be called with `new` whose result is
-  set as the initial value of the attribute.
+    @option {can-define.types.defaultConstructor} Default Specifies a function that will be called with `new` whose result is set as the initial value of the attribute.
 
     ```js
+import { DefineMap, DefineList } from "can";
+
 // A default empty DefineList of hobbies:
 const Person = DefineMap.extend( {
 	hobbies: { Default: DefineList }
 } );
 
-new Person().hobbies; //-> []
+const person = new Person();
+console.log(person.hobbies); //-> []
 ```
 
-    @option {can-define.types.type} type Specifies the type of the
-    property.  The type can be specified as either a function
-    that returns the type coerced value or one of the [can-define.types] names.
+    @option {can-define.types.type} type Specifies the type of the property. The type can be specified as either a function that returns the type coerced value or one of the [can-define.types] names.
 
     ```js
+import { DefineMap } from "can";
+
 const Person = DefineMap.extend( {
 	age: { type: "number" },
 	hobbies: {
@@ -76,13 +75,16 @@ const Person = DefineMap.extend( {
 		}
 	}
 } );
+
+const person = new Person({ age: 20, hobbies: "1,2,3" });
+console.log(person.age, person.hobbies); //-> 20, [1,2,3]
 ```
 
-    @option {can-define.types.typeConstructor} Type A constructor function that takes
-    the assigned property value as the first argument and called with new. For example, the following will call
-    `new Address(newValue)` with whatever non null, undefined, or address type is set as a `Person`'s address property.
+    @option {can-define.types.typeConstructor} Type A constructor function that takes the assigned property value as the first argument and called with new. For example, the following will call `new Address(newValue)` with whatever non null, undefined, or address type is set as a `Person`'s address property.
 
     ```js
+import { DefineMap } from "can";
+
 const Address = DefineMap.extend( {
 	street: "string",
 	state: "string"
@@ -91,22 +93,32 @@ const Address = DefineMap.extend( {
 const Person = DefineMap.extend( {
 	address: { Type: Address }
 } );
+
+const person = new Person({
+    address: {
+        street: "Example Ave.",
+        state: "IL"
+    }
+});
+console.log(person.address.street); //-> "Example Ave."
 ```
 
-
-
-    @option {can-define.types.get} get A function that specifies how the value is retrieved.  The get function is
-    converted to an [can-compute.async async compute].  It should derive its value from other values on the object. The following
-    defines a `page` getter that reads from a map's offset and limit:
+    @option {can-define.types.get} get A function that specifies how the value is retrieved.  The get function is converted to an [can-compute.async async compute].  It should derive its value from other values on the object. The following defines a `page` getter that reads from a map's offset and limit:
 
     ```js
-DefineMap.extend( {
+import { DefineMap } from "can";
+
+const pages = DefineMap.extend( {
+    offset: 10,
+    limit: 5,
 	page: {
 		get: function( newVal ) {
 			return Math.floor( this.offset / this.limit ) + 1;
 		}
 	}
 } );
+
+console.log(pages.page) //-> 3
 ```
 
     A `get` definition makes the property __computed__ which means it will not be enumerable by default.
@@ -116,7 +128,9 @@ DefineMap.extend( {
     counts the number of times the `page` property changes:
 
     ```js
-DefineMap.extend( {
+import { DefineMap } from "can";
+
+const book = DefineMap.extend( {
 	pageChangeCount: function( prop ) {
 		let count = 0;
 
@@ -129,12 +143,14 @@ DefineMap.extend( {
 		prop.resolve( count );
 	}
 } );
+book.page = 1;
+book.page += 1;
+console.log(book.count); //-> 2
 ```
 
     A `value` definition makes the property __computed__ which means it will not be enumerable by default.
 
-    @option {can-define.types.set} set A set function that specifies what should happen when a property is set. `set` is called with the result of `type` or `Type`. The following
-    defines a `page` setter that updates the map's offset:
+    @option {can-define.types.set} set A set function that specifies what should happen when a property is set. `set` is called with the result of `type` or `Type`. The following defines a `page` setter that updates the map's offset:
 
     ```js
 DefineMap.extend( {
@@ -213,7 +229,7 @@ OR
 @type {Array} Defines an inline [can-define/list/list] Type setting. This is
 used as a shorthand for creating a property that is an [can-define/list/list] of another type.
 
-```
+```js
 {
 	propertyName: [Constructor | propDefinitions]
 }
@@ -259,11 +275,9 @@ This is a shorthand for providing an object with a `get` property like:
 }
 ```
 
-You must use an object with a [can-define.types.get] property if you want your get to take the `lastSetValue`
-or `resolve` arguments.
+You must use an object with a [can-define.types.get] property if you want your get to take the `lastSetValue` or `resolve` arguments.
 
-@type {SETTER} Defines a property's [can-define.types.set] behavior with the
-[set syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set).
+@type {SETTER} Defines a property's [can-define.types.set] behavior with the [set syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set).
 
 ```js
 {
@@ -285,7 +299,7 @@ For example:
 
 This is a shorthand for providing an object with a `set` property like:
 
-```
+```js
 {
 	fullName: {
 	    set: function(newValue){
@@ -312,19 +326,19 @@ get converted to a `PropDefinition` as follows:
 
 ```js
 DefineMap.extend( {
-	propertyA: Object,      // -> PropertyDefinition
-	propertyB: String,      // -> {type: String}
-	propertyC: Constructor, // -> {Type: Constructor}
-	propertyD: [ PropDefs ],  // -> {Type: DefineList.extend({"#": PropDefs})>}
+	propertyA: Object,          // -> PropertyDefinition
+	propertyB: String,          // -> {type: String}
+	propertyC: Constructor,     // -> {Type: Constructor}
+	propertyD: [ PropDefs ],    // -> {Type: DefineList.extend({"#": PropDefs})>}
 	get propertyE() { /* ... */ },   // -> {get: propertyE(){ /* ... */ }}
-	set propertyF( value ) { /* ... */ },   // -> {set: propertyF(value){ /* ... */ }}
+	set propertyF( value ) { /* ... */ },   // -> {set: propertyF(value){ /* ... */ }},
 	method: Function
 } );
 ```
 
 Within a property definition, the available properties and their signatures look like:
 
-```
+```js
 DefineMap.extend({
   property: {
     get: function(lastSetValue, resolve){...},
@@ -345,6 +359,12 @@ For example:
 
 
 ```js
+import { DefineMap } from "can";
+const Address = DefineMap.extend( "Address", {
+    street: "string",
+    state: "string"
+} );
+
 const Person = DefineMap.extend( "Person", {
 
 	// a `DefineList` of `Address`
@@ -362,4 +382,9 @@ const person = new Person( {
 	name: { first: "Kath", last: "Iann" },
 	cars: [ { make: "Nissan", year: 2010 } ]
 } );
+
+console.log(person.addresses[0].street); //-> "1134 Pinetree"
+console.log(person.name.first); //-> "Kath"
+console.log(person.cars[0].make); //-> "Nissan"
 ```
+@codepen

@@ -9,37 +9,39 @@ The `value` behavior is used to compose a property value from events dispatched
 by other properties on the map. It's similar to [can-define.types.get], but can
 be used to build property behaviors that [can-define.types.get] can not provide.
 
-`value` enables techniques very similar to using
-event streams and functional reactive programming. Use `prop.listenTo` to listen to events
-dispatched on the map or other observables,
-`prop.stopListening` to stop listening to those events if needed, and `prop.resolve`
-to set a new value on the observable. For example, the following
-counts the number of times the `name` property changed:
+`value` enables techniques very similar to using event streams and functional
+reactive programming. Use `prop.listenTo` to listen to events dispatched on
+the map or other observables, `prop.stopListening` to stop listening to those
+events if needed, and `prop.resolve` to set a new value on the observable.
+For example, the following counts the number of times the `name` property changed:
 
-```js
-Person = DefineMap.extend( "Person", {
-	name: "string",
-	nameChangeCount: {
-		value( prop ) {
-			let count = 0;
+  ```js
+  import { DefineMap } from "can";
 
-			prop.listenTo( "name", () => {
-				prop.resolve( ++count );
-			} );
+  const Person = DefineMap.extend( "Person", {
+    name: "string",
+    nameChangeCount: {
+      value( prop ) {
+        let count = 0;
 
-			prop.resolve( count );
-		}
-	}
-} );
+        prop.listenTo( "name", () => {
+          prop.resolve( ++count );
+        } );
 
-const p = new Person();
-p.on( "nameChangedCount", ( ev, newVal )=> {
-	console.log( "name changed", newVal, "times" );
-} );
+        prop.resolve( count );
+      }
+    }
+  } );
 
-p.name = "Justin"; // logs name changed 1 times
-p.name = "Ramiya"; // logs name changed 2 times
-```
+  const p = new Person();
+  p.on( "nameChangedCount", ( ev, newVal ) => {
+    console.log( "name changed", newVal, "times" );
+  } );
+
+  p.name = "Justin"; // logs name changed 1 times
+  p.name = "Ramiya"; // logs name changed 2 times
+  ```
+  <!-- @codepen -->
 
 If the property defined by `value` is unbound, the `value` function will be called each time. Use `prop.resolve` synchronously
 to provide a value.
@@ -76,7 +78,7 @@ behavior:
   prop.listenTo( todos, "length", handler, "mutate" );
 
   // Binds to an `onValue` emitter:
-  prop.listenTo( observable, handler ); //
+  prop.listenTo( observable, handler );
   ```
 
 - __prop.stopListening(bindTarget, event, handler, queue)__ `{function(Any,String,Fuction,String)}`  A function that removes bindings
@@ -137,7 +139,7 @@ remove all bindings.
 The following `time` property increments every second.  Notice how a function
 is returned to clear the interval when the property is returned:
 
-```js
+  ```js
 const Timer = DefineMap.extend( "Timer", {
 	time: {
 		value( prop ) {
@@ -158,8 +160,8 @@ const timer = new Timer();
 timer.on( "time", function( ev, newVal, oldVal ) {
 	console.log( newVal ); //-> logs a new date every second
 } );
-```
-
+  ```
+  <!-- @codepen -->
 
 @body
 
@@ -169,19 +171,25 @@ The `value` behavior should be used where the [can-define.types.get] behavior ca
 not derive a property value from instantaneous values.  This often happens in situations
 where the fact that something changes needs to saved in the state of the application.
 
-Lets first see an example where [can-define.types.get] should be used, the
-ubiquitous `fullName` property.  The following creates a `fullName` property
+Our next example shows how [can-define.types.get] should be used with the
+`fullName` property.  The following creates a `fullName` property
 that derives its value from the instantaneous `first` and `last` values:
 
 ```js
-DefineMap.extend( "Person", {
+import { DefineMap } from "can";
+
+const Person = DefineMap.extend( "Person", {
 	first: "string",
 	last: "string",
 	get fullName() {
 		return this.first + " " + this.last;
 	}
 } );
+
+const p = new Person({ first: "John", last: "Smith" });
+console.log(p.fullName); //-> "John Smith"
 ```
+@codepen
 
 [can-define.types.get] is great for these types of values. But [can-define.types.get]
 is unable to derive property values based on the change of values or the
@@ -190,7 +198,9 @@ passage of time.
 The following `fullNameChangeCount` increments every time `fullName` changes:
 
 ```js
-DefineMap.extend( "Person", {
+import { DefineMap } from "can";
+
+const Person = DefineMap.extend( "Person", {
 	first: "string",
 	last: "string",
 	fullName: {
@@ -202,10 +212,17 @@ DefineMap.extend( "Person", {
 		value( prop ) {
 			let count = 0;
 			prop.resolve( 0 );
-			prop.listenTo( "fullName", ()=> {
+			prop.listenTo( "fullName", () => {
 				prop.resolve( ++count );
 			} );
 		}
 	}
 } );
+
+const p = new Person({ first: "John", last: "Smith" });
+p.on("fullNameChangeCount", () => {});
+p.first = "Justin";
+p.last = "Meyer";
+console.log(p.fullNameChangeCount); //-> 2
 ```
+@codepen
