@@ -402,4 +402,4 @@ QUnit.test("assignDeep", function(){
 		{name: "Justin", age: 36},
 		{name: "Payal", age: 35}
 	], "assigned right");
-})
+});
