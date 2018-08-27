@@ -5,16 +5,16 @@ Return true if every item in a list matches a predicate.
 
 @signature `list.every( callback [,thisArg] )`
 
-Tests each item in `list` by calling `callback` on it.  If `callback` returns truthy for every element in
-`list`, `every` returns `true`.
+  Tests each item in `list` by calling `callback` on it.  If `callback` returns truthy for every 
+  element in `list`, `every` returns `true`.
 
   ```js
-import { DefineList } from "can";
-const names = new DefineList(["alice","adam","zack","zeffer"]);
-const aNames = names.every((name) => {
-    return name[0] === "a";
-});
-console.log(aNames); //-> false
+  import { DefineList } from "can";
+  const names = new DefineList(["alice","adam","zack","zeffer"]);
+  const aNames = names.every((name) => {
+      return name[0] === "a";
+  });
+  console.log(aNames); //-> false
   ```
   @codepen
 
@@ -32,20 +32,20 @@ console.log(aNames); //-> false
 
 @signature `list.every( props )`
 
-Tests each item in `list` by comparing its properties to `props`.  If `props` match for every element in
-`list`, `every` returns `true`.
+  Tests each item in `list` by comparing its properties to `props`.  If `props` match for every element in
+  `list`, `every` returns `true`.
 
   ```js
-import { DefineList } from "can";
-const todos = new DefineList([
-    {name: "dishes", complete: false},
-    {name: "lawn", complete: true}
-]);
-const complete = todos.every({complete: true});
-console.log(complete); //-> false
+  import { DefineList } from "can";
+  const todos = new DefineList([
+      {name: "dishes", complete: false},
+      {name: "lawn", complete: true}
+  ]);
+  const complete = todos.every({complete: true});
+  console.log(complete); //-> false
   ```
   @codepen
 
-   @param  {Object}  props An object of key-value properties.  Each key and value in
-   `props` must be present on an `item` for the `item` to match.
-   @return {Boolean} `true` if every element in `list` matches `props`, `false` otherwise.
+  @param  {Object}  props An object of key-value properties.  Each key and value in
+  `props` must be present on an `item` for the `item` to match.
+  @return {Boolean} `true` if every element in `list` matches `props`, `false` otherwise.

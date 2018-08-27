@@ -4,18 +4,18 @@
 @description Remove an item from the front of a list.
 @signature `list.shift()`
 
-`shift` removes an element from the beginning of a DefineList.
+  `shift` removes an element from the beginning of a DefineList.
 
   ```js
-import { DefineList } from "can";
-const list = new DefineList(['Alice','Adam']);
-console.log(list.shift()); //-> 'Alice'
-console.log(list.shift()); //-> 'Adam'
-console.log(list.shift()); //-> undefined
+  import { DefineList } from "can";
+  const list = new DefineList(['Alice','Adam']);
+  console.log(list.shift()); //-> 'Alice'
+  console.log(list.shift()); //-> 'Adam'
+  console.log(list.shift()); //-> undefined
   ```
   @codepen
 
-@return {*} The element just shifted off the DefineList, or `undefined` if the DefineList is empty
+  @return {*} The element just shifted off the DefineList, or `undefined` if the DefineList is empty
 
 @body
 

@@ -4,13 +4,13 @@
 @description Look for an item in a DefineList.
 @signature `list.indexOf(item)`
 
-`indexOf` finds the position of a given item in the DefineList.
+  `indexOf` finds the position of a given item in the DefineList.
 
   ```js
-import { DefineList } from "can";
-const list = new DefineList(["Alice", "Bob", "Eve"]);
-console.log(list.indexOf("Alice")); //-> 0
-console.log(list.indexOf("Charlie")); //-> -1
+  import { DefineList } from "can";
+  const list = new DefineList(["Alice", "Bob", "Eve"]);
+  console.log(list.indexOf("Alice")); //-> 0
+  console.log(list.indexOf("Charlie")); //-> -1
   ```
   @codepen
 
