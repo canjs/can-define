@@ -5,16 +5,16 @@ Return true if at least one item in a list matches a predicate.
 
 @signature `list.some( callback [,thisArg] )`
 
-Tests each item in `list` by calling `callback` on it.  If `callback` returns truthy for some element in
-`list`, `some` returns `true`.
+  Tests each item in `list` by calling `callback` on it.  If `callback` returns truthy for some element in
+  `list`, `some` returns `true`.
 
   ```js
-import { DefineList } from "can";
-const names = new DefineList(["alice","adam","zack","zeffer"]);
-const aNames = names.some((name) => {
-    return name[0] === "a";
-});
-console.log(aNames); //-> true
+  import { DefineList } from "can";
+  const names = new DefineList(["alice","adam","zack","zeffer"]);
+  const aNames = names.some((name) => {
+      return name[0] === "a";
+  });
+  console.log(aNames); //-> true
   ```
   @codepen
 
@@ -32,17 +32,17 @@ console.log(aNames); //-> true
 
 @signature `list.some( props )`
 
-Tests each item in `list` by comparing its properties to `props`.  If `props` match for some element in
-`list`, `some` returns `true`.
+  Tests each item in `list` by comparing its properties to `props`.  If `props` match for some element in
+  `list`, `some` returns `true`.
 
   ```js
-import { DefineList } from "can";
-const todos = new DefineList([
-    {name: "dishes", complete: false},
-    {name: "lawn", complete: true}
-]);
-const complete = todos.some({complete: true});
-console.log(complete); //-> true
+  import { DefineList } from "can";
+  const todos = new DefineList([
+      {name: "dishes", complete: false},
+      {name: "lawn", complete: true}
+  ]);
+  const complete = todos.some({complete: true});
+  console.log(complete); //-> true
   ```
   @codepen
 

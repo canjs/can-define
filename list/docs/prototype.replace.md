@@ -5,13 +5,13 @@
 @description Replace all the elements of a DefineList.
 @signature `list.replace(collection)`
 
-Replaces every item in the list with `collection`.
+  Replaces every item in the list with `collection`.
 
   ```js
-import { DefineList } from "can";
-const names = new DefineList(["alice","adam","eve"]);
-names.replace(["Justin","Xena"]);
-console.log(names.get()); //-> ["Justin","Xena"]
+  import { DefineList } from "can";
+  const names = new DefineList(["alice","adam","eve"]);
+  names.replace(["Justin","Xena"]);
+  console.log(names.get()); //-> ["Justin","Xena"]
   ```
   @codepen
 

@@ -5,16 +5,16 @@
 @description Insert and remove elements from a DefineList.
 @signature `list.splice(index[, howMany[, ...newItems]])`
 
-Removes `howMany` items at `index` and adds `newItems` in their place.
+  Removes `howMany` items at `index` and adds `newItems` in their place.
 
-@param {Number} index Where to start removing or inserting elements.
+  @param {Number} index Where to start removing or inserting elements.
 
-@param {Number} [howMany] The number of elements to remove
-If _howMany_ is not provided, `splice` will remove all elements from `index` to the end of the DefineList.
+  @param {Number} [howMany] The number of elements to remove
+  If _howMany_ is not provided, `splice` will remove all elements from `index` to the end of the DefineList.
 
-@param {*} newItems Items to insert into the DefineList
+  @param {*} newItems Items to insert into the DefineList
 
-@return {Array} The elements removed by `splice`.
+  @return {Array} The elements removed by `splice`.
 
 @body
 

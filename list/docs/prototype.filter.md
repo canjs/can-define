@@ -5,15 +5,15 @@ Filter a list to a new list of the matched items.
 
 @signature `list.filter( callback [,thisArg] )`
 
-Filters `list` based on the return value of `callback`.
+  Filters `list` based on the return value of `callback`.
 
   ```js
-import{ DefineList } from "can";
-const names = new DefineList(["alice","adam","zack","zeffer"]);
-const aNames = names.filter((name) => {
-    return name[0] === "a";
-});
-console.log(aNames.get()); //-> ["alice","adam"]
+  import{ DefineList } from "can";
+  const names = new DefineList(["alice","adam","zack","zeffer"]);
+  const aNames = names.filter((name) => {
+      return name[0] === "a";
+  });
+  console.log(aNames.get()); //-> ["alice","adam"]
   ```
   @codepen
 
@@ -31,16 +31,16 @@ console.log(aNames.get()); //-> ["alice","adam"]
 
 @signature `list.filter( props )`
 
-Filters items in `list` based on the property values in `props`.
+  Filters items in `list` based on the property values in `props`.
 
   ```js
-import { DefineList } from "can";
-const todos = new DefineList([
-    {name: "dishes", complete: false},
-    {name: "lawn", complete: true}
-]);
-const complete = todos.filter({complete: true});
-console.log(complete.get()); //-> [{name: "lawn", complete: true}]
+  import { DefineList } from "can";
+  const todos = new DefineList([
+      {name: "dishes", complete: false},
+      {name: "lawn", complete: true}
+  ]);
+  const complete = todos.filter({complete: true});
+  console.log(complete.get()); //-> [{name: "lawn", complete: true}]
   ```
   @codepen
 

@@ -4,13 +4,13 @@
 @description Add elements to the end of a list.
 @signature `list.push(...elements)`
 
-`push` adds elements onto the end of a DefineList.
+  `push` adds elements onto the end of a DefineList.
 
   ```js
-import { DefineList } from "can";
-const names = new DefineList(['Alice']);
-names.push('Bob', 'Eve');
-console.log(names.get()); //-> ['Alice','Bob', 'Eve']
+  import { DefineList } from "can";
+  const names = new DefineList(['Alice']);
+  names.push('Bob', 'Eve');
+  console.log(names.get()); //-> ['Alice','Bob', 'Eve']
   ```
   @codepen
 

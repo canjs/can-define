@@ -4,13 +4,13 @@
 @description Make a copy of a part of a DefineList.
 @signature `list.slice([start[, end]])`
 
-`slice` creates a copy of a portion of the DefineList.
+  `slice` creates a copy of a portion of the DefineList.
 
   ```js
-import { DefineList } from "can";
-const list = new DefineList(["Alice", "Bob", "Charlie", "Daniel", "Eve"]);
-const newList = list.slice(1, 4);
-console.log(newList.get()); //-> ["Bob", "Charlie", "Daniel"]
+  import { DefineList } from "can";
+  const list = new DefineList(["Alice", "Bob", "Charlie", "Daniel", "Eve"]);
+  const newList = list.slice(1, 4);
+  console.log(newList.get()); //-> ["Bob", "Charlie", "Daniel"]
   ```
   @codepen
 

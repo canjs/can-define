@@ -5,7 +5,7 @@
 
 @signature `list.set(index, value)`
 
-Sets the item at `index`.  Typically, [can-define/list/list::splice] should be used instead.
+  Sets the item at `index`.  Typically, [can-define/list/list::splice] should be used instead.
 
   ```js
   import { DefineList } from "can";
@@ -28,13 +28,13 @@ Sets the item at `index`.  Typically, [can-define/list/list::splice] should be u
 @signature `list.set(prop, value)`
 
 Sets the property at `prop`. This should be used when the property
-isn't already defined.
+  isn't already defined.
 
   ```js
-import { DefineList } from "can";
-const list = new DefineList(["A","B"]);
-list.set("count",1000);
-console.log(list.get("count")); //-> 1000
+  import { DefineList } from "can";
+  const list = new DefineList(["A","B"]);
+  list.set("count",1000);
+  console.log(list.get("count")); //-> 1000
   ```
   @codepen
 
@@ -44,22 +44,22 @@ console.log(list.get("count")); //-> 1000
 
 @signature `list.set(newProps)`
 
-<section class="warnings">
-<div class="deprecated warning">
-<h3>Deprecated 3.10.1</h3>
-<div class="signature-wrapper">
-<p>Passing an {Object} to <code>.set</code> has been deprecated in favor of <a href="list.prototype.assign.html">assign</a> or <a href="list.prototype.update.html">update</a>. <code>list.set(index, value)</code> is <em>not</em> deprecated.</p>
-</div>
-</div>
-</section>
+  <section class="warnings">
+  <div class="deprecated warning">
+  <h3>Deprecated 3.10.1</h3>
+  <div class="signature-wrapper">
+  <p>Passing an {Object} to <code>.set</code> has been deprecated in favor of <a href="list.prototype.assign.html">assign</a> or <a href="list.prototype.update.html">update</a>. <code>list.set(index, value)</code> is <em>not</em> deprecated.</p>
+  </div>
+  </div>
+  </section>
 
-Updates the properties on the list with `newProps`.
+  Updates the properties on the list with `newProps`.
 
   ```js
-import { DefineList } from "can";
-const list = new DefineList(["A","B"]);
-list.set({count: 1000, skip: 2});
-console.log(list.get("count")); //-> 1000
+  import { DefineList } from "can";
+  const list = new DefineList(["A","B"]);
+  list.set({count: 1000, skip: 2});
+  console.log(list.get("count")); //-> 1000
   ```
   @codepen
 

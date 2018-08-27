@@ -4,12 +4,12 @@
 @description Remove an element from the end of a DefineList.
 @signature `list.pop()`
 
-`pop` removes an element from the end of a DefineList.
+  `pop` removes an element from the end of a DefineList.
 
   ```js
-import { DefineList } from "can";
-const names = new DefineList(['Alice', 'Bob', 'Eve']);
-console.log(names.pop()); //-> 'Eve'
+  import { DefineList } from "can";
+  const names = new DefineList(['Alice', 'Bob', 'Eve']);
+  console.log(names.pop()); //-> 'Eve'
   ```
   @codepen
 
