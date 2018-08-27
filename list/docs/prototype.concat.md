@@ -29,4 +29,3 @@
 
   @return {can-define/list/list} A DefineList of the same type.
 
-@body
