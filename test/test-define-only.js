@@ -1279,3 +1279,23 @@ testHelpers.dev.devOnlyTest("warn with constructor for Value instead of Default 
 	});
 	QUnit.equal(finishErrorCheck(), 1);
 });
+
+
+QUnit.test("canReflect.onKeyValue (#363)", function(){
+	var Greeting = function( message ) {
+		this.message = message;
+	};
+
+	define( Greeting.prototype, {
+		message: { type: "string" }
+	} );
+
+	var greeting = new Greeting("Hello");
+
+	canReflect.onKeyValue(greeting, "message", function(newVal, oldVal) {
+		QUnit.equal(newVal, "bye");
+		QUnit.equal(oldVal, "Hello");
+	});
+
+	greeting.message = "bye";
+});
