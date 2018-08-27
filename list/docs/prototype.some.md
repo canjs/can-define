@@ -1,4 +1,5 @@
 @function can-define/list/list.prototype.some some
+@parent can-define/list/list.prototype
 
 Return true if at least one item in a list matches a predicate.
 

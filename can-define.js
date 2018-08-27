@@ -77,6 +77,13 @@ function eachPropertyDescriptor(map, cb){
 	}
 }
 
+function getEveryPropertyAndSymbol(obj) {
+	var props = Object.getOwnPropertyNames(obj);
+	var symbols = ("getOwnPropertySymbols" in Object) ?
+	  Object.getOwnPropertySymbols(obj) : [];
+	return props.concat(symbols);
+}
+
 function cleanUpDefinition(prop, definition, shouldWarn, typePrototype){
 	// cleanup `value` -> `default`
 	if(definition.value !== undefined && ( typeof definition.value !== "function" || definition.value.length === 0) ){
@@ -170,14 +177,15 @@ module.exports = define = ns.define = function(typePrototype, defines, baseDefin
 	}
 
 	// Add necessary event methods to this object.
-	for (prop in eventsProto) {
+	getEveryPropertyAndSymbol(eventsProto).forEach(function(prop){
 		Object.defineProperty(typePrototype, prop, {
 			enumerable: false,
 			value: eventsProto[prop],
 			configurable: true,
 			writable: true
 		});
-	}
+	});
+	// also add any symbols
 	// add so instance defs can be dynamically added
 	Object.defineProperty(typePrototype,"_define",{
 		enumerable: false,

@@ -1,23 +1,38 @@
 @function can-define/list/list.prototype.assignDeep assignDeep
 @parent can-define/list/list.prototype
 
-Sets an item or property or items or properties on a list.
+Recursively sets values within a list or properties on a list.
 
-@signature `list.assignDeep(newProps)`
+@signature `list.assignDeep(newItems)`
 
-Updates the properties on the list with `newProps`. Properties not in `newProps` will be left unchanged.
+  Similar to [can-define/list/list.prototype.assign .assign()], `.assignDeep()` will
+  overwrite values within `list` with values from `newItems`.  Where `assign()` will replace
+  values or properties one level deep, `.assignDeep()` will overwrite values or
+  properties on objects and lists recursively.
+
+  For example, the following only assigns `justin`'s `age` to 36:
 
   ```js
-import { DefineList } from "can";
-const list = new DefineList(["A","B"]);
-list.assign({count: 1, skip: 2});
-console.log(list.get("count")); //-> 1
+  import { DefineMap, DefineList } from "can";
 
-list.assignDeep({count: 1000});
-console.log(list.get("count")); //-> 1000
-console.log(list.get("skip")); //-> 2
+  const justin = new DefineMap({name: "Justin", age: 35}),
+        payal = new DefineMap({name: "Payal", age: 35});
+
+  const people = new DefineList([justin, payal]);
+
+  people.assignDeep([
+  	{age: 36}
+  ]);
+
+  console.log(people.serialize()) //-> [
+  //   {name: "Justin", age: 36},
+  //   {name: "Payal", age: 35}
+  // ]
   ```
   @codepen
 
-  @param {Array} newProps Properties that need to be assigned to the list instance
+
+  @param {Array|Object} newItems A list or array of values, or an object of property values.
+  If an object is passed, the properties of the list will be assigned with the values
+  in  `newItems`.
   @return {can-define/list/list} The list instance.

@@ -1,4 +1,6 @@
 @function can-define/list/list.prototype.reduce reduce
+@parent can-define/list/list.prototype
+
 @description Map the values in this list to a single value
 
 @signature `list.reduce(callback, initialValue, [, thisArg])`

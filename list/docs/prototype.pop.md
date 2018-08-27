@@ -1,4 +1,6 @@
 @function can-define/list/list.prototype.pop pop
+@parent can-define/list/list.prototype
+
 @description Remove an element from the end of a DefineList.
 @signature `list.pop()`
 

@@ -387,3 +387,19 @@ QUnit.test('Deep updating a map', function() {
 	QUnit.equal(obj.list[0], 'something', 'the first element of the list should be updated');
 
 });
+
+QUnit.test("assignDeep", function(){
+	var justin = new DefineMap({name: "Justin", age: 35}),
+		payal = new DefineMap({name: "Payal", age: 35});
+
+	var people = new DefineList([justin, payal]);
+
+	people.assignDeep([
+		{age: 36}
+	]);
+
+	QUnit.deepEqual(people.serialize(),  [
+		{name: "Justin", age: 36},
+		{name: "Payal", age: 35}
+	], "assigned right");
+});

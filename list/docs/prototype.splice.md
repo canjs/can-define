@@ -1,5 +1,7 @@
 @function can-define/list/list.prototype.splice splice
 @parent can-define/list/list.prototype
+
+@parent can-define/list/list.prototype
 @description Insert and remove elements from a DefineList.
 @signature `list.splice(index[, howMany[, ...newItems]])`
 

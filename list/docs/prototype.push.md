@@ -1,4 +1,6 @@
 @function can-define/list/list.prototype.push push
+@parent can-define/list/list.prototype
+
 @description Add elements to the end of a list.
 @signature `list.push(...elements)`
 
