@@ -15,7 +15,7 @@
   const result = list.concat(
   	[1,2],
   	new DefineList(["X","Y"]),
-	  {value: "Z"}
+	{value: "Z"}
   );
 
   console.log( result.serialize() );
