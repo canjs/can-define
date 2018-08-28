@@ -4,7 +4,7 @@
 @description Look for an item in a DefineList.
 @signature `list.indexOf(item)`
 
-  `indexOf` finds the position of a given item in the DefineList.
+  `indexOf` finds the first index position of a given item in the DefineList.
 
   ```js
   import {DefineList} from "can";
@@ -18,6 +18,4 @@
 
   @param {*} item The item to find.
 
-  @return {Number} The position of the item in the DefineList, or -1 if the item is not found.
-
-@body
+  @return {Number} The index of the item in the DefineList, or -1 if the item is not found.
