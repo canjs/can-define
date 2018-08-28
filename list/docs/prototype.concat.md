@@ -10,16 +10,16 @@
   ```js
   import {DefineList} from "can";
 
-  var list = new DefineList(["a","b"]);
+  const list = new DefineList(["a","b"]);
 
-  var result = list.concat(
+  const result = list.concat(
   	[1,2],
   	new DefineList(["X","Y"]),
-	{value: "Z"}
+	  {value: "Z"}
   );
 
-  console.log( result.serialize() )
-  //-> ["a","b",1,2,"X","Y",{value: "Z"}]
+  console.log( result.serialize() );
+  //-> ["a", "b", 1, 2, "X", "Y", {value: "Z"}]
   ```
   @codepen
 
