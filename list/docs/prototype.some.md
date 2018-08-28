@@ -38,7 +38,7 @@ Return true if at least one item in a list matches a predicate.
   `list`, `some` returns `true`.
 
   ```js
-  import { DefineList } from "can";
+  import {DefineList} from "can";
 
   const todos = new DefineList([
       {name: "dishes", complete: false},
