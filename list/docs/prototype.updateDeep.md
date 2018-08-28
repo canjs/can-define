@@ -28,6 +28,8 @@ Recursively updates a list with new values or new property values.
   	{name: "JUSTIN"}
   ]);
 
+  console.log( justin.serialize(), payal.serialize() );
+  //-> {name: "JUSTIN"}, {age: 35, name: "Payal"}
   console.log( people.serialize() ) //-> [
   //   {name: "JUSTIN"}
   // ]
