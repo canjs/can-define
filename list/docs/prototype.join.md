@@ -14,6 +14,6 @@
   ```
   @codepen
 
-  @param {String} separator The string to seperate elements.
+  @param {String} separator The string to separate elements.
 
   @return {String} The joined string.
