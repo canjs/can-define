@@ -7,7 +7,7 @@
 
   Loops through the values of the list in reverse order, calling `callback` for each one until the list
   ends.  The return value of `callback` is passed to the next iteration as the first argument,
-  and finally returned by `reduce`.
+  and finally returned by `reduceRight`.
 
   ```js
   import {DefineList} from "can";
@@ -34,7 +34,7 @@
     - list (DefineList) - the `DefineList` the elements are coming from.
 
   The return value of `callback` is passed to the next iteration as the first argument, and returned from
-  `reduce` if the last iteration.
+  `reduceRight` if the last iteration.
 
   @param {*} [initialValue] The initial value to use as `current` in the first iteration
   @param {Object} [thisArg] The object to use as `this` inside the callback.
