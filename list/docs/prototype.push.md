@@ -24,17 +24,6 @@
 
 ## Use
 
-`push` adds elements onto the end of a DefineList here is an example:
-
-```js
-import {DefineList} from "can";
-const list = new DefineList(['Alice']);
-
-list.push('Bob', 'Eve');
-console.log(list.get()); // ['Alice', 'Bob', 'Eve']
-```
-@codepen
-
 If you have an array you want to concatenate to the end
 of the DefineList, you can use `apply`:
 
