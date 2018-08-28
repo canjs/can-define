@@ -123,44 +123,6 @@ var DefineMap = Construct.extend("DefineMap",{
 			sealed === true
 		);
 	},
-	/**
-	 * @function can-define/map/map.prototype.get get
-	 * @parent can-define/map/map.prototype
-	 *
-	 * @description Get a value or all values from a DefineMap.
-	 *
-	 * @signature `map.get()`
-	 *
-	 * Returns a plain JavaScript object that contains the properties and values of the map instance.  Any property values
-	 * that also have a `get` method will have their `get` method called and the resulting value will be used as
-	 * the property value.  This can be used to recursively convert a map instance to an object of other plain
-	 * JavaScript objects.  Cycles are supported and only create one object.
-	 *
-	 * `.get()` can still return other non plain JS objects like Date.
-	 * Use [can-define/map/map.prototype.serialize] when a form proper for `JSON.stringify` is needed.
-	 *
-	 * ```js
-	 * var map = new DefineMap({foo: new DefineMap({bar: "zed"})});
-	 * map.get() //-> {foo: {bar: "zed"}};
-	 * ```
-	 *
-	 *   @return {Object} A plain JavaScript `Object` that contains all the properties and values of the map instance.
-	 *
-	 * @signature `map.get(propName)`
-	 *
-	 * Get a single property on a DefineMap instance.
-	 *
-	 * `.get(propName)` only should be used when reading properties that might not have been defined yet, but
-	 * will be later via [can-define/map/map.prototype.set].
-	 *
-	 * ```js
-	 * var map = new DefineMap();
-	 * map.get("name") //-> undefined;
-	 * ```
-	 *
-	 *   @param {String} propName The property name of a property that may not have been defined yet.
-	 *   @return {*} The value of that property.
-	 */
 	get: function(prop){
 		if(prop) {
 			return getKeyValue.call(this, prop);
@@ -168,46 +130,6 @@ var DefineMap = Construct.extend("DefineMap",{
 			return canReflect.unwrap(this, Map);
 		}
 	},
-	/**
-	 * @function can-define/map/map.prototype.set set
-	 * @parent can-define/map/map.prototype
-	 *
-	 *
-	 * @description Sets multiple properties on a map instance or a property that wasn't predefined.
-	 *
-	 * @signature `map.set(propName, value)`
-	 *
-	 * Assigns _value_ to a property on this map instance called _propName_.  This will define
-	 * the property if it hasn't already been predefined.
-	 *
-	 *   @param {String} propName The property to set.
-	 *   @param {*} value The value to assign to `propName`.
-	 *   @return {can-define/map/map} This map instance, for chaining.
-	 *
-	 * @signature `map.set(props [,removeProps])`
-	 * 
-	 * Assigns each value in `props` to a property on this map instance named after the
-	 * corresponding key in `props`, effectively merging `props` into the Map. If `removeProps` is true, properties not in
-	 * `props` will be set to `undefined`.
-	 *
-	 * <section class="warnings">
-   * <div class="deprecated warning">
-   * <h3>Deprecated 3.10.1</h3>
-   * <div class="signature-wrapper">
-   * <p>Passing an {Object} to <code>.set</code> has been deprecated in favor of <a href="map.prototype.assign.html" title="Sets multiple properties on a map instance or a property that wasn't predefined.">assign</a> or <a href="map.prototype.update.html" title="Sets multiple properties on a map instance or a property that wasn't predefined.">update</a>. <code>map.set(propName, value)</code> is <em>not</em> deprecated.</p>
-   * </div>
-   * </div>
-	 * </section>
-	 * 
-	 *   @param {Object} props A collection of key-value pairs to set.
-	 *   If any properties already exist on the map, they will be overwritten.
-	 *
-	 *   @param {Boolean} [removeProps=false] Whether to set keys not present in `props` to `undefined`.
-	 *
-	 *   @return {can-define/map/map} The map instance for chaining.
-	 *
-	 
-	 */
 	set: function(prop, value){
 		if(typeof prop === "object") {
 			//!steal-remove-start
@@ -227,198 +149,22 @@ var DefineMap = Construct.extend("DefineMap",{
 
 		return this;
 	},
-	/**
-	 * @function can-define/map/map.prototype.assignDeep assignDeep
-	 * @parent can-define/map/map.prototype
-	 *
-	 * @description Sets multiple properties on a map instance or a property that wasn't predefined.
-	 *
-	 * @signature `map.assignDeep(props)`
-	 *
-	 * Assigns each value in `props` to a property on this map instance named after the
-	 * corresponding key in `props`, effectively replacing `props` into the Map.
-	 * Properties not in `props` will not be changed.
-	 *
-	 * ```js
-	 * var MyMap = DefineMap.extend({
-	 * 	list: DefineList,
-	 * 	name: 'string'
-	 * });
-	 * var obj = new MyMap({
-	 * 	list: ['1', '2', '3'],
-	 * 	foo: 'bar'
-	 * });
-	 * obj.assignDeep({
-	 * 	list: ['first']
- 	 * });
-	 *
-	 * obj.list //-> ['first']
-	 * obj.foo //-> 'bar'
-	 * ```
-	 *   @param {Object} props A collection of key-value pairs to set.
-	 *   If any properties already exist on the map, they will be overwritten.
-	 *
-	 *   @return {can-define/map/map} The map instance for chaining.
-	 *
-	 */
 	assignDeep: function(prop) {
 		assignDeep.call(this, prop);
 		return this;
 	},
-	/**
-	 * @function can-define/map/map.prototype.updateDeep updateDeep
-	 * @parent can-define/map/map.prototype
-	 *
-	 * @description Sets multiple properties on a map instance or a property that wasn't predefined.
-	 *
-	 * @signature `map.updateDeep(props)`
-	 *
-	 * Assigns each value in `props` to a property on this map instance named after the
-	 * corresponding key in `props`, effectively merging `props` into the Map.
-	 * Properties not in `props` will be set to `undefined`.
-	 *
-	 * ```js
-	 * var MyMap = DefineMap.extend({
-	 * 	list: DefineList,
-	 * 	name: 'string'
-	 * });
-	 * var obj = new MyMap({
-	 * 	list: ['1', '2', '3'],
-	 * 	name: 'bar',
-	 * 	foo: {
-	 * 		bar: 'zed',
-	 * 		boo: 'goo'
-	 * 	}
-	 * });
-	 * obj.updateDeep({
-	 * 	list: ['first'],
-	 * 	foo: {
-	 * 		bar: 'abc'
-	 * 	}
- 	 * });
-	 *
-	 * obj.list //-> ['first', '2', '3']
-	 * obj.foo	//-> { bar: 'abc', boo: undefined }
-	 * obj.name //-> 'undefined'
-	 * ```
-	 *   @param {Object} props A collection of key-value pairs to set.
-	 *   If any properties already exist on the map, they will be overwritten.
-	 *
-	 *   @return {can-define/map/map} The map instance for chaining.
-	 *
-	 */
 	updateDeep: function(prop) {
 		updateDeep.call(this, prop);
 		return this;
 	},
-	/**
-	 * @function can-define/map/map.prototype.assign assign
-	 * @parent can-define/map/map.prototype
-	 *
-	 * @description Sets multiple properties on a map instance or a property that wasn't predefined.
-	 *
-	 * @signature `map.assign(props)`
-	 *
-	 * ```js
-	 * var MyMap = DefineMap.extend({
-	 * 	list: DefineList,
-	 * 	name: 'string'
-	 * });
-	 * var obj = new MyMap({
-	 * 	list: ['1', '2', '3'],
-	 * 	foo: 'bar'
-	 * });
-	 * obj.assign({
-	 * 	list: ['first']
- 	 * });
-	 *
-	 * obj.list //-> ['first']
-	 * obj.foo //-> 'bar'
-	 * ```
-	 * Assigns each value in `props` to a property on this map instance named after the
-	 * corresponding key in `props`, effectively replacing `props` into the Map.
-	 * Properties not in `props` will not be changed.
-	 *
-	 *   @param {Object} props A collection of key-value pairs to set.
-	 *   If any properties already exist on the map, they will be overwritten.
-	 *
-	 *   @return {can-define/map/map} The map instance for chaining.
-	 *
-	 */
 	assign: function(prop) {
 		assign.call(this, prop);
 		return this;
 	},
-	/**
-	 * @function can-define/map/map.prototype.update update
-	 * @parent can-define/map/map.prototype
-	 *
-	 * @description Sets multiple properties on a map instance or a property that wasn't predefined.
-	 *
-	 * @signature `map.update(props)`
-	 *
-	 * ```js
-	 * var MyMap = DefineMap.extend({
-	 * 	list: DefineList,
-	 * 	name: 'string'
-	 * });
-	 * var obj = new MyMap({
-	 * 	list: ['1', '2', '3'],
-	 * 	foo: 'bar'
-	 * });
-	 * obj.update({
-	 * 	list: ['first']
- 	 * });
-	 *
-	 * obj.list //-> ['first', '2', '3']
-	 * obj.foo //-> 'undefined'
-	 * ```
-	 * Assigns each value in `props` to a property on this map instance named after the
-	 * corresponding key in `props`, effectively merging `props` into the Map.
-	 * Properties not in `props` will be set to `undefined`.
-	 *
-	 *   @param {Object} props A collection of key-value pairs to set.
-	 *   If any properties already exist on the map, they will be overwritten.
-	 *
-	 *   @return {can-define/map/map} The map instance for chaining.
-	 *
-	 */
 	update: function(prop) {
 		update.call(this, prop);
 		return this;
 	},
-	/**
-	 * @function can-define/map/map.prototype.serialize serialize
-	 * @parent can-define/map/map.prototype
-	 *
-	 * @description Get a serialized representation of the map instance and its children.
-	 *
-	 * @signature `map.serialize()`
-	 *
-	 * Get the serialized Object form of the map.  Serialized
-	 * data is typically used to send back to a server.  Use [can-define.types.serialize]
-	 * to customize a property's serialized value or if the property should be added to
-	 * the result or not.
-	 *
-	 * `undefined` serialized values are not added to the result.
-	 *
-	 * ```js
-	 * var MyMap = DefineMap.extend({
-	 *   date: {
-	 *     type: "date",
-	 *     serialize: function(date){
-	 *       return date.getTime()
-	 *     }
-	 *   }
-	 * });
-	 *
-	 * var myMap = new MyMap({date: new Date(), count: 5});
-	 * myMap.serialize() //-> {date: 1469566698504, count: 5}
-	 * ```
-	 *
-	 *   @return {Object} A JavaScript Object that can be serialized with `JSON.stringify` or other methods.
-	 *
-	 */
 	serialize: function () {
 		return canReflect.serialize(this, Map);
 	},
