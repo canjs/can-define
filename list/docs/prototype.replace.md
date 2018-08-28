@@ -8,9 +8,11 @@
   Replaces every item in the list with `collection`.
 
   ```js
-  import { DefineList } from "can";
+  import {DefineList} from "can";
+
   const names = new DefineList(["alice","adam","eve"]);
   names.replace(["Justin","Xena"]);
+
   console.log(names.get()); //-> ["Justin","Xena"]
   ```
   @codepen

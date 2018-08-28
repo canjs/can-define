@@ -7,8 +7,10 @@
   `lastIndexOf` finds the last position of a given item in the DefineList.
 
   ```js
-  import { DefineList } from "can";
+  import {DefineList} from "can";
+
   const list = new DefineList(["Alice", "Bob", "Alice", "Eve"]);
+
   console.log(list.lastIndexOf("Alice")); //-> 2
   console.log(list.lastIndexOf("Charlie")); //-> -1
   ```

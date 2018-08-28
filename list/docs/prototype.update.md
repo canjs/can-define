@@ -8,7 +8,7 @@ Updates a list with new values or new property values.
   If `newItems` [can-reflect.isListLike is list like] the values in `newItems` will replace all values in `list`.  For example:
 
   ```js
-  import { DefineList } from "can";
+  import {DefineList} from "can";
 
   const list = new DefineList(["A","B"]);
 
@@ -22,7 +22,7 @@ Updates a list with new values or new property values.
   not in `newItems` will be removed.
 
   ```js
-  import { DefineList } from "can";
+  import {DefineList} from "can";
 
   const list = new DefineList(["A","B"]);
 

@@ -7,7 +7,8 @@
   `unshift` adds items onto the beginning of a DefineList.
 
   ```js
-  import { DefineList } from "can";
+  import {DefineList} from "can";
+
   const list = new DefineList(['Alice']);
 
   list.unshift('Bob', 'Eve');
@@ -27,7 +28,8 @@ If you have an array you want to concatenate to the beginning
 of the DefineList, you can use `apply`:
 
 ```js
-import { DefineList } from "can";
+import {DefineList} from "can";
+
 const names = ['Bob', 'Eve'];
 const list = new DefineList(['Alice']);
 

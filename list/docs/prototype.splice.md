@@ -25,12 +25,13 @@
 This example demonstrates how to do surgery on a list of numbers:
 
 ```js
-import { DefineList } from "can";
+import {DefineList} from "can";
+
 const list = new DefineList([0, 1, 2, 3]);
 
 // starting at index 2, remove one element and insert 'Alice' and 'Bob':
 list.splice(2, 1, 'Alice', 'Bob');
-console.log(list.get()); // [0, 1, 'Alice', 'Bob', 3]
+console.log(list.get()); //-> [0, 1, 'Alice', 'Bob', 3]
 ```
 @codepen
 

@@ -8,10 +8,12 @@
   Sets the item at `index`.  Typically, [can-define/list/list::splice] should be used instead.
 
   ```js
-  import { DefineList } from "can";
+  import {DefineList} from "can";
+
   const list = new DefineList(["A","B"]);
   list.set(2,"C");
-  console.log(list[2]); //-> 2
+
+  console.log(list[2]); //-> "C"
   ```
   @codepen
 
@@ -31,9 +33,11 @@ Sets the property at `prop`. This should be used when the property
   isn't already defined.
 
   ```js
-  import { DefineList } from "can";
+  import {DefineList} from "can";
+
   const list = new DefineList(["A","B"]);
   list.set("count",1000);
+
   console.log(list.get("count")); //-> 1000
   ```
   @codepen
@@ -56,9 +60,11 @@ Sets the property at `prop`. This should be used when the property
   Updates the properties on the list with `newProps`.
 
   ```js
-  import { DefineList } from "can";
+  import {DefineList} from "can";
+
   const list = new DefineList(["A","B"]);
   list.set({count: 1000, skip: 2});
+
   console.log(list.get("count")); //-> 1000
   ```
   @codepen

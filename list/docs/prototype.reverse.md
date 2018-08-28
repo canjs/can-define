@@ -7,7 +7,8 @@
   Reverses the elements of the DefineList in place.
 
   ```js
-  import { DefineList } from "can";
+  import {DefineList} from "can";
+
   const list = new DefineList(["Alice", "Bob", "Eve"]);
   const reversedList = list.reverse();
 

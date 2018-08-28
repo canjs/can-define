@@ -10,10 +10,13 @@ Return true if every item in a list matches a predicate.
 
   ```js
   import { DefineList } from "can";
+
   const names = new DefineList(["alice","adam","zack","zeffer"]);
+
   const aNames = names.every((name) => {
-      return name[0] === "a";
+    return name[0] === "a";
   });
+
   console.log(aNames); //-> false
   ```
   @codepen
@@ -36,12 +39,15 @@ Return true if every item in a list matches a predicate.
   `list`, `every` returns `true`.
 
   ```js
-  import { DefineList } from "can";
+  import {DefineList} from "can";
+
   const todos = new DefineList([
       {name: "dishes", complete: false},
       {name: "lawn", complete: true}
   ]);
+
   const complete = todos.every({complete: true});
+
   console.log(complete); //-> false
   ```
   @codepen

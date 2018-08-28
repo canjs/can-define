@@ -8,8 +8,10 @@
 
   ```js
   import { DefineList } from "can";
+
   const names = new DefineList(['Alice']);
   names.push('Bob', 'Eve');
+
   console.log(names.get()); //-> ['Alice','Bob', 'Eve']
   ```
   @codepen
@@ -25,7 +27,7 @@
 `push` adds elements onto the end of a DefineList here is an example:
 
 ```js
-import { DefineList } from "can";
+import {DefineList} from "can";
 const list = new DefineList(['Alice']);
 
 list.push('Bob', 'Eve');
@@ -37,7 +39,7 @@ If you have an array you want to concatenate to the end
 of the DefineList, you can use `apply`:
 
 ```js
-import { DefineList } from "can";
+import {DefineList} from "can";
 const names = ['Bob', 'Eve'];
 const list = new DefineList(['Alice']);
 

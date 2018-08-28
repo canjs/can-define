@@ -10,15 +10,18 @@
   and finally returned by `reduce`.
 
   ```js
-  import { DefineList } from "can";
+  import {DefineList} from "can";
+
   const todos = new DefineList([
       {name: "dishes", complete: false},
       {name: "lawn", complete: true}
   ]);
-  const todosAsOneObject = todos.reduce((todos, todo) => {
+
+  const todosAsOneObject = todos.reduceRight((todos, todo) => {
       todos.push([todo.name, todo.complete]);
       return todos;
   }, []);
+
   console.log(todosAsOneObject); //-> [["lawn", true], ["dishes", false]]
   ```
   @codepen

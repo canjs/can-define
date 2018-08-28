@@ -8,8 +8,10 @@
   of all the elements of the DefineList.
 
   ```js
-  import { DefineList } from "can";
+  import {DefineList} from "can";
+
   const list = new DefineList(["Alice", "Bob", "Eve"]);
+
   console.log(list.join(", ")); //-> "Alice, Bob, Eve"
   ```
   @codepen

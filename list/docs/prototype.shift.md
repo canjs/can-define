@@ -7,8 +7,10 @@
   `shift` removes an element from the beginning of a DefineList.
 
   ```js
-  import { DefineList } from "can";
+  import {DefineList} from "can";
+
   const list = new DefineList(['Alice','Adam']);
+
   console.log(list.shift()); //-> 'Alice'
   console.log(list.shift()); //-> 'Adam'
   console.log(list.shift()); //-> undefined

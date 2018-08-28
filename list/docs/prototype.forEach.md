@@ -28,11 +28,14 @@
 `forEach` calls a callback for each element in the DefineList.
 
 ```js
-import { DefineList } from "can"
+import {DefineList} from "can";
+
 const list = new DefineList([1, 2, 3]);
+
 list.forEach((element, index, list) => {
     list.set(index, element * element);
 });
+
 console.log(list.get()); //-> [1, 4, 9]
 ```
 @codepen

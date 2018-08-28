@@ -31,8 +31,10 @@ Gets an item or all items from a DefineList.
   (as opposed to [can-define/list/list.prototype.splice] which is the better way).
 
   ```js
-  import { DefineList } from "can";
+  import {DefineList} from "can";
+
   const list = new DefineList(["A","B"]);
+
   console.log(list.get(1)); //-> "B"
   ```
   @codepen
@@ -47,9 +49,12 @@ Gets an item or all items from a DefineList.
 
 
   ```js
-  import { DefineList } from "can";
+  import {DefineList} from "can";
+
   const list = new DefineList(["A","B"]);
+
   list.set("count",1000);
+
   console.log(list.get("count")); //-> 1000
   ```
   @codepen

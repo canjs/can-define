@@ -9,12 +9,14 @@
   same as the native JavaScript `Array.prototype.sort` API.
 
   ```js
-  import { DefineList } from "can";
+  import {DefineList} from "can";
+
   const accounts = new DefineList([
       { name: "Savings", amount: 20.00 },
       { name: "Checking", amount: 103.24 },
       { name: "Kids Savings", amount: 48155.13 }
   ]);
+
   accounts.sort((a, b) => {
       if (a.name < b.name) {
           return -1;
@@ -24,6 +26,7 @@
           return 0;
       }
   });
+
   console.log(accounts[0].name); //-> "Checking"
   console.log(accounts[1].name); //-> "Kids Savings"
   console.log(accounts[2].name); //-> "Savings"

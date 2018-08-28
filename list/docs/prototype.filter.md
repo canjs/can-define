@@ -8,11 +8,14 @@ Filter a list to a new list of the matched items.
   Filters `list` based on the return value of `callback`.
 
   ```js
-  import{ DefineList } from "can";
+  import{DefineList} from "can";
+
   const names = new DefineList(["alice","adam","zack","zeffer"]);
+
   const aNames = names.filter((name) => {
       return name[0] === "a";
   });
+
   console.log(aNames.get()); //-> ["alice","adam"]
   ```
   @codepen

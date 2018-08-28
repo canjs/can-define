@@ -11,7 +11,7 @@ Returns the a serialized version of this list.
   Each items serialized value is the result of calling [can-reflect.serialize canReflect.serialize()] on the item.
 
   ```js
-  import { DefineList } from "can";
+  import {DefineList} from "can";
 
   const list = new DefineList(["first", {foo: "bar"}]);
   const serializedList = list.serialize();

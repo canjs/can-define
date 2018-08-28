@@ -9,14 +9,17 @@
   ends.  The return values of `callback` are used to populate the returned list.
 
   ```js
-  import { DefineList } from "can";
+  import {DefineList} from "can";
+
   const todos = new DefineList([
       {name: "dishes", complete: false},
       {name: "lawn", complete: true}
   ]);
+
   const names = todos.map((todo) => {
       return todo.name;
   });
+
   console.log(names.get()); //-> ["dishes","lawn"]
   ```
   @codepen

@@ -8,7 +8,9 @@
 
   ```js
   import { DefineList } from "can";
+
   const names = new DefineList(['Alice', 'Bob', 'Eve']);
+
   console.log(names.pop()); //-> 'Eve'
   ```
   @codepen
@@ -22,7 +24,8 @@
 `pop` is the opposite action from [can-define/list/list::push push]:
 
 ```js
-import { DefineList } from "can";
+import {DefineList} from "can";
+
 const list = new DefineList(['Alice', 'Bob', 'Eve']);
 
 console.log(list.pop()); //-> 'Eve'

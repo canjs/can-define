@@ -17,7 +17,7 @@ Recursively updates a list with new values or new property values.
   - remove `justin`'s `age` property:
 
   ```js
-  import { DefineMap, DefineList } from "can";
+  import {DefineMap, DefineList} from "can";
 
   const justin = new DefineMap({name: "Justin", age: 35}),
         payal = new DefineMap({name: "Payal", age: 35});
@@ -28,8 +28,8 @@ Recursively updates a list with new values or new property values.
   	{name: "JUSTIN"}
   ]);
 
-  console.log(people.serialize()) //-> [
-  //   {name: "Justin"}
+  console.log( people.serialize() ) //-> [
+  //   {name: "JUSTIN"}
   // ]
   ```
   @codepen
