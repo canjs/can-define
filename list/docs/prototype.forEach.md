@@ -4,12 +4,21 @@
 @description Call a function for each element of a DefineList.
 @signature `list.forEach(callback[, thisArg])`
 
-  Loops through the values of the list, calling `callback` for each one until the list ends
+  Loops through the values of the list, calling `callback` for each value until the list ends
   or `false` is returned.
 
   ```js
-  list.forEach(function(item, index, list){ ... })
+  import {DefineList} from "can";
+
+  const list = new DefineList([1, 2, 3]);
+
+  list.forEach((element, index, list) => {
+      list.set(index, element * element);
+  });
+
+  console.log(list.get()); //-> [1, 4, 9]
   ```
+  @codepen
 
   @param {function(item, index, list)} callback A function to call with each element of the DefineList.
   The three parameters that callback gets passed are:
@@ -25,17 +34,20 @@
 
 ## Use
 
-`forEach` calls a callback for each element in the DefineList.
+If `false` is returned by the callback the `forEach` loop would exit.
 
 ```js
 import {DefineList} from "can";
 
-const list = new DefineList([1, 2, 3]);
+const list = new DefineList([1, 2, 3, 4, 5]);
 
 list.forEach((element, index, list) => {
-    list.set(index, element * element);
+    if (index === 2) {
+      return false;
+    }
+    list.set(index, `index: ${index}`);
 });
 
-console.log(list.get()); //-> [1, 4, 9]
+console.log(list.get()); //-> ["index: 0", "index: 1", 3, 4, 5]
 ```
 @codepen
