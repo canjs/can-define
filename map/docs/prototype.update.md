@@ -22,8 +22,8 @@
     list: ["first"]
   });
 
-  console.log(obj.list); //-> ["first"]
-  console.log(obj.foo); //-> 'undefined'
+  console.log( obj.list ); //-> ["first"]
+  console.log( obj.foo ); //-> 'undefined'
   ```
   @codepen
  
