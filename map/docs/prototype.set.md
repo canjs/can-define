@@ -8,6 +8,16 @@
   Assigns _value_ to a property on this map instance called _propName_.  This will define
   the property if it hasn't already been predefined.
 
+  ```js
+  import {DefineMap} from "can";
+
+  const map = new DefineMap({});
+  map.set("propA", "value");
+
+  console.log( map.serialize() ); //-> {propA: "value"} 
+  ```
+  @codepen
+
   @param {String} propName The property to set.
   @param {*} value The value to assign to `propName`.
   @return {can-define/map/map} This map instance, for chaining.
