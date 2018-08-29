@@ -6,21 +6,27 @@
 @signature `map.update(props)`
 
   ```js
-  var MyMap = DefineMap.extend({
+  import {DefineMap, DefineList} from "can";
+
+  const MyMap = DefineMap.extend({
     list: DefineList,
-    name: 'string'
-  });
-  var obj = new MyMap({
-    list: ['1', '2', '3'],
-    foo: 'bar'
-  });
-  obj.update({
-    list: ['first']
+    name: "string"
   });
 
-  obj.list //-> ['first', '2', '3']
-  obj.foo //-> 'undefined'
+  const obj = new MyMap({
+    list: ["1", "2", "3"],
+    foo: "bar"
+  });
+
+  obj.update({
+    list: ["first"]
+  });
+
+  console.log(obj.list); //-> ["first"]
+  console.log(obj.foo); //-> 'undefined'
   ```
+  @codepen
+ 
   Assigns each value in `props` to a property on this map instance named after the
   corresponding key in `props`, effectively merging `props` into the Map.
   Properties not in `props` will be set to `undefined`.
