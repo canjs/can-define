@@ -14,28 +14,28 @@
 
   const MyMap = DefineMap.extend({
     list: DefineList,
-    name: 'string'
+    name: "string"
   });
 
   const obj = new MyMap({
-    list: ['1', '2', '3'],
-    name: 'bar',
+    list: ["1", "2", "3"],
+    name: "bar",
     foo: {
-      bar: 'zed',
-      boo: 'goo'
+      bar: "zed",
+      boo: "goo"
     }
   });
 
   obj.updateDeep({
-    list: ['first'],
+    list: ["first"],
     foo: {
-      bar: 'abc'
+      bar: "abc"
     }
   });
 
-  console.log( obj.list ); //-> ['first', '2', '3']
-  console.log( obj.foo ); //-> { bar: 'abc', boo: undefined }
-  console.log( obj.name ); //-> 'undefined'
+  console.log( obj.list ); //-> ["first"]
+  console.log( obj.foo ); //-> { bar: "abc", boo: undefined }
+  console.log( obj.name ); //-> "undefined"
   ```
   @codepen
 
