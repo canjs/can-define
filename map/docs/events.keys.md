@@ -5,14 +5,15 @@ Event fired when a property is added.
 
 @signature `handler(event)`
 
-Handlers registered on `can.keys` events will be called
-back as follows.
+  Handlers registered on `can.keys` events will be called
+  back as follows.
 
-```
-var person = new DefineMap({name: "Justin"});
-list.on("can.keys", function(event){ ... });
-person.set("age", 33);
-```
-
+  ```js
+  import {DefineMap} from "can";
+  var person = new DefineMap({name: "Justin"});
+  list.on("can.keys", (event) => { console.log(event); });
+  person.set("age", 33);
+  ```
+  @codepen
 
   @param {Event} event An event object.
