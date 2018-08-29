@@ -6,11 +6,11 @@
 @signature `map.assign(props)`
 
   ```js
-  var MyMap = DefineMap.extend({
+  const MyMap = DefineMap.extend({
     list: DefineList,
     name: 'string'
   });
-  var obj = new MyMap({
+  const obj = new MyMap({
     list: ['1', '2', '3'],
     foo: 'bar'
   });
@@ -18,9 +18,11 @@
     list: ['first']
   });
 
-  obj.list //-> ['first']
-  obj.foo //-> 'bar'
+  console.log(obj.list.serialize()); //-> ['first']
+  console.log(obj.foo); //-> 'bar'
   ```
+  @codepen
+
   Assigns each value in `props` to a property on this map instance named after the
   corresponding key in `props`, effectively replacing `props` into the Map.
   Properties not in `props` will not be changed.
