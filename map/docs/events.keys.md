@@ -10,8 +10,12 @@ Event fired when a property is added.
 
   ```js
   import {DefineMap} from "can";
-  var person = new DefineMap({name: "Justin"});
-  list.on("can.keys", (event) => { console.log(event); });
+
+  const person = new DefineMap({name: "Justin"});
+
+  list.on("can.keys", (event) => {
+    console.log(event.target.serialize()); //-> {name: "Justin", age: 33}
+  });
   person.set("age", 33);
   ```
   @codepen
