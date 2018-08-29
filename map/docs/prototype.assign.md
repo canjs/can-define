@@ -6,20 +6,24 @@
 @signature `map.assign(props)`
 
   ```js
+  import {DefineMap, DefineList} from "can";
+
   const MyMap = DefineMap.extend({
     list: DefineList,
-    name: 'string'
-  });
-  const obj = new MyMap({
-    list: ['1', '2', '3'],
-    foo: 'bar'
-  });
-  obj.assign({
-    list: ['first']
+    name: "string"
   });
 
-  console.log(obj.list.serialize()); //-> ['first']
-  console.log(obj.foo); //-> 'bar'
+  const obj = new MyMap({
+    list: ["1", "2", "3"],
+    foo: "bar"
+  });
+
+  obj.assign({
+    list: ["first"]
+  });
+
+  console.log(obj.list.serialize()); //-> ["first"]
+  console.log(obj.foo); //-> "bar"
   ```
   @codepen
 
