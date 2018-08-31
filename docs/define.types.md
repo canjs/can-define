@@ -48,9 +48,9 @@ const Person = DefineMap.extend( {
 	age: "number"
 } );
 
-var person = new Person({age: "30"});
+const person = new Person( {age: "30"} );
 
-console.log(person.age) //-> 30
+console.log( person.age ); //-> 30
 ```
 @codepen
 
@@ -64,9 +64,9 @@ const Person = DefineMap.extend( {
 	age: define.types.number
 } );
 
-var person = new Person({age: "30"});
+const person = new Person( {age: "30"} );
 
-console.log(person.age) //-> 30
+console.log( person.age ); //-> 30
 ```
 @codepen
 
@@ -80,8 +80,8 @@ const Person = DefineMap.extend( {
 	age: MaybeNumber
 } );
 
-var person = new Person({age: "30"});
+const person = new Person({age: "30"});
 
-console.log(person.age) //-> 30
+console.log( person.age ); //-> 30
 ```
 @codepen

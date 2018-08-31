@@ -43,7 +43,7 @@ const direction = new Direction( {
 	to: { street: "2070 N. Stave" }
 } );
 
-console.log(direction.from.street); //-> "321 Longbow"
-console.log(direction.to.street);   //-> "2070 N. Stave"
+console.log( direction.from.street ); //-> "321 Longbow"
+console.log( direction.to.street );   //-> "2070 N. Stave"
 ```
 @codepen

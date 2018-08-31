@@ -20,7 +20,7 @@ instances:
       complete: "boolean"
   });
 
-  var todo = new Todo({id: 6, name: "mow lawn"});
+  const todo = new Todo({id: 6, name: "mow lawn"});
 
   console.log(Reflect.getIdentity(todo)); //-> 6
   ```
@@ -38,7 +38,7 @@ are specified, a sorted JSON string is returned:
       grade: "string"
   });
 
-  var grade = new Grade({classId: 5, studentId: 7, grade: "A+"});
+  const grade = new Grade({classId: 5, studentId: 7, grade: "A+"});
 
   console.log(Reflect.getIdentity(grade)); //-> '{"classId":5,"studentId":7}'
   ```

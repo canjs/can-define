@@ -116,13 +116,15 @@ console.log(map.count, map.items); //-> 4 ["1", "2", "3"]
 
 When an array value is set, it is automatically converted into a DefineList. Likewise, objects are converted into DefineMap instances. This behavior can be prevented like the following:
 
-
-     locations: {type: "any"}
-
+	```js
+  locations: {type: "any"}
+	```
 
 When a user tries to set this property, the resulting value will remain an array.
 
-    map.locations = [1, 2, 3]; // locations is an array, not a DefineList
+	```js
+  map.locations = [1, 2, 3]; // locations is an array, not a DefineList
+	```
 
 ### Working with the 'compute' type
 
@@ -130,7 +132,7 @@ Setting type as `compute` allows for resolving a computed property with the .att
 method.
 
 ```js
-import { DefineMap } from "can";
+import {DefineMap} from "can";
 
 const MyMap = DefineMap.extend({
     value: {
@@ -142,15 +144,15 @@ const myMap = new MyMap();
 const c = compute(5);
 
 myMap.value = c;
-console.log(myMap.value); //-> 5
+console.log( myMap.value ); //-> 5
 
 c(6);
-console.log(myMap.value); //-> 6
+console.log( myMap.value ); //-> 6
 
 //Be sure if setting to pass the new compute
 const c2 = compute("a");
 myMap.value = c2;
-console.log(myMap.value); //-> "a"
+console.log( myMap.value ); //-> "a"
 ```
 <!-- `compute` is undefined -->
 <!-- @codepen -->

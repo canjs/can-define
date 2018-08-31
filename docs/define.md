@@ -35,7 +35,7 @@ and [can-define/list/list] are documented here.
   	message: { type: "string" }
   } );
 
-  var greeting = new Greeting("Hello");
+  const greeting = new Greeting("Hello");
 
   canReflect.onKeyValue(greeting, "message", (newValue) => {
 	  console.log(newValue); // logs "goodbye"
@@ -80,8 +80,7 @@ more assumptions on the type constructor.  `can-define` can be used
 to create completely customized types.
 
 
-The following creates a
-`Person` constructor function that
+The following creates a `Person` constructor function that
 will be used to create `Person` instances with observable properties:
 
 ```js
@@ -105,13 +104,13 @@ define( Person.prototype, {
 // Create an instance
 const person = new Person( "Justin", "Meyer" );
 
-console.log( person.first )    //-> "Justin"
-console.log( person.last )     //-> "Meyer"
-console.log( person.fullName ) //-> "Justin Meyer"
+console.log( person.first ); //-> "Justin"
+console.log( person.last ); //-> "Meyer"
+console.log( person.fullName ); //-> "Justin Meyer"
 
 person.on( "fullName", function( ev, newVal, oldVal ) {
-	console.log( newVal ) //-> "Ramiya Meyer"
-	console.log( oldVal ) //-> "Justin Meyer"
+	console.log( newVal ); //-> "Ramiya Meyer"
+	console.log( oldVal ); //-> "Justin Meyer"
 } );
 
 person.first = "Ramiya";
