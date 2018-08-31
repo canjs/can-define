@@ -135,25 +135,29 @@ observable property.  These behaviors can be specified with as an `Object`, `Str
   ```js
   import {DefineMap} from "can";
 
-  const book = DefineMap.extend( {
+  const Book = DefineMap.extend( {
     page: "number",
-    pageChangeCount: function( prop ) {
-      let count = 0;
+    pageChangeCount: {
+      value( prop ) {
+        let count = 0;
 
-      // When page changes, update the count.
-      prop.listenTo( "page", function() {
-        prop.resolve( ++count );
-      } );
+        // When page changes, update the count.
+        prop.listenTo( "page", function() {
+          prop.resolve( ++count );
+        } );
 
-      // Set initial count.
-      prop.resolve( count );
+        // Set initial count.
+        prop.resolve( count );
+      }
     }
   } );
+  const book = new Book();
+  book.on("pageChangeCount", () => {});
   book.page = 1;
   book.page += 1;
-  console.log( book.count ); //-> 2
+  console.log( book.pageChangeCount ); //-> 2
   ```
-  <!-- @codepen -->
+  @codepen
 
   A `value` definition makes the property __computed__ which means it will not be enumerable by default.
 
@@ -306,7 +310,7 @@ observable property.  These behaviors can be specified with as an `Object`, `Str
   const Person = DefineMap.extend( {
     first: "string",
     last: "string",
-    fullName {
+    fullName: {
       get: function() {
         return this.first + " " + this.last;
       }
