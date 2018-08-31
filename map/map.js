@@ -278,6 +278,7 @@ var eventsProtoSymbols = ("getOwnPropertySymbols" in Object) ?
 
 eventsProtoSymbols.forEach(function(sym) {
   Object.defineProperty(DefineMap.prototype, sym, {
+  	configurable: true,
     enumerable:false,
     value: define.eventsProto[sym],
     writable: true
