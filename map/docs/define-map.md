@@ -14,7 +14,7 @@
 
   The `can-define/map/map` module exports the `DefineMap` constructor function.
 
-  Calling `new DefineMap(props)` creates a new instance of DefineMap or an [can-define/map/map.extend extended] DefineMap. Then, assigns every property on `props` to the new instance.  If props are passed that are not defined already, those property definitions are created.  If the instance should be sealed, it is sealed.
+  Calling `new DefineMap(props)` creates a new instance of DefineMap or an [can-define/map/map.extend extended] DefineMap. Then, `new DefineMap(props)` assigns every property on `props` to the new instance.  If props are passed that are not defined already, those property definitions are created.  If the instance should be sealed, it is sealed.
 
   ```js
   import {DefineMap} from "can";
@@ -52,12 +52,12 @@ const MyType = DefineMap.extend( {prop: "string"} );
 
 const myInstance = new MyType( {prop: "VALUE"} );
 
-myInstance.on( "prop", ( event, newVal, oldVal ) => { 
+myInstance.on( "prop", ( event, newVal, oldVal ) => {
 	console.log( newVal ); //-> "VALUE"
 	console.log( oldVal ); //-> "NEW VALUE"
 } );
 
-myInstance.set("prop", "NEW VALUE");
+myInstance.prop = "NEW VALUE";
 ```
 @codepen
 
@@ -73,16 +73,19 @@ Extended `DefineMap` constructor functions have all methods and properties from
 Example:
 
 ```js
-import {DefineMap, Reflect} from "can";
+import {DefineMap, Reflect as canReflect} from "can";
 const MyType = DefineMap.extend( {
   prop: "string",
 } );
 
 canReflect.onInstancePatches( MyType, ( instance, patches ) => {
-  console.log(instance, patches);
+  console.log(patches) //-> {key:"prop", type:"set", value:"VALUE"}
 } );
+
+var instance = new MyType({prop: "value"});
+instance.prop = "VALUE";
 ```
-<!-- @codepen -->
+@codepen
 
 ## Use
 
@@ -233,7 +236,7 @@ me.last = "Henderson";
 @codepen
 @highlight 4-8
 
-`getter` properties use [can-compute] internally.  This means that when bound,
+`getter` properties use [can-observation] internally.  This means that when bound,
 the value of the `getter` is cached and only updates when one of its source
 observables change.  For example:
 
@@ -251,24 +254,19 @@ const Person = DefineMap.extend( {
 
 const hero = new Person( { first: "Wonder", last: "Woman" } );
 
-// console.logs "calculating fullName"
-console.log( hero.fullName ); //-> Wonder Woman
+console.log( hero.fullName ); // logs Wonder Woman
 
-// console.logs "calculating fullName"
-console.log( hero.fullName ); //-> Wonder Woman
+console.log( hero.fullName ); // logs Wonder Woman
 
-// console.logs "calculating fullName"
 hero.on( "fullName", () => {} );
 
-console.log( hero.fullName ); //-> "Wonder Woman"
+console.log( hero.fullName ); // logs "Wonder Woman"
 
-// console.logs "calculating fullName"
-hero.first = "Bionic";
+hero.first = "Bionic";        // logs "calculating fullName"
 
-// console.logs "calculating fullName"
-hero.last = "Man";
+hero.last = "Man";            // logs "calculating fullName"
 
-console.log( hero.fullName ); //-> "Bionic Man"
+console.log( hero.fullName ); // logs "Bionic Man"
 ```
 @codepen
 
@@ -290,18 +288,17 @@ const hero = new CustomPerson();
 
 hero.on( "fullName", () => {} );
 
-// console.logs "calculating fullName"
-hero.first = "Bionic";
-// console.logs "calculating fullName"
-hero.last = "Man";
-// console.logs "calculating fullName"
-console.log( hero.fullName ); //-> "Bionic Man"
+hero.first = "Bionic"; // logs "calculating fullName"
+
+hero.last = "Man";     // logs "calculating fullName"
+
+console.log( hero.fullName ); // logs "calculating fullName"
+                              //-> "Bionic Man"
 
 queues.batch.start();
 hero.first = "Silk";
 hero.last = "Spectre";
-// console.logs "calculating fullName"
-queues.batch.stop();
+queues.batch.stop();          // logs "calculating fullName"
 ```
 @codepen
 @highlight 23, 27
@@ -310,8 +307,7 @@ queues.batch.stop();
 
 `getters` can also be asynchronous.  These are very useful when you have a type
 that requires data from the server.  This is very common in [can-component]
-view-models.  For example, a `view-model` might take a `todoId` value, and want
-to make a `todo` property available:
+view-models.  For example, a [can-component.prototype.ViewModel] might take a `todoId` value, and want to make a `todo` property available:
 
 ```js
 import {DefineMap, ajax} from "can";
@@ -332,19 +328,31 @@ your template will automatically bind on the `todo` property.  But to use it in 
 look like:
 
 ```js
-import {fixture} from "can";
+import {DefineMap, ajax, fixture} from "can";
+
+const TodoViewModel = DefineMap.extend( {
+	todoId: "number",
+	todo: {
+		get: function( lastSetValue, resolve ) {
+			ajax( { url: "/todos/" + this.todoId } ).then( resolve );
+		}
+	}
+} );
 
 fixture( "GET /todos/5", () => {
 	return { id: 5, name: "take out trash" };
 } );
 
-const todoVM = new TodoViewModel( { id: 5 } );
+const todoVM = new TodoViewModel( { todoId: 5 } );
 
 todoVM.on( "todo", function( ev, newVal ) {
-	assert.equal( newVal.name, "take out trash" );
+
+	console.log( newVal.name ) //-> "take out trash"
 } );
+
+console.log(todoVM.todo) //-> undefined
 ```
-<!-- @codepen -->
+@codepen
 
 ### Getter limitations
 
@@ -439,15 +447,7 @@ const Locator = DefineMap.extend( {
 		}
 	}
 } );
-
-const location = new Locator({
-	state: "Illinois",
-	city: "Chicago"
-});
-
-console.log( location.serialize() );
 ```
-@codepen
 
 Notice, in the `can-define-stream` example, `city` must be bound for it to work.  
 
