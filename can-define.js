@@ -929,7 +929,8 @@ getDefinitionsAndMethods = function(defines, baseDefines, typePrototype) {
 		}
 	});
 	if(defaults) {
-		defines["*"] = defaults;
+		// we should move this property off the prototype.
+		defineConfigurableAndNotEnumerable(defines,"*", defaults);
 	}
 	return {definitions: definitions, methods: methods, defaultDefinition: defaultDefinition};
 };
