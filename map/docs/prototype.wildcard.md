@@ -36,7 +36,7 @@
   console.log( someNumbers.serialize() ) //-> {
   //   age: 22,
   //   count: 23,
-  //   version: 24 
+  //   version: 24
   // }
   ```
   @codepen
@@ -58,7 +58,7 @@
   ```js
   const MyMap = DefineMap.extend({
     "*": {
-      type: "*"
+      type: "any"
     }
   });
   ```
