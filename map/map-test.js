@@ -1426,3 +1426,14 @@ QUnit.test("type called with `this` as the map (#349)", function(){
 	var map = new Type();
 	QUnit.equal(map.foo, 5);
 });
+
+QUnit.test("expandos use default type (#383)", function(){
+	var AllNumbers = DefineMap.extend({
+		"*": {type: "number"}
+	});
+
+	var someNumbers = new AllNumbers({
+		version: "24"
+	});
+	QUnit.ok(someNumbers.version === 24, "is 24");
+});
