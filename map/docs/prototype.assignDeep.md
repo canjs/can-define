@@ -5,8 +5,11 @@
 
 @signature `map.assignDeep(props)`
 
-  Assigns each value in `props` to a property on this map instance named after the
-  corresponding key in `props`, effectively replacing `props` into the Map.
+  Similar to [can-deefine/map/map.prototype.assign .assign()], `.assignDeep()` will overwrite
+  values within a `map` with values from `props`. Where `.assign()` will replace values or
+  properties one level deep, `.assignDeep()` will overwrite values or properties on objects
+  and lists recursively.
+
   Properties not in `props` will not be changed.
 
   ```js
@@ -26,8 +29,7 @@
     list: ["first"]
   });
 
-  console.log(obj.list.serialize()); //-> ["first", "2", "3"]
-  console.log(obj.foo); //-> "bar"
+  console.log( obj.serialize() ); //-> { foo: "bar", list: ["first", "2", "3"] }
   ```
   @codepen
 

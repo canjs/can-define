@@ -5,6 +5,9 @@
 
 @signature `map.assign(props)`
 
+  If `props` [can-reflect.isMapLike is map like] each value in `props` will be assigned to a property on this map instance named after the
+  corresponding key in `props`, effectively replacing `props` into the Map. Properties not in `props` will not be changed. For example:
+
   ```js
   import {DefineMap, DefineList} from "can";
 
@@ -22,14 +25,11 @@
     list: ["first"]
   });
 
-  console.log(obj.list.serialize()); //-> ["first"]
-  console.log(obj.foo); //-> "bar"
+  console.log( obj.serialize() ); //-> { foo: "bar", list: ["first"] }
   ```
   @codepen
 
-  Assigns each value in `props` to a property on this map instance named after the
-  corresponding key in `props`, effectively replacing `props` into the Map.
-  Properties not in `props` will not be changed.
+  > NOTICE: `.assign` will not remove or change properties that are not in `props`. Use [can-define/map/prototype.update .update()] to replace all of a map's values.
 
   @param {Object} props A collection of key-value pairs to set.
   If any properties already exist on the map, they will be overwritten.
