@@ -38,33 +38,32 @@ and [can-define/list/list] are documented here.
   const greeting = new Greeting("Hello");
 
   canReflect.onKeyValue(greeting, "message", (newValue) => {
-  	console.log(newValue.target.message); //-> logs "goodbye"
+  	console.log( newValue.target.message ); //-> logs "goodbye"
   });
 
   greeting.message = "goodbye";
   ```
   @codepen
 
-@param {Object} prototype The prototype object of a constructor function or [class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/class). The prototype object will have getter/setters defined on it that carry out the defined behavior.  The prototype will also contain all of [can-event-queue/map/map]'s methods.
+  @param {Object} prototype The prototype object of a constructor function or [class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/class). The prototype object will have getter/setters defined on it that carry out the defined behavior.  The prototype will also contain all of [can-event-queue/map/map]'s methods.
 
-@param {Object<String,can-define.types.propDefinition>} propDefinitions An object of properties and their definitions. For example, a property (`propertyName`) has a [can-define.types.propDefinition] object with zero or more of the following behaviors:
+  @param {Object<String,can-define.types.propDefinition>} propDefinitions An object of properties and their definitions. For example, a property (`propertyName`) has a [can-define.types.propDefinition] object with zero or more of the following behaviors:
 
-```js
-define(Type.prototype, {
+  ```js
+  define(Type.prototype, {
     propertyName: {
-        default: function() { /* ... */ },
-        Default: Constructor,
-        type: function() { /* ... */ },
-        Type: Constructor,
-        get: function() { /* ... */ },
-        value: function() { /* ... */ },
-        set: function() { /* ... */ },
-        serialize: function() { /* ... */ },
-        identity: Boolean
+      default: function() { /* ... */ },
+      Default: Constructor,
+      type: function() { /* ... */ },
+      Type: Constructor,
+      get: function() { /* ... */ },
+      value: function() { /* ... */ },
+      set: function() { /* ... */ },
+      serialize: function() { /* ... */ },
+      identity: Boolean
     }
-})
-```
-
+  })
+  ```
 
 @body
 

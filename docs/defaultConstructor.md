@@ -27,7 +27,7 @@ Specify `Default` like:
 ## Use
 
 ```js
-import { DefineMap } from "can";
+import {DefineMap} from "can";
 
 const Address = DefineMap.extend( {
 	street: { type: "string", value: "321 Longbow" },
