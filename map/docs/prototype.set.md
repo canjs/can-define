@@ -14,9 +14,11 @@
   const map = new DefineMap({});
   map.set("propA", "value");
 
-  console.log( map.serialize() ); //-> {propA: "value"} 
+  console.log( map.serialize() ); //-> {propA: "value"}
   ```
   @codepen
+
+  Predefined properties can always set the property directly: `map.propName = value`.
 
   @param {String} propName The property to set.
   @param {*} value The value to assign to `propName`.

@@ -16,6 +16,31 @@
   }
   ```
 
+  The following defaults every property to be a number:
+
+  ```js
+  import {DefineMap} from "can";
+
+  const AllNumbers = DefineMap.extend({
+    "*": {type: "number"},
+    age: {},
+    count: {}
+  });
+
+  const someNumbers = new AllNumbers({
+    age: "22",
+    count: "23",
+    version: "24"	  
+  });
+
+  console.log( someNumbers.serialize() ) //-> {
+  //   age: 22,
+  //   count: 23,
+  //   version: 24
+  // }
+  ```
+  @codepen
+
   Setting the wildcard is useful when every property on a
   map instance should behave in a particular way.  For example, for map types used
   with [can-route]:
@@ -33,7 +58,7 @@
   ```js
   const MyMap = DefineMap.extend({
     "*": {
-      type: "*"
+      type: "any"
     }
   });
   ```

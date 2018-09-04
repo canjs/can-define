@@ -12,8 +12,13 @@
   import {DefineMap} from "can";
 
   const Person = DefineMap.extend(
+    // Optional debugger name
     "Person",
-    { seal: true },
+	// Optional static properties.
+    {
+      // Seal instances of this type. This is the default.
+      seal: true
+    },
     {
       first: "string",
       last: { type: "string" },

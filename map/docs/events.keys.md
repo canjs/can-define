@@ -13,11 +13,14 @@ Event fired when a property is added.
 
   const person = new DefineMap({name: "Justin"});
 
-  list.on("can.keys", (event) => {
+  person.on("can.keys", (event) => {
     console.log(event.target.serialize()); //-> {name: "Justin", age: 33}
   });
   person.set("age", 33);
   ```
   @codepen
+
+  Use [can-reflect/observe.onPatches canReflect.onPatches()] to know which
+  property changed. 
 
   @param {Event} event An event object.

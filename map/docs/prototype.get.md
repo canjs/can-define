@@ -27,9 +27,6 @@
 
   Get a single property on a DefineMap instance.
 
-  `.get(propName)` only should be used when reading properties that might not have been defined yet, but
-  will be later via [can-define/map/map.prototype.set].
-
   ```js
   import {DefineMap} from "can";
 
@@ -37,6 +34,8 @@
   console.log( map.get("name") ); //-> undefined;
   ```
   @codepen
+
+  `.get(propName)` only needs to be used when reading properties that might not have been defined yet, but will be later via [can-define/map/map.prototype.set]. Predefined properties can always be read like `map.propName`.
 
   @param {String} propName The property name of a property that may not have been defined yet.
   @return {*} The value of that property.
