@@ -14,9 +14,12 @@
   Use [can-define/map/map.prototype.serialize] when a form proper for `JSON.stringify` is needed.
 
   ```js
-  var map = new DefineMap({foo: new DefineMap({bar: "zed"})});
-  map.get() //-> {foo: {bar: "zed"}};
+  import {DefineMap} from "can";
+
+  const map = new DefineMap({foo: new DefineMap({bar: "zed"})});
+  console.log( map.get() ); //-> {foo: {bar: "zed"}};
   ```
+  @codepen
 
   @return {Object} A plain JavaScript `Object` that contains all the properties and values of the map instance.
 
@@ -24,13 +27,15 @@
 
   Get a single property on a DefineMap instance.
 
-  `.get(propName)` only should be used when reading properties that might not have been defined yet, but
-  will be later via [can-define/map/map.prototype.set].
-
   ```js
-  var map = new DefineMap();
-  map.get("name") //-> undefined;
+  import {DefineMap} from "can";
+
+  const map = new DefineMap();
+  console.log( map.get("name") ); //-> undefined;
   ```
+  @codepen
+
+  `.get(propName)` only needs to be used when reading properties that might not have been defined yet, but will be later via [can-define/map/map.prototype.set]. Predefined properties can always be read like `map.propName`.
 
   @param {String} propName The property name of a property that may not have been defined yet.
   @return {*} The value of that property.

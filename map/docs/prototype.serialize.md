@@ -13,17 +13,20 @@
   `undefined` serialized values are not added to the result.
 
   ```js
-  var MyMap = DefineMap.extend({
+  import {DefineMap} from "can";
+
+  const MyMap = DefineMap.extend({
     date: {
       type: "date",
-      serialize: function(date){
-        return date.getTime()
+      serialize: (date) => {
+        return date.getTime();
       }
     }
   });
 
-  var myMap = new MyMap({date: new Date(), count: 5});
-  myMap.serialize() //-> {date: 1469566698504, count: 5}
+  const myMap = new MyMap({date: new Date(), count: 5});
+  console.log( myMap.serialize() ); //-> {date: 1469566698504, count: 5}
   ```
+  @codepen
 
   @return {Object} A JavaScript Object that can be serialized with `JSON.stringify` or other methods.
