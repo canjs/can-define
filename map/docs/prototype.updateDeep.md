@@ -10,29 +10,38 @@
   Properties not in `props` will be set to `undefined`.
 
   ```js
-  var MyMap = DefineMap.extend({
+  import {DefineMap, DefineList} from "can";
+
+  const MyMap = DefineMap.extend({
     list: DefineList,
-    name: 'string'
+    name: "string"
   });
-  var obj = new MyMap({
-    list: ['1', '2', '3'],
-    name: 'bar',
+
+  const obj = new MyMap({
+    list: ["1", "2", "3"],
+    name: "bar",
     foo: {
-      bar: 'zed',
-      boo: 'goo'
-    }
-  });
-  obj.updateDeep({
-    list: ['first'],
-    foo: {
-      bar: 'abc'
+      bar: "zed",
+      boo: "goo"
     }
   });
 
-  obj.list //-> ['first', '2', '3']
-  obj.foo	//-> { bar: 'abc', boo: undefined }
-  obj.name //-> 'undefined'
+  obj.updateDeep({
+    list: ["first"],
+    foo: {
+      bar: "abc"
+    }
+  });
+
+  console.log( obj.serialize() ); //-> {
+  //   foo: { bar: "abc" },
+  //   list: ["first"]
+  // }
+  console.log( obj.foo.boo ); //-> undefined
+  console.log( obj.name ); //-> undefined
   ```
+  @codepen
+
   @param {Object} props A collection of key-value pairs to set.
   If any properties already exist on the map, they will be overwritten.
 
