@@ -1426,3 +1426,33 @@ QUnit.test("type called with `this` as the map (#349)", function(){
 	var map = new Type();
 	QUnit.equal(map.foo, 5);
 });
+
+QUnit.test("expandos use default type (#383)", function(){
+	var AllNumbers = DefineMap.extend({
+		"*": {type: "number"}
+	});
+
+	var someNumbers = new AllNumbers({
+		version: "24"
+	});
+	QUnit.ok(someNumbers.version === 24, "is 24");
+});
+
+QUnit.test("do not enumerate anything other than key properties (#369)", function(){
+	var Type = DefineMap.extend({
+		aProp: "string",
+		aMethod: function(){}
+	});
+
+	var instance = new Type({aProp: "VALUE", anExpando: "VALUE"});
+
+	var props = {};
+	for(var prop in instance) {
+		props[prop] = true;
+	}
+	QUnit.deepEqual(props,{
+		aProp: true,
+		anExpando: true,
+		aMethod: true // TODO: this should be removed someday
+	});
+});
