@@ -5,6 +5,10 @@
 
 @signature `map.update(props)`
 
+  Assigns each value in `props` to a property on this map instance named after the
+  corresponding key in `props`, effectively merging `props` into the Map.
+  Properties not in `props` will be set to `undefined`.
+
   ```js
   import {DefineMap, DefineList} from "can";
 
@@ -26,10 +30,6 @@
   console.log( obj.foo ); //-> undefined
   ```
   @codepen
- 
-  Assigns each value in `props` to a property on this map instance named after the
-  corresponding key in `props`, effectively merging `props` into the Map.
-  Properties not in `props` will be set to `undefined`.
 
   @param {Object} props A collection of key-value pairs to set.
   If any properties already exist on the map, they will be overwritten.

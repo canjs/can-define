@@ -5,7 +5,7 @@
 
 @signature `map.assignDeep(props)`
 
-  Similar to [can-deefine/map/map.prototype.assign .assign()], `.assignDeep()` will overwrite
+  Similar to [can-define/map/map.prototype.assign .assign()], `.assignDeep()` will overwrite
   values within a `map` with values from `props`. Where `.assign()` will replace values or
   properties one level deep, `.assignDeep()` will overwrite values or properties on objects
   and lists recursively.
