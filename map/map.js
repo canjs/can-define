@@ -86,14 +86,13 @@ var DefineMap = Construct.extend("DefineMap",{
 			for(key in DefineMap.prototype) {
 				define.defineConfigurableAndNotEnumerable(prototype, key, prototype[key]);
 			}
-
-			this.prototype.setup = function(props){
+			define.defineConfigurableAndNotEnumerable(prototype, "setup", function(props){
 				define.setup.call(
 					this,
 					props || {},
 					this.constructor.seal
 				);
-			};
+			});
 		} else {
 			for(key in prototype) {
 				define.defineConfigurableAndNotEnumerable(prototype, key, prototype[key]);
