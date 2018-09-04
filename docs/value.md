@@ -138,7 +138,7 @@ Specify the behavior of a property by listening to changes in other properties.
   is returned to clear the interval when the property is returned:
 
   ```js
-  import {DefineMap} from "can";
+  import {DefineMap} from "//unpkg.com/can@5/core.mjs";
 
   const Timer = DefineMap.extend( "Timer", {
     time: {
@@ -158,7 +158,7 @@ Specify the behavior of a property by listening to changes in other properties.
 
   const timer = new Timer();
   timer.on( "time", function( ev, newVal, oldVal ) {
-    console.log( newVal ); //-> logs a new date every second
+    console.log( newVal.getSeconds() ); //-> logs a new date every second
   } );
   ```
   @codepen
