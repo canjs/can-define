@@ -130,33 +130,3 @@ console.log( map.locations instanceof DefineList ); //-> false
 console.log( Array.isArray( map.locations ) ); //-> true
 ```
 @codepen
-
-### Working with the 'compute' type
-
-Setting type as `compute` allows for resolving a computed property with the .attr()
-method.
-
-```js
-import {DefineMap, SimpleObservable, Reflect as canReflect} from "can";
-
-const MyMap = DefineMap.extend({
-    value: {
-        type: "observable"
-    }
-});
-
-const myMap = new MyMap();
-const c = new SimpleObservable(5);
-
-myMap.value = c;
-console.log( canReflect.getValue(myMap.value) ); //-> 5
-
-canReflect.setValue(c, 6)
-console.log( canReflect.getValue(myMap.value) ); //-> 6
-
-//Be sure if setting to pass the new compute
-const c2 = new SimpleObservable("a");
-myMap.value = c2;
-console.log( canReflect.getValue(myMap.value) ); //-> "a"
-```
-@codepen
