@@ -17,7 +17,7 @@ Event fired when a property on the map changes values.
     console.log( newVal ); //-> "Brian"
     console.log( oldVal ); //-> "Justin"
   });
-  person.name = "Brian";
+  person.set("name", "Brian");
   ```
   @codepen
 

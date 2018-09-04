@@ -33,9 +33,12 @@
     }
   });
 
-  console.log( obj.list ); //-> ["first"]
-  console.log( obj.foo ); //-> { bar: "abc", boo: undefined }
-  console.log( obj.name ); //-> "undefined"
+  console.log( obj.serialize() ); //-> {
+  //   foo: { bar: "abc" },
+  //   list: ["first"]
+  // }
+  console.log( obj.foo.boo ); //-> undefined
+  console.log( obj.name ); //-> undefined
   ```
   @codepen
 
