@@ -5,65 +5,64 @@ Specify the behavior of a property by listening to changes in other properties.
 
 @signature `value(prop)`
 
-The `value` behavior is used to compose a property value from events dispatched
-by other properties on the map. It's similar to [can-define.types.get], but can
-be used to build property behaviors that [can-define.types.get] can not provide.
+  The `value` behavior is used to compose a property value from events dispatched
+  by other properties on the map. It's similar to [can-define.types.get], but can
+  be used to build property behaviors that [can-define.types.get] can not provide.
 
-`value` enables techniques very similar to using event streams and functional
-reactive programming. Use `prop.listenTo` to listen to events dispatched on
-the map or other observables, `prop.stopListening` to stop listening to those
-events if needed, and `prop.resolve` to set a new value on the observable.
-For example, the following counts the number of times the `name` property changed:
+  `value` enables techniques very similar to using event streams and functional
+  reactive programming. Use `prop.listenTo` to listen to events dispatched on
+  the map or other observables, `prop.stopListening` to stop listening to those
+  events if needed, and `prop.resolve` to set a new value on the observable.
+  For example, the following counts the number of times the `name` property changed:
 
   ```js
-  import { DefineMap } from "can";
+  import {DefineMap} from "can";
 
   const Person = DefineMap.extend( "Person", {
     name: "string",
     nameChangeCount: {
       value( prop ) {
         let count = 0;
-
+        
         prop.listenTo( "name", () => {
           prop.resolve( ++count );
         } );
-
         prop.resolve( count );
       }
     }
   } );
 
   const p = new Person();
-  p.on( "nameChangedCount", ( ev, newVal ) => {
-    console.log( "name changed", newVal, "times" );
+  p.on( "nameChangeCount", ( ev, newValue ) => {
+    console.log( "name changed " + newValue + " times." );
   } );
 
   p.name = "Justin"; // logs name changed 1 times
   p.name = "Ramiya"; // logs name changed 2 times
   ```
-  <!-- @codepen -->
+  @codepen
 
-If the property defined by `value` is unbound, the `value` function will be called each time. Use `prop.resolve` synchronously
-to provide a value.
+  If the property defined by `value` is unbound, the `value` function will be called each time. Use `prop.resolve` synchronously
+  to provide a value.
 
-[can-define.types.type], [can-define.types.default], [can-define.types.get], and [can-define.types.set] behaviors are ignored when `value` is present.
+  [can-define.types.type], [can-define.types.default], [can-define.types.get], and [can-define.types.set] behaviors are ignored when `value` is present.
 
-`value` properties are not enumerable by default.
+  `value` properties are not enumerable by default.
 
-@param {can-define.types.valueOptions} [prop] An object of methods and values used to specify the property
-behavior:  
+  @param {can-define.types.valueOptions} [prop] An object of methods and values used to specify the property
+  behavior:  
 
 
 
-- __prop.resolve(value)__ `{function(Any)}` Sets the value of this property as `value`. During a [can-queues.batch.start batch],
-  the last value passed to `prop.resolve` will be used as the value.
+  - __prop.resolve(value)__ `{function(Any)}` Sets the value of this property as `value`. During a [can-queues.batch.start batch],
+    the last value passed to `prop.resolve` will be used as the value.
 
-- __prop.listenTo(bindTarget, event, handler, queue)__ `{function(Any,String,Fuction,String)}`  A function that sets up a binding that
-  will be automatically torn-down when the `value` property is unbound.  This `prop.listenTo` method is very similar to the [can-event-queue/map/map.listenTo] method available on [can-define/map/map DefineMap].  It differs only that it:
+  - __prop.listenTo(bindTarget, event, handler, queue)__ `{function(Any,String,Fuction,String)}`  A function that sets up a binding that
+    will be automatically torn-down when the `value` property is unbound.  This `prop.listenTo` method is very similar to the [can-event-queue/map/map.listenTo] method available on [can-define/map/map DefineMap].  It differs only that it:
 
-  - defaults bindings within the [can-queues.notifyQueue].
-  - calls handlers with `this` as the instance.
-  - localizes saved bindings to the property instead of the entire map.
+    - defaults bindings within the [can-queues.notifyQueue].
+    - calls handlers with `this` as the instance.
+    - localizes saved bindings to the property instead of the entire map.
 
   Examples:
 
@@ -81,11 +80,11 @@ behavior:
   prop.listenTo( observable, handler );
   ```
 
-- __prop.stopListening(bindTarget, event, handler, queue)__ `{function(Any,String,Fuction,String)}`  A function that removes bindings
-  registered by the `prop.listenTo` argument.  This `prop.stopListening` method is very similar to the [can-event-queue/map/map.stopListening] method available on [can-define/map/map DefineMap].  It differs only that it:
+  - __prop.stopListening(bindTarget, event, handler, queue)__ `{function(Any,String,Fuction,String)}`  A function that removes bindings
+    registered by the `prop.listenTo` argument.  This `prop.stopListening` method is very similar to the [can-event-queue/map/map.stopListening] method available on [can-define/map/map DefineMap].  It differs only that it:
 
-  - defaults to unbinding within the [can-queues.notifyQueue].
-  - unbinds saved bindings by `prop.listenTo`.
+    - defaults to unbinding within the [can-queues.notifyQueue].
+    - unbinds saved bindings by `prop.listenTo`.
 
   Examples:
 
@@ -111,10 +110,10 @@ behavior:
   prop.stopListening( observable );
   ```
 
-- __prop.lastSet__ `{can-simple-observable}` An observable value that gets set when this
-  property is set.  You can read its value or listen to when its value changes to
-  derive the property value.  The following makes `property` behave like a
-  normal object property that can be get or set:
+  - __prop.lastSet__ `{can-simple-observable}` An observable value that gets set when this
+    property is set.  You can read its value or listen to when its value changes to
+    derive the property value.  The following makes `property` behave like a
+    normal object property that can be get or set:
 
   ```js
   {
@@ -131,37 +130,38 @@ behavior:
   }
   ```
 
-
 @return {function} An optional teardown function. If provided, the teardown function
-will be called when the property is unbound after `stopListening()` is used to
-remove all bindings.
+  will be called when the property is unbound after `stopListening()` is used to
+  remove all bindings.
 
-The following `time` property increments every second.  Notice how a function
-is returned to clear the interval when the property is returned:
+  The following `time` property increments every second.  Notice how a function
+  is returned to clear the interval when the property is returned:
 
   ```js
-const Timer = DefineMap.extend( "Timer", {
-	time: {
-		value( prop ) {
-			prop.resolve( new Date() );
+  import {DefineMap} from "can";
 
-			const interval = setInterval( () => {
-				prop.resolve( new Date() );
-			}, 1000 );
+  const Timer = DefineMap.extend( "Timer", {
+    time: {
+      value( prop ) {
+        prop.resolve( new Date() );
 
-			return () => {
-				clearInterval( interval );
-			};
-		}
-	}
-} );
+        const interval = setInterval( () => {
+          prop.resolve( new Date() );
+        }, 1000 );
 
-const timer = new Timer();
-timer.on( "time", function( ev, newVal, oldVal ) {
-	console.log( newVal ); //-> logs a new date every second
-} );
+        return () => {
+          clearInterval( interval );
+        };
+      }
+    }
+  } );
+
+  const timer = new Timer();
+  timer.on( "time", function( ev, newVal, oldVal ) {
+    console.log( newVal ); //-> logs a new date every second
+  } );
   ```
-  <!-- @codepen -->
+  @codepen
 
 @body
 
