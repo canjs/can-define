@@ -95,7 +95,7 @@ import { DefineMap } from "can";
 const Map = DefineMap.extend( {
 	count: { type: "number" },
 	items: {
-		type: function( newValue ) {
+		type( newValue ) {
 			if ( typeof newValue === "string" ) {
 				return newValue.split( "," );
 			} else if ( Array.isArray( newValue ) ) {
@@ -116,15 +116,20 @@ console.log(map.count, map.items); //-> 4 ["1", "2", "3"]
 
 When an array value is set, it is automatically converted into a DefineList. Likewise, objects are converted into DefineMap instances. This behavior can be prevented like the following:
 
-	```js
-  locations: {type: "any"}
-	```
+In this example when a user tries to set the `locations` property, the resulting value will remain an array.
+```js
+import {DefineMap, DefineList} from "can";
 
-When a user tries to set this property, the resulting value will remain an array.
+const MyMap = DefineMap.extend({
+	locations: {type: "any"},
+});
+const map = new MyMap( {locations: [1, 2, 3]} );
 
-	```js
-  map.locations = [1, 2, 3]; // locations is an array, not a DefineList
-	```
+// locations is an array, not a DefineList
+console.log( map.locations instanceof DefineList ); //-> false
+console.log( Array.isArray( map.locations ) ); //-> true
+```
+@codepen
 
 ### Working with the 'compute' type
 
@@ -132,27 +137,26 @@ Setting type as `compute` allows for resolving a computed property with the .att
 method.
 
 ```js
-import {DefineMap} from "can";
+import {DefineMap, SimpleObservable, Reflect as canReflect} from "can";
 
 const MyMap = DefineMap.extend({
     value: {
-        type: "compute"
+        type: "observable"
     }
 });
 
 const myMap = new MyMap();
-const c = compute(5);
+const c = new SimpleObservable(5);
 
 myMap.value = c;
-console.log( myMap.value ); //-> 5
+console.log( canReflect.getValue(myMap.value) ); //-> 5
 
-c(6);
-console.log( myMap.value ); //-> 6
+canReflect.setValue(c, 6)
+console.log( canReflect.getValue(myMap.value) ); //-> 6
 
 //Be sure if setting to pass the new compute
-const c2 = compute("a");
+const c2 = new SimpleObservable("a");
 myMap.value = c2;
-console.log( myMap.value ); //-> "a"
+console.log( canReflect.getValue(myMap.value) ); //-> "a"
 ```
-<!-- `compute` is undefined -->
-<!-- @codepen -->
+@codepen
