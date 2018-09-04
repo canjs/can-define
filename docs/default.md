@@ -58,13 +58,15 @@ The following defaults `age` to `0` and `address` to an object:
 ```js
 import {DefineMap} from "can";
 
-// A default age of `0`:
+
 const Person = DefineMap.extend( {
+  // A default age of `0`:
 	age: {
 		default: 0
 	},
+  // A default address:
 	address: {
-		default: function() {
+		default() {
 			return { city: "Chicago", state: "IL" };
 		}
 	}
