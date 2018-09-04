@@ -706,9 +706,8 @@ var defineListProto = {
 		var ret;
 		if(this._computed && this._computed[key] && this._computed[key].compute) {
 			ret = {};
-			ret.valueDependencies = new Set([
-				this._computed[key].compute
-			]);
+			ret.valueDependencies = new Set();
+			ret.valueDependencies.add(this._computed[key].compute);
 		}
 		return ret;
 	},
