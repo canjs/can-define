@@ -5,22 +5,22 @@ Provides a constructor function to be used to provide a default value for a prop
 
 @signature `Default`
 
-A constructor function can be provided that is called to create a default value used for this property.
-This constructor will be invoked with `new` for each created instance. The default
-value is created on demand when the property is read for the first time.
+  A constructor function can be provided that is called to create a default value used for this property.
+  This constructor will be invoked with `new` for each created instance. The default
+  value is created on demand when the property is read for the first time.
 
-Specify `Default` like:
+  Specify `Default` like:
 
-```js
-{
-	prop: {
-		Default: Array
-	},
-	person: {
-		Default: Person
-	}
-}
-```
+  ```js
+  {
+    prop: {
+      Default: Array
+    },
+    person: {
+      Default: Person
+    }
+  }
+  ```
 
 @body
 
