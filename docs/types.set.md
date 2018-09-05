@@ -184,7 +184,7 @@ A set function provides a useful hook for performing side effect logic as a cert
 In the example below, Paginator DefineMap includes a `page` property, which derives its value entirely from other properties (limit and offset).  If something tries to set the `page` directly, the set method will set the value of `offset`:
 
 ```js
-import { DefineMap } from "can";
+import {DefineMap} from "can";
 
 const Paginate = DefineMap.extend( {
 	limit: "number",

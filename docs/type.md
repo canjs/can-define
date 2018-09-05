@@ -101,10 +101,13 @@ Converts a value set on an instance into an appropriate value.
 
   const myList = new List({
     people: [ {first: "Justin", last: "Meyer"} ],
-    addresses: [ {street: "11 Example Ave.", city: "Chigago"} ]
+    addresses: [ {street: "11 Example Ave.", city: "Chicago"} ]
   });
 
-  console.log( myList.serialize() );
+  console.log( myList.serialize() ); //-> {
+  //   addresses: [ {city: "Chicago", street: "11 Example Ave."} ],
+  //   people: [ {first: "Justin", last: "Meyer"} ]
+  // }
   ```
   @codepen
 
