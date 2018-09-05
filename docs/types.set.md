@@ -65,7 +65,7 @@ The following makes setting a `page` property update the `offset`:
 
 
 ```js
-import { DefineMap } from "can";
+import {DefineMap} from "can";
 
 const Pages = DefineMap.extend( {
     limit: { default: 5 },
@@ -78,14 +78,14 @@ const Pages = DefineMap.extend( {
 } );
 const book = new Pages();
 book.page = 10;
-console.log(book.offset); //-> 45
+console.log( book.offset ); //-> 45
 ```
 @codepen
 
 The following makes changing `makeId` un-define the `modelId` property:
 
 ```js
-import { DefineMap } from "can";
+import {DefineMap} from "can";
 
 const Car = DefineMap.extend( {
 	modelId: { default: undefined },
@@ -102,9 +102,9 @@ const Car = DefineMap.extend( {
 } );
 
 const myCar = new Car({ makeId: "GMC", modelId: "Jimmy" });
-console.log(myCar.modelId) ;//-> "Jimmy"
+console.log( myCar.modelId ); //-> "Jimmy"
 myCar.makeId = "Chevrolet";
-console.log(myCar.modelId); //-> undefined
+console.log( myCar.modelId ); //-> undefined
 ```
 @codepen
 
@@ -130,7 +130,7 @@ When a setter returns `undefined`, its behavior changes depending on the number 
 With 0 arguments, the original set value is set on the attribute.
 
 ```js
-import { DefineMap } from "can";
+import {DefineMap} from "can";
 
 const MyMap = DefineMap.extend( {
 	prop: { set: function() {} }
@@ -138,14 +138,14 @@ const MyMap = DefineMap.extend( {
 
 const map = new MyMap( { prop: "foo" } );
 
-console.log(map.prop); //-> "foo"
+console.log( map.prop ); //-> "foo"
 ```
 @codepen
 
 With 1 argument, an `undefined` return value will set the property to `undefined`.  
 
 ```js
-import { DefineMap } from "can";
+import {DefineMap} from "can";
 
 const MyMap = DefineMap.extend( {
 	prop: { set: function( newVal ) {} }
@@ -153,7 +153,7 @@ const MyMap = DefineMap.extend( {
 
 const map = new MyMap( { prop: "foo" } );
 
-console.log(map.prop); //-> undefined
+console.log( map.prop ); //-> undefined
 ```
 @codepen
 
@@ -161,7 +161,7 @@ With 2 arguments, `undefined` leaves the property in place.  It is expected
 that `resolve` will be called:
 
 ```js
-import { DefineMap } from "can";
+import {DefineMap} from "can";
 
 const MyMap = DefineMap.extend( {
 	prop: {
@@ -173,7 +173,7 @@ const MyMap = DefineMap.extend( {
 
 const map = new MyMap( { prop: "foo" } );
 
-console.log(map.prop); //-> "food";
+console.log( map.prop ); //-> "food";
 ```
 @codepen
 
@@ -202,8 +202,8 @@ const Paginate = DefineMap.extend( {
 const p = new Paginate( { limit: 10, offset: 20 } );
 p.set({ page: 13 });
 
-console.log(p.offset); //-> 120
-console.log(p.page); //-> 13
+console.log( p.offset ); //-> 120
+console.log( p.page ); //-> 13
 ```
 @codepen
 
@@ -213,7 +213,7 @@ console.log(p.page); //-> 13
 By default, if a value returned from a setter is an object the effect will be to replace the property with the new object completely.
 
 ```js
-import { DefineMap } from "can";
+import {DefineMap} from "can";
 
 const Contact = DefineMap.extend( {
 	info: {
@@ -231,14 +231,14 @@ const info = alice.info;
 
 alice.info = { name: "Allison Wonderland", phone: "888-888-8888" };
 
-console.log(info === alice.info); // -> false
+console.log( info === alice.info ); // -> false
 ```
 @codepen
 
 In contrast, you can merge properties with:
 
 ```js
-import { DefineMap } from "can";
+import {DefineMap} from "can";
 
 const Contact = DefineMap.extend( {
 	info: {
@@ -260,7 +260,7 @@ const info = alice.info;
 
 alice.info = { name: "Allison Wonderland", phone: "888-888-8888" };
 
-console.log(info === alice.info); // -> true
+console.log( info === alice.info ); // -> true
 ```
 @codepen
 

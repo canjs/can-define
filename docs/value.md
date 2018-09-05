@@ -176,7 +176,7 @@ Our next example shows how [can-define.types.get] should be used with the
 that derives its value from the instantaneous `first` and `last` values:
 
 ```js
-import { DefineMap } from "can";
+import {DefineMap} from "can";
 
 const Person = DefineMap.extend( "Person", {
 	first: "string",
@@ -187,7 +187,7 @@ const Person = DefineMap.extend( "Person", {
 } );
 
 const p = new Person({ first: "John", last: "Smith" });
-console.log(p.fullName); //-> "John Smith"
+console.log( p.fullName ); //-> "John Smith"
 ```
 @codepen
 
@@ -198,7 +198,7 @@ passage of time.
 The following `fullNameChangeCount` increments every time `fullName` changes:
 
 ```js
-import { DefineMap } from "can";
+import {DefineMap} from "can";
 
 const Person = DefineMap.extend( "Person", {
 	first: "string",
