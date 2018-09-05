@@ -1453,8 +1453,6 @@ QUnit.test("do not enumerate anything other than key properties (#369)", functio
 	});
 	var test = {};
 	for (var k in descendant) test[k] = descendant[k];
-	console.log(test);
-	debugger;
 	if (test.prop) {
 		return QUnit.ok(test.prop, "Browser doesn't correctly skip shadowed enumerable properties")
 	}
