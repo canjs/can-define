@@ -1439,6 +1439,27 @@ QUnit.test("expandos use default type (#383)", function(){
 });
 
 QUnit.test("do not enumerate anything other than key properties (#369)", function(){
+	// Internet Explorer doesn't correctly skip properties that are non-enumerable
+	// on the current object, but enumerable on the prototype:
+	var ancestor = { prop: true };
+	var F = function() {};
+	F.prototype = ancestor;
+	var descendant = new F();
+	Object.defineProperty(descendant, "prop", {
+		writable: true,
+		configurable: true,
+		enumerable: false,
+		value: true
+	});
+	var test = {};
+	for (var k in descendant) test[k] = descendant[k];
+	console.log(test);
+	debugger;
+	if (test.prop) {
+		return QUnit.ok(test.prop, "Browser doesn't correctly skip shadowed enumerable properties")
+	}
+
+
 	var Type = DefineMap.extend({
 		aProp: "string",
 		aMethod: function(){}
@@ -1448,6 +1469,8 @@ QUnit.test("do not enumerate anything other than key properties (#369)", functio
 
 	var props = {};
 	for(var prop in instance) {
+		var descriptor = Object.getOwnPropertyDescriptor(instance, prop);
+		if (!descriptor) descriptor = Object.getOwnPropertyDescriptor(Type.prototype, prop) || {};
 		props[prop] = true;
 	}
 	QUnit.deepEqual(props,{

@@ -1246,7 +1246,7 @@ testHelpers.dev.devOnlyTest("warn on using a Constructor for small-t type defini
 testHelpers.dev.devOnlyTest("warn with constructor for Value instead of Default (#340)", function() {
 	QUnit.expect(1);
 
-	var message = "can-define: Change the 'Value' definition for VM{}.currency to 'Default'.";
+	var message = /can-define: Change the 'Value' definition for [\w\.{}]+.currency to 'Default'./;
 	var finishErrorCheck = testHelpers.dev.willWarn(message);
 
 	function Currency() {
