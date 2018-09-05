@@ -1216,10 +1216,10 @@ testHelpers.dev.devOnlyTest("Setting a value with only a get() generates a warni
 	QUnit.equal(finishErrorCheck(), 1);
 });
 
-testHelpers.dev.devOnlyTest("warn on using a Constructor for small-t type definintions", function() {
-	QUnit.expect(2);
+testHelpers.dev.devOnlyTest("warn on using a Constructor for small-t type definitions", function() {
+	QUnit.expect(1);
 
-	var message = 'can-define: the definition for VM{}.currency uses a constructor for "type". Did you mean "Type"?';
+	var message = /can-define: the definition for [\w{}\.]+ uses a constructor for "type"\. Did you mean "Type"\?/;
 	var finishErrorCheck = testHelpers.dev.willWarn(message);
 
 	function Currency() {
@@ -1241,21 +1241,6 @@ testHelpers.dev.devOnlyTest("warn on using a Constructor for small-t type defini
 
 	QUnit.equal(finishErrorCheck(), 1);
 
-	message = 'can-define: the definition for VM2{}.currency uses a constructor for "type". Did you mean "Type"?';
-	finishErrorCheck = testHelpers.dev.willWarn(message);
-
-	function VM2() {}
-
-	define(VM2.prototype, {
-		currency: {
-			type: Currency, // should be `Type: Currency`
-			default: function() {
-				return new Currency({});
-			}
-		}
-	});
-
-	QUnit.equal(finishErrorCheck(), 1);
 });
 
 testHelpers.dev.devOnlyTest("warn with constructor for Value instead of Default (#340)", function() {
