@@ -46,12 +46,14 @@ if(process.env.NODE_ENV !== 'production') {
 		if (definition.get) {
 			Object.defineProperty(definition.get, "name", {
 				value: "get "+canReflect.getName(obj) + "."+prop,
-				writable: true
+				writable: true,
+				configurable: true
 			});
 		}
 		if (definition.set) {
 			Object.defineProperty(definition.set, "name", {
-				value:  "set "+canReflect.getName(obj) + "."+prop
+				value:  "set "+canReflect.getName(obj) + "."+prop,
+				configurable: true
 			});
 		}
 		return Object.defineProperty(obj, prop, definition);
@@ -271,16 +273,19 @@ define.property = function(typePrototype, prop, definition, dataInitializers, co
 		if (definition.get) {
 			Object.defineProperty(definition.get, "name", {
 				value: canReflect.getName(typePrototype) + "'s " + prop + " getter",
+				configurable: true
 			});
 		}
 		if (definition.set) {
 			Object.defineProperty(definition.set, "name", {
 				value: canReflect.getName(typePrototype) + "'s " + prop + " setter",
+				configurable: true
 			});
 		}
 		if(isValueResolver(definition)) {
 			Object.defineProperty(definition.value, "name", {
 				value: canReflect.getName(typePrototype) + "'s " + prop + " value",
+				configurable: true
 			});
 		}
 	}
