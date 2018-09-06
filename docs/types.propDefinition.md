@@ -291,10 +291,16 @@ observable property.  These behaviors can be specified with as an `Object`, `Str
 [https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get syntax].
 
   ```js
-  {
-    get propertyName() { /* ... */ }
-  }
+  import {DefineMap} from "can";
+
+  const Example = DefineMap.extend( {
+    get propertyName() { return true; }
+  } );
+
+  const e = new Example();
+  console.log( e.propertyName );
   ```
+  @codepen
 
   For example:
 
