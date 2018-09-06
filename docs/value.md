@@ -64,21 +64,21 @@ Specify the behavior of a property by listening to changes in other properties.
     - calls handlers with `this` as the instance.
     - localizes saved bindings to the property instead of the entire map.
 
-  Examples:
+    Examples:
 
-  ```js
-  // Binds to the map's `name` event:
-  prop.listenTo( "name", handler );
+    ```js
+    // Binds to the map's `name` event:
+    prop.listenTo( "name", handler );
 
-  // Binds to the todos `length` event:
-  prop.listenTo( todos, "length", handler );
+    // Binds to the todos `length` event:
+    prop.listenTo( todos, "length", handler );
 
-  // Binds to the `todos` `length` event in the mutate queue:
-  prop.listenTo( todos, "length", handler, "mutate" );
+    // Binds to the `todos` `length` event in the mutate queue:
+    prop.listenTo( todos, "length", handler, "mutate" );
 
-  // Binds to an `onValue` emitter:
-  prop.listenTo( observable, handler );
-  ```
+    // Binds to an `onValue` emitter:
+    prop.listenTo( observable, handler );
+    ```
 
   - __prop.stopListening(bindTarget, event, handler, queue)__ `{function(Any,String,Fuction,String)}`  A function that removes bindings
     registered by the `prop.listenTo` argument.  This `prop.stopListening` method is very similar to the [can-event-queue/map/map.stopListening] method available on [can-define/map/map DefineMap].  It differs only that it:
@@ -86,49 +86,58 @@ Specify the behavior of a property by listening to changes in other properties.
     - defaults to unbinding within the [can-queues.notifyQueue].
     - unbinds saved bindings by `prop.listenTo`.
 
-  Examples:
+    Examples:
 
-  ```js
-  // Unbind all handlers bound using `listenTo`:
-  prop.stopListening();
+    ```js
+    // Unbind all handlers bound using `listenTo`:
+    prop.stopListening();
 
-  // Unbind handlers to the map's `name` event:
-  prop.stopListening( "name" );
+    // Unbind handlers to the map's `name` event:
+    prop.stopListening( "name" );
 
-  // Unbind a specific handler on the map's `name` event
-  // registered in the "notify" queue.
-  prop.stopListening( "name", handler );
+    // Unbind a specific handler on the map's `name` event
+    // registered in the "notify" queue.
+    prop.stopListening( "name", handler );
 
-  // Unbind all handlers bound to `todos` using `listenTo`:
-  prop.stopListening( todos );
+    // Unbind all handlers bound to `todos` using `listenTo`:
+    prop.stopListening( todos );
 
-  // Unbind all `length` handlers bound to `todos`
-  // using `listenTo`:
-  prop.stopListening( todos, "length" );
+    // Unbind all `length` handlers bound to `todos`
+    // using `listenTo`:
+    prop.stopListening( todos, "length" );
 
-  // Unbind all handlers to an `onValue` emitter:
-  prop.stopListening( observable );
-  ```
+    // Unbind all handlers to an `onValue` emitter:
+    prop.stopListening( observable );
+    ```
 
   - __prop.lastSet__ `{can-simple-observable}` An observable value that gets set when this
     property is set.  You can read its value or listen to when its value changes to
     derive the property value.  The following makes `property` behave like a
     normal object property that can be get or set:
 
-  ```js
-  {
-	property: {
-      value: function( prop ) {
+    ```js
+    import {DefineMap} from "can";
 
-        // Set `property` initial value to set value.
-        prop.resolve( prop.lastSet.get() );
+    const Example = DefineMap.extend( {
+      property: {
+        value: function( prop ) {
 
-        // When the property is set, update `property`.
-        prop.listenTo( prop.lastSet, prop.resolve );
+          console.log( prop.lastSet.get() ); //-> "test"
+    
+          // Set `property` initial value to set value.
+          prop.resolve( prop.lastSet.get() );
+
+          // When the property is set, update `property`.
+          prop.listenTo( prop.lastSet, prop.resolve );
+        }
       }
-    }
-  }
-  ```
+    } );
+
+    const e = new Example();
+    e.property = "test";
+    e.serialize();
+    ```
+    @codepen
 
 @return {function} An optional teardown function. If provided, the teardown function
   will be called when the property is unbound after `stopListening()` is used to
@@ -146,7 +155,11 @@ Specify the behavior of a property by listening to changes in other properties.
         prop.resolve( new Date() );
 
         const interval = setInterval( () => {
-          prop.resolve( new Date() );
+
+          const date = new Date()
+          console.log( date.getSeconds() ); //-> logs a new date every second
+          
+          prop.resolve( date );
         }, 1000 );
 
         return () => {
@@ -157,9 +170,11 @@ Specify the behavior of a property by listening to changes in other properties.
   } );
 
   const timer = new Timer();
-  timer.on( "time", function( ev, newVal, oldVal ) {
-    console.log( newVal.getSeconds() ); //-> logs a new date every second
-  } );
+  timer.listenTo( "time", () => {} );
+
+  setTimeout( () => {
+    timer.stopListening( "time" );
+  }, 5000 ); //-> stops logging after five seconds
   ```
   @codepen
 
