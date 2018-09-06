@@ -298,7 +298,7 @@ observable property.  These behaviors can be specified with as an `Object`, `Str
   } );
 
   const e = new Example();
-  console.log( e.propertyName );
+  console.log( e.propertyName ); //-> true
   ```
   @codepen
 
