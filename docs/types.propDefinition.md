@@ -269,10 +269,22 @@ observable property.  These behaviors can be specified with as an `Object`, `Str
   For example:
 
   ```js
-  {
+  import {DefineMap} from "can";
+
+  const User = DefineMap.extend( {username: "string", password: "string"} );
+  const TodoList = DefineMap.extend( {
     users: [ User ],
     todos: [ { complete: "boolean", name: "string" } ]
-  }
+  } );
+
+  const user1 = new User( {username: "JMeyers", password: "12345"} );
+  const user2 = new User( {username: "PStrozak", password: "54321"} );
+  const myList = new TodoList( {
+    users: [ user1, user2 ],
+    todos: [ {complete: true, name: "Write this example"} ]
+  } );
+
+  console.log( myList.serialize() );
   ```
 
 @type {GETTER} Defines a property's [can-define.types.get] behavior with the
