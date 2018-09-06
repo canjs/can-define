@@ -78,8 +78,8 @@ observable property.  These behaviors can be specified with as an `Object`, `Str
     }
   } );
 
-  const person = new Person({ age: "20", hobbies: "1,2,3" });
-  console.log( person.age, person.hobbies ); //-> 20, ["1", "2", "3"]
+  const person = new Person({ age: "20", hobbies: "basketball,billiards,dancing" });
+  console.log( person.age, person.hobbies ); //-> 20, ["basketball", "billiards", "dancing"]
   ```
   @codepen
 
