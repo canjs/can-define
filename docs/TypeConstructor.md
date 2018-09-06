@@ -18,7 +18,7 @@ value.
     }
   });
   const ex = new Example();
-  ex.set( "prop", {first: "Justin", last: "Meyer"} );
+  ex.prop = {first: "Justin", last: "Meyer"};
 
   console.log( ex.prop instanceof Person ); //-> true
   console.log( ex.prop.fullName ); //-> "Justin Meyer"

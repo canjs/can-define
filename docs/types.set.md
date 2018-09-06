@@ -200,10 +200,9 @@ const Paginate = DefineMap.extend( {
 } );
 
 const p = new Paginate( { limit: 10, offset: 20 } );
-p.set({ page: 13 });
 
-console.log( p.offset ); //-> 120
-console.log( p.page ); //-> 13
+console.log( p.offset ); //-> 20
+console.log( p.page ); //-> 2
 ```
 @codepen
 

@@ -20,7 +20,7 @@ Converts a value set on an instance into an appropriate value.
   });
 
   const p = new Person();
-  p.set("age", "25");
+  p.age = "25";
   console.log( "p.age is a", typeof p.age, "The value is", p.age ); //-> "p.age is a number. The value is 25"
   ```
   @codepen
