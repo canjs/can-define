@@ -45,7 +45,7 @@ Defines custom serialization behavior for a property.
 
 @signature `serialize( currentValue, propertyName )`
 
-	Specifies the serialized value of a property.
+  Specifies the serialized value of a property.
 
   ```js
   import {DefineMap} from "can";
