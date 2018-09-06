@@ -78,7 +78,7 @@ value.
 ## Use
 
 ```js
-import {DefineMap} from "can";
+import {DefineMap, Reflect as canReflect} from "can";
 
 const Address = DefineMap.extend( {
     street: "string",
@@ -95,6 +95,7 @@ const direction = new Direction( {
     to: new Address( {street: "123 Greenview", city: "Libertyville"} )
 } );
 
+console.log( direction.from instanceof Address ); //-> true
 console.log( direction.serialize() ); //-> {
 //   from: {city: "Chicago", street: "2060 N. Stave"}
 //   to: {city: "Libertyville", street: "123 Greenview"}
