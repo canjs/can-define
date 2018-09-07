@@ -1451,10 +1451,13 @@ QUnit.test("do not enumerate anything other than key properties (#369)", functio
 		enumerable: false,
 		value: true
 	});
+
 	var test = {};
-	for (var k in descendant) test[k] = descendant[k];
+	for (var k in descendant) {
+		test[k] = descendant[k];
+	}
 	if (test.prop) {
-		return QUnit.ok(test.prop, "Browser doesn't correctly skip shadowed enumerable properties")
+		return QUnit.ok(test.prop, "Browser doesn't correctly skip shadowed enumerable properties");
 	}
 
 
@@ -1466,9 +1469,7 @@ QUnit.test("do not enumerate anything other than key properties (#369)", functio
 	var instance = new Type({aProp: "VALUE", anExpando: "VALUE"});
 
 	var props = {};
-	for(var prop in instance) {
-		var descriptor = Object.getOwnPropertyDescriptor(instance, prop);
-		if (!descriptor) descriptor = Object.getOwnPropertyDescriptor(Type.prototype, prop) || {};
+	for (var prop in instance) {
 		props[prop] = true;
 	}
 	QUnit.deepEqual(props,{
