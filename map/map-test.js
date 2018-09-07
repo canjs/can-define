@@ -1456,3 +1456,27 @@ QUnit.test("do not enumerate anything other than key properties (#369)", functio
 		aMethod: true // TODO: this should be removed someday
 	});
 });
+
+QUnit.test("Properties added via defineInstanceKey are observable", function(){
+	var Type = DefineMap.extend({});
+	var map = new Type();
+
+	var obs = new Observation(function(){
+		return canReflect.serialize(map);
+	});
+
+	var count = 0;
+	canReflect.onValue(obs, function(val) {
+		count++;
+
+		if(count === 2) {
+			QUnit.deepEqual(val, {foo:"bar"}, "changed value");
+		}
+	});
+
+	canReflect.defineInstanceKey(Type, "foo", {
+		type: "string"
+	});
+
+	map.foo = "bar";
+});

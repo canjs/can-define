@@ -215,6 +215,7 @@ var defineMapProto = {
 	},
 	"can.getOwnEnumerableKeys": function(){
 		ObservationRecorder.add(this, 'can.keys');
+		ObservationRecorder.add(Object.getPrototypeOf(this), 'can.keys');
 		return keysForDefinition(this._define.definitions).concat(keysForDefinition(this._instanceDefinitions) );
 	},
 	"can.hasOwnKey": function(key) {
