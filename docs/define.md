@@ -35,39 +35,35 @@ and [can-define/list/list] are documented here.
   	message: { type: "string" }
   } );
 
-  var greeting = new Greeting("Hello");
+  const greeting = new Greeting("Hello");
 
   canReflect.onKeyValue(greeting, "message", (newValue) => {
-	  console.log(newValue); // logs "goodbye"
+  	console.log( newValue.target.message ); //-> logs "goodbye"
   });
 
   greeting.message = "goodbye";
   ```
   @codepen
 
-@param {Object} prototype The prototype object of a constructor function or [class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/class). The prototype
-object will have getter/setters defined on it that carry out the defined behavior.  The prototype will also contain
-all of [can-event-queue/map/map]'s methods.
+  @param {Object} prototype The prototype object of a constructor function or [class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/class). The prototype object will have getter/setters defined on it that carry out the defined behavior.  The prototype will also contain all of [can-event-queue/map/map]'s methods.
 
-@param {Object<String,can-define.types.propDefinition>} propDefinitions An object of
-properties and their definitions. For example, a property (`propertyName`) has a [can-define.types.propDefinition] object with zero or more of the following behaviors:
+  @param {Object<String,can-define.types.propDefinition>} propDefinitions An object of properties and their definitions. For example, a property (`propertyName`) has a [can-define.types.propDefinition] object with zero or more of the following behaviors:
 
-```js
-define(Type.prototype, {
+  ```js
+  define(Type.prototype, {
     propertyName: {
-        default: function() { /* ... */ },
-        Default: Constructor,
-        type: function() { /* ... */ },
-        Type: Constructor,
-        get: function() { /* ... */ },
-        value: function() { /* ... */ },
-        set: function() { /* ... */ },
-        serialize: function() { /* ... */ },
-        identity: Boolean
+      default: function() { /* ... */ },
+      Default: Constructor,
+      type: function() { /* ... */ },
+      Type: Constructor,
+      get: function() { /* ... */ },
+      value: function() { /* ... */ },
+      set: function() { /* ... */ },
+      serialize: function() { /* ... */ },
+      identity: Boolean
     }
-})
-```
-
+  })
+  ```
 
 @body
 
@@ -80,8 +76,7 @@ more assumptions on the type constructor.  `can-define` can be used
 to create completely customized types.
 
 
-The following creates a
-`Person` constructor function that
+The following creates a `Person` constructor function that
 will be used to create `Person` instances with observable properties:
 
 ```js
@@ -105,13 +100,13 @@ define( Person.prototype, {
 // Create an instance
 const person = new Person( "Justin", "Meyer" );
 
-console.log( person.first )    //-> "Justin"
-console.log( person.last )     //-> "Meyer"
-console.log( person.fullName ) //-> "Justin Meyer"
+console.log( person.first ); //-> "Justin"
+console.log( person.last ); //-> "Meyer"
+console.log( person.fullName ); //-> "Justin Meyer"
 
 person.on( "fullName", function( ev, newVal, oldVal ) {
-	console.log( newVal ) //-> "Ramiya Meyer"
-	console.log( oldVal ) //-> "Justin Meyer"
+	console.log( newVal ); //-> "Ramiya Meyer"
+	console.log( oldVal ); //-> "Justin Meyer"
 } );
 
 person.first = "Ramiya";

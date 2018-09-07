@@ -175,11 +175,11 @@ of the compute.
 import { DefineMap, SimpleObservable, Reflect } from "can";
 
 const MyMap = DefineMap.extend( {
-    value: {
-        get: function( lastSetValue ) {
-            return lastSetValue.value;
-        }
-    }
+	value: {
+		get: function( lastSetValue ) {
+			return lastSetValue.value;
+		}
+	}
 } );
 
 const map = new MyMap();
