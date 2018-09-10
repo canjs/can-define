@@ -395,6 +395,11 @@ define.makeDefineInstanceKey = function(constructor) {
 		} else {
 			defineResult.methods[property] = definition;
 		}
+
+		this.prototype.dispatch({
+			type: "can.keys",
+			target: this.prototype
+		});
 	};
 };
 
