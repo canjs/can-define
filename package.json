@@ -31,7 +31,7 @@
   "homepage": "https://github.com/canjs/can-define",
   "dependencies": {
     "can-assign": "^1.1.1",
-    "can-construct": "^3.2.0",
+    "can-construct": "^3.5.2",
     "can-data-types": "<2.0.0",
     "can-define-lazy-value": "^1.0.0",
     "can-diff": "^1.0.0",
