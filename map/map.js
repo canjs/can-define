@@ -289,7 +289,7 @@ eventsProtoSymbols.forEach(function(sym) {
 if(process.env.NODE_ENV !== 'production') {
 	// call `map.log()` to log all event changes
 	// pass `key` to only log the matching property, e.g: `map.log("foo")`
-	DefineMap.prototype.log = defineHelpers.log;
+	define.defineConfigurableAndNotEnumerable(DefineMap.prototype, "log", defineHelpers.log);
 }
 //!steal-remove-end
 
