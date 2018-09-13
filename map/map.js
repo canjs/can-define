@@ -93,6 +93,18 @@ var DefineMap = Construct.extend("DefineMap",{
 					this.constructor.seal
 				);
 			});
+
+			var _computedGetter = Object.getOwnPropertyDescriptor(prototype, "_computed").get;
+			Object.defineProperty(prototype, "_computed", {
+				configurable: true,
+				enumerable: false,
+				get: function(){
+					if(this === prototype) {
+						return;
+					}
+					return _computedGetter.call(this, arguments);
+				}
+			});
 		} else {
 			for(key in prototype) {
 				define.defineConfigurableAndNotEnumerable(prototype, key, prototype[key]);

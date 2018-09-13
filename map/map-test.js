@@ -1480,3 +1480,26 @@ QUnit.test("Properties added via defineInstanceKey are observable", function(){
 
 	map.foo = "bar";
 });
+
+QUnit.test("Serialized computes do not prevent getters from working", function(){
+	var Type = DefineMap.extend("MyType", {
+		page: "string",
+		myPage: {
+			get: function(last, resolve) {
+				return this.page;
+			}
+		}
+	});
+
+	var first = new Type({ page: "one" });
+	var firstObservation = new Observation(function() {
+		return canReflect.serialize(first);
+	});
+
+	var boundTo = Function.prototype;
+	canReflect.onValue(firstObservation, boundTo);
+
+	var second = new Type({ page: "two" });
+
+	QUnit.equal(second.myPage, "two", "Runs the getter correctly");
+});
