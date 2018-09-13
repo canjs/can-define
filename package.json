@@ -1,6 +1,6 @@
 {
   "name": "can-define",
-  "version": "2.6.1",
+  "version": "2.6.2",
   "description": "Create observable objects with JS dot operator compatibility",
   "main": "can-define.js",
   "scripts": {
