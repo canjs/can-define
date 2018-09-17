@@ -251,9 +251,8 @@ var defineMapProto = {
 		var ret;
 		if(this._computed && this._computed[key] && this._computed[key].compute) {
 			ret = {};
-			ret.valueDependencies = new Set([
-				this._computed[key].compute
-			]);
+			ret.valueDependencies = new Set();
+			ret.valueDependencies.add(this._computed[key].compute);
 		}
 		return ret;
 	}
@@ -290,6 +289,7 @@ var eventsProtoSymbols = ("getOwnPropertySymbols" in Object) ?
 
 eventsProtoSymbols.forEach(function(sym) {
   Object.defineProperty(DefineMap.prototype, sym, {
+  	configurable: true,
     enumerable:false,
     value: define.eventsProto[sym],
     writable: true
