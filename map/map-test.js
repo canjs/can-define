@@ -9,6 +9,7 @@ var isPlainObject = canReflect.isPlainObject;
 var canTestHelpers = require("can-test-helpers/lib/dev");
 var DefineList = require("can-define/list/list");
 var dev = require("can-log/dev/dev");
+var ObservationRecorder = require("can-observation-recorder");
 
 var sealWorks = (function() {
 	try {
@@ -1395,10 +1396,9 @@ QUnit.test("deleteKey works (#351)", function(){
 
 	map.deleteKey("foo");
 
-	var pd = Object.getOwnPropertyDescriptor(map, "foo");
-
-
-	QUnit.ok(!pd, "no property descriptor");
+	// We should keep the property descriptor
+	// var pd = Object.getOwnPropertyDescriptor(map, "foo");
+	// QUnit.ok(!pd, "no property descriptor");
 
 	QUnit.deepEqual( canReflect.getOwnKeys(map), [] );
 
@@ -1410,6 +1410,17 @@ QUnit.test("deleteKey works (#351)", function(){
 	map.deleteKey("foo");
 
 	QUnit.equal(map.foo, undefined, "prop set to undefined");
+});
+
+QUnit.test("makes sure observation add is called (#393)", function(){
+	var map = new DefineMap({foo: "bar"});
+
+	canReflect.deleteKeyValue(map, "foo");
+
+	ObservationRecorder.start();
+	(function(){ return map.foo; }());
+	var result = ObservationRecorder.stop();
+	QUnit.deepEqual(canReflect.toArray( result.keyDependencies.get(map) ), ["foo"], "toArray" );
 });
 
 QUnit.test("type called with `this` as the map (#349)", function(){

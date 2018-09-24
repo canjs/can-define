@@ -91,7 +91,7 @@ var defineHelpers = {
 			var oldValue = this._data[prop];
 			if(oldValue !== undefined) {
 				delete this._data[prop];
-				delete this[prop];
+				//delete this[prop];
 				this.dispatch({
 					type: prop,
 					target: this,
