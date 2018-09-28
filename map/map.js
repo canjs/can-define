@@ -73,6 +73,15 @@ function getSchema() {
 	return define.updateSchemaKeys(schema, definitions);
 }
 
+var sealedSetup = function(props){
+	define.setup.call(
+		this,
+		props || {},
+		this.constructor.seal
+	);
+};
+
+
 var DefineMap = Construct.extend("DefineMap",{
 	setup: function(base){
 		var key,
@@ -86,13 +95,10 @@ var DefineMap = Construct.extend("DefineMap",{
 			for(key in DefineMap.prototype) {
 				define.defineConfigurableAndNotEnumerable(prototype, key, prototype[key]);
 			}
-			define.defineConfigurableAndNotEnumerable(prototype, "setup", function(props){
-				define.setup.call(
-					this,
-					props || {},
-					this.constructor.seal
-				);
-			});
+			// If someone provided their own setup, we call that.
+			if(prototype.setup === DefineMap.prototype.setup) {
+				define.defineConfigurableAndNotEnumerable(prototype, "setup", sealedSetup);
+			}
 
 			var _computedGetter = Object.getOwnPropertyDescriptor(prototype, "_computed").get;
 			Object.defineProperty(prototype, "_computed", {
