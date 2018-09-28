@@ -1536,3 +1536,20 @@ QUnit.test("Serialized computes do not prevent getters from working", function()
 
 	QUnit.equal(second.myPage, "two", "Runs the getter correctly");
 });
+
+QUnit.test("setup should be called (#395)", function(){
+	var calls = [];
+	var Base = DefineMap.extend("Base",{
+		setup: function(attrs) {
+			calls.push(this);
+			return DefineMap.prototype.setup.apply(this, arguments);
+		}
+	});
+
+	var Super = Base.extend("Super",{});
+
+	var base = new Base();
+	var supa = new Super();
+
+	QUnit.deepEqual(calls,[base, supa], "setup called");
+});
