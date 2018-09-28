@@ -1546,7 +1546,7 @@ QUnit.test("setup should be called (#395)", function(){
 		}
 	});
 
-	var Super = Base.extend("Super",{})
+	var Super = Base.extend("Super",{});
 
 	var base = new Base();
 	var supa = new Super();
