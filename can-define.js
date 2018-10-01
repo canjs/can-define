@@ -447,9 +447,11 @@ make = {
 		return computeObj;
 	},
 	valueResolver: function(prop, definition, typeConvert) {
+		var getDefault = make.get.defaultValue(prop, definition, typeConvert);
 		return function(){
 			var map = this;
-			var computeObj = make.computeObj(map, prop, new ResolverObservable(definition.value, map));
+			var defaultValue = getDefault.call(this);
+			var computeObj = make.computeObj(map, prop, new ResolverObservable(definition.value, map, defaultValue));
 			//!steal-remove-start
 			if(process.env.NODE_ENV !== 'production') {
 				Object.defineProperty(computeObj.handler, "name", {
