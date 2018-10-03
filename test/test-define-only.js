@@ -1286,14 +1286,13 @@ QUnit.test("canReflect.onKeyValue (#363)", function(){
 });
 
 QUnit.test("value lastSet has default value (#397)", function() {
-	var Defaulted = function(defaultValue) {
-		this.hasDefault = defaultValue;
-	};
+	var Defaulted = function() {};
 
 	define(Defaulted.prototype, {
 		hasDefault: {
 			default: 42,
 			value: function hasDefaultValue(props) {
+				QUnit.equal(props.lastSet.get(), 42, "props.lastSet works");
 				props.resolve(props.lastSet.get());
 			}
 		}
