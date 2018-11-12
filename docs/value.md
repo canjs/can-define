@@ -27,7 +27,6 @@ Specify the behavior of a property by listening to changes in other properties.
         prop.listenTo( "name", () => {
           prop.resolve( ++count );
         } );
-        prop.resolve( count );
       }
     }
   } );
