@@ -6,6 +6,7 @@ var canSymbol = require("can-symbol");
 var SimpleObservable = require("can-simple-observable");
 var testHelpers = require("can-test-helpers");
 var canReflect = require("can-reflect");
+var ObservationRecorder = require("can-observation-recorder");
 
 QUnit.module("can-define");
 
@@ -1300,4 +1301,23 @@ QUnit.test("value lastSet has default value (#397)", function() {
 	var defaulted = new Defaulted();
 	QUnit.equal(defaulted.hasDefault, 42,
 		"hasDefault value.lastSet set default value");
+});
+
+QUnit.test("binding computed properties do not observation recordings (#406)", function(){
+	var Type = function() {};
+
+	define(Type.prototype, {
+		prop: {
+			get: function(){
+				return "foo";
+			}
+		}
+	});
+
+	var inst = new Type();
+
+	ObservationRecorder.start();
+	inst.on("prop", function(){});
+	var records = ObservationRecorder.stop();
+	QUnit.equal(records.valueDependencies.size, 0, "nothing recorded");
 });

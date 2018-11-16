@@ -955,7 +955,7 @@ function setupComputed(instance, eventName) {
 		if (!computedBinding.count) {
 			computedBinding.count = 1;
 			canReflect.onValue(computedBinding.compute, computedBinding.handler, "notify");
-			computedBinding.oldValue = canReflect.getValue(computedBinding.compute);
+			computedBinding.oldValue = peek(computedBinding.compute);
 		} else {
 			computedBinding.count++;
 		}
