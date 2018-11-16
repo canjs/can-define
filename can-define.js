@@ -1094,7 +1094,7 @@ define.expando = function(map, prop, value) {
 				map.dispatch({
 					type: prop,
 					target: map,
-					patches: [{type: "set", key: prop, value: map._data[prop]}],
+					patches: [{type: "add", key: prop, value: map._data[prop]}],
 				},[map._data[prop], undefined]);
 			}
 			queues.batch.stop();

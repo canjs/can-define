@@ -403,3 +403,20 @@ QUnit.test("assignDeep", function(){
 		{name: "Payal", age: 35}
 	], "assigned right");
 });
+
+QUnit.test("DefineMap fires 'set' event when a new property is added (#400)", function(){
+	var counter = 0;
+	var vm = new DefineMap({});
+
+	canReflect.onPatches(vm, function (patch) {
+		if (counter === 0) {
+			QUnit.equal(patch[0].type, 'add', 'dispatched add correctly');
+		} else {
+			QUnit.equal(patch[0].type, 'set', 'dispatched set correctly');
+		}
+		counter++;
+	});
+
+	vm.set("name", "Matt");
+	vm.set("name", "Justin");
+});
