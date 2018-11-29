@@ -813,6 +813,7 @@ var addBehaviorToDefinition = function(definition, behavior, value) {
 // Currently, this is adding default behavior
 // copying `type` over, and even cleaning up the final definition object
 makeDefinition = function(prop, def, defaultDefinition, typePrototype) {
+
 	var definition = {};
 
 	canReflect.eachKey(def, function(value, behavior) {
@@ -838,7 +839,7 @@ makeDefinition = function(prop, def, defaultDefinition, typePrototype) {
 			};
 		}
 		if(value[newSymbol]) {
-			definition.type = value[newSymbol];
+			definition.type = value;
 			delete definition.Type;
 		}
 	}
@@ -1233,7 +1234,9 @@ define.updateSchemaKeys = function(schema, definitions) {
 	for(var prop in definitions) {
 		var definition = definitions[prop];
 		if(definition.serialize !== false ) {
-			if(definition.type) {
+			if(definition.Type) {
+				schema.keys[prop] = definition.Type;
+			} else if(definition.type) {
 				schema.keys[prop] = definition.type;
 			} else {
 				schema.keys[prop] = function(val){ return val; };
