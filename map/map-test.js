@@ -10,6 +10,7 @@ var canTestHelpers = require("can-test-helpers/lib/dev");
 var DefineList = require("can-define/list/list");
 var dev = require("can-log/dev/dev");
 var ObservationRecorder = require("can-observation-recorder");
+var MaybeString = require("can-data-types/maybe-string/maybe-string");
 
 var sealWorks = (function() {
 	try {
@@ -1256,22 +1257,43 @@ QUnit.test("value as a string breaks", function(){
 });
 
 QUnit.test("canReflect.getSchema", function(){
+
+	// For #401
+	var StringIgnoreCase = canReflect.assignSymbols({},{
+		"can.new": function(value){
+			return value.toLowerCase();
+		}
+	});
+
 	var MyType = DefineMap.extend({
 		id: {identity: true, type: "number"},
 		name: "string",
-		foo: {serialize: false}
+		foo: {serialize: false},
+		lowerCase: StringIgnoreCase,
+		text: MaybeString,
+
+		maybeString_type: {type: MaybeString},
+		maybeString_Type: {Type: MaybeString}
 	});
 
 	var schema = canReflect.getSchema(MyType);
 
 	QUnit.deepEqual(schema.identity, ["id"], "right identity");
-	QUnit.deepEqual(Object.keys(schema.keys), ["id","name"], "right key names");
+	QUnit.deepEqual(Object.keys(schema.keys), ["id","name","lowerCase","text","maybeString_type","maybeString_Type"], "right key names");
 
 	QUnit.equal( canReflect.convert("1", schema.keys.id), 1, "converted to number");
 
 	QUnit.equal( canReflect.convert(3, schema.keys.id), "3", "converted to number");
 
+	QUnit.equal(schema.keys.name, MaybeString, " 'string' -> MaybeString");
+	QUnit.equal(schema.keys.lowerCase, StringIgnoreCase, "StringIgnoreCase");
+	QUnit.equal(schema.keys.text, MaybeString, "MaybeString");
+
+	QUnit.equal(schema.keys.maybeString_type, MaybeString, "{type: MaybeString}");
+	QUnit.equal(schema.keys.maybeString_Type, MaybeString, "{Type: MaybeString}");
+
 });
+
 
 QUnit.test("use can.new and can.serialize for conversion", function(){
 	var Status = canReflect.assignSymbols({},{
