@@ -237,10 +237,11 @@ var defineMapProto = {
 		return keysForDefinition(this._define.definitions).concat(keysForDefinition(this._instanceDefinitions) );
 	},
 	"can.hasOwnKey": function(key) {
-		return Object.hasOwnProperty.call(this._define.definitions, key);
+		return Object.hasOwnProperty.call(this._define.definitions, key) ||
+			( this._instanceDefinitions !== undefined && Object.hasOwnProperty.call(this._instanceDefinitions, key) );
 	},
 	"can.hasKey": function(key) {
-		return !!this._define.definitions[key];
+		return (key in this._define.definitions) || (this._instanceDefinitions !== undefined && key in this._instanceDefinitions);
 	},
 
 	// -shape get/set-

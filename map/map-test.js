@@ -1150,7 +1150,8 @@ canTestHelpers.devOnlyTest("setting a property gives a nice error", function(){
 	}
 });
 
-canTestHelpers.devOnlyTest("can.hasKey and can.hasOwnKey (#303)", function(assert) {
+canTestHelpers.devOnlyTest("can.hasKey and can.hasOwnKey (#303) (#412)", function(assert) {
+
 	var hasKeySymbol = canSymbol.for("can.hasKey"),
 		hasOwnKeySymbol = canSymbol.for("can.hasOwnKey");
 
@@ -1193,6 +1194,9 @@ canTestHelpers.devOnlyTest("can.hasKey and can.hasOwnKey (#303)", function(asser
 	assert.equal(vm[hasOwnKeySymbol]("parentDerivedProp"), false, "vm.hasOwnKey('parentDerivedProp') false");
 
 	assert.equal(vm[hasOwnKeySymbol]("anotherProp"), false, "vm.hasOwnKey('anotherProp') false");
+	
+	var map = new DefineMap({expandoKey: undefined});
+	assert.equal(map[hasKeySymbol]("expandoKey"), true, "map.hasKey('expandoKey')  (#412)");
 });
 
 canTestHelpers.devOnlyTest("getOwnKeys, getOwnEnumerableKeys (#326)", function(assert) {
