@@ -288,11 +288,15 @@ for(var prop in define.eventsProto) {
 		writable: true
 	});
 }
-// @@can.onKeyValue and @@can.offKeyValue are also on define.eventsProto
-//  but symbols are not enumerated in for...in loops
+function getSymbolsForIE(obj){
+	return Object.getOwnPropertyNames(obj).filter(function(name){
+		return name.indexOf("@@symbol") === 0;
+	});
+}
+// Copy symbols over, but they aren't supported in IE
 var eventsProtoSymbols = ("getOwnPropertySymbols" in Object) ?
   Object.getOwnPropertySymbols(define.eventsProto) :
-  [canSymbol.for("can.onKeyValue"), canSymbol.for("can.offKeyValue")];
+  getSymbolsForIE(define.eventsProto);
 
 eventsProtoSymbols.forEach(function(sym) {
   Object.defineProperty(DefineMap.prototype, sym, {
