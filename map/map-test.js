@@ -1579,3 +1579,19 @@ QUnit.test("setup should be called (#395)", function(){
 
 	QUnit.deepEqual(calls,[base, supa], "setup called");
 });
+
+QUnit.test("Set new prop to undefined #408", function(){
+	var obj = new DefineMap({});
+	var PATCHES = [
+		[ { type: "add", key: "foo", value: undefined } ],
+		[ { type: "set", key: "foo", value: "bar" } ]
+	];
+	var calledPatches = [];
+	var handler = function(patches){
+		calledPatches.push(patches);
+	};
+	obj[canSymbol.for("can.onPatches")](handler,"notify");
+	obj.set("foo", undefined);
+	obj.set("foo", "bar");
+	QUnit.deepEqual(calledPatches, PATCHES);
+});
