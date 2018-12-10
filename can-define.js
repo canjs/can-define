@@ -1090,7 +1090,7 @@ define.expando = function(map, prop, value) {
 				type: "can.keys",
 				target: map
 			});
-			if(map._data[prop] !== undefined) {
+			if(map._data.hasOwnProperty(prop)) {
 				map.dispatch({
 					type: prop,
 					target: map,
@@ -1103,7 +1103,6 @@ define.expando = function(map, prop, value) {
 					patches: [{type: "add", key: prop, value: map._data[prop]}],
 				},[map._data[prop], undefined]);
 			}
-			
 			queues.batch.stop();
 		}
 		return true;
