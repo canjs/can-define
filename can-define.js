@@ -1090,12 +1090,19 @@ define.expando = function(map, prop, value) {
 				type: "can.keys",
 				target: map
 			});
-			
-			map.dispatch({
-				type: prop,
-				target: map,
-				patches: [{type: "add", key: prop, value: map._data[prop]}],
-			},[map._data[prop], undefined]);
+			if(map._data[prop] !== undefined) {
+				map.dispatch({
+					type: prop,
+					target: map,
+					patches: [{type: "add", key: prop, value: map._data[prop]}],
+				},[map._data[prop], undefined]);
+			} else {
+				map.dispatch({
+					type: "set",
+					target: map,
+					patches: [{type: "add", key: prop, value: map._data[prop]}],
+				},[map._data[prop], undefined]);
+			}
 			
 			queues.batch.stop();
 		}
