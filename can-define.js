@@ -1090,7 +1090,7 @@ define.expando = function(map, prop, value) {
 				type: "can.keys",
 				target: map
 			});
-			if(map._data.hasOwnProperty(prop)) {
+			if(Object.prototype.hasOwnProperty.call(map._data, prop)) {
 				map.dispatch({
 					type: prop,
 					target: map,
