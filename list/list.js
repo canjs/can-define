@@ -57,6 +57,19 @@ function getSchema() {
 	return schema;
 }
 
+var includes = (function(){
+	var arrayIncludes =  Array.prototype.includes;
+	if(arrayIncludes){
+		return function includes() {
+			return arrayIncludes.apply(this, arguments);
+		};
+	} else {
+		return function includes() {
+			throw new Error("DefineList.prototype.includes must have Array.prototype.includes available. Please add a polyfill to this environment.");
+		};
+	}
+})();
+
 
 /** @add can-define/list/list */
 var DefineList = Construct.extend("DefineList",
@@ -472,25 +485,7 @@ function a(fnLength, fnName) {
 });
 
 assign(DefineList.prototype, {
-	includes: function(item, fromIndex) {
-		// adapted from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes#Polyfill
-		var len = this.length >>> 0;
-		if (len === 0) { return false; }
-
-		var n = fromIndex | 0;
-		var k = Math.max(n >= 0 ? n : len - Math.abs(n), 0);
-
-		function sameValueZero(x, y) {
-			return x === y ||
-				(typeof x === 'number' && typeof y === 'number' && isNaN(x) && isNaN(y));
-		}
-
-		while (k < len) {
-			if (sameValueZero(this[k], item)) { return true; }
-			k++;
-		}
-		return false;
-	},
+	includes: includes,
 	indexOf: function(item, fromIndex) {
 		for (var i = fromIndex || 0, len = this.length; i < len; i++) {
 			if (this.get(i) === item) {

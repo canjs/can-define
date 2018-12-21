@@ -1520,3 +1520,19 @@ QUnit.test("computed index is less than 0", function(assert) {
 	assert.ok(list.includes("c", -100));
 	assert.notOk(list.includes("a", -2));
 });
+
+QUnit.test("Bound 'includes' (#277)", function(){
+	expect(1);
+	var list = new DefineList();
+	var obs = new Observation(function(){
+		return list.includes("foo");
+	});
+
+	function onChange(val) {
+		ok(val);
+	}
+
+	canReflect.onValue(obs, onChange);
+	list.push("foo");
+	canReflect.offValue(obs, onChange);
+});
