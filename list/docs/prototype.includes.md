@@ -24,4 +24,4 @@
   
   @param {*} [fromIndex] The position in the `list` at which to begin searching for `itemToFind`.
   
-  @return {Boolean} `false` if `itemToFind` is not found the `list`, `true` otherwise
+  @return {Boolean} `false` if `itemToFind` is not found in the `list`, `true` otherwise
