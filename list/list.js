@@ -57,7 +57,6 @@ function getSchema() {
 	return schema;
 }
 
-
 /** @add can-define/list/list */
 var DefineList = Construct.extend("DefineList",
 	/** @static */
@@ -472,6 +471,18 @@ function a(fnLength, fnName) {
 });
 
 assign(DefineList.prototype, {
+	includes: (function(){
+		var arrayIncludes =  Array.prototype.includes;
+		if(arrayIncludes){
+			return function includes() {
+				return arrayIncludes.apply(this, arguments);
+			};
+		} else {
+			return function includes() {
+				throw new Error("DefineList.prototype.includes must have Array.prototype.includes available. Please add a polyfill to this environment.");
+			};
+		}
+	})(),
 	indexOf: function(item, fromIndex) {
 		for (var i = fromIndex || 0, len = this.length; i < len; i++) {
 			if (this.get(i) === item) {
