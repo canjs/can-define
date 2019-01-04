@@ -1488,51 +1488,68 @@ QUnit.test("Bound serialized lists update when they change length", function(){
 });
 
 QUnit.test("'includes' method basics (#277)", function(assert) {
-	QUnit.expect(6);
-
-	var emptyList = new DefineList([]);
-	assert.notOk(emptyList.includes(2));
-
-	var list = new DefineList([1, 2, 3]);
-	assert.ok(list.includes(2));
-	assert.notOk(list.includes(4));
-	assert.notOk(list.includes(3, 3));
-	assert.ok(list.includes(3, -1));
-
-	var nanList = new DefineList([1, 2, NaN]);
-	assert.ok(nanList.includes(NaN));
+	if (typeof Array.prototype.includes === "function") {
+		QUnit.expect(6);
+	
+		var emptyList = new DefineList([]);
+		assert.notOk(emptyList.includes(2));
+	
+		var list = new DefineList([1, 2, 3]);
+		assert.ok(list.includes(2));
+		assert.notOk(list.includes(4));
+		assert.notOk(list.includes(3, 3));
+		assert.ok(list.includes(3, -1));
+	
+		var nanList = new DefineList([1, 2, NaN]);
+		assert.ok(nanList.includes(NaN));
+	} else {
+		expect(0);
+	}
 });
 
 QUnit.test("'fromIndex' is not >= to the array length", function(assert) {
-	QUnit.expect(2);
+	if (typeof Array.prototype.includes === "function") {
+		QUnit.expect(2);
 
-	var list = new DefineList(["a", "b", "c"]);
-	assert.notOk(list.includes("c", 3));
-	assert.notOk(list.includes("c", 100));
+		var list = new DefineList(["a", "b", "c"]);
+		assert.notOk(list.includes("c", 3));
+		assert.notOk(list.includes("c", 100));
+	} else {
+		expect(0);
+	}
 });
 
 QUnit.test("computed index is less than 0", function(assert) {
-	QUnit.expect(4);
+	if (typeof Array.prototype.includes === "function") {
+		QUnit.expect(4);
 
-	var list = new DefineList(["a", "b", "c"]);
-	assert.ok(list.includes("a", -100));
-	assert.ok(list.includes("b", -100));
-	assert.ok(list.includes("c", -100));
-	assert.notOk(list.includes("a", -2));
+		var list = new DefineList(["a", "b", "c"]);
+		assert.ok(list.includes("a", -100));
+		assert.ok(list.includes("b", -100));
+		assert.ok(list.includes("c", -100));
+		assert.notOk(list.includes("a", -2));
+	} else {
+		expect(0);
+	}
 });
 
 QUnit.test("Bound 'includes' (#277)", function(){
-	expect(1);
-	var list = new DefineList();
-	var obs = new Observation(function(){
-		return list.includes("foo");
-	});
+	if (typeof Array.prototype.includes === "function") {
+		expect(1);
+		var list = new DefineList();
+		var obs = new Observation(function(){
+			return list.includes("foo");
+		});
 
-	function onChange(val) {
-		ok(val);
+		// put it in an expression to avoid jshint "Function declarations should not be placed in blocks"
+		var onChange = function onChange(val) {
+			ok(val);
+		};
+
+		canReflect.onValue(obs, onChange);
+		list.push("foo");
+		canReflect.offValue(obs, onChange);
+	} else {
+		expect(0);
 	}
-
-	canReflect.onValue(obs, onChange);
-	list.push("foo");
-	canReflect.offValue(obs, onChange);
 });
