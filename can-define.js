@@ -27,7 +27,8 @@ var MaybeBoolean = require("can-data-types/maybe-boolean/maybe-boolean"),
     MaybeString = require("can-data-types/maybe-string/maybe-string");
 
 var newSymbol = canSymbol.for("can.new"),
-	serializeSymbol = canSymbol.for("can.serialize");
+	serializeSymbol = canSymbol.for("can.serialize"),
+	inSetupSymbol = canSymbol.for("can.initializing");
 
 var eventsProto, define,
 	make, makeDefinition, getDefinitionsAndMethods, getDefinitionOrMethod;
@@ -411,14 +412,14 @@ define.makeDefineInstanceKey = function(constructor) {
 // Makes a simple constructor function.
 define.Constructor = function(defines, sealed) {
 	var constructor = function DefineConstructor(props) {
-		Object.defineProperty(this,"__inSetup",{
+		Object.defineProperty(this, inSetupSymbol, {
 			configurable: true,
 			enumerable: false,
 			value: true,
 			writable: true
 		});
 		define.setup.call(this, props, sealed);
-		this.__inSetup = false;
+		this[inSetupSymbol] = false;
 	};
 	var result = define(constructor.prototype, defines);
 	addTypeEvents(constructor);
@@ -505,7 +506,7 @@ make = {
 		},
 		events: function(prop, getCurrent, setData, eventType) {
 			return function(newVal) {
-				if (this.__inSetup) {
+				if (this[inSetupSymbol]) {
 					setData.call(this, newVal);
 				}
 				else {
@@ -760,7 +761,7 @@ make = {
 		},
 		data: function(prop) {
 			return function() {
-				if (!this.__inSetup) {
+				if (!this[inSetupSymbol]) {
 					ObservationRecorder.add(this, prop);
 				}
 
@@ -1085,7 +1086,7 @@ define.expando = function(map, prop, value) {
 		}
 
 		instanceDefines[prop] = defaultDefinition;
-		if(!map.__inSetup) {
+		if(!map[inSetupSymbol]) {
 			queues.batch.start();
 			map.dispatch({
 				type: "can.keys",
