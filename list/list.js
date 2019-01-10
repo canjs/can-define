@@ -41,6 +41,7 @@ var makeFilterCallback = function(props) {
 var onKeyValue = define.eventsProto[canSymbol.for("can.onKeyValue")];
 var offKeyValue = define.eventsProto[canSymbol.for("can.offKeyValue")];
 var getSchemaSymbol = canSymbol.for("can.getSchema");
+var inSetupSymbol = canSymbol.for("can.initializing");
 
 function getSchema() {
 	var definitions = this.prototype._define.definitions;
@@ -584,7 +585,7 @@ for (var prop in define.eventsProto) {
 
 Object.defineProperty(DefineList.prototype, "length", {
 	get: function() {
-		if (!this.__inSetup) {
+		if (!this[inSetupSymbol]) {
 			ObservationRecorder.add(this, "length");
 		}
 		return this._length;
