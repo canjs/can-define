@@ -1538,3 +1538,9 @@ if (typeof Array.prototype.includes === "function") {
 		canReflect.offValue(obs, onChange);
 	});
 }
+
+QUnit.test("Set __inSetup prop #421", function() {
+	var list = new DefineList([]);
+	list.set("__inSetup", "nope");
+	QUnit.equal(list.__inSetup, "nope");
+});

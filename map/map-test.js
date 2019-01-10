@@ -1595,3 +1595,9 @@ QUnit.test("Set new prop to undefined #408", function(){
 	obj.set("foo", "bar");
 	QUnit.deepEqual(calledPatches, PATCHES);
 });
+
+QUnit.test("Set __inSetup prop #421", function() {
+	var map = new DefineMap({});
+	map.set("__inSetup", "nope");
+	QUnit.equal(map.__inSetup, "nope");
+});
