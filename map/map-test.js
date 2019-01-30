@@ -1601,3 +1601,30 @@ QUnit.test("Set __inSetup prop #421", function() {
 	map.set("__inSetup", "nope");
 	QUnit.equal(map.__inSetup, "nope");
 });
+
+QUnit.test("'*' wildcard type definitions that use constructors works for expandos #425", function(){
+	var MyType = function MyType() {};
+	MyType.prototype = {};
+
+	var OtherType = DefineMap.extend({ seal : false }, {
+		"*" : MyType
+	});
+
+	var map = new OtherType();
+	map.set( "foo", {});
+	var foo = map.get( "foo" );
+	QUnit.ok(foo instanceof MyType);
+});
+
+QUnit.test("'*' wildcard type definitions that use DefineMap constructors works for expandos #425", function(){
+	var MyType = DefineMap.extend({});
+
+	var OtherType = DefineMap.extend({ seal : false }, {
+		"*" : MyType
+	});
+
+	var map = new OtherType();
+	map.set( "foo", {});
+	var foo = map.get( "foo" );
+	QUnit.ok(foo instanceof MyType);
+});
