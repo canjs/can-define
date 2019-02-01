@@ -1081,6 +1081,8 @@ define.expando = function(map, prop, value) {
 		// possibly convert value to List or DefineMap
 		if(defaultDefinition.type) {
 			map._data[prop] = define.make.set.type(prop, defaultDefinition.type, returnFirstArg).call(map, value);
+		} else if (defaultDefinition.Type && canReflect.isConstructorLike(defaultDefinition.Type)) {
+			map._data[prop] = define.make.set.Type(prop, defaultDefinition.Type, returnFirstArg).call(map, value);
 		} else {
 			map._data[prop] = define.types.observable(value);
 		}
