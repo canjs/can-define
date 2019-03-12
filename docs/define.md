@@ -38,7 +38,7 @@ and [can-define/list/list] are documented here.
   const greeting = new Greeting("Hello");
 
   canReflect.onKeyValue(greeting, "message", (newValue) => {
-  	console.log( newValue.target.message ); //-> logs "goodbye"
+  	console.log( newValue ); //-> logs "goodbye"
   });
 
   greeting.message = "goodbye";
