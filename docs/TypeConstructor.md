@@ -51,6 +51,7 @@ value.
 
   ```js
   import {DefineMap} from "can";
+  import {Person} from "//unpkg.com/can-demo-models@5";
 
   const List = DefineMap.extend({
     people: {
