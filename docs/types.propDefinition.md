@@ -357,8 +357,8 @@ observable property.  These behaviors can be specified with as an `Object`, `Str
 
   const Person = DefineMap.extend( {
     fullName: {
-      set(newVal) {
-        const parts = newVal.split(" ");
+      set(newValue) {
+        const parts = newValue.split(" ");
         this.first = parts[0];
         this.last = parts[1];
       }
@@ -379,7 +379,7 @@ observable property.  These behaviors can be specified with as an `Object`, `Str
   const Person = DefineMap.extend( {
     fullName: {
       set: function(newValue) {
-        const parts = newVal.split(" ");
+        const parts = newValue.split(" ");
         this.first = parts[0];
         this.last = parts[1];
       }
