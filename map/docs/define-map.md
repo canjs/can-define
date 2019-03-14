@@ -163,7 +163,7 @@ that functionally derive their value from other property values.  This is done b
 defining [can-define.types.get getter] properties like `fullName` as follows:
 
 ```js
-import {DefineMap} from "can":
+import {DefineMap} from "can";
 
 const Person = DefineMap.extend( {
 	first: "string",
