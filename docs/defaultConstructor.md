@@ -30,8 +30,8 @@ Provides a constructor function to be used to provide a default value for a prop
 import {DefineMap} from "can";
 
 const Address = DefineMap.extend( {
-	street: { type: "string", value: "321 Longbow" },
-	city: { type: "string", value: "Dallas" }
+	street: { type: "string", default: "321 Longbow" },
+	city: { type: "string", default: "Dallas" }
 } );
 
 const Direction = DefineMap.extend( {
