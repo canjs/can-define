@@ -85,7 +85,8 @@ var defineHelpers = {
 			delete instanceDefines[prop];
 			queues.batch.start();
 			this.dispatch({
-				type: "can.keys",
+				action: "can.keys",
+				type: "can.keys", // TODO: Remove in 6.0
 				target: this
 			});
 			var oldValue = this._data[prop];
@@ -93,7 +94,11 @@ var defineHelpers = {
 				delete this._data[prop];
 				//delete this[prop];
 				this.dispatch({
-					type: prop,
+					action: "delete",
+					key: prop,
+					newValue: undefined,
+					oldValue: oldValue,
+					type: prop, // TODO: Remove in 6.0
 					target: this,
 					patches: [{type: "delete", key: prop}],
 				},[undefined,oldValue]);
