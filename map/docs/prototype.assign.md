@@ -29,7 +29,7 @@
   ```
   @codepen
 
-  > NOTICE: `.assign` will not remove or change properties that are not in `props`. Use [can-define/map/map.prototype.update .update()] to replace all of a map's values.
+  > **Note:** `.assign` will not remove or change properties that are not in `props`. Use [can-define/map/map.prototype.update .update()] to replace all of a map’s values.
 
   @param {Object} props A collection of key-value pairs to set.
   If any properties already exist on the map, they will be overwritten.
