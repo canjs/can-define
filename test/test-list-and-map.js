@@ -387,3 +387,36 @@ QUnit.test('Deep updating a map', function() {
 	QUnit.equal(obj.list[0], 'something', 'the first element of the list should be updated');
 
 });
+
+QUnit.test("assignDeep", function(){
+	var justin = new DefineMap({name: "Justin", age: 35}),
+		payal = new DefineMap({name: "Payal", age: 35});
+
+	var people = new DefineList([justin, payal]);
+
+	people.assignDeep([
+		{age: 36}
+	]);
+
+	QUnit.deepEqual(people.serialize(),  [
+		{name: "Justin", age: 36},
+		{name: "Payal", age: 35}
+	], "assigned right");
+});
+
+QUnit.test("DefineMap fires 'set' event when a new property is added (#400)", function(){
+	var counter = 0;
+	var vm = new DefineMap({});
+
+	canReflect.onPatches(vm, function (patch) {
+		if (counter === 0) {
+			QUnit.equal(patch[0].type, 'add', 'dispatched add correctly');
+		} else {
+			QUnit.equal(patch[0].type, 'set', 'dispatched set correctly');
+		}
+		counter++;
+	});
+
+	vm.set("name", "Matt");
+	vm.set("name", "Justin");
+});

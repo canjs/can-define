@@ -6,6 +6,7 @@ var canSymbol = require("can-symbol");
 var SimpleObservable = require("can-simple-observable");
 var testHelpers = require("can-test-helpers");
 var canReflect = require("can-reflect");
+var ObservationRecorder = require("can-observation-recorder");
 
 QUnit.module("can-define");
 
@@ -1178,13 +1179,16 @@ QUnit.test('defined properties are configurable', function(){
 testHelpers.dev.devOnlyTest("Setting a value with only a get() generates a warning (#202)", function() {
 	QUnit.expect(7);
 
-	var message = "can-define: Set value for property derivedProp ignored, as its definition has a zero-argument getter and no setter";
+	var VM = function() {};
+
+	var message = "can-define: Set value for property "+canReflect.getName(VM.prototype)+".derivedProp ignored, as its definition has a zero-argument getter and no setter";
 	var finishErrorCheck = testHelpers.dev.willWarn(message, function(actualMessage, success) {
+
 		QUnit.equal(actualMessage, message, "Warning is expected message");
 		QUnit.ok(success);
 	});
 
-	var VM = function() {};
+
 	define(VM.prototype, {
 		derivedProp: {
 			get: function() {
@@ -1203,7 +1207,7 @@ testHelpers.dev.devOnlyTest("Setting a value with only a get() generates a warni
 
 	QUnit.equal(finishErrorCheck(), 1);
 
-	message = "can-define: Set value for property derivedProp on VM ignored, as its definition has a zero-argument getter and no setter";
+	message = "can-define: Set value for property "+canReflect.getName(VM.prototype)+".derivedProp ignored, as its definition has a zero-argument getter and no setter";
 	finishErrorCheck = testHelpers.dev.willWarn(message, function(actualMessage, success) {
 		QUnit.equal(actualMessage, message, "Warning is expected message");
 		QUnit.ok(success);
@@ -1213,10 +1217,10 @@ testHelpers.dev.devOnlyTest("Setting a value with only a get() generates a warni
 	QUnit.equal(finishErrorCheck(), 1);
 });
 
-testHelpers.dev.devOnlyTest("warn on using a Constructor for small-t type definintions", function() {
-	QUnit.expect(2);
+testHelpers.dev.devOnlyTest("warn on using a Constructor for small-t type definitions", function() {
+	QUnit.expect(1);
 
-	var message = "can-define: the definition for currency uses a constructor for \"type\". Did you mean \"Type\"?";
+	var message = /can-define: the definition for [\w{}\.]+ uses a constructor for "type"\. Did you mean "Type"\?/;
 	var finishErrorCheck = testHelpers.dev.willWarn(message);
 
 	function Currency() {
@@ -1238,19 +1242,82 @@ testHelpers.dev.devOnlyTest("warn on using a Constructor for small-t type defini
 
 	QUnit.equal(finishErrorCheck(), 1);
 
-	message = "can-define: the definition for currency on VM2 uses a constructor for \"type\". Did you mean \"Type\"?";
-	finishErrorCheck = testHelpers.dev.willWarn(message);
+});
 
-	function VM2() {}
-	VM2.shortName = "VM2";
-	define(VM2.prototype, {
+testHelpers.dev.devOnlyTest("warn with constructor for Value instead of Default (#340)", function() {
+	QUnit.expect(1);
+
+	var message = /can-define: Change the 'Value' definition for [\w\.{}]+.currency to 'Default'./;
+	var finishErrorCheck = testHelpers.dev.willWarn(message);
+
+	function Currency() {
+		return this;
+	}
+	Currency.prototype = {
+		symbol: "USD"
+	};
+
+	function VM() {}
+	define(VM.prototype, {
 		currency: {
-			type: Currency, // should be `Type: Currency`
-			default: function() {
-				return new Currency({});
+			Value: Currency
+		}
+	});
+	QUnit.equal(finishErrorCheck(), 1);
+});
+
+
+QUnit.test("canReflect.onKeyValue (#363)", function(){
+	var Greeting = function( message ) {
+		this.message = message;
+	};
+
+	define( Greeting.prototype, {
+		message: { type: "string" }
+	} );
+
+	var greeting = new Greeting("Hello");
+
+	canReflect.onKeyValue(greeting, "message", function(newVal, oldVal) {
+		QUnit.equal(newVal, "bye");
+		QUnit.equal(oldVal, "Hello");
+	});
+
+	greeting.message = "bye";
+});
+
+QUnit.test("value lastSet has default value (#397)", function() {
+	var Defaulted = function() {};
+
+	define(Defaulted.prototype, {
+		hasDefault: {
+			default: 42,
+			value: function hasDefaultValue(props) {
+				QUnit.equal(props.lastSet.get(), 42, "props.lastSet works");
+				props.resolve(props.lastSet.get());
+			}
+		}
+	});
+	var defaulted = new Defaulted();
+	QUnit.equal(defaulted.hasDefault, 42,
+		"hasDefault value.lastSet set default value");
+});
+
+QUnit.test("binding computed properties do not observation recordings (#406)", function(){
+	var Type = function() {};
+
+	define(Type.prototype, {
+		prop: {
+			get: function(){
+				return "foo";
 			}
 		}
 	});
 
-	QUnit.equal(finishErrorCheck(), 1);
+	var inst = new Type();
+
+	ObservationRecorder.start();
+	inst.on("prop", function(){});
+	var records = ObservationRecorder.stop();
+	QUnit.equal(records.valueDependencies.size, 0, "nothing recorded");
 });

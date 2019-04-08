@@ -14,8 +14,7 @@ instance. It is typically used to:
  - Add or update other properties as side effects
  - Coerce the set value into an appropriate action
 
-The behavior of the setter depends on the number of arguments specified. This means that a
-setter like:
+The behavior of the setter depends on the number of arguments specified. This means that a setter like:
 
 ```js
 {
@@ -58,7 +57,7 @@ arguments the setter declares:
 
 ## Use
 
-A property's `set` function can be used to customize the behavior of when an attribute value is set.  Lets see some common cases:
+A property's `set` function can be used to customize the behavior of when an attribute value is set.  Let's see some common cases:
 
 #### Side effects
 
@@ -66,19 +65,30 @@ The following makes setting a `page` property update the `offset`:
 
 
 ```js
-{
-	page: {
-		set: function( newVal ) {
-			this.offset =  ( parseInt( newVal ) - 1 ) * this.limit;
-		}
-	}
-}
+import {DefineMap} from "can";
+
+const Pages = DefineMap.extend( {
+    limit: { default: 5 },
+    offset: { default: 0 },
+    page: {
+        set: function( newVal ) {
+            this.offset =  ( parseInt( newVal ) - 1 ) * this.limit;
+        }
+    }
+} );
+const book = new Pages();
+book.page = 10;
+console.log( book.offset ); //-> 45
 ```
+@codepen
 
 The following makes changing `makeId` un-define the `modelId` property:
 
-```
-{
+```js
+import {DefineMap} from "can";
+
+const Car = DefineMap.extend( {
+	modelId: { default: undefined },
 	makeId: {
 	    set: function(newValue){
 	        // Check if we are changing.
@@ -89,8 +99,14 @@ The following makes changing `makeId` un-define the `modelId` property:
 	        return newValue;
 	    }
 	}
-}
+} );
+
+const myCar = new Car({ makeId: "GMC", modelId: "Jimmy" });
+console.log( myCar.modelId ); //-> "Jimmy"
+myCar.makeId = "Chevrolet";
+console.log( myCar.modelId ); //-> undefined
 ```
+@codepen
 
 #### Asynchronous Setter
 
@@ -114,51 +130,62 @@ When a setter returns `undefined`, its behavior changes depending on the number 
 With 0 arguments, the original set value is set on the attribute.
 
 ```js
-MyMap = DefineMap.extend( {
+import {DefineMap} from "can";
+
+const MyMap = DefineMap.extend( {
 	prop: { set: function() {} }
 } );
 
 const map = new MyMap( { prop: "foo" } );
 
-map.prop; //-> "foo"
+console.log( map.prop ); //-> "foo"
 ```
+@codepen
 
 With 1 argument, an `undefined` return value will set the property to `undefined`.  
 
 ```js
-MyMap = DefineMap.extend( {
+import {DefineMap} from "can";
+
+const MyMap = DefineMap.extend( {
 	prop: { set: function( newVal ) {} }
 } );
 
 const map = new MyMap( { prop: "foo" } );
 
-map.prop; //-> undefined
+console.log( map.prop ); //-> undefined
 ```
+@codepen
 
 With 2 arguments, `undefined` leaves the property in place.  It is expected
 that `resolve` will be called:
 
 ```js
-MyMap = DefineMap.extend( {
+import {DefineMap} from "can";
+
+const MyMap = DefineMap.extend( {
 	prop: {
 		set: function( newVal, resolve ) {
-			setVal( newVal + "d" );
+			resolve( newVal + "d" );
 		}
 	}
 } );
 
 const map = new MyMap( { prop: "foo" } );
 
-map.prop; //-> "food";
+console.log( map.prop ); //-> "food";
 ```
+@codepen
 
 ## Side effects
 
 A set function provides a useful hook for performing side effect logic as a certain property is being changed.
 
-For example, in the example below, Paginator DefineMap includes a `page` property, which derives its value entirely from other properties (limit and offset).  If something tries to set the `page` directly, the set method will set the value of `offset`:
+In the example below, Paginator DefineMap includes a `page` property, which derives its value entirely from other properties (limit and offset).  If something tries to set the `page` directly, the set method will set the value of `offset`:
 
 ```js
+import {DefineMap} from "can";
+
 const Paginate = DefineMap.extend( {
 	limit: "number",
 	offset: "number",
@@ -173,8 +200,11 @@ const Paginate = DefineMap.extend( {
 } );
 
 const p = new Paginate( { limit: 10, offset: 20 } );
-```
 
+console.log( p.offset ); //-> 20
+console.log( p.page ); //-> 2
+```
+@codepen
 
 
 ## Merging
@@ -182,6 +212,8 @@ const p = new Paginate( { limit: 10, offset: 20 } );
 By default, if a value returned from a setter is an object the effect will be to replace the property with the new object completely.
 
 ```js
+import {DefineMap} from "can";
+
 const Contact = DefineMap.extend( {
 	info: {
 		set: function( newVal ) {
@@ -194,17 +226,20 @@ const alice = new Contact( {
 	info: { name: "Alice Liddell", email: "alice@liddell.com" }
 } );
 
-const info  = alice.info;
+const info = alice.info;
 
 alice.info = { name: "Allison Wonderland", phone: "888-888-8888" };
 
-info === alice.info; // -> false
+console.log( info === alice.info ); // -> false
 ```
+@codepen
 
 In contrast, you can merge properties with:
 
 ```js
-Contact = DefineMap.extend( {
+import {DefineMap} from "can";
+
+const Contact = DefineMap.extend( {
 	info: {
 		set: function( newVal ) {
 			if ( this.info ) {
@@ -220,12 +255,13 @@ const alice = new Contact( {
 	info: { name: "Alice Liddell", email: "alice@liddell.com" }
 } );
 
-const info  = alice.info;
+const info = alice.info;
 
 alice.info = { name: "Allison Wonderland", phone: "888-888-8888" };
 
-info === alice.info; // -> true
+console.log( info === alice.info ); // -> true
 ```
+@codepen
 
 ## Batched Changes
 

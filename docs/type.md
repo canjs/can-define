@@ -5,18 +5,25 @@ Converts a value set on an instance into an appropriate value.
 
 @signature `type(newValue, propertyName)`
 
-Given the set value, transform it into a value appropriate to be set.
-`type` is called before [can-define.types.set].  
+  Given the set value, transform it into a value appropriate to be set.
+  `type` is called before [can-define.types.set].  
 
-```js
-{
-	age: {
-		type: function( newValue, propertyName ) {
-			return +newValue;
-		}
-	}
-}
-```
+  ```js
+  import {DefineMap} from "can";
+
+  const Person = DefineMap.extend({
+    age: {
+      type: ( newValue, propertyName ) => {
+        return +newValue;
+      }
+    }
+  });
+
+  const p = new Person();
+  p.age = "25";
+  console.log( "p.age is a", typeof p.age, "The value is", p.age ); //-> "p.age is a number. The value is 25"
+  ```
+  @codepen
 
   @param {*} newValue The value set on the property.
   @param {String} propertyName The property name being set.
@@ -25,53 +32,84 @@ Given the set value, transform it into a value appropriate to be set.
 
 @signature `"typeName"`
 
-Sets the type to a named type in [can-define.types].  The default typeName is `"observable"`.
+  Sets the type to a named type in [can-define.types].  The default typeName is `"observable"`.
 
-```js
-{
-	age: {
-		type: "number"
-	}
-}
-```
+  ```js
+  import {DefineMap} from "can";
+
+  const Person = DefineMap.extend({
+    age: {
+      type: "number"
+    }
+  });
+
+  const p = new Person({ age: "5" });
+
+  console.log( p.age ) //-> 5
+  ```
+  @codepen
 
   @param {String} typeName A named type in [can-define.types].
 
 
-  @signature `{propDefinition}`
+@signature `{propDefinition}`
 
   A [can-define.types.propDefinition] that defines an inline [can-define/map/map] type.  For example:
 
   ```js
-{
-	address: {
-		type: {
-			street: "string",
-			city: "string"
-		}
-	}
-}
-```
+  import {DefineMap} from "can";
 
-  @signature `[Type|propDefinition]`
+  const Home = DefineMap.extend({
+    address: {
+      type: {
+        street: "string",
+        city: { type: "string", default: "Chicago" }
+      }
+    }
+  });
+
+  const myHouse = new Home({
+    address: {
+      street: "101 Example St."
+    }
+  });
+
+  console.log( myHouse.serialize() ); //-> { address: {city: "Chicago", street: "101 Example St."} }
+  ```
+  @codepen
+
+@signature `[Type|propDefinition]`
 
   Defines an inline [can-define/list/list] type that's an array of `Type` or inline `propDefinition` [can-define/map/map]
   instances.  For example:
 
-```js
-{
-	people: {
-		type: [ Person ]
-	},
-	addresses: {
-		type: [ {
-			street: "string",
-			city: "string"
-		} ]
-	}
-}
-```
+  ```js
+  import {DefineMap} from "can";
+  import {Person} from "//unpkg.com/can-demo-models@5";
 
+  const List = DefineMap.extend({
+    people: {
+      type: [ Person ]
+    },
+    addresses: {
+      type: [ {
+        street: "string",
+        city: "string"
+      } ]
+    }
+  });
+
+  const myList = new List({
+    people: [ {first: "Justin", last: "Meyer"} ],
+    addresses: [ {street: "11 Example Ave.", city: "Chicago"} ]
+  });
+
+  console.log( myList.serialize() ); //-> {
+  //   addresses: [ {city: "Chicago", street: "11 Example Ave."} ],
+  //   people: [ {first: "Justin", last: "Meyer"} ]
+  // }
+  ```
+  @codepen
 
 @body
 
@@ -82,18 +120,20 @@ as either:
 
 - A type function that returns the type coerced value.
 - A named type in [can-define.types].
-- An object that gets converted into an inline `DefineMap`.
-- An array that gets converted to an inline `DefineList`.
+- An object that gets converted into an inline `[can-define/map/map DefineMap]`.
+- An array that gets converted to an inline `[can-define/list/list DefineList]`.
 
 ### Basic Example
 
-The following example converts the `count` property to a number and the `items` property to an array:
+The following example converts the `count` property to a number and the `items` property to an array.
 
 ```js
-DefineMap.extend( {
+import {DefineMap} from "can";
+
+const Map = DefineMap.extend( {
 	count: { type: "number" },
 	items: {
-		type: function( newValue ) {
+		type( newValue ) {
 			if ( typeof newValue === "string" ) {
 				return newValue.split( "," );
 			} else if ( Array.isArray( newValue ) ) {
@@ -102,49 +142,29 @@ DefineMap.extend( {
 		}
 	}
 } );
+
+const map = new Map();
+map.assign({ count: "4", items: "1,2,3" });
+
+console.log(map.count, map.items); //-> 4 ["1", "2", "3"]
 ```
-
-When a user tries to set those properties like:
-
-    map.set({count: "4", items: "1,2,3"});
-
-The number converter will be used to turn count into 4, and the items type converter function will be used to turn items into [1,2,3].
+@codepen
 
 ### Preventing Arrays and Objects from Automatic Conversion
 
 When an array value is set, it is automatically converted into a DefineList. Likewise, objects are converted into DefineMap instances. This behavior can be prevented like the following:
 
+In this example when a user tries to set the `locations` property, the resulting value will remain an array.
+```js
+import {DefineMap, DefineList} from "can";
 
-     locations: {type: "any"}
-
-
-When a user tries to set this property, the resulting value will remain an array.
-
-    map.locations = [1, 2, 3]; // locations is an array, not a DefineList
-
-### Working with the 'compute' type
-
-Setting type as `compute` allows for resolving a computed property with the .attr()
-method.
-
-```
-MyMap = DefineMap.extend({
-    value: {
-        type: "compute"
-    }
+const MyMap = DefineMap.extend({
+	locations: {type: "any"},
 });
+const map = new MyMap( {locations: [1, 2, 3]} );
 
-var myMap = new MyMap();
-var c = compute(5);
-
-myMap.value = c;
-myMap.value //-> 5
-
-c(6);
-myMap.value //-> 6
-
-//Be sure if setting to pass the new compute
-var c2 = compute("a");
-myMap.value = c2;
-myMap.value //-> "a"
+// locations is an array, not a DefineList
+console.log( map.locations instanceof DefineList ); //-> false
+console.log( Array.isArray( map.locations ) ); //-> true
 ```
+@codepen

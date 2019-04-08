@@ -1,6 +1,6 @@
 {
   "name": "can-define",
-  "version": "2.5.2",
+  "version": "2.7.11",
   "description": "Create observable objects with JS dot operator compatibility",
   "main": "can-define.js",
   "scripts": {
@@ -31,7 +31,7 @@
   "homepage": "https://github.com/canjs/can-define",
   "dependencies": {
     "can-assign": "^1.1.1",
-    "can-construct": "^3.2.0",
+    "can-construct": "^3.5.4",
     "can-data-types": "<2.0.0",
     "can-define-lazy-value": "^1.0.0",
     "can-diff": "^1.0.0",
@@ -42,7 +42,7 @@
     "can-observation-recorder": "^1.0.0",
     "can-queues": "^1.0.0",
     "can-reflect": "^1.15.0",
-    "can-simple-observable": "^2.0.5",
+    "can-simple-observable": "^2.4.0",
     "can-single-reference": "^1.0.0",
     "can-string-to-any": "^1.0.1",
     "can-symbol": "^1.0.0"
@@ -52,7 +52,7 @@
     "can-test-helpers": "^1.1.0",
     "detect-cyclic-packages": "^1.1.0",
     "jshint": "^2.9.1",
-    "serve": "^9.0.0",
+    "serve": "^10.0.0",
     "steal": "^2.0.0",
     "steal-qunit": "^1.0.0",
     "testee": "^0.8.0"

@@ -5,14 +5,22 @@ Event fired when a property is added.
 
 @signature `handler(event)`
 
-Handlers registered on `can.keys` events will be called
-back as follows.
+  Handlers registered on `can.keys` events will be called
+  back as follows.
 
-```
-var person = new DefineMap({name: "Justin"});
-list.on("can.keys", function(event){ ... });
-person.set("age", 33);
-```
+  ```js
+  import {DefineMap} from "can";
 
+  const person = new DefineMap({name: "Justin"});
+
+  person.on("can.keys", (event) => {
+    console.log(event.target.serialize()); //-> {name: "Justin", age: 33}
+  });
+  person.set("age", 33);
+  ```
+  @codepen
+
+  Use [can-reflect/observe.onPatches canReflect.onPatches()] to know which
+  property changed. 
 
   @param {Event} event An event object.
