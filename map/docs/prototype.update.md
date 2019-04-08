@@ -5,7 +5,7 @@
 
 @signature `map.update(props)`
 
-  Assigns each value in `props` to a property on this map instance named after the
+  Sets each value in `props` to a property on this map instance named after the
   corresponding key in `props`, effectively merging `props` into the Map.
   Properties not in `props` will be set to `undefined`.
 
@@ -30,6 +30,8 @@
   console.log( obj.foo ); //-> undefined
   ```
   @codepen
+
+  > **Note:** `.update` will remove or change properties that are not in `props`. Use [can-define/map/map.prototype.assign .assign()] to avoid replacing all of a map’s values.
 
   @param {Object} props A collection of key-value pairs to set.
   If any properties already exist on the map, they will be overwritten.
