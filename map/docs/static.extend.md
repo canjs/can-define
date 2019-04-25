@@ -43,7 +43,7 @@
   @param {Object} [static] Static properties that are set directly on the
   constructor function.
 
-  @param {Object<String,Function|can-define.types.propDefinition>} prototype A definition of the properties or methods on this type.
+  @param {can-define.types.propDefinition} prototype A definition of the properties or methods on this type. See [can-define.types.propDefinition] for all available property definitions.
 
 @body
 
