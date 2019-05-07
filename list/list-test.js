@@ -24,8 +24,8 @@ QUnit.test("creating an instance", function() {
 	var list = new DefineList([ "a", "b", "c" ]);
 
 	list.on("add", function(ev, newVals, index) {
-		QUnit.deepEqual(newVals, [ "d" ]);
-        QUnit.equal(index, 3);
+		assert.deepEqual(newVals, [ "d" ]);
+        assert.equal(index, 3);
     });
 
     list.push("d");
@@ -373,7 +373,7 @@ test('list.map', function() {
 	try {
 		newExtendedList.testMe();
 	} catch(err) {
-		QUnit.ok(err.message.match(/testMe/), 'Does not return the same type of list.');
+		assert.ok(err.message.match(/testMe/), 'Does not return the same type of list.');
 	}
 });
 
@@ -504,22 +504,22 @@ QUnit.test("setting expandos on a DefineList", function() {
     var dl = new DL();
 	dl.assign({ count: 5, skip: 2 });
 
-	QUnit.equal(dl.get("count"), 5, "read with .get defined"); //-> 5
-	QUnit.equal(dl.count, 5, "read with . defined");
+	assert.equal(dl.get("count"), 5, "read with .get defined"); //-> 5
+	assert.equal(dl.count, 5, "read with . defined");
 
-	QUnit.equal(dl.get("skip"), 2, "read with .get expando");
-	QUnit.equal(dl.skip, 2, "read with . expando");
+	assert.equal(dl.get("skip"), 2, "read with .get expando");
+	assert.equal(dl.skip, 2, "read with . expando");
 
-	QUnit.equal(dl.get("limit"), undefined, "read with .get undefined");
+	assert.equal(dl.get("limit"), undefined, "read with .get undefined");
 });
 
 QUnit.test("passing a DefineList to DefineList (#33)", function() {
 	var m = new DefineList([ {}, {} ]);
 
     var m2 = new DefineList(m);
-    QUnit.deepEqual(m.get(), m2.get());
-    QUnit.ok(m[0] === m2[0], "index the same");
-    QUnit.ok(m[1] === m2[1], "index the same");
+    assert.deepEqual(m.get(), m2.get());
+    assert.ok(m[0] === m2[0], "index the same");
+    assert.ok(m[1] === m2[1], "index the same");
 
 });
 
@@ -528,18 +528,18 @@ QUnit.test("reading and setting expandos", function() {
 	var countObservation = new Observation(function() {
         return list.get("count");
 	}, null, function(newValue) {
-        QUnit.equal(newValue, 1000, "got new value");
+        assert.equal(newValue, 1000, "got new value");
     });
-    countObservation.start();
+    countObservation.done();
 
 	list.set("count", 1000);
 
-	QUnit.equal(countObservation.value, 1000);
+	assert.equal(countObservation.value, 1000);
 
 
     var list2 = new DefineList();
 	list2.on("count", function(ev, newVal) {
-        QUnit.equal(newVal, 5);
+        assert.equal(newVal, 5);
     });
     list2.set("count", 5);
 });
@@ -552,25 +552,25 @@ QUnit.test("extending DefineList constructor functions (#61)", function() {
 	var list = new CList([ {}, {} ]);
 
 	list.on("aProp", function(ev, newVal, oldVal) {
-      QUnit.equal(newVal, "PROP");
-      QUnit.equal(oldVal, undefined);
+      assert.equal(newVal, "PROP");
+      assert.equal(oldVal, undefined);
   });
 	list.on("bProp", function(ev, newVal, oldVal) {
-      QUnit.equal(newVal, "FOO");
-      QUnit.equal(oldVal, undefined);
+      assert.equal(newVal, "FOO");
+      assert.equal(oldVal, undefined);
   });
 	list.on("cProp", function(ev, newVal, oldVal) {
-      QUnit.equal(newVal, "BAR");
-      QUnit.equal(oldVal, undefined);
+      assert.equal(newVal, "BAR");
+      assert.equal(oldVal, undefined);
   });
 
   list.aProp = "PROP";
   list.bProp = 'FOO';
   list.cProp = 'BAR';
 
-  QUnit.ok(list.aMethod);
-  QUnit.ok(list.bMethod);
-  QUnit.ok(list.cMethod);
+  assert.ok(list.aMethod);
+  assert.ok(list.bMethod);
+  assert.ok(list.cMethod);
 });
 
 QUnit.test("extending DefineList constructor functions more than once (#61)", function() {
@@ -584,31 +584,31 @@ QUnit.test("extending DefineList constructor functions more than once (#61)", fu
 	var list2 = new CList([ {}, {}, {} ]);
 
 	list1.on("aProp", function(ev, newVal, oldVal) {
-        QUnit.equal(newVal, "PROP", "aProp newVal on list1");
-        QUnit.equal(oldVal, undefined);
+        assert.equal(newVal, "PROP", "aProp newVal on list1");
+        assert.equal(oldVal, undefined);
     });
 	list1.on("bProp", function(ev, newVal, oldVal) {
-        QUnit.equal(newVal, "FOO", "bProp newVal on list1");
-        QUnit.equal(oldVal, undefined);
+        assert.equal(newVal, "FOO", "bProp newVal on list1");
+        assert.equal(oldVal, undefined);
     });
 
 	list2.on("aProp", function(ev, newVal, oldVal) {
-        QUnit.equal(newVal, "PROP", "aProp newVal on list2");
-        QUnit.equal(oldVal, undefined);
+        assert.equal(newVal, "PROP", "aProp newVal on list2");
+        assert.equal(oldVal, undefined);
     });
 	list2.on("cProp", function(ev, newVal, oldVal) {
-        QUnit.equal(newVal, "BAR", "cProp newVal on list2");
-        QUnit.equal(oldVal, undefined);
+        assert.equal(newVal, "BAR", "cProp newVal on list2");
+        assert.equal(oldVal, undefined);
     });
 
     list1.aProp = "PROP";
     list1.bProp = 'FOO';
     list2.aProp = "PROP";
     list2.cProp = 'BAR';
-    QUnit.ok(list1.aMethod, "list1 aMethod");
-    QUnit.ok(list1.bMethod);
-    QUnit.ok(list2.aMethod);
-    QUnit.ok(list2.cMethod, "list2 cMethod");
+    assert.ok(list1.aMethod, "list1 aMethod");
+    assert.ok(list1.bMethod);
+    assert.ok(list2.aMethod);
+    assert.ok(list2.cMethod, "list2 cMethod");
 });
 
 QUnit.test("extending DefineList constructor functions - value (#61)", function() {
@@ -619,7 +619,7 @@ QUnit.test("extending DefineList constructor functions - value (#61)", function(
 	var CList = BList.extend("CList", { });
 
     var c = new CList([]);
-	QUnit.equal(c.aProp, 1, "got initial value");
+	assert.equal(c.aProp, 1, "got initial value");
 });
 
 QUnit.test("'*' inheritance works (#61)", function() {
@@ -642,7 +642,7 @@ QUnit.test("'*' inheritance works (#61)", function() {
 
 	var xl = new ExtendedList([ {} ]);
 
-    QUnit.ok(xl[0] instanceof Account);
+    assert.ok(xl[0] instanceof Account);
 
 });
 
@@ -665,8 +665,8 @@ QUnit.test("shorthand getter setter (#56)", function() {
     p.fullName = "Mohamed Cherif";
 
 	p.on("fullName", function(ev, newVal, oldVal) {
-		QUnit.equal(oldVal, "Mohamed Cherif");
-		QUnit.equal(newVal, "Justin Meyer");
+		assert.equal(oldVal, "Mohamed Cherif");
+		assert.equal(newVal, "Justin Meyer");
 	});
 
 	equal(p.fullName, "Mohamed Cherif", "fullName initialized right");
@@ -739,9 +739,9 @@ QUnit.test("* vs # (#78)", function() {
 
 	var list = new MyList([ 1, 2, 3 ]);
 
-    QUnit.ok(list[0] === "1", "converted to string");
+    assert.ok(list[0] === "1", "converted to string");
     list.set("prop", "4");
-    QUnit.ok(list.prop === 4, "type converted");
+    assert.ok(list.prop === 4, "type converted");
 
 });
 
@@ -751,10 +751,10 @@ QUnit.test("Array shorthand uses #", function() {
     });
 
 	var map = new MyMap({ numbers: [ "1", "2" ] });
-    QUnit.ok(map.numbers[0] === 1, "converted to number");
+    assert.ok(map.numbers[0] === 1, "converted to number");
 
     map.numbers.set("prop", "4");
-    QUnit.ok(map.numbers.prop === "4", "type left alone");
+    assert.ok(map.numbers.prop === "4", "type left alone");
 });
 
 QUnit.test("replace-with-self lists are diffed properly (can-view-live#10)", function() {
@@ -1012,7 +1012,7 @@ test("compute(defineMap, 'property.names') works (#20)", function(){
 	var map = new DefineMap();
 	var c = compute(map, "foo.bar");
 	c.on("change", function(ev, newVal){
-		QUnit.equal(newVal, 2);
+		assert.equal(newVal, 2);
 	});
 
 	map.set("foo", new DefineMap());
@@ -1061,15 +1061,15 @@ test("works with can-reflect", function(){
 	var a = new DefineMap({ foo: 4 });
 	var b = new DefineList([ "foo", "bar" ]);
 	var c;
-	QUnit.equal( canReflect.getKeyValue(b, "0"), "foo", "unbound value");
+	assert.equal( canReflect.getKeyValue(b, "0"), "foo", "unbound value");
 
 
-	QUnit.ok(!canReflect.isValueLike(b), "isValueLike is false");
-	QUnit.ok(canReflect.isObservableLike(b), "isObservableLike is true");
-	QUnit.ok(canReflect.isMapLike(b), "isMapLike is true");
-	QUnit.ok(canReflect.isListLike(b), "isListLike is false");
+	assert.ok(!canReflect.isValueLike(b), "isValueLike is false");
+	assert.ok(canReflect.isObservableLike(b), "isObservableLike is true");
+	assert.ok(canReflect.isMapLike(b), "isMapLike is true");
+	assert.ok(canReflect.isListLike(b), "isListLike is false");
 
-	QUnit.ok( !canReflect.keyHasDependencies(b, "length"), "keyHasDependencies -- false");
+	assert.ok( !canReflect.keyHasDependencies(b, "length"), "keyHasDependencies -- false");
 
 	define(c = Object.create(b), {
 		length: {
@@ -1079,8 +1079,8 @@ test("works with can-reflect", function(){
 		}
 	});
 
-	QUnit.ok(canReflect.getKeyDependencies(c, "length"), "dependencies exist");
-	QUnit.ok(
+	assert.ok(canReflect.getKeyDependencies(c, "length"), "dependencies exist");
+	assert.ok(
 		canReflect.getKeyDependencies(c, "length").valueDependencies.has(c._computed.length.compute),
 		"dependencies returned"
 	);
@@ -1088,12 +1088,12 @@ test("works with can-reflect", function(){
 	/*
 	canReflect.onKeysAdded(b, handler);
 	canReflect.onKeysRemoved(b, handler);
-	QUnit.ok(b.__bindEvents.add, "add handler added");
-	QUnit.ok(b.__bindEvents.remove, "remove handler added");
+	assert.ok(b.__bindEvents.add, "add handler added");
+	assert.ok(b.__bindEvents.remove, "remove handler added");
 
 	b.push("quux");
 	c.push("quux");
-	QUnit.equal( canReflect.getKeyValue(c, "length"), "4", "bound value");
+	assert.equal( canReflect.getKeyValue(c, "length"), "4", "bound value");
 	b.pop();*/
 
 });
@@ -1102,7 +1102,7 @@ QUnit.test("can-reflect setKeyValue", function(){
 	var a = new DefineList([ "a", "b" ]);
 
 	canReflect.setKeyValue(a, 1, "c");
-	QUnit.equal(a[1], "c", "setKeyValue");
+	assert.equal(a[1], "c", "setKeyValue");
 });
 
 QUnit.test("can-reflect deleteKeyValue", function(){
@@ -1110,12 +1110,12 @@ QUnit.test("can-reflect deleteKeyValue", function(){
 	a.set("foo", "bar");
 
 	canReflect.deleteKeyValue(a, 0);
-	QUnit.equal(a[1], undefined, "last value is now undefined");
-	QUnit.equal(a[0], "b", "last value is shifted down");
+	assert.equal(a[1], undefined, "last value is now undefined");
+	assert.equal(a[0], "b", "last value is shifted down");
 
 	canReflect.deleteKeyValue(a, "foo");
-	QUnit.equal(a.foo, undefined, "value not included in serial");
-	QUnit.ok(!("foo" in a.get()), "value not included in serial");
+	assert.equal(a.foo, undefined, "value not included in serial");
+	assert.ok(!("foo" in a.get()), "value not included in serial");
 });
 
 QUnit.test("can-reflect getKeyDependencies", function() {
@@ -1210,7 +1210,7 @@ QUnit.test("cannot remove length", function() {
 
 	list.set("length", undefined);
 
-	QUnit.equal(list.length, 1, "list length is unchanged");
+	assert.equal(list.length, 1, "list length is unchanged");
 
 });
 
@@ -1218,26 +1218,26 @@ QUnit.test("cannot set length to a non-number", function() {
 	var list = new DefineList(["a"]);
 
 	list.set("length", null);
-	QUnit.equal(list.length, 1, "list length is unchanged");
+	assert.equal(list.length, 1, "list length is unchanged");
 
 	list.set("length", "foo");
-	QUnit.equal(list.length, 1, "list length is unchanged");
+	assert.equal(list.length, 1, "list length is unchanged");
 
 	list.set("length", {});
-	QUnit.equal(list.length, 1, "list length is unchanged");
+	assert.equal(list.length, 1, "list length is unchanged");
 });
 
 QUnit.test("_length is not enumerable", function() {
-	QUnit.ok(!Object.getOwnPropertyDescriptor(new DefineList(), "_length").enumerable, "_length is not enumerable");
+	assert.ok(!Object.getOwnPropertyDescriptor(new DefineList(), "_length").enumerable, "_length is not enumerable");
 });
 
 QUnit.test("update with no indexed items sets length to 0", function() {
 	var list = new DefineList(["a"]);
-	QUnit.equal(list.length, 1, "list length is correct before update");
+	assert.equal(list.length, 1, "list length is correct before update");
 
 	list.update({ foo: "bar" });
 
-	QUnit.equal(list.length, 0, "list length is correct after update");
+	assert.equal(list.length, 0, "list length is correct after update");
 });
 
 ["length", "_length"].forEach(function(prop) {
@@ -1261,18 +1261,18 @@ QUnit.test("update with no indexed items sets length to 0", function() {
 		delete listDef2.value;
 		delete listDef.value;
 
-		QUnit.deepEqual(listDef2, listDef, "descriptor hasn't changed");
+		assert.deepEqual(listDef2, listDef, "descriptor hasn't changed");
 	});
 });
 
 QUnit.test("iterator can recover from bad _length", function() {
 	var list = new DefineList(["a"]);
 	list.set("_length", null);
-	QUnit.equal(list._length, null, "Bad value for _length");
+	assert.equal(list._length, null, "Bad value for _length");
 
 	var iterator = list[canSymbol.iterator]();
 	var iteration = iterator.next();
-	QUnit.ok(iteration.done, "Didn't fail");
+	assert.ok(iteration.done, "Didn't fail");
 });
 
 
@@ -1292,7 +1292,7 @@ QUnit.test("onPatches", function(){
 	list[canSymbol.for("can.offPatches")](handler,"notify");
 
 	list.replace(["1","2"]);
-	QUnit.deepEqual(calledPatches, PATCHES);
+	assert.deepEqual(calledPatches, PATCHES);
 });
 
 canTestHelpers.devOnlyTest("can.getName symbol behavior", function(assert) {
@@ -1436,7 +1436,7 @@ QUnit.test("DefineList has defineInstanceKey symbol", function(){
 
 	var t = new Type();
 	t.prop = "5";
-	QUnit.equal(t.prop, 5, "value set");
+	assert.equal(t.prop, 5, "value set");
 });
 
 QUnit.test(".sort() produces patches (can-stache#498)", function(){
@@ -1453,7 +1453,7 @@ QUnit.test(".sort() produces patches (can-stache#498)", function(){
 	list[canSymbol.for("can.onPatches")](handler,"notify");
 	list.sort();
 
-	QUnit.deepEqual(calledPatches, PATCHES);
+	assert.deepEqual(calledPatches, PATCHES);
 });
 
 QUnit.test("canReflect.getSchema", function(){
@@ -1468,7 +1468,7 @@ QUnit.test("canReflect.getSchema", function(){
 
 	var schema = canReflect.getSchema(MyList);
 
-	QUnit.equal(schema.values, MyType);
+	assert.equal(schema.values, MyType);
 });
 
 QUnit.test("Bound serialized lists update when they change length", function(){
@@ -1479,7 +1479,7 @@ QUnit.test("Bound serialized lists update when they change length", function(){
 	});
 
 	function onChange(val) {
-		QUnit.deepEqual(val, ["eggs", "toast"]);
+		assert.deepEqual(val, ["eggs", "toast"]);
 	}
 
 	canReflect.onValue(obs, onChange);
@@ -1542,5 +1542,5 @@ if (typeof Array.prototype.includes === "function") {
 QUnit.test("Set __inSetup prop #421", function() {
 	var list = new DefineList([]);
 	list.set("__inSetup", "nope");
-	QUnit.equal(list.__inSetup, "nope");
+	assert.equal(list.__inSetup, "nope");
 });
