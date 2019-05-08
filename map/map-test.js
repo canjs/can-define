@@ -32,43 +32,43 @@ QUnit.test("Map is an event emitter", function (assert) {
 	assert.ok(Map.on, 'Map has event methods.');
 });
 
-QUnit.test("creating an instance", function(){
+QUnit.test("creating an instance", function(assert) {
 	var map = new DefineMap({prop: "foo"});
 	map.on("prop", function(ev, newVal, oldVal){
-		QUnit.equal(newVal, "BAR");
-		QUnit.equal(oldVal, "foo");
+		assert.equal(newVal, "BAR");
+		assert.equal(oldVal, "foo");
 	});
 
 	map.prop = "BAR";
 });
 
-QUnit.test("creating an instance with nested prop", function(){
+QUnit.test("creating an instance with nested prop", function(assert) {
 
 	var map = new DefineMap({name: {first: "Justin"}});
 
 	map.name.on("first", function(ev, newVal, oldVal){
-		QUnit.equal(newVal, "David");
-		QUnit.equal(oldVal, "Justin");
+		assert.equal(newVal, "David");
+		assert.equal(oldVal, "Justin");
 	});
 
 	map.name.first = "David";
 });
 
-QUnit.test("extending", function(){
+QUnit.test("extending", function(assert) {
 	var MyMap = DefineMap.extend({
 		prop: {}
 	});
 
 	var map = new MyMap();
 	map.on("prop", function(ev, newVal, oldVal){
-		QUnit.equal(newVal, "BAR");
-		QUnit.equal(oldVal, undefined);
+		assert.equal(newVal, "BAR");
+		assert.equal(oldVal, undefined);
 	});
 
 	map.prop = "BAR";
 });
 
-QUnit.test("loop only through defined serializable props", function(){
+QUnit.test("loop only through defined serializable props", function(assert) {
 	var MyMap = DefineMap.extend({
 		propA: {},
 		propB: {serialize: false},
@@ -80,24 +80,24 @@ QUnit.test("loop only through defined serializable props", function(){
 	});
 	var inst = new MyMap({propA: 1, propB: 2});
 
-	QUnit.deepEqual(Object.keys(inst.get()), ["propA"]);
+	assert.deepEqual(Object.keys(inst.get()), ["propA"]);
 
 });
 
-QUnit.test("get and set can setup expandos", function(){
+QUnit.test("get and set can setup expandos", function(assert) {
 	var map = new DefineMap();
 	var oi = new Observation(function(){
 		return map.get("foo");
 	});
 	canReflect.onValue(oi, function(newVal){
-		QUnit.equal(newVal, "bar", "updated to bar");
+		assert.equal(newVal, "bar", "updated to bar");
 	});
 
 	map.set("foo","bar");
 
 });
 
-QUnit.test("default settings", function(){
+QUnit.test("default settings", function(assert) {
 	var MyMap = DefineMap.extend({
 		"*": "string",
 		foo: {}
@@ -105,11 +105,11 @@ QUnit.test("default settings", function(){
 
 	var m = new MyMap();
 	m.set("foo",123);
-	QUnit.ok(m.get("foo") === "123");
+	assert.ok(m.get("foo") === "123");
 
 });
 
-QUnit.test("default settings on unsealed", function(){
+QUnit.test("default settings on unsealed", function(assert) {
 	var MyMap = DefineMap.extend({
 		seal: false
 	},{
@@ -118,12 +118,12 @@ QUnit.test("default settings on unsealed", function(){
 
 	var m = new MyMap();
 	m.set("foo",123);
-	QUnit.ok(m.get("foo") === "123");
+	assert.ok(m.get("foo") === "123");
 
 });
 
 if (!System.isEnv('production')) {
-	QUnit.test("extends sealed objects (#48)", function(){
+	QUnit.test("extends sealed objects (#48)", function(assert) {
 		var Map1 = DefineMap.extend({ seal: true }, {
 			name: {
 				get: function(curVal){
@@ -138,123 +138,123 @@ if (!System.isEnv('production')) {
 		try {
 			map1.foo = "bar";
 			if (map1.foo) {
-				QUnit.ok(false, "map1 not sealed");
+				assert.ok(false, "map1 not sealed");
 			} else {
-				QUnit.ok(true, "map1 sealed - silent failure");
+				assert.ok(true, "map1 sealed - silent failure");
 			}
 		} catch(ex) {
-			QUnit.ok(true, "map1 sealed");
+			assert.ok(true, "map1 sealed");
 		}
-		QUnit.equal(map1.name, "computed Justin", "map1.name property is computed");
+		assert.equal(map1.name, "computed Justin", "map1.name property is computed");
 
 		var map2 = new Map2({ name: "Brian" });
 		try {
 			map2.foo = "bar";
 			if (map2.foo) {
-				QUnit.ok(true, "map2 not sealed");
+				assert.ok(true, "map2 not sealed");
 			} else {
-				QUnit.ok(false, "map2 sealed");
+				assert.ok(false, "map2 sealed");
 			}
 		} catch (ex) {
-			QUnit.ok(false, "map2 sealed");
+			assert.ok(false, "map2 sealed");
 		}
-		QUnit.equal(map2.name, "computed Brian", "map2.name property is computed");
+		assert.equal(map2.name, "computed Brian", "map2.name property is computed");
 
 		var map3 = new Map3({ name: "Curtis" });
 		try {
 			map3.foo = "bar";
 			if (map3.foo) {
-				QUnit.ok(false, "map3 not sealed");
+				assert.ok(false, "map3 not sealed");
 			} else {
-				QUnit.ok(true, "map3 sealed");
+				assert.ok(true, "map3 sealed");
 			}
 		} catch (ex) {
-			QUnit.ok(true, "map3 sealed");
+			assert.ok(true, "map3 sealed");
 		}
-		QUnit.equal(map3.name, "computed Curtis", "map3.name property is computed");
+		assert.equal(map3.name, "computed Curtis", "map3.name property is computed");
 	});
 }
 
-QUnit.test("get with dynamically added properties", function(){
+QUnit.test("get with dynamically added properties", function(assert) {
 	var map = new DefineMap();
 	map.set("a",1);
 	map.set("b",2);
-	QUnit.deepEqual(map.get(), {a: 1, b: 2});
+	assert.deepEqual(map.get(), {a: 1, b: 2});
 });
 
-QUnit.test("set multiple props", function(){
+QUnit.test("set multiple props", function(assert) {
 	var map = new DefineMap();
 	map.assign({a: 0, b: 2});
 
-	QUnit.deepEqual(map.get(), {a: 0, b: 2}, "added props");
+	assert.deepEqual(map.get(), {a: 0, b: 2}, "added props");
 
 	map.update({a: 2});
 
-	QUnit.deepEqual(map.get(), {a: 2}, "removed b");
+	assert.deepEqual(map.get(), {a: 2}, "removed b");
 
 	map.assign({foo: {bar: "VALUE"}});
 
-	QUnit.deepEqual(map.get(), {foo: {bar: "VALUE"}, a: 2}, "works nested");
+	assert.deepEqual(map.get(), {foo: {bar: "VALUE"}, a: 2}, "works nested");
 });
 
-QUnit.test("serialize responds to added props", function(){
+QUnit.test("serialize responds to added props", function(assert) {
 	var map = new DefineMap();
 	var oi = new Observation(function(){
 		return map.serialize();
 	});
 	canReflect.onValue(oi, function(newVal){
-		QUnit.deepEqual(newVal, {a: 1, b: 2}, "updated right");
+		assert.deepEqual(newVal, {a: 1, b: 2}, "updated right");
 	});
 
 	map.assign({a: 1, b: 2});
 });
 
-QUnit.test("initialize an undefined property", function(){
+QUnit.test("initialize an undefined property", function(assert) {
 	var MyMap = DefineMap.extend({seal: false},{});
 	var instance = new MyMap({foo: "bar"});
 
-	equal(instance.foo, "bar");
+	assert.equal(instance.foo, "bar");
 });
 
-QUnit.test("set an already initialized null property", function(){
+QUnit.test("set an already initialized null property", function(assert) {
   var map = new DefineMap({ foo: null });
   map.assign({ foo: null });
 
-  equal(map.foo, null);
+  assert.equal(map.foo, null);
 });
 
-QUnit.test("creating a new key doesn't cause two changes", 1, function(){
+QUnit.test("creating a new key doesn't cause two changes", 1, function(assert) {
 	var map = new DefineMap();
 	var oi = new Observation(function(){
 		return map.serialize();
 	});
 	canReflect.onValue(oi, function(newVal){
-		QUnit.deepEqual(newVal, {a: 1}, "updated right");
+		assert.deepEqual(newVal, {a: 1}, "updated right");
 	});
 
 	map.set("a", 1);
 });
 
-QUnit.test("setting nested object", function(){
+QUnit.test("setting nested object", function(assert) {
 	var m = new DefineMap({});
 
 	m.assign({foo: {}});
 	m.assign({foo: {}});
-	QUnit.deepEqual(m.get(), {foo: {}});
+	assert.deepEqual(m.get(), {foo: {}});
 });
 
-QUnit.test("passing a DefineMap to DefineMap (#33)", function(){
+QUnit.test("passing a DefineMap to DefineMap (#33)", function(assert) {
 	var MyMap = DefineMap.extend({foo: "observable"});
 	var m = new MyMap({foo: {}, bar: {}});
 
 	var m2 = new MyMap(m);
-	QUnit.deepEqual(m.get(), m2.get());
-	QUnit.ok(m.foo === m2.foo, "defined props the same");
-	QUnit.ok(m.bar === m2.bar, "expando props the same");
+	assert.deepEqual(m.get(), m2.get());
+	assert.ok(m.foo === m2.foo, "defined props the same");
+	assert.ok(m.bar === m2.bar, "expando props the same");
 
 });
 
-QUnit.test("serialize: function works (#38)", function(){
+QUnit.test("serialize: function works (#38)", function(assert) {
 	var Something = DefineMap.extend({});
 
 	var MyMap = DefineMap.extend({
@@ -276,8 +276,8 @@ QUnit.test("serialize: function works (#38)", function(){
 
 	var myMap = new MyMap({somethingRef: 2, somethingElseRef: 3});
 
-	QUnit.ok(myMap.somethingRef instanceof Something);
-	QUnit.deepEqual( myMap.serialize(), {somethingRef: 2}, "serialize: function and serialize: false works");
+	assert.ok(myMap.somethingRef instanceof Something);
+	assert.deepEqual( myMap.serialize(), {somethingRef: 2}, "serialize: function and serialize: false works");
 
 
 	var MyMap2 = DefineMap.extend({
@@ -289,11 +289,11 @@ QUnit.test("serialize: function works (#38)", function(){
 	});
 
 	var myMap2 = new MyMap2({foo: 1, bar: 2});
-	QUnit.deepEqual( myMap2.serialize(), {foo: "1", bar: "2"}, "serialize: function on default works");
+	assert.deepEqual( myMap2.serialize(), {foo: "1", bar: "2"}, "serialize: function on default works");
 
 });
 
-QUnit.test("get will not create properties", function(){
+QUnit.test("get will not create properties", function(assert) {
 	var method = function(){};
 	var MyMap = DefineMap.extend({
 		method: method
@@ -301,10 +301,10 @@ QUnit.test("get will not create properties", function(){
 	var m = new MyMap();
 	m.get("foo");
 
-	QUnit.equal(m.get("method"), method);
+	assert.equal(m.get("method"), method);
 });
 
-QUnit.test("Properties are enumerable", function(){
+QUnit.test("Properties are enumerable", function(assert) {
   QUnit.expect(4);
 
   var VM = DefineMap.extend({
@@ -315,17 +315,17 @@ QUnit.test("Properties are enumerable", function(){
   var i = 0;
   canReflect.eachKey(vm, function(value, key){
 	if(i === 0) {
-	  QUnit.equal(key, "foo");
-	  QUnit.equal(value, "bar");
+	  assert.equal(key, "foo");
+	  assert.equal(value, "bar");
 	} else {
-	  QUnit.equal(key, "baz");
-	  QUnit.equal(value, "qux");
+	  assert.equal(key, "baz");
+	  assert.equal(value, "qux");
 	}
 	i++;
   });
 });
 
-QUnit.test("Getters are not enumerable", function(){
+QUnit.test("Getters are not enumerable", function(assert) {
   QUnit.expect(2);
 
   var MyMap = DefineMap.extend({
@@ -340,12 +340,12 @@ QUnit.test("Getters are not enumerable", function(){
   var map = new MyMap({ foo: "bar" });
 
   canReflect.eachKey(map, function(value, key){
-	QUnit.equal(key, "foo");
-	QUnit.equal(value, "bar");
+	assert.equal(key, "foo");
+	assert.equal(value, "bar");
   });
 });
 
-QUnit.test("extending DefineMap constructor functions (#18)", function(){
+QUnit.test("extending DefineMap constructor functions (#18)", function(assert) {
 	var AType = DefineMap.extend("AType", { aProp: {}, aMethod: function(){} });
 
 	var BType = AType.extend("BType", { bProp: {}, bMethod: function(){} });
@@ -355,27 +355,27 @@ QUnit.test("extending DefineMap constructor functions (#18)", function(){
 	var map = new CType();
 
 	map.on("aProp", function(ev, newVal, oldVal){
-		QUnit.equal(newVal, "PROP");
-		QUnit.equal(oldVal, undefined);
+		assert.equal(newVal, "PROP");
+		assert.equal(oldVal, undefined);
 	});
 	map.on("bProp", function(ev, newVal, oldVal){
-		QUnit.equal(newVal, "FOO");
-		QUnit.equal(oldVal, undefined);
+		assert.equal(newVal, "FOO");
+		assert.equal(oldVal, undefined);
 	});
 	map.on("cProp", function(ev, newVal, oldVal){
-		QUnit.equal(newVal, "BAR");
-		QUnit.equal(oldVal, undefined);
+		assert.equal(newVal, "BAR");
+		assert.equal(oldVal, undefined);
 	});
 
 	map.aProp = "PROP";
 	map.bProp = 'FOO';
 	map.cProp = 'BAR';
-	QUnit.ok(map.aMethod);
-	QUnit.ok(map.bMethod);
-	QUnit.ok(map.cMethod);
+	assert.ok(map.aMethod);
+	assert.ok(map.bMethod);
+	assert.ok(map.cMethod);
 });
 
-QUnit.test("extending DefineMap constructor functions more than once (#18)", function(){
+QUnit.test("extending DefineMap constructor functions more than once (#18)", function(assert) {
 	var AType = DefineMap.extend("AType", { aProp: {}, aMethod: function(){} });
 
 	var BType = AType.extend("BType", { bProp: {}, bMethod: function(){} });
@@ -386,34 +386,34 @@ QUnit.test("extending DefineMap constructor functions more than once (#18)", fun
 	var map2 = new CType();
 
 	map1.on("aProp", function(ev, newVal, oldVal){
-		QUnit.equal(newVal, "PROP", "aProp newVal on map1");
-		QUnit.equal(oldVal, undefined);
+		assert.equal(newVal, "PROP", "aProp newVal on map1");
+		assert.equal(oldVal, undefined);
 	});
 	map1.on("bProp", function(ev, newVal, oldVal){
-		QUnit.equal(newVal, "FOO", "bProp newVal on map1");
-		QUnit.equal(oldVal, undefined);
+		assert.equal(newVal, "FOO", "bProp newVal on map1");
+		assert.equal(oldVal, undefined);
 	});
 
 	map2.on("aProp", function(ev, newVal, oldVal){
-		QUnit.equal(newVal, "PROP", "aProp newVal on map2");
-		QUnit.equal(oldVal, undefined);
+		assert.equal(newVal, "PROP", "aProp newVal on map2");
+		assert.equal(oldVal, undefined);
 	});
 	map2.on("cProp", function(ev, newVal, oldVal){
-		QUnit.equal(newVal, "BAR", "cProp newVal on map2");
-		QUnit.equal(oldVal, undefined);
+		assert.equal(newVal, "BAR", "cProp newVal on map2");
+		assert.equal(oldVal, undefined);
 	});
 
 	map1.aProp = "PROP";
 	map1.bProp = 'FOO';
 	map2.aProp = "PROP";
 	map2.cProp = 'BAR';
-	QUnit.ok(map1.aMethod, "map1 aMethod");
-	QUnit.ok(map1.bMethod);
-	QUnit.ok(map2.aMethod);
-	QUnit.ok(map2.cMethod, "map2 cMethod");
+	assert.ok(map1.aMethod, "map1 aMethod");
+	assert.ok(map1.bMethod);
+	assert.ok(map2.aMethod);
+	assert.ok(map2.cMethod, "map2 cMethod");
 });
 
-QUnit.test("extending DefineMap constructor functions - value (#18)", function(){
+QUnit.test("extending DefineMap constructor functions - value (#18)", function(assert) {
 	var AType = DefineMap.extend("AType", { aProp: {default: 1} });
 
 	var BType = AType.extend("BType", { });
@@ -421,10 +421,10 @@ QUnit.test("extending DefineMap constructor functions - value (#18)", function()
 	var CType = BType.extend("CType",{ });
 
 	var c = new CType();
-	QUnit.equal( c.aProp , 1 ,"got initial value" );
+	assert.equal( c.aProp , 1 ,"got initial value" );
 });
 
-QUnit.test("copying DefineMap excludes constructor", function() {
+QUnit.test("copying DefineMap excludes constructor", function(assert) {
 
 	var AType = DefineMap.extend("AType", { aProp: {default: 1} });
 
@@ -432,12 +432,12 @@ QUnit.test("copying DefineMap excludes constructor", function() {
 
 	var b = assign({}, a);
 
-	QUnit.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
-	QUnit.equal(a.aProp, b.aProp, "Other values are unaffected");
+	assert.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
+	assert.equal(a.aProp, b.aProp, "Other values are unaffected");
 
 });
 
-QUnit.test("cloning from non-defined map excludes special keys on setup", function() {
+QUnit.test("cloning from non-defined map excludes special keys on setup", function(assert) {
 	var MyType = DefineMap.extend({
 
 	});
@@ -447,12 +447,12 @@ QUnit.test("cloning from non-defined map excludes special keys on setup", functi
 
 	var b = new DefineMap(a);
 
-	QUnit.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
-	QUnit.notEqual(a._data, b._data, "_data prop not copied");
-	QUnit.equal(a.foo, b.foo, "Other props copied");
+	assert.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
+	assert.notEqual(a._data, b._data, "_data prop not copied");
+	assert.equal(a.foo, b.foo, "Other props copied");
 });
 
-QUnit.test("copying from .set() excludes special keys", function() {
+QUnit.test("copying from .set() excludes special keys", function(assert) {
 
 	var MyType = DefineMap.extend({});
 
@@ -466,12 +466,12 @@ QUnit.test("copying from .set() excludes special keys", function() {
 	});
 	b.assign(a);
 
-	QUnit.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
-	QUnit.notEqual(a._data, b._data, "_data prop not copied");
-	QUnit.equal(a.foo, b.foo, "NEw props copied");
+	assert.notEqual(a.constructor, b.constructor, "Constructor prop not copied");
+	assert.notEqual(a._data, b._data, "_data prop not copied");
+	assert.equal(a.foo, b.foo, "NEw props copied");
 });
 
-QUnit.test("copying with assign() excludes special keys", function() {
+QUnit.test("copying with assign() excludes special keys", function(assert) {
 
 	var a = {
 		_data: {},
@@ -484,13 +484,13 @@ QUnit.test("copying with assign() excludes special keys", function() {
 	}, false);
 	canReflect.assignMap(b, a);
 
-	QUnit.notEqual(a._data, b._data, "_data prop not copied");
-	QUnit.equal(a.foo, b.foo, "New props copied");
-	QUnit.equal(a.existing, b.existing, "Existing props copied");
+	assert.notEqual(a._data, b._data, "_data prop not copied");
+	assert.equal(a.foo, b.foo, "New props copied");
+	assert.equal(a.existing, b.existing, "Existing props copied");
 
 });
 
-QUnit.test("shorthand getter setter (#56)", function(){
+QUnit.test("shorthand getter setter (#56)", function(assert) {
 
 	var Person = DefineMap.extend({
 		first: "*",
@@ -508,16 +508,16 @@ QUnit.test("shorthand getter setter (#56)", function(){
 	var p = new Person({first: "Mohamed", last: "Cherif"});
 
 	p.on("fullName", function(ev, newVal, oldVal) {
-		QUnit.equal(oldVal, "Mohamed Cherif");
-		QUnit.equal(newVal, "Justin Meyer");
+		assert.equal(oldVal, "Mohamed Cherif");
+		assert.equal(newVal, "Justin Meyer");
 	});
 
-	equal(p.fullName, "Mohamed Cherif", "fullName initialized right");
+	assert.equal(p.fullName, "Mohamed Cherif", "fullName initialized right");
 
 	p.fullName = "Justin Meyer";
 });
 
-QUnit.test('compute props can be set to null or undefined (#2372)', function() {
+QUnit.test('compute props can be set to null or undefined (#2372)', function(assert) {
 	var VM = DefineMap.extend({
 		computeProp: {
 			type: 'compute'
@@ -525,12 +525,12 @@ QUnit.test('compute props can be set to null or undefined (#2372)', function() {
 	});
 
 	var vmNull = new VM({computeProp: null});
-	QUnit.equal(vmNull.get('computeProp'), null, 'computeProp is null, no error thrown');
+	assert.equal(vmNull.get('computeProp'), null, 'computeProp is null, no error thrown');
 	var vmUndef = new VM({computeProp: undefined});
-	QUnit.equal(vmUndef.get('computeProp'), undefined, 'computeProp is undefined, no error thrown');
+	assert.equal(vmUndef.get('computeProp'), undefined, 'computeProp is undefined, no error thrown');
 });
 
-QUnit.test("Inheriting DefineMap .set doesn't work if prop is on base map (#74)", function(){
+QUnit.test("Inheriting DefineMap .set doesn't work if prop is on base map (#74)", function(assert) {
 	var Base = DefineMap.extend({
 		baseProp: "string"
 	});
@@ -542,11 +542,11 @@ QUnit.test("Inheriting DefineMap .set doesn't work if prop is on base map (#74)"
 	inherting.set("baseProp", "value");
 
 
-	QUnit.equal(inherting.baseProp,"value", "set prop");
+	assert.equal(inherting.baseProp,"value", "set prop");
 });
 
 if(sealWorks && System.env.indexOf('production') < 0) {
-	QUnit.test("setting not defined property", function(){
+	QUnit.test("setting not defined property", function(assert) {
 		var MyMap = DefineMap.extend({
 			prop: {}
 		});
@@ -554,14 +554,14 @@ if(sealWorks && System.env.indexOf('production') < 0) {
 
 		try {
 			mymap.notdefined = "value";
-			ok(false, "no error");
+			assert.ok(false, "no error");
 		} catch(e) {
-			ok(true, "error thrown");
+			assert.ok(true, "error thrown");
 		}
 	});
 }
 
-QUnit.test(".extend errors when re-defining a property (#117)", function(){
+QUnit.test(".extend errors when re-defining a property (#117)", function(assert) {
 
 	var A = DefineMap.extend("A", {
 		foo: {
@@ -594,10 +594,10 @@ QUnit.test(".extend errors when re-defining a property (#117)", function(){
 			}
 		}
 	});
-	QUnit.ok(true, "extended without errors");
+	assert.ok(true, "extended without errors");
 });
 
-QUnit.test(".value functions should not be observable", function(){
+QUnit.test(".value functions should not be observable", function(assert) {
 	var outer = new DefineMap({
 		bam: "baz"
 	});
@@ -625,10 +625,10 @@ QUnit.test(".value functions should not be observable", function(){
 	items.item.foo = "changed";
 	items.zed = "changed";
 
-	equal(count, 1);
+	assert.equal(count, 1);
 });
 
-QUnit.test(".value values are overwritten by props in DefineMap construction", function() {
+QUnit.test(".value values are overwritten by props in DefineMap construction", function(assert) {
 	var Foo = DefineMap.extend({
 		bar: {
 			default: "baz"
@@ -639,10 +639,10 @@ QUnit.test(".value values are overwritten by props in DefineMap construction", f
 		bar: "quux"
 	});
 
-	equal(foo.bar, "quux", "Value set properly");
+	assert.equal(foo.bar, "quux", "Value set properly");
 });
 
-QUnit.test("can-reflect reflections work with DefineMap", function() {
+QUnit.test("can-reflect reflections work with DefineMap", function(assert) {
 	var b = new DefineMap({ "foo": "bar" });
 	var c = new (DefineMap.extend({
 		"baz": {
@@ -652,52 +652,52 @@ QUnit.test("can-reflect reflections work with DefineMap", function() {
 		}
 	}))({ "foo": "bar", thud: "baz" });
 
-	QUnit.equal( canReflect.getKeyValue(b, "foo"), "bar", "unbound value");
+	assert.equal( canReflect.getKeyValue(b, "foo"), "bar", "unbound value");
 
 	var handler = function(newValue){
-		QUnit.equal(newValue, "quux", "observed new value");
+		assert.equal(newValue, "quux", "observed new value");
 
 		// Turn off the "foo" handler but "thud" should still be bound.
 		canReflect.offKeyValue(c, "baz", handler);
 	};
-	QUnit.ok(!canReflect.isValueLike(c), "isValueLike is false");
-	QUnit.ok(canReflect.isObservableLike(c), "isObservableLike is true");
-	QUnit.ok(canReflect.isMapLike(c), "isMapLike is true");
-	QUnit.ok(!canReflect.isListLike(c), "isListLike is false");
+	assert.ok(!canReflect.isValueLike(c), "isValueLike is false");
+	assert.ok(canReflect.isObservableLike(c), "isObservableLike is true");
+	assert.ok(canReflect.isMapLike(c), "isMapLike is true");
+	assert.ok(!canReflect.isListLike(c), "isListLike is false");
 
-	QUnit.ok( !canReflect.keyHasDependencies(b, "foo"), "keyHasDependencies -- false");
+	assert.ok( !canReflect.keyHasDependencies(b, "foo"), "keyHasDependencies -- false");
 
 	canReflect.onKeyValue(c, "baz", handler);
 	// Do a second binding to check that you can unbind correctly.
 	canReflect.onKeyValue(c, "thud", handler);
-	QUnit.ok( canReflect.keyHasDependencies(c, "baz"), "keyHasDependencies -- true");
+	assert.ok( canReflect.keyHasDependencies(c, "baz"), "keyHasDependencies -- true");
 
 	b.foo = "quux";
 	c.thud = "quux";
 
-	QUnit.equal( canReflect.getKeyValue(c, "baz"), "quux", "bound value");
+	assert.equal( canReflect.getKeyValue(c, "baz"), "quux", "bound value");
 	// sanity checks to ensure that handler doesn't get called again.
 	b.foo = "thud";
 	c.baz = "jeek";
 
 });
 
-QUnit.test("can-reflect setKeyValue", function(){
+QUnit.test("can-reflect setKeyValue", function(assert) {
 	var a = new DefineMap({ "a": "b" });
 
 	canReflect.setKeyValue(a, "a", "c");
-	QUnit.equal(a.a, "c", "setKeyValue");
+	assert.equal(a.a, "c", "setKeyValue");
 });
 
-QUnit.test("can-reflect deleteKeyValue", function(){
+QUnit.test("can-reflect deleteKeyValue", function(assert) {
 	var a = new DefineMap({ "a": "b" });
 
 	canReflect.deleteKeyValue(a, "a");
-	QUnit.equal(a.a, undefined, "value is now undefined");
-	QUnit.ok(!("a" in a.get()), "value not included in serial");
+	assert.equal(a.a, undefined, "value is now undefined");
+	assert.ok(!("a" in a.get()), "value not included in serial");
 });
 
-QUnit.test("can-reflect getKeyDependencies", function() {
+QUnit.test("can-reflect getKeyDependencies", function(assert) {
 	var a = new DefineMap({ "a": "a" });
 	var b = new (DefineMap.extend({
 		"a": {
@@ -708,13 +708,13 @@ QUnit.test("can-reflect getKeyDependencies", function() {
 	}))();
 
 	// DefineMaps bind automatically without events, so this is already running.
-	ok(canReflect.getKeyDependencies(b, "a"), "dependencies exist");
-	ok(!canReflect.getKeyDependencies(b, "b"), "no dependencies exist for unknown value");
-	ok(canReflect.getKeyDependencies(b, "a").valueDependencies.has(b._computed.a.compute), "dependencies returned");
+	assert.ok(canReflect.getKeyDependencies(b, "a"), "dependencies exist");
+	assert.ok(!canReflect.getKeyDependencies(b, "b"), "no dependencies exist for unknown value");
+	assert.ok(canReflect.getKeyDependencies(b, "a").valueDependencies.has(b._computed.a.compute), "dependencies returned");
 
 });
 
-QUnit.test("can-reflect assign", function() {
+QUnit.test("can-reflect assign", function(assert) {
 	var aData = { "a": "b" };
 	var bData = { "b": "c" };
 
@@ -722,10 +722,10 @@ QUnit.test("can-reflect assign", function() {
 	var b = new DefineMap(bData);
 
 	canReflect.assign( a,b);
-	QUnit.deepEqual(a.get(), assign(aData, bData), "when called with an object, should merge into existing object");
+	assert.deepEqual(a.get(), assign(aData, bData), "when called with an object, should merge into existing object");
 });
 
-QUnit.test("Does not attempt to redefine _data if already defined", function() {
+QUnit.test("Does not attempt to redefine _data if already defined", function(assert) {
 	var Bar = DefineMap.extend({seal: false}, {
 		baz: { default: "thud" }
 	});
@@ -741,14 +741,14 @@ QUnit.test("Does not attempt to redefine _data if already defined", function() {
 		}
 	}, baz._define);
 
-	QUnit.equal(baz.quux, "jeek", "New definitions successful");
-	QUnit.equal(baz.plonk, "waldo", "New computed definitions successful");
-	QUnit.equal(baz.baz, "thud", "Old definitions still available");
+	assert.equal(baz.quux, "jeek", "New definitions successful");
+	assert.equal(baz.plonk, "waldo", "New computed definitions successful");
+	assert.equal(baz.baz, "thud", "Old definitions still available");
 
 });
 
 if (!System.isEnv('production')) {
-	QUnit.test("redefines still not allowed on sealed objects", function() {
+	QUnit.test("redefines still not allowed on sealed objects", function(assert) {
 		QUnit.expect(6);
 		var Bar = DefineMap.extend({seal: true}, {
 			baz: { default: "thud" }
@@ -761,9 +761,9 @@ if (!System.isEnv('production')) {
 				quux: { default: "jeek" }
 			}, baz._define);
 		} catch(e) {
-			QUnit.ok(/is not extensible/i.test(e.message), "Sealed object throws on data property defines");
-			QUnit.ok(!Object.getOwnPropertyDescriptor(baz, "quux"), "nothing set on object");
-			QUnit.ok(!Object.getOwnPropertyDescriptor(baz._data, "quux"), "nothing set on _data");
+			assert.ok(/is not extensible/i.test(e.message), "Sealed object throws on data property defines");
+			assert.ok(!Object.getOwnPropertyDescriptor(baz, "quux"), "nothing set on object");
+			assert.ok(!Object.getOwnPropertyDescriptor(baz._data, "quux"), "nothing set on _data");
 		}
 
 		try {
@@ -775,14 +775,14 @@ if (!System.isEnv('production')) {
 				}
 			}, baz._define);
 		} catch(e) {
-			QUnit.ok(/is not extensible/i.test(e.message), "Sealed object throws on computed property defines");
-			QUnit.ok(!Object.getOwnPropertyDescriptor(baz, "plonk"), "nothing set on object");
-			QUnit.ok(!Object.getOwnPropertyDescriptor(baz._computed, "plonk"), "nothing set on _computed");
+			assert.ok(/is not extensible/i.test(e.message), "Sealed object throws on computed property defines");
+			assert.ok(!Object.getOwnPropertyDescriptor(baz, "plonk"), "nothing set on object");
+			assert.ok(!Object.getOwnPropertyDescriptor(baz._computed, "plonk"), "nothing set on _computed");
 		}
 	});
 }
 
-QUnit.test("Call .get() when a nested object has its own get method", function(){
+QUnit.test("Call .get() when a nested object has its own get method", function(assert) {
 	var Bar = DefineMap.extend({
 		request: "*"
 	});
@@ -799,10 +799,10 @@ QUnit.test("Call .get() when a nested object has its own get method", function()
 	var obj = new Bar({ request: request });
 	var data = obj.get();
 
-	QUnit.equal(data.request.prop, 22, "obj did get()");
+	assert.equal(data.request.prop, 22, "obj did get()");
 });
 
-QUnit.test("DefineMap short-hand Type (#221)", function(){
+QUnit.test("DefineMap short-hand Type (#221)", function(assert) {
 	var Child = DefineMap.extend('child', {
 		other: DefineMap
 	});
@@ -812,17 +812,17 @@ QUnit.test("DefineMap short-hand Type (#221)", function(){
 		prop: 'hello'
 	};
 
-	QUnit.ok(c.other instanceof DefineMap, "is a DefineMap");
+	assert.ok(c.other instanceof DefineMap, "is a DefineMap");
 
 });
 
-QUnit.test("non-Object constructor", function() {
+QUnit.test("non-Object constructor", function(assert) {
 	var Constructor = DefineMap.extend();
-	QUnit.ok(!isPlainObject(new DefineMap()), "instance of DefineMap is not a plain object");
-	QUnit.ok(!isPlainObject(new Constructor()), "instance of extended DefineMap is not a plain object");
+	assert.ok(!isPlainObject(new DefineMap()), "instance of DefineMap is not a plain object");
+	assert.ok(!isPlainObject(new Constructor()), "instance of extended DefineMap is not a plain object");
 });
 
-QUnit.test('Observation bound to getter using lastSetVal updates correctly (canjs#3541)', function() {
+QUnit.test('Observation bound to getter using lastSetVal updates correctly (canjs#3541)', function(assert) {
 	var MyMap = DefineMap.extend({
 		foo: {
 			get: function(lastSetVal) {
@@ -837,14 +837,14 @@ QUnit.test('Observation bound to getter using lastSetVal updates correctly (canj
 		return map.get("foo");
 	});
 	canReflect.onValue(oi, function(newVal){
-		QUnit.equal(newVal, "bar", "updated to bar");
+		assert.equal(newVal, "bar", "updated to bar");
 	});
 
 	map.set("foo","bar");
 
 });
 
-QUnit.test('Observation bound to async getter updates correctly (canjs#3541)', function() {
+QUnit.test('Observation bound to async getter updates correctly (canjs#3541)', function(assert) {
 	var MyMap = DefineMap.extend({
 		foo: {
 			get: function(lastSetVal, resolve) {
@@ -859,7 +859,7 @@ QUnit.test('Observation bound to async getter updates correctly (canjs#3541)', f
 		return map.get("foo");
 	});
 	canReflect.onValue(oi, function(newVal){
-		QUnit.equal(newVal, "bar", "updated to bar");
+		assert.equal(newVal, "bar", "updated to bar");
 	});
 
 	map.set("foo","bar");
@@ -1008,7 +1008,7 @@ canTestHelpers.devOnlyTest("Setting a value with an object type generates a warn
 		}
 	});
 
-	QUnit.equal(finishErrorCheck(), 2);
+	assert.equal(finishErrorCheck(), 2);
 });
 
 canTestHelpers.devOnlyTest("Setting a default value to a constructor type generates a warning", function() {
@@ -1024,7 +1024,7 @@ canTestHelpers.devOnlyTest("Setting a default value to a constructor type genera
 		}
 	});
 
-	QUnit.equal(finishErrorCheck(), 1);
+	assert.equal(finishErrorCheck(), 1);
 });
 
 canTestHelpers.devOnlyTest("can.getName symbol behavior", function(assert) {
@@ -1046,13 +1046,13 @@ canTestHelpers.devOnlyTest("can.getName symbol behavior", function(assert) {
 });
 
 canTestHelpers.devOnlyTest("Error on not using a constructor or string on short-hand definitions (#278)", function() {
-	expect(5);
+	assert.expect(5);
 	var message = /does not match a supported propDefinition. See: https:\/\/canjs.com\/doc\/can-define.types.propDefinition.html/i;
 
 	var finishErrorCheck = canTestHelpers.willError(message, function(actual, match) {
 		var rightProp = /prop0[15]/;
-		QUnit.ok(rightProp.test(actual.split(" ")[0]));
-		QUnit.ok(match);
+		assert.ok(rightProp.test(actual.split(" ")[0]));
+		assert.ok(match);
 	});
 
 	DefineMap.extend('ShortName', {
@@ -1067,22 +1067,22 @@ canTestHelpers.devOnlyTest("Error on not using a constructor or string on short-
 		prop08: 'boolean'
 	});
 
-	QUnit.equal(finishErrorCheck(), 2);
+	assert.equal(finishErrorCheck(), 2);
 });
 
-QUnit.test('Improper shorthand properties are not set', function() {
+QUnit.test('Improper shorthand properties are not set', function(assert) {
 	var VM = DefineMap.extend({
 		prop01: 0,
 		prop02: function() {},
 		prop03: 'some random string'
 	});
 
-	QUnit.equal(VM.prototype._define.methods.prop01, undefined);
-	QUnit.equal(typeof VM.prototype._define.methods.prop02, 'function');
-	QUnit.equal(VM.prototype._define.methods.prop03, undefined);
+	assert.equal(VM.prototype._define.methods.prop01, undefined);
+	assert.equal(typeof VM.prototype._define.methods.prop02, 'function');
+	assert.equal(VM.prototype._define.methods.prop03, undefined);
 });
 
-QUnit.test("onKeyValue sets up computed values", function(){
+QUnit.test("onKeyValue sets up computed values", function(assert) {
 	var fullNameCalls = [];
 	var VM = DefineMap.extend({
 		first: "string",
@@ -1097,11 +1097,11 @@ QUnit.test("onKeyValue sets up computed values", function(){
 
 	canReflect.onKeyValue(vm, "fullName", function(){});
 
-	QUnit.deepEqual(fullNameCalls,["J M"]);
+	assert.deepEqual(fullNameCalls,["J M"]);
 
 });
 
-QUnit.test("async getters derived from other properties should have correct keyDependencies", function() {
+QUnit.test("async getters derived from other properties should have correct keyDependencies", function(assert) {
 
 	var VM = DefineMap.extend({
 		get source() {
@@ -1118,7 +1118,7 @@ QUnit.test("async getters derived from other properties should have correct keyD
 	var vm = new VM();
 
 	vm.on('derived', function(){});
-	QUnit.ok(vm._computed.derived.compute.observation.newDependencies.keyDependencies.get(vm).has('source'), 'getter should depend on vm.source');
+	assert.ok(vm._computed.derived.compute.observation.newDependencies.keyDependencies.get(vm).has('source'), 'getter should depend on vm.source');
 });
 
 var sealDoesErrorWithPropertyName = (function () {
@@ -1140,12 +1140,12 @@ canTestHelpers.devOnlyTest("setting a property gives a nice error", function(){
 		vm.set("fooxyz","bar");
 	} catch (error) {
 		if (sealDoesErrorWithPropertyName) {
-			QUnit.ok(
+			assert.ok(
 				error.message.indexOf("fooxyz") !== -1,
 				"Set property error with property name should be thrown"
 			);
 		} else {
-			QUnit.ok(true, 'Set property error should be thrown');
+			assert.ok(true, 'Set property error should be thrown');
 		}
 	}
 });
@@ -1252,15 +1252,15 @@ canTestHelpers.devOnlyTest("getOwnKeys, getOwnEnumerableKeys (#326)", function(a
 	assert.deepEqual( vm[getOwnKeysSymbol](), [ "prop", "valueProp", "parentProp", "parentValueProp", "derivedProp", "parentDerivedProp" ], "vm.getOwnKeys()");
 });
 
-QUnit.test("value as a string breaks", function(){
+QUnit.test("value as a string breaks", function(assert) {
 	var MyMap = DefineMap.extend({
 		prop: {value: "a string"}
 	});
 	var my = new MyMap();
-	QUnit.equal(my.prop, "a string", "works");
+	assert.equal(my.prop, "a string", "works");
 });
 
-QUnit.test("canReflect.getSchema", function(){
+QUnit.test("canReflect.getSchema", function(assert) {
 
 	// For #401
 	var StringIgnoreCase = canReflect.assignSymbols({},{
@@ -1282,24 +1282,24 @@ QUnit.test("canReflect.getSchema", function(){
 
 	var schema = canReflect.getSchema(MyType);
 
-	QUnit.deepEqual(schema.identity, ["id"], "right identity");
-	QUnit.deepEqual(Object.keys(schema.keys), ["id","name","lowerCase","text","maybeString_type","maybeString_Type"], "right key names");
+	assert.deepEqual(schema.identity, ["id"], "right identity");
+	assert.deepEqual(Object.keys(schema.keys), ["id","name","lowerCase","text","maybeString_type","maybeString_Type"], "right key names");
 
-	QUnit.equal( canReflect.convert("1", schema.keys.id), 1, "converted to number");
+	assert.equal( canReflect.convert("1", schema.keys.id), 1, "converted to number");
 
-	QUnit.equal( canReflect.convert(3, schema.keys.id), "3", "converted to number");
+	assert.equal( canReflect.convert(3, schema.keys.id), "3", "converted to number");
 
-	QUnit.equal(schema.keys.name, MaybeString, " 'string' -> MaybeString");
-	QUnit.equal(schema.keys.lowerCase, StringIgnoreCase, "StringIgnoreCase");
-	QUnit.equal(schema.keys.text, MaybeString, "MaybeString");
+	assert.equal(schema.keys.name, MaybeString, " 'string' -> MaybeString");
+	assert.equal(schema.keys.lowerCase, StringIgnoreCase, "StringIgnoreCase");
+	assert.equal(schema.keys.text, MaybeString, "MaybeString");
 
-	QUnit.equal(schema.keys.maybeString_type, MaybeString, "{type: MaybeString}");
-	QUnit.equal(schema.keys.maybeString_Type, MaybeString, "{Type: MaybeString}");
+	assert.equal(schema.keys.maybeString_type, MaybeString, "{type: MaybeString}");
+	assert.equal(schema.keys.maybeString_Type, MaybeString, "{Type: MaybeString}");
 
 });
 
 
-QUnit.test("use can.new and can.serialize for conversion", function(){
+QUnit.test("use can.new and can.serialize for conversion", function(assert) {
 	var Status = canReflect.assignSymbols({},{
         "can.new": function(val){
 
@@ -1322,9 +1322,9 @@ QUnit.test("use can.new and can.serialize for conversion", function(){
 
 
 	var todo = new Todo({status: "NEW"});
-	QUnit.equal(todo.status, "new", "converted during set");
+	assert.equal(todo.status, "new", "converted during set");
 
-	QUnit.deepEqual(todo.serialize(),{status: "NEW"}, "serialized to upper case");
+	assert.deepEqual(todo.serialize(),{status: "NEW"}, "serialized to upper case");
 
 	var Todo2 = DefineMap.extend("Todo",{
 		due: "date"
@@ -1336,24 +1336,24 @@ QUnit.test("use can.new and can.serialize for conversion", function(){
 		due: date.toString()
 	});
 
-	QUnit.ok(todo2.due instanceof Date, "converted to a date instance");
+	assert.ok(todo2.due instanceof Date, "converted to a date instance");
 
 	var res = todo2.serialize();
 
-	QUnit.deepEqual(res,{due: date}, "serialized to a date?");
+	assert.deepEqual(res,{due: date}, "serialized to a date?");
 });
 
-QUnit.test("make sure stringOrObservable works", function(){
+QUnit.test("make sure stringOrObservable works", function(assert) {
 	var Type = DefineMap.extend({
 		val : "stringOrObservable"
 	});
 
 	var type  = new Type({val: "foo"});
 
-	QUnit.equal(type.val, "foo", "works");
+	assert.equal(type.val, "foo", "works");
 });
 
-QUnit.test("primitive types work with val: Type", function(){
+QUnit.test("primitive types work with val: Type", function(assert) {
 	var UpperCase = {};
 	UpperCase[canSymbol.for("can.new")] = function(val){
 		return val.toUpperCase();
@@ -1364,10 +1364,10 @@ QUnit.test("primitive types work with val: Type", function(){
 	});
 
 	var type = new Type({ val: "works" });
-	QUnit.equal(type.val, "WORKS", "it worked");
+	assert.equal(type.val, "WORKS", "it worked");
 });
 
-QUnit.test("primitive types work with val: {Type: Type}", function(){
+QUnit.test("primitive types work with val: {Type: Type}", function(assert) {
 	var UpperCase = {};
 	UpperCase[canSymbol.for("can.new")] = function(val){
 		return val.toUpperCase();
@@ -1380,10 +1380,10 @@ QUnit.test("primitive types work with val: {Type: Type}", function(){
 	});
 
 	var type = new Type({ val: "works" });
-	QUnit.equal(type.val, "WORKS", "it worked");
+	assert.equal(type.val, "WORKS", "it worked");
 });
 
-QUnit.test("primitive types work with val: {type: Type}", function(){
+QUnit.test("primitive types work with val: {type: Type}", function(assert) {
 	var UpperCase = {};
 	UpperCase[canSymbol.for("can.new")] = function(val){
 		return val.toUpperCase();
@@ -1396,37 +1396,37 @@ QUnit.test("primitive types work with val: {type: Type}", function(){
 	});
 
 	var type = new Type({ val: "works" });
-	QUnit.equal(type.val, "WORKS", "it worked");
+	assert.equal(type.val, "WORKS", "it worked");
 });
 
-QUnit.test("ownKeys works on basic DefineMaps", function(){
+QUnit.test("ownKeys works on basic DefineMaps", function(assert) {
 	var map = new DefineMap({ first: "Jane", last: "Doe" });
 	var keys = canReflect.getOwnKeys(map);
 
-	QUnit.equal(keys.length, 2, "There are 2 keys");
+	assert.equal(keys.length, 2, "There are 2 keys");
 });
 
-QUnit.test("deleteKey works (#351)", function(){
+QUnit.test("deleteKey works (#351)", function(assert) {
 
 	var map = new DefineMap({foo: "bar"});
 
-	QUnit.deepEqual( canReflect.getOwnKeys(map), ["foo"] );
+	assert.deepEqual( canReflect.getOwnKeys(map), ["foo"] );
 
 	map.set("zed", "ted");
 
-	QUnit.deepEqual( canReflect.getOwnKeys(map), ["foo","zed"] );
+	assert.deepEqual( canReflect.getOwnKeys(map), ["foo","zed"] );
 
 	map.deleteKey("zed");
 
-	QUnit.deepEqual( canReflect.getOwnKeys(map), ["foo"] );
+	assert.deepEqual( canReflect.getOwnKeys(map), ["foo"] );
 
 	map.deleteKey("foo");
 
 	// We should keep the property descriptor
 	// var pd = Object.getOwnPropertyDescriptor(map, "foo");
-	// QUnit.ok(!pd, "no property descriptor");
+	// assert.ok(!pd, "no property descriptor");
 
-	QUnit.deepEqual( canReflect.getOwnKeys(map), [] );
+	assert.deepEqual( canReflect.getOwnKeys(map), [] );
 
 	map.set("foo", "bar");
 
@@ -1435,10 +1435,10 @@ QUnit.test("deleteKey works (#351)", function(){
 
 	map.deleteKey("foo");
 
-	QUnit.equal(map.foo, undefined, "prop set to undefined");
+	assert.equal(map.foo, undefined, "prop set to undefined");
 });
 
-QUnit.test("makes sure observation add is called (#393)", function(){
+QUnit.test("makes sure observation add is called (#393)", function(assert) {
 	var map = new DefineMap({foo: "bar"});
 
 	canReflect.deleteKeyValue(map, "foo");
@@ -1446,14 +1446,14 @@ QUnit.test("makes sure observation add is called (#393)", function(){
 	ObservationRecorder.start();
 	(function(){ return map.foo; }());
 	var result = ObservationRecorder.stop();
-	QUnit.deepEqual(canReflect.toArray( result.keyDependencies.get(map) ), ["foo"], "toArray" );
+	assert.deepEqual(canReflect.toArray( result.keyDependencies.get(map) ), ["foo"], "toArray" );
 });
 
-QUnit.test("type called with `this` as the map (#349)", function(){
+QUnit.test("type called with `this` as the map (#349)", function(assert) {
 	var Type = DefineMap.extend({
 		foo: {
 			type: function(){
-				QUnit.equal(Type, this.constructor, "got the right this");
+				assert.equal(Type, this.constructor, "got the right this");
 				return 5;
 			},
 			default: 4
@@ -1461,10 +1461,10 @@ QUnit.test("type called with `this` as the map (#349)", function(){
 	});
 
 	var map = new Type();
-	QUnit.equal(map.foo, 5);
+	assert.equal(map.foo, 5);
 });
 
-QUnit.test("expandos use default type (#383)", function(){
+QUnit.test("expandos use default type (#383)", function(assert) {
 	var AllNumbers = DefineMap.extend({
 		"*": {type: "number"}
 	});
@@ -1472,10 +1472,10 @@ QUnit.test("expandos use default type (#383)", function(){
 	var someNumbers = new AllNumbers({
 		version: "24"
 	});
-	QUnit.ok(someNumbers.version === 24, "is 24");
+	assert.ok(someNumbers.version === 24, "is 24");
 });
 
-QUnit.test("do not enumerate anything other than key properties (#369)", function(){
+QUnit.test("do not enumerate anything other than key properties (#369)", function(assert) {
 	// Internet Explorer doesn't correctly skip properties that are non-enumerable
 	// on the current object, but enumerable on the prototype:
 	var ancestor = { prop: true };
@@ -1494,7 +1494,7 @@ QUnit.test("do not enumerate anything other than key properties (#369)", functio
 		test[k] = descendant[k];
 	}
 	if (test.prop) {
-		return QUnit.ok(test.prop, "Browser doesn't correctly skip shadowed enumerable properties");
+		return assert.ok(test.prop, "Browser doesn't correctly skip shadowed enumerable properties");
 	}
 
 
@@ -1509,14 +1509,14 @@ QUnit.test("do not enumerate anything other than key properties (#369)", functio
 	for (var prop in instance) {
 		props[prop] = true;
 	}
-	QUnit.deepEqual(props,{
+	assert.deepEqual(props,{
 		aProp: true,
 		anExpando: true,
 		aMethod: true // TODO: this should be removed someday
 	});
 });
 
-QUnit.test("Properties added via defineInstanceKey are observable", function(){
+QUnit.test("Properties added via defineInstanceKey are observable", function(assert) {
 	var Type = DefineMap.extend({});
 	var map = new Type();
 
@@ -1529,7 +1529,7 @@ QUnit.test("Properties added via defineInstanceKey are observable", function(){
 		count++;
 
 		if(count === 2) {
-			QUnit.deepEqual(val, {foo:"bar"}, "changed value");
+			assert.deepEqual(val, {foo:"bar"}, "changed value");
 		}
 	});
 
@@ -1540,7 +1540,7 @@ QUnit.test("Properties added via defineInstanceKey are observable", function(){
 	map.foo = "bar";
 });
 
-QUnit.test("Serialized computes do not prevent getters from working", function(){
+QUnit.test("Serialized computes do not prevent getters from working", function(assert) {
 	var Type = DefineMap.extend("MyType", {
 		page: "string",
 		myPage: {
@@ -1560,10 +1560,10 @@ QUnit.test("Serialized computes do not prevent getters from working", function()
 
 	var second = new Type({ page: "two" });
 
-	QUnit.equal(second.myPage, "two", "Runs the getter correctly");
+	assert.equal(second.myPage, "two", "Runs the getter correctly");
 });
 
-QUnit.test("setup should be called (#395)", function(){
+QUnit.test("setup should be called (#395)", function(assert) {
 	var calls = [];
 	var Base = DefineMap.extend("Base",{
 		setup: function(attrs) {
@@ -1577,10 +1577,10 @@ QUnit.test("setup should be called (#395)", function(){
 	var base = new Base();
 	var supa = new Super();
 
-	QUnit.deepEqual(calls,[base, supa], "setup called");
+	assert.deepEqual(calls,[base, supa], "setup called");
 });
 
-QUnit.test("Set new prop to undefined #408", function(){
+QUnit.test("Set new prop to undefined #408", function(assert) {
 	var obj = new DefineMap({});
 	var PATCHES = [
 		[ { type: "add", key: "foo", value: undefined } ],
@@ -1593,16 +1593,16 @@ QUnit.test("Set new prop to undefined #408", function(){
 	obj[canSymbol.for("can.onPatches")](handler,"notify");
 	obj.set("foo", undefined);
 	obj.set("foo", "bar");
-	QUnit.deepEqual(calledPatches, PATCHES);
+	assert.deepEqual(calledPatches, PATCHES);
 });
 
-QUnit.test("Set __inSetup prop #421", function() {
+QUnit.test("Set __inSetup prop #421", function(assert) {
 	var map = new DefineMap({});
 	map.set("__inSetup", "nope");
-	QUnit.equal(map.__inSetup, "nope");
+	assert.equal(map.__inSetup, "nope");
 });
 
-QUnit.test("'*' wildcard type definitions that use constructors works for expandos #425", function(){
+QUnit.test("'*' wildcard type definitions that use constructors works for expandos #425", function(assert) {
 	var MyType = function MyType() {};
 	MyType.prototype = {};
 
@@ -1613,10 +1613,10 @@ QUnit.test("'*' wildcard type definitions that use constructors works for expand
 	var map = new OtherType();
 	map.set( "foo", {});
 	var foo = map.get( "foo" );
-	QUnit.ok(foo instanceof MyType);
+	assert.ok(foo instanceof MyType);
 });
 
-QUnit.test("'*' wildcard type definitions that use DefineMap constructors works for expandos #425", function(){
+QUnit.test("'*' wildcard type definitions that use DefineMap constructors works for expandos #425", function(assert) {
 	var MyType = DefineMap.extend({});
 
 	var OtherType = DefineMap.extend({ seal : false }, {
@@ -1626,5 +1626,5 @@ QUnit.test("'*' wildcard type definitions that use DefineMap constructors works 
 	var map = new OtherType();
 	map.set( "foo", {});
 	var foo = map.get( "foo" );
-	QUnit.ok(foo instanceof MyType);
+	assert.ok(foo instanceof MyType);
 });
