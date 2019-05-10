@@ -9,7 +9,7 @@ var ObservationRecorder = require("can-observation-recorder");
 // Tests events directly on the Constructor function for define.Constructor, DefineMap and DefineList
 QUnit.module("can-define value with resolve");
 
-QUnit.test("counter", function(){
+QUnit.test("counter", function(assert) {
     var Person = DefineMap.extend("Person", {
         name: "string",
         nameChangeCount: {
@@ -24,23 +24,23 @@ QUnit.test("counter", function(){
     });
 
     var me = new Person();
-    QUnit.equal(me.nameChangeCount,0, "unbound value");
+    assert.equal(me.nameChangeCount,0, "unbound value");
 
     me.name = "first";
 
-    QUnit.equal(me.nameChangeCount,0, "unbound value");
+    assert.equal(me.nameChangeCount,0, "unbound value");
 
     me.on("nameChangeCount", function(ev, newVal, oldVal){
-        QUnit.equal(newVal,1, "updated count");
-        QUnit.equal(oldVal,0, "updated count from old value");
+        assert.equal(newVal,1, "updated count");
+        assert.equal(oldVal,0, "updated count from old value");
     });
 
     me.name = "second";
 
-    QUnit.equal(me.nameChangeCount,1, "bound value");
+    assert.equal(me.nameChangeCount,1, "bound value");
 });
 
-QUnit.test("fullName getter the hard way", 3, function(){
+QUnit.test("fullName getter the hard way", 3, function(assert) {
     var Person = DefineMap.extend("Person", {
         first: "string",
         last: "string",
@@ -62,11 +62,11 @@ QUnit.test("fullName getter the hard way", 3, function(){
     });
     var me = new Person({first:"Justin", last: "Meyer"});
 
-    QUnit.equal(me.fullName, "Justin Meyer", "unbound value");
+    assert.equal(me.fullName, "Justin Meyer", "unbound value");
 
     var handler = function(ev, newVal, oldVal){
-        QUnit.equal(newVal, "Ramiya Meyer", "event newVal");
-        QUnit.equal(oldVal, "Justin Meyer", "event oldVal");
+        assert.equal(newVal, "Ramiya Meyer", "event newVal");
+        assert.equal(oldVal, "Justin Meyer", "event oldVal");
     };
 
     me.on("fullName", handler);
@@ -78,7 +78,7 @@ QUnit.test("fullName getter the hard way", 3, function(){
     me.last = "Shah";
 });
 
-QUnit.test("list length", function(){
+QUnit.test("list length", function(assert) {
     var VM = DefineMap.extend("VM", {
         tasks: [],
         tasksLength: {
@@ -114,35 +114,35 @@ QUnit.test("list length", function(){
 
     var vm = new VM({tasks: null});
 
-    QUnit.equal(vm.tasksLength, 0, "empty tasks, unbound");
+    assert.equal(vm.tasksLength, 0, "empty tasks, unbound");
 
     vm.tasks = ["chore 1", "chore 2"];
 
-    QUnit.equal(vm.tasksLength, 2, "tasks, unbound");
+    assert.equal(vm.tasksLength, 2, "tasks, unbound");
     var lengths = [];
     vm.on("tasksLength", function(ev, newLength){
         lengths.push(newLength);
     });
 
-    QUnit.equal(vm.tasksLength, 2, "2 tasks, bound");
+    assert.equal(vm.tasksLength, 2, "2 tasks, bound");
 
     vm.tasks.push("chore 3");
 
     var originalTasks = vm.tasks;
 
-    QUnit.equal(vm.tasksLength, 3, "3 tasks, bound, after push to source");
+    assert.equal(vm.tasksLength, 3, "3 tasks, bound, after push to source");
 
     vm.tasks = ["one chore"];
 
-    QUnit.equal(vm.tasksLength, 1, "1 tasks, bound, after replace array");
+    assert.equal(vm.tasksLength, 1, "1 tasks, bound, after replace array");
 
-    QUnit.notOk( canReflect.isBound(originalTasks), "not bound on original");
+    assert.notOk( canReflect.isBound(originalTasks), "not bound on original");
 
 
-    QUnit.deepEqual(lengths, [3, 1], "length changes are right");
+    assert.deepEqual(lengths, [3, 1], "length changes are right");
 });
 
-QUnit.test("batches produce one result", 2, function(){
+QUnit.test("batches produce one result", 2, function(assert) {
     var Person = DefineMap.extend("Person", {
         first: "string",
         last: "string",
@@ -166,8 +166,8 @@ QUnit.test("batches produce one result", 2, function(){
     var me = new Person({first:"Justin", last: "Meyer"});
 
     var handler = function(ev, newVal, oldVal){
-        QUnit.equal(newVal, "Ramiya Shah", "event newVal");
-        QUnit.equal(oldVal, "Justin Meyer", "event oldVal");
+        assert.equal(newVal, "Ramiya Shah", "event newVal");
+        assert.equal(oldVal, "Justin Meyer", "event oldVal");
     };
 
     me.on("fullName", handler);
@@ -178,7 +178,7 @@ QUnit.test("batches produce one result", 2, function(){
     queues.batch.stop();
 });
 
-QUnit.test("location vm", function(){
+QUnit.test("location vm", function(assert) {
     var Locator = DefineMap.extend("Locator",{
     	state: "string",
         setCity: function(city){
@@ -204,11 +204,11 @@ QUnit.test("location vm", function(){
     locator.setCity("Chicago");
 
     locator.state = "CA";
-    QUnit.equal(locator.city, null, "changing the state sets the city");
+    assert.equal(locator.city, null, "changing the state sets the city");
 
 });
 
-QUnit.test("location vm with setter", function(){
+QUnit.test("location vm with setter", function(assert) {
     var Locator = DefineMap.extend("Locator",{
     	state: "string",
     	city: {
@@ -226,20 +226,20 @@ QUnit.test("location vm with setter", function(){
     	state: "IL",
         city: "Chicago"
     });
-    QUnit.equal(locator.city, "Chicago", "init to Chicago");
+    assert.equal(locator.city, "Chicago", "init to Chicago");
 
     locator.on("city", function(){});
 
     locator.state = "CA";
-    QUnit.equal(locator.city, null, "changing the state sets the city");
+    assert.equal(locator.city, null, "changing the state sets the city");
 
     locator.city = "San Jose";
 
-    QUnit.equal(locator.city, "San Jose", "changing the state sets the city");
+    assert.equal(locator.city, "San Jose", "changing the state sets the city");
 
 });
 
-QUnit.test("events should not be fired when resolve is not called", function(){
+QUnit.test("events should not be fired when resolve is not called", function(assert) {
 	var Numbers = DefineMap.extend("Numbers",{
 		oddNumber: {
 			value: function(prop) {
@@ -256,17 +256,17 @@ QUnit.test("events should not be fired when resolve is not called", function(){
 
 	var nums = new Numbers({});
 
-	QUnit.equal(nums.oddNumber, 5, "initial value is 5");
+	assert.equal(nums.oddNumber, 5, "initial value is 5");
 
 	nums.on("oddNumber", function(ev, newVal){
-		QUnit.equal(newVal % 2, 1, "event dispatched for " + newVal);
+		assert.equal(newVal % 2, 1, "event dispatched for " + newVal);
 	});
 
 	nums.oddNumber = 7;
 	nums.oddNumber = 8;
 });
 
-QUnit.test("reading properties does not leak out", function(){
+QUnit.test("reading properties does not leak out", function(assert) {
     var Type = DefineMap.extend({
         prop: {
             value: function(prop){
@@ -284,7 +284,7 @@ QUnit.test("reading properties does not leak out", function(){
 
     var records = ObservationRecorder.stop();
 
-    QUnit.equal(records.keyDependencies.size, 0, "there are no key dependencies");
+    assert.equal(records.keyDependencies.size, 0, "there are no key dependencies");
 });
 
 /*
@@ -330,11 +330,11 @@ QUnit.test("fullName getter/setter the hard way", 3, function(){
     });
     var me = new Person({first:"Justin", last: "Meyer"});
 
-    QUnit.equal(me.fullName, "Justin Meyer", "unbound value");
+    assert.equal(me.fullName, "Justin Meyer", "unbound value");
 
     var handler = function(ev, newVal, oldVal){
-        QUnit.equal(newVal, "Ramiya Meyer", "event newVal");
-        QUnit.equal(oldVal, "Justin Meyer", "event oldVal");
+        assert.equal(newVal, "Ramiya Meyer", "event newVal");
+        assert.equal(oldVal, "Justin Meyer", "event oldVal");
     };
 
     me.on("fullName", handler);
