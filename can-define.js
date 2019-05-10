@@ -523,7 +523,25 @@ make = {
 
 						//!steal-remove-start
 						if(process.env.NODE_ENV !== 'production') {
+							var lastItem;
 							dispatched.reasonLog = [ canReflect.getName(this) + "'s", prop, "changed to", newVal, "from", current ];
+
+							if(!eventQueue.canSafelyMutate() && queues.stack().length) {
+								lastItem = queues.stack()[queues.stack().length - 1];
+								if(lastItem.context instanceof Observation) {
+									lastItem = lastItem.context.func;
+								} else {
+									lastItem = lastItem.fn;
+								}
+								canLogDev.warn(
+									"can-define: The " + prop + " property on "
+									+ canReflect.getName(this)
+									+ " is being set while computing the value of "
+									+ canReflect.getName(lastItem)
+									+ ". Setting values at this time should be avoided."
+								);
+							}
+
 						}
 						//!steal-remove-end
 

@@ -1321,3 +1321,113 @@ QUnit.test("binding computed properties do not observation recordings (#406)", f
 	var records = ObservationRecorder.stop();
 	QUnit.equal(records.valueDependencies.size, 0, "nothing recorded");
 });
+
+QUnit.test("warning when setting during a get", function(){
+	var Type = function() {};
+	var teardownWarn = testHelpers.dev.willWarn("can-define: The prop2 property on Type{} is being set while computing the value of Type{}'s prop getter. Setting values at this time should be avoided.", function(text, match) {
+		if(match) {
+			QUnit.ok(true, "warning fired");
+		}
+	});
+
+	define(Type.prototype, {
+		prop: {
+			get: function(){
+				if(!this.prop2) {
+					this.prop2 = "baz";
+				}
+				return "";
+			}
+		},
+		prop2: "string"
+	});
+
+	var inst = new Type();
+
+	inst.on("prop", function(){});
+	inst.prop2 = "";
+	QUnit.equal(teardownWarn(), 1, "warning correctly generated");
+	teardownWarn = testHelpers.dev.willWarn("can-define: The prop2 property on Type{} is being set while computing the value of Type{}'s prop getter. Setting values at this time should be avoided.", function(text, match) {
+		if(match) {
+			QUnit.ok(false, "warning incorrectly fired");
+		}
+	});
+	inst.prop2 = "quux";
+	teardownWarn();
+});
+
+QUnit.test("warning when setting during a get (batched)", function(){
+	var Type = function() {};
+	var teardownWarn = testHelpers.dev.willWarn("can-define: The prop2 property on Type{} is being set while computing the value of Type{}'s prop getter. Setting values at this time should be avoided.", function(text, match) {
+		if(match) {
+			QUnit.ok(true, "warning fired");
+		}
+	});
+
+	define(Type.prototype, {
+		prop: {
+			get: function(){
+				if(!this.prop2) {
+					this.prop2 = "baz";
+					return "";
+				}
+			}
+		},
+		prop2: "string"
+	});
+
+	var inst = new Type();
+
+	queues.batch.start();
+	inst.on("prop", function(){});
+	inst.prop2 = "";
+	queues.batch.stop();
+	QUnit.equal(teardownWarn(), 1, "warning correctly generated");
+	teardownWarn = testHelpers.dev.willWarn("can-define: The prop2 property on Type{} is being set while computing the value of Type{}'s prop getter. Setting values at this time should be avoided.", function(text, match) {
+		if(match) {
+			QUnit.ok(false, "warning incorrectly fired");
+		}
+	});
+	queues.batch.start();
+	inst.prop2 = "quux";
+	queues.batch.stop();
+	teardownWarn();
+});
+
+QUnit.test("warning when setting during a get (setter)", function(){
+	var Type = function() {};
+	var teardownWarn = testHelpers.dev.willWarn("can-define: The prop2 property on Type{} is being set while computing the value of Type{}'s prop getter. Setting values at this time should be avoided.", function(text, match) {
+		if(match) {
+			QUnit.ok(true, "warning fired");
+		}
+	});
+
+	var cell;
+	define(Type.prototype, {
+		prop: {
+			get: function() {
+				if(!this.prop2) {
+					this.prop2 = "baz";
+				}
+				return cell;
+			},
+			set: function(val) {
+				cell = val;
+			}
+		},
+		prop2: "string"
+	});
+
+	var inst = new Type();
+
+	inst.on("prop", function(){}); // generates a warning
+	inst.prop2 = ""; // also generates a warning, as the bound getter will fire again
+	QUnit.equal(teardownWarn(), 1, "warning correctly generated");
+	teardownWarn = testHelpers.dev.willWarn("can-define: The prop2 property on Type{} is being set while computing the value of Type{}'s prop getter. Setting values at this time should be avoided.", function(text, match) {
+		if(match) {
+			QUnit.ok(false, "warning incorrectly fired");
+		}
+	});
+	inst.prop2 = "quux";
+	teardownWarn();
+});
