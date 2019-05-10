@@ -10,17 +10,17 @@ var QUnit = require("steal-qunit");
 
 QUnit.module("can-define: map and list combined");
 
-QUnit.test("basics", function(){
+QUnit.test("basics", function(assert) {
     var items = new DefineMap({ people: [{name: "Justin"},{name: "Brian"}], count: 1000 });
 
-    QUnit.ok(items.people instanceof DefineList, "people is list");
-    QUnit.ok(items.people.item(0) instanceof DefineMap, "1st object is Map");
-    QUnit.ok(items.people.item(1) instanceof DefineMap, "2nd object is Map");
-    QUnit.equal(items.people.item(1).name, "Brian", "2nd object's name is right");
-    QUnit.equal(items.count, 1000, "count is number");
+    assert.ok(items.people instanceof DefineList, "people is list");
+    assert.ok(items.people.item(0) instanceof DefineMap, "1st object is Map");
+    assert.ok(items.people.item(1) instanceof DefineMap, "2nd object is Map");
+    assert.equal(items.people.item(1).name, "Brian", "2nd object's name is right");
+    assert.equal(items.count, 1000, "count is number");
 });
 
-QUnit.test("basic type", function() {
+QUnit.test("basic type", function(assert) {
 
 	QUnit.expect(6);
 
@@ -53,31 +53,31 @@ QUnit.test("basic type", function() {
 
 
 	var t = new Typer();
-	deepEqual(Object.keys(t), [], "no keys");
+	assert.deepEqual(Object.keys(t), [], "no keys");
 
 	var array = [];
 	t.arrayWithAddedItem = array;
 
-	deepEqual(array, ["item"], "updated array");
-	QUnit.equal(t.arrayWithAddedItem, array, "leave value as array");
+	assert.deepEqual(array, ["item"], "updated array");
+	assert.equal(t.arrayWithAddedItem, array, "leave value as array");
 
 	t.listWithAddedItem = [];
 
-	QUnit.ok(t.listWithAddedItem instanceof DefineList, "convert to CanList");
-	QUnit.equal(t.listWithAddedItem[0], "item", "has item in it");
+	assert.ok(t.listWithAddedItem instanceof DefineList, "convert to CanList");
+	assert.equal(t.listWithAddedItem[0], "item", "has item in it");
 
     var observation = new Observation(function() {
 		return t.listWithAddedItem.attr("length");
 	});
     canReflect.onValue(observation, function(newVal) {
-		QUnit.equal(newVal, 2, "got a length change");
+		assert.equal(newVal, 2, "got a length change");
 	});
 
 	t.listWithAddedItem.push("another item");
 
 });
 
-QUnit.test("serialize works", function(){
+QUnit.test("serialize works", function(assert) {
     var Person = DefineMap.extend({
         first: "string",
         last: "string"
@@ -87,11 +87,11 @@ QUnit.test("serialize works", function(){
     });
 
     var people = new People([{first: "j", last: "m"}]);
-    QUnit.deepEqual(people.serialize(), [{first: "j", last: "m"}]);
+    assert.deepEqual(people.serialize(), [{first: "j", last: "m"}]);
 
 });
 
-QUnit.test("Extended Map with empty def converts to default Observables", function(){
+QUnit.test("Extended Map with empty def converts to default Observables", function(assert) {
     var School = DefineMap.extend({
         students: {},
         teacher: {}
@@ -102,12 +102,12 @@ QUnit.test("Extended Map with empty def converts to default Observables", functi
     school.students = [{name: "J"}];
     school.teacher = {name: "M"};
 
-    ok(school.students instanceof DefineList, "converted to DefineList");
-    ok(school.teacher instanceof DefineMap, "converted to DefineMap");
+    assert.ok(school.students instanceof DefineList, "converted to DefineList");
+    assert.ok(school.teacher instanceof DefineMap, "converted to DefineMap");
 
 });
 
-QUnit.test("default 'observable' type prevents Type from working (#29)", function(){
+QUnit.test("default 'observable' type prevents Type from working (#29)", function(assert) {
     var M = DefineMap.extend("M",{
         id: "number"
     });
@@ -123,11 +123,11 @@ QUnit.test("default 'observable' type prevents Type from working (#29)", functio
         l: [{id: 5}]
     });
 
-    QUnit.ok( m.l[0] instanceof M, "is instance" );
-    QUnit.equal(m.l[0].id, 5, "correct props");
+    assert.ok( m.l[0] instanceof M, "is instance" );
+    assert.equal(m.l[0].id, 5, "correct props");
 });
 
-QUnit.test("inline DefineList Type", function(){
+QUnit.test("inline DefineList Type", function(assert) {
     var M = DefineMap.extend("M",{
         id: "number"
     });
@@ -140,11 +140,11 @@ QUnit.test("inline DefineList Type", function(){
         l: [{id: 5}]
     });
 
-    QUnit.ok( m.l[0] instanceof M, "is instance" );
-    QUnit.equal(m.l[0].id, 5, "correct props");
+    assert.ok( m.l[0] instanceof M, "is instance" );
+    assert.equal(m.l[0].id, 5, "correct props");
 });
 
-QUnit.test("recursively `get`s (#31)", function(){
+QUnit.test("recursively `get`s (#31)", function(assert) {
     var M = DefineMap.extend("M",{
         id: "number"
     });
@@ -158,23 +158,23 @@ QUnit.test("recursively `get`s (#31)", function(){
     });
 
     var res = m.get();
-    QUnit.ok( Array.isArray(res.l), "is a plain array");
-    QUnit.ok( isPlainObject(res.l[0]), "plain object");
+    assert.ok( Array.isArray(res.l), "is a plain array");
+    assert.ok( isPlainObject(res.l[0]), "plain object");
 });
 
-QUnit.test("DefineList trigger deprecation warning when set with Map.set (#93)", 0, function(){
+QUnit.test("DefineList trigger deprecation warning when set with Map.set (#93)", 0, function(assert) {
 	var map = new DefineMap({
 		things: [{ foo: 'bar' }]
 	});
 	map.things.attr = function(){
-		ok(false, "attr should not be called");
+		assert.ok(false, "attr should not be called");
 	};
 
 	map.assign({ things: [{ baz: 'luhrmann' }] });
 });
 
 
-test("Value generator can read other properties", function() {
+QUnit.test("Value generator can read other properties", function(assert) {
 	var Map = define.Constructor({
 		letters: {
 			default: "ABC"
@@ -239,23 +239,23 @@ test("Value generator can read other properties", function() {
 	var map = new Map();
 	var prefix = 'Was able to read dependent value from ';
 
-	equal(map.firstLetter, 'A',
+	assert.equal(map.firstLetter, 'A',
 		prefix + 'traditional can.Map style property definition');
-	equal(map.firstNumber, 1,
+	assert.equal(map.firstNumber, 1,
 		prefix + 'traditional can.Map style property definition');
 
-	equal(map.middleLetter, 'E',
+	assert.equal(map.middleLetter, 'E',
 		prefix + 'define plugin style default property definition');
-	equal(map.middleNumber, 5,
+	assert.equal(map.middleNumber, 5,
 		prefix + 'define plugin style default property definition');
 
-	equal(map.lastLetter, 'I',
+	assert.equal(map.lastLetter, 'I',
 		prefix + 'define plugin style generated default property definition');
-	equal(map.lastNumber, 9,
+	assert.equal(map.lastNumber, 9,
 		prefix + 'define plugin style generated default property definition');
 });
 
-test('value and get (#1521)', function() {
+QUnit.test('value and get (#1521)', function(assert) {
 	// problem here is that previously, can.Map would set `size:1` on
 	// the map. This would effectively set the "lastSetValue".
 
@@ -281,10 +281,10 @@ test('value and get (#1521)', function() {
 	});
 
 	var map = new MyMap({});
-	equal(map.size, 2);
+	assert.equal(map.size, 2);
 });
 
-QUnit.test('Assign value on map', function() {
+QUnit.test('Assign value on map', function(assert) {
 	var MyConstruct = DefineMap.extend({
 		list: DefineList,
 		name: 'string'
@@ -307,13 +307,13 @@ QUnit.test('Assign value on map', function() {
 		}
 	});
 
-	QUnit.equal(obj.list.length, 1, 'list length should be 1');
-	QUnit.propEqual(obj.foo, { bar: 'zed' }, 'foo.bar is set correctly');
-	QUnit.equal(obj.name, 'CanJS', 'name is unchanged');
+	assert.equal(obj.list.length, 1, 'list length should be 1');
+	assert.propEqual(obj.foo, { bar: 'zed' }, 'foo.bar is set correctly');
+	assert.equal(obj.name, 'CanJS', 'name is unchanged');
 
 });
 
-QUnit.test('Update value on a map', function() {
+QUnit.test('Update value on a map', function(assert) {
 	var MyConstruct = DefineMap.extend({
 		list: DefineList,
 		name: 'string'
@@ -334,14 +334,14 @@ QUnit.test('Update value on a map', function() {
 		}
 	});
 
-	QUnit.equal(obj.list.length, 1, 'list length should be 1');
-	QUnit.equal(obj.foo.bar, 'zed', 'foo.bar is set correctly');
-	QUnit.equal(obj.name, undefined, 'name is removed');
+	assert.equal(obj.list.length, 1, 'list length should be 1');
+	assert.equal(obj.foo.bar, 'zed', 'foo.bar is set correctly');
+	assert.equal(obj.name, undefined, 'name is removed');
 
 });
 
 
-QUnit.test('Deep assign a map', function() {
+QUnit.test('Deep assign a map', function(assert) {
 	var MyConstruct = DefineMap.extend({
 		list: DefineList,
 		name: 'string'
@@ -352,20 +352,20 @@ QUnit.test('Deep assign a map', function() {
 		name: 'Test Name'
 	});
 
-	QUnit.equal(obj.list.length, 3, 'list length should be 3');
+	assert.equal(obj.list.length, 3, 'list length should be 3');
 
 
 	obj.assignDeep({
 		list: ['something']
 	});
 
-	QUnit.equal(obj.name, 'Test Name', 'Name property is still intact');
-	QUnit.equal(obj.list[0], 'something', 'the first element in the list should be updated');
+	assert.equal(obj.name, 'Test Name', 'Name property is still intact');
+	assert.equal(obj.list[0], 'something', 'the first element in the list should be updated');
 
 });
 
 
-QUnit.test('Deep updating a map', function() {
+QUnit.test('Deep updating a map', function(assert) {
 	var MyConstruct = DefineMap.extend({
 		list: DefineList,
 		name: 'string'
@@ -376,19 +376,19 @@ QUnit.test('Deep updating a map', function() {
 		name: 'Test Name'
 	});
 
-	QUnit.equal(obj.list.length, 3, 'list length should be 3');
+	assert.equal(obj.list.length, 3, 'list length should be 3');
 
 
 	obj.updateDeep({
 		list: ['something']
 	});
 
-	QUnit.equal(obj.name, undefined, 'Name property has been reset');
-	QUnit.equal(obj.list[0], 'something', 'the first element of the list should be updated');
+	assert.equal(obj.name, undefined, 'Name property has been reset');
+	assert.equal(obj.list[0], 'something', 'the first element of the list should be updated');
 
 });
 
-QUnit.test("assignDeep", function(){
+QUnit.test("assignDeep", function(assert) {
 	var justin = new DefineMap({name: "Justin", age: 35}),
 		payal = new DefineMap({name: "Payal", age: 35});
 
@@ -398,21 +398,21 @@ QUnit.test("assignDeep", function(){
 		{age: 36}
 	]);
 
-	QUnit.deepEqual(people.serialize(),  [
+	assert.deepEqual(people.serialize(),  [
 		{name: "Justin", age: 36},
 		{name: "Payal", age: 35}
 	], "assigned right");
 });
 
-QUnit.test("DefineMap fires 'set' event when a new property is added (#400)", function(){
+QUnit.test("DefineMap fires 'set' event when a new property is added (#400)", function(assert) {
 	var counter = 0;
 	var vm = new DefineMap({});
 
 	canReflect.onPatches(vm, function (patch) {
 		if (counter === 0) {
-			QUnit.equal(patch[0].type, 'add', 'dispatched add correctly');
+			assert.equal(patch[0].type, 'add', 'dispatched add correctly');
 		} else {
-			QUnit.equal(patch[0].type, 'set', 'dispatched set correctly');
+			assert.equal(patch[0].type, 'set', 'dispatched set correctly');
 		}
 		counter++;
 	});
