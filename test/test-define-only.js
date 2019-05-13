@@ -1322,7 +1322,7 @@ QUnit.test("binding computed properties do not observation recordings (#406)", f
 	QUnit.equal(records.valueDependencies.size, 0, "nothing recorded");
 });
 
-QUnit.test("warning when setting during a get", function(){
+testHelpers.dev.devOnlyTest("warning when setting during a get", function(){
 	var Type = function() {};
 	var teardownWarn = testHelpers.dev.willWarn("can-define: The prop2 property on Type{} is being set while computing the value of Type{}'s prop getter. Setting values at this time should be avoided.", function(text, match) {
 		if(match) {
@@ -1356,7 +1356,7 @@ QUnit.test("warning when setting during a get", function(){
 	teardownWarn();
 });
 
-QUnit.test("warning when setting during a get (batched)", function(){
+testHelpers.dev.devOnlyTest("warning when setting during a get (batched)", function(){
 	var Type = function() {};
 	var teardownWarn = testHelpers.dev.willWarn("can-define: The prop2 property on Type{} is being set while computing the value of Type{}'s prop getter. Setting values at this time should be avoided.", function(text, match) {
 		if(match) {
@@ -1394,7 +1394,7 @@ QUnit.test("warning when setting during a get (batched)", function(){
 	teardownWarn();
 });
 
-QUnit.test("warning when setting during a get (setter)", function(){
+testHelpers.dev.devOnlyTest("warning when setting during a get (setter)", function(){
 	var Type = function() {};
 	var teardownWarn = testHelpers.dev.willWarn("can-define: The prop2 property on Type{} is being set while computing the value of Type{}'s prop getter. Setting values at this time should be avoided.", function(text, match) {
 		if(match) {
