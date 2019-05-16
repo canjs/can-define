@@ -511,38 +511,55 @@ make = {
 				}
 				else {
 					var current = getCurrent.call(this);
-					if (newVal !== current) {
-						var dispatched;
-						setData.call(this, newVal);
-
-						dispatched = {
-							patches: [{type: "set", key: prop, value: newVal}],
-							type: prop,
-							target: this
-						};
-
-						//!steal-remove-start
-						if(process.env.NODE_ENV !== 'production') {
-							var lastItem;
-							dispatched.reasonLog = [ canReflect.getName(this) + "'s", prop, "changed to", newVal, "from", current ];
-
-							if(!eventQueue.canSafelyMutate() && queues.stack().length) {
-								lastItem = queues.stack()[queues.stack().length - 1];
-								lastItem = lastItem.context instanceof Observation ? lastItem.context.func : lastItem.fn;
-								canLogDev.warn(
-									"can-define: The " + prop + " property on " +
-									canReflect.getName(this) +
-									" is being set while computing the value of " +
-									canReflect.getName(lastItem) +
-									". Setting values at this time should be avoided."
-								);
-							}
-
-						}
-						//!steal-remove-end
-
-						this.dispatch(dispatched, [newVal, current]);
+					if (newVal === current) {
+						return;
 					}
+					var dispatched;
+					setData.call(this, newVal);
+
+					dispatched = {
+						patches: [{type: "set", key: prop, value: newVal}],
+						type: prop,
+						target: this
+					};
+
+					//!steal-remove-start
+					if(process.env.NODE_ENV !== 'production') {
+						var lastItem, lastFn;
+						dispatched.reasonLog = [ canReflect.getName(this) + "'s", prop, "changed to", newVal, "from", current ];
+
+						// If there are observations currently recording, this isn't a good time to
+						//   mutate values: it's likely a cycle, and even if it doesn't cycle infinitely,
+						//   it will likely cause unnecessary recomputation of derived values.  Warn the user.
+						if(ObservationRecorder.isRecording() && queues.stack().length && !this[inSetupSymbol]) {
+							lastItem = queues.stack()[queues.stack().length - 1];
+							lastFn = lastItem.context instanceof Observation ? lastItem.context.func : lastItem.fn;
+							var mutationWarning = "can-define: The " + prop + " property on " +
+								canReflect.getName(this) +
+								" is being set in " +
+								(canReflect.getName(lastFn) || canReflect.getName(lastItem.fn)) +
+								". This can cause infinite loops and performance issues. ";
+							if(lastItem.context instanceof Observation &&
+								lastItem.context.context &&
+								lastItem.context.context._define
+							) {
+								// the observation comes from a Defined object and we should tell the user to use value() to
+								//   listen for changes and do other updates instead of get().
+								mutationWarning += 
+									"Use the value() behavior on other properties to safely set " +
+									prop +
+									". https://canjs.com/doc/can-define.types.value.html";
+							} else {
+								// Otherwise print a generic recommendation.
+								mutationWarning += "Use can-observation-recorder.ignore() to safely change values while deriving other ones. https://canjs.com/doc/can-observation-recorder.ignore.html";
+							}
+							canLogDev.warn(mutationWarning);
+							queues.logStack();
+						}
+					}
+					//!steal-remove-end
+
+					this.dispatch(dispatched, [newVal, current]);
 				}
 			};
 		},
