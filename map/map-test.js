@@ -91,6 +91,7 @@ QUnit.test("get and set can setup expandos", function(assert) {
 	});
 	canReflect.onValue(oi, function(newVal){
 		assert.equal(newVal, "bar", "updated to bar");
+		canReflect.offValue(oi);
 	});
 
 	map.set("foo","bar");
@@ -205,6 +206,7 @@ QUnit.test("serialize responds to added props", function(assert) {
 	
 	canReflect.onValue(oi, function(newVal){
 		assert.deepEqual(newVal, {a: 1, b: 2}, "updated right");
+		canReflect.offValue(oi);
 	});
 	
 	map.assign({a: 1, b: 2});
@@ -232,6 +234,7 @@ QUnit.test("creating a new key doesn't cause two changes", function(assert) {
 	});
 	canReflect.onValue(oi, function(newVal){
 		assert.deepEqual(newVal, {a: 1}, "updated right");
+		canReflect.offValue(oi);
 	});
 
 	map.set("a", 1);
@@ -1534,11 +1537,11 @@ QUnit.test("Properties added via defineInstanceKey are observable", function(ass
 			assert.deepEqual(val, {foo:"bar"}, "changed value");
 		}
 	});
-
+	
 	canReflect.defineInstanceKey(Type, "foo", {
 		type: "string"
 	});
-
+	
 	map.foo = "bar";
 });
 
