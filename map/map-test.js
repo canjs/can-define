@@ -202,10 +202,11 @@ QUnit.test("serialize responds to added props", function(assert) {
 	var oi = new Observation(function(){
 		return map.serialize();
 	});
+	
 	canReflect.onValue(oi, function(newVal){
 		assert.deepEqual(newVal, {a: 1, b: 2}, "updated right");
 	});
-
+	
 	map.assign({a: 1, b: 2});
 });
 
