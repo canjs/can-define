@@ -40,7 +40,8 @@ QUnit.test("counter", function(assert) {
     assert.equal(me.nameChangeCount,1, "bound value");
 });
 
-QUnit.test("fullName getter the hard way", 3, function(assert) {
+QUnit.test("fullName getter the hard way", function(assert) {
+	assert.expect(3);
     var Person = DefineMap.extend("Person", {
         first: "string",
         last: "string",
@@ -142,7 +143,8 @@ QUnit.test("list length", function(assert) {
     assert.deepEqual(lengths, [3, 1], "length changes are right");
 });
 
-QUnit.test("batches produce one result", 2, function(assert) {
+QUnit.test("batches produce one result", function(assert) {
+	assert.expect(2);
     var Person = DefineMap.extend("Person", {
         first: "string",
         last: "string",

@@ -81,7 +81,8 @@ QUnit.test('list splice', function(assert) {
 });
 
 
-QUnit.test('Array accessor methods', 11, function(assert) {
+QUnit.test('Array accessor methods', function(assert) {
+	assert.expect(11);
 	var l = new DefineList([
 		'a',
 		'b',
@@ -426,7 +427,8 @@ QUnit.test('list.sort a list of objects without losing reference (#137)', functi
 	assert.equal(unSorted[0], sorted[2], 'items should be equal');
 });
 
-QUnit.test("list defines", 6, function(assert) {
+QUnit.test("list defines", function(assert) {
+	assert.expect(6);
 	var Todo = function(props) {
         assign(this, props);
         //CID(this);
@@ -1272,7 +1274,7 @@ QUnit.test("iterator can recover from bad _length", function(assert) {
 
 	var iterator = list[canSymbol.iterator]();
 	var iteration = iterator.next();
-	assert.ok(iteration.start, "Didn't fail");
+	assert.ok(iteration.done, "Didn't fail");
 });
 
 
@@ -1472,7 +1474,7 @@ QUnit.test("canReflect.getSchema", function(assert) {
 });
 
 QUnit.test("Bound serialized lists update when they change length", function(assert) {
-	QUnit.expect(1);
+	assert.expect(1);
 	var list = new DefineList(["eggs"]);
 	var obs = new Observation(function(){
 		return list.serialize();
@@ -1489,7 +1491,7 @@ QUnit.test("Bound serialized lists update when they change length", function(ass
 
 if (typeof Array.prototype.includes === "function") {
 	QUnit.test("'includes' method basics (#277)", function(assert) {
-		QUnit.expect(6);
+		assert.expect(6);
 
 		var emptyList = new DefineList([]);
 		assert.notOk(emptyList.includes(2));
@@ -1505,7 +1507,7 @@ if (typeof Array.prototype.includes === "function") {
 	});
 
 	QUnit.test("'fromIndex' is not >= to the array length", function(assert) {
-		QUnit.expect(2);
+		assert.expect(2);
 
 		var list = new DefineList(["a", "b", "c"]);
 		assert.notOk(list.includes("c", 3));
@@ -1513,7 +1515,7 @@ if (typeof Array.prototype.includes === "function") {
 	});
 
 	QUnit.test("computed index is less than 0", function(assert) {
-		QUnit.expect(4);
+		assert.expect(4);
 
 		var list = new DefineList(["a", "b", "c"]);
 		assert.ok(list.includes("a", -100));

@@ -223,7 +223,8 @@ QUnit.test("set an already initialized null property", function(assert) {
   assert.equal(map.foo, null);
 });
 
-QUnit.test("creating a new key doesn't cause two changes", 1, function(assert) {
+QUnit.test("creating a new key doesn't cause two changes", function(assert) {
+	assert.expect(1);
 	var map = new DefineMap();
 	var oi = new Observation(function(){
 		return map.serialize();
@@ -305,7 +306,7 @@ QUnit.test("get will not create properties", function(assert) {
 });
 
 QUnit.test("Properties are enumerable", function(assert) {
-  QUnit.expect(4);
+  assert.expect(4);
 
   var VM = DefineMap.extend({
 	foo: "string"
@@ -326,7 +327,7 @@ QUnit.test("Properties are enumerable", function(assert) {
 });
 
 QUnit.test("Getters are not enumerable", function(assert) {
-  QUnit.expect(2);
+  assert.expect(2);
 
   var MyMap = DefineMap.extend({
 	foo: "string",
@@ -749,7 +750,7 @@ QUnit.test("Does not attempt to redefine _data if already defined", function(ass
 
 if (!System.isEnv('production')) {
 	QUnit.test("redefines still not allowed on sealed objects", function(assert) {
-		QUnit.expect(6);
+		assert.expect(6);
 		var Bar = DefineMap.extend({seal: true}, {
 			baz: { default: "thud" }
 		});
@@ -976,7 +977,7 @@ canTestHelpers.devOnlyTest("log multiple property changes", function(assert) {
 });
 
 canTestHelpers.devOnlyTest("Setting a value with an object type generates a warning (#148)", function(assert) {
-	QUnit.expect(1);
+	assert.expect(1);
 
 	var message = "can-define: The default value for DefineMap{}.options is set to an object. This will be shared by all instances of the DefineMap. Use a function that returns the object instead.";
 	var finishErrorCheck = canTestHelpers.willWarn(message);
@@ -1012,7 +1013,7 @@ canTestHelpers.devOnlyTest("Setting a value with an object type generates a warn
 });
 
 canTestHelpers.devOnlyTest("Setting a default value to a constructor type generates a warning", function(assert) {
-	QUnit.expect(1);
+	assert.expect(1);
 
 	var message = "can-define: The \"default\" for DefineMap{}.options is set to a constructor. Did you mean \"Default\" instead?";
 	var finishErrorCheck = canTestHelpers.willWarn(message);

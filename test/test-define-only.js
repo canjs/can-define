@@ -10,7 +10,8 @@ var ObservationRecorder = require("can-observation-recorder");
 
 QUnit.module("can-define");
 
-QUnit.test("basics on a prototype", 5, function(assert) {
+QUnit.test("basics on a prototype", function(assert) {
+	assert.expect(5);
 
 	var Person = function(first, last) {
 		this.first = first;
@@ -47,7 +48,8 @@ QUnit.test("basics on a prototype", 5, function(assert) {
 
 });
 
-QUnit.test('basics set', 2, function(assert) {
+QUnit.test('basics set', function(assert) {
+	assert.expect(2);
 	var Defined = function(prop) {
 		this.prop = prop;
 	};
@@ -268,7 +270,8 @@ QUnit.test("setter with no arguments and returns undefined does the default beha
 
 });
 
-QUnit.test("type happens before the set", 2, function(assert) {
+QUnit.test("type happens before the set", function(assert) {
+	assert.expect(2);
 
 	var Typer = function() {};
 	define(Typer.prototype, {
@@ -442,7 +445,8 @@ QUnit.test("nested define", function(assert) {
 	assert.ok(nested.examples.two.deep instanceof Example);
 });
 
-QUnit.test('Can make an attr alias a compute (#1470)', 9, function(assert) {
+QUnit.test('Can make an attr alias a compute (#1470)', function(assert) {
+	assert.expect(9);
 	var computeValue = new SimpleObservable(1);
 
 	var GetMap = define.Constructor({
@@ -583,7 +587,8 @@ QUnit.test('Can read a defined property with a set/get method (#1648)', function
 });
 
 
-QUnit.test('Can bind to a defined property with a set/get method (#1648)', 3, function(assert) {
+QUnit.test('Can bind to a defined property with a set/get method (#1648)', function(assert) {
+	assert.expect(3);
 	// Problem: "get" is not called before and after the "set"
 	// Problem: Function bound to "foo" is not called
 	// Problem: Cannot read the value of "foo"
@@ -937,7 +942,7 @@ QUnit.test('Extensions can modify definitions', function(assert) {
 
 
 QUnit.test("Properties are enumerable", function(assert) {
-	QUnit.expect(1);
+	assert.expect(1);
 
 	function VM(foo) {
 		this.foo = foo;
@@ -1101,7 +1106,8 @@ QUnit.test("set and value work together (#87)", function(assert) {
 
 });
 
-QUnit.test("async setter is provided", 5, function(assert) {
+QUnit.test("async setter is provided", function(assert) {
+	assert.expect(5);
 	var RESOLVE;
 
 	var Type = define.Constructor({
@@ -1177,7 +1183,7 @@ QUnit.test('defined properties are configurable', function(assert) {
 });
 
 testHelpers.dev.devOnlyTest("Setting a value with only a get() generates a warning (#202)", function (assert) {
-	QUnit.expect(7);
+	assert.expect(7);
 
 	var VM = function() {};
 
@@ -1218,7 +1224,7 @@ testHelpers.dev.devOnlyTest("Setting a value with only a get() generates a warni
 });
 
 testHelpers.dev.devOnlyTest("warn on using a Constructor for small-t type definitions", function (assert) {
-	QUnit.expect(1);
+	assert.expect(1);
 
 	var message = /can-define: the definition for [\w{}\.]+ uses a constructor for "type"\. Did you mean "Type"\?/;
 	var finishErrorCheck = testHelpers.dev.willWarn(message);
@@ -1245,7 +1251,7 @@ testHelpers.dev.devOnlyTest("warn on using a Constructor for small-t type defini
 });
 
 testHelpers.dev.devOnlyTest("warn with constructor for Value instead of Default (#340)", function (assert) {
-	QUnit.expect(1);
+	assert.expect(1);
 
 	var message = /can-define: Change the 'Value' definition for [\w\.{}]+.currency to 'Default'./;
 	var finishErrorCheck = testHelpers.dev.willWarn(message);

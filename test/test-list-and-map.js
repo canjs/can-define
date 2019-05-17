@@ -22,7 +22,7 @@ QUnit.test("basics", function(assert) {
 
 QUnit.test("basic type", function(assert) {
 
-	QUnit.expect(6);
+	assert.expect(6);
 
 	var Typer = function(arrayWithAddedItem, listWithAddedItem) {
 		this.arrayWithAddedItem = arrayWithAddedItem;
@@ -162,7 +162,8 @@ QUnit.test("recursively `get`s (#31)", function(assert) {
     assert.ok( isPlainObject(res.l[0]), "plain object");
 });
 
-QUnit.test("DefineList trigger deprecation warning when set with Map.set (#93)", 0, function(assert) {
+QUnit.test("DefineList trigger deprecation warning when set with Map.set (#93)", function(assert) {
+	assert.expect(0);
 	var map = new DefineMap({
 		things: [{ foo: 'bar' }]
 	});
