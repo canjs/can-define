@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/canjs/can-define",
   "dependencies": {
-    "can-assign": "^1.1.1",
+    "can-assign": "^1.3.2",
     "can-construct": "^3.5.4",
     "can-data-types": "<2.0.0",
     "can-define-lazy-value": "^1.0.0",
