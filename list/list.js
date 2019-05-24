@@ -1533,15 +1533,11 @@ canReflect.assignSymbols(DefineList.prototype,{
 	},
 	// Called when a property reference is removed
 	"can.offKeyValue": function(key, handler) {
-		var translationHandler;
+		var translationHandler = singleReference.getAndDelete(handler, this, key);
 		if (isNaN(key)) {
-			translationHandler = function(ev, newValue, oldValue) {
-				handler(newValue, oldValue);
-			};
 			this.removeEventListener(key, translationHandler);
 		}
 		else {
-			translationHandler = singleReference.getAndDelete(handler, this, key);
 			this.removeEventListener('length', translationHandler);
 		}
 	},

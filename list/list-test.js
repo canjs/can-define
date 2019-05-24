@@ -1287,3 +1287,32 @@ QUnit.test("Bound serialized lists update when they change length", function(){
 	list.push("toast");
 	canReflect.offValue(obs, onChange);
 });
+
+
+QUnit.test('listening to index and key events with symbol funciton', function() {
+	QUnit.expect(2);
+	var list = new DefineList([ "a", "b" ]);
+	var indexListenerOk = true;
+	var keyListenerOk = true;
+
+	var indexHandler, keyHandler;
+
+	list[canSymbol.for("can.onKeyValue")](0, indexHandler = function() {
+		QUnit.ok(indexListenerOk, 'index callback (once only).');
+		indexListenerOk = false;
+	});
+
+	list[canSymbol.for("can.onKeyValue")]('foo', keyHandler = function() {
+		QUnit.ok(keyListenerOk, 'key callback (once only).');
+		keyListenerOk = false;
+	});
+
+	list.splice(0, 2, "c", "d");
+	list.set("foo", "bar");
+
+	list[canSymbol.for("can.offKeyValue")](0, indexHandler);
+	list[canSymbol.for("can.offKeyValue")]('foo', keyHandler);
+
+	list.splice(0, 2, "e", "f");
+	list.set("foo", "baz");
+});
