@@ -10,7 +10,8 @@ var ObservationRecorder = require("can-observation-recorder");
 
 QUnit.module("can-define");
 
-QUnit.test("basics on a prototype", 5, function() {
+QUnit.test("basics on a prototype", function(assert) {
+	assert.expect(5);
 
 	var Person = function(first, last) {
 		this.first = first;
@@ -29,15 +30,15 @@ QUnit.test("basics on a prototype", 5, function() {
 	var p = new Person("Mohamed", "Cherif");
 
 	p.bind("fullName", function(ev, newVal, oldVal) {
-		QUnit.equal(oldVal, "Mohamed Cherif");
-		QUnit.equal(newVal, "Justin Meyer");
+		assert.equal(oldVal, "Mohamed Cherif");
+		assert.equal(newVal, "Justin Meyer");
 	});
 
-	equal(p.fullName, "Mohamed Cherif", "fullName initialized right");
+	assert.equal(p.fullName, "Mohamed Cherif", "fullName initialized right");
 
 	p.bind("first", function(el, newVal, oldVal) {
-		QUnit.equal(newVal, "Justin", "first new value");
-		QUnit.equal(oldVal, "Mohamed", "first old value");
+		assert.equal(newVal, "Justin", "first new value");
+		assert.equal(oldVal, "Mohamed", "first old value");
 	});
 
 	queues.batch.start();
@@ -47,7 +48,8 @@ QUnit.test("basics on a prototype", 5, function() {
 
 });
 
-QUnit.test('basics set', 2, function() {
+QUnit.test('basics set', function(assert) {
+	assert.expect(2);
 	var Defined = function(prop) {
 		this.prop = prop;
 	};
@@ -64,7 +66,7 @@ QUnit.test('basics set', 2, function() {
 	def.prop = "bar";
 
 
-	QUnit.equal(def.prop, "foobar", "setter works");
+	assert.equal(def.prop, "foobar", "setter works");
 
 	var DefinedCB = function(prop) {
 		this.prop = prop;
@@ -80,13 +82,13 @@ QUnit.test('basics set', 2, function() {
 
 	var defCallback = new DefinedCB();
 	defCallback.prop = "bar";
-	QUnit.equal(defCallback.prop, "foobar", "setter callback works");
+	assert.equal(defCallback.prop, "foobar", "setter callback works");
 
 });
 
 
 
-QUnit.test("basic Type", function() {
+QUnit.test("basic Type", function(assert) {
 	var Foo = function(name) {
 		this.name = name;
 	};
@@ -105,17 +107,17 @@ QUnit.test("basic Type", function() {
 	});
 
 	var t = new Typer("Justin");
-	QUnit.equal(t.foo.getName(), "Justin", "correctly created an instance");
+	assert.equal(t.foo.getName(), "Justin", "correctly created an instance");
 
 	var brian = new Foo("brian");
 
 	t.foo = brian;
 
-	QUnit.equal(t.foo, brian, "same instances");
+	assert.equal(t.foo, brian, "same instances");
 
 });
 
-QUnit.test("type converters", function() {
+QUnit.test("type converters", function(assert) {
 
 	var Typer = function(date, string, number, bool, htmlbool, leaveAlone) {
 		this.date = date;
@@ -158,25 +160,25 @@ QUnit.test("type converters", function() {
 		obj
 	);
 
-	QUnit.ok(t.date instanceof Date, "converted to date");
+	assert.ok(t.date instanceof Date, "converted to date");
 
-	QUnit.equal(t.string, '5', "converted to string");
+	assert.equal(t.string, '5', "converted to string");
 
-	QUnit.equal(t.number, 5, "converted to number");
+	assert.equal(t.number, 5, "converted to number");
 
-	QUnit.equal(t.bool, false, "converted to boolean");
+	assert.equal(t.bool, false, "converted to boolean");
 
-	QUnit.equal(t.htmlbool, true, "converted to htmlbool");
+	assert.equal(t.htmlbool, true, "converted to htmlbool");
 
-	QUnit.equal(t.leaveAlone, obj, "left as object");
+	assert.equal(t.leaveAlone, obj, "left as object");
 
 	t.number = '15';
 
-	QUnit.ok(t.number === 15, "converted to number");
+	assert.ok(t.number === 15, "converted to number");
 
 });
 
-QUnit.test("basics value", function() {
+QUnit.test("basics value", function(assert) {
 
 	var Typer = function(prop) {
 		if (prop !== undefined) {
@@ -191,7 +193,7 @@ QUnit.test("basics value", function() {
 	});
 	var t = new Typer();
 
-	QUnit.equal(t.prop, "foo", "value is used as default value");
+	assert.equal(t.prop, "foo", "value is used as default value");
 
 	var Typer2 = function(prop) {
 		if (prop !== undefined) {
@@ -211,13 +213,13 @@ QUnit.test("basics value", function() {
 	var t1 = new Typer2(),
 		t2 = new Typer2();
 
-	QUnit.ok(t1.prop !== t2.prop, "different array instances");
-	QUnit.ok(Array.isArray(t1.prop), "its an array");
+	assert.ok(t1.prop !== t2.prop, "different array instances");
+	assert.ok(Array.isArray(t1.prop), "its an array");
 
 
 });
 
-test("basics Value", function() {
+QUnit.test("basics Value", function(assert) {
 
 	var Typer = function(prop) {
 		//this.prop = prop;
@@ -233,13 +235,13 @@ test("basics Value", function() {
 
 	var t1 = new Typer(),
 		t2 = new Typer();
-	QUnit.ok(t1.prop !== t2.prop, "different array instances");
-	QUnit.ok(Array.isArray(t1.prop), "its an array");
+	assert.ok(t1.prop !== t2.prop, "different array instances");
+	assert.ok(Array.isArray(t1.prop), "its an array");
 
 
 });
 
-test("setter with no arguments and returns undefined does the default behavior, the setter is for side effects only", function() {
+QUnit.test("setter with no arguments and returns undefined does the default behavior, the setter is for side effects only", function(assert) {
 	var Typer = function(prop) {
 		//this.prop = prop;
 	};
@@ -258,7 +260,7 @@ test("setter with no arguments and returns undefined does the default behavior, 
 
 	t.prop = false;
 
-	deepEqual({
+	assert.deepEqual({
 		foo: t.foo,
 		prop: t.prop
 	}, {
@@ -268,7 +270,8 @@ test("setter with no arguments and returns undefined does the default behavior, 
 
 });
 
-test("type happens before the set", 2, function() {
+QUnit.test("type happens before the set", function(assert) {
+	assert.expect(2);
 
 	var Typer = function() {};
 	define(Typer.prototype, {
@@ -276,7 +279,7 @@ test("type happens before the set", 2, function() {
 		prop: {
 			type: "number",
 			set: function(newValue) {
-				equal(typeof newValue, "number", "got a number");
+				assert.equal(typeof newValue, "number", "got a number");
 				return newValue + 1;
 			}
 		}
@@ -286,12 +289,12 @@ test("type happens before the set", 2, function() {
 	var map = new Typer();
 	map.prop = "5";
 
-	equal(map.prop, 6, "number");
+	assert.equal(map.prop, 6, "number");
 });
 
 
-test("getter and setter work", function() {
-	expect(5);
+QUnit.test("getter and setter work", function(assert) {
+	assert.expect(5);
 
 	var Paginate = define.Constructor({
 		limit: "*",
@@ -311,22 +314,22 @@ test("getter and setter work", function() {
 		offset: 20
 	});
 
-	equal(p.page, 3, "page get right");
+	assert.equal(p.page, 3, "page get right");
 
 	p.bind("page", function(ev, newValue, oldValue) {
-		equal(newValue, 2, "got new value event");
-		equal(oldValue, 3, "got old value event");
+		assert.equal(newValue, 2, "got new value event");
+		assert.equal(oldValue, 3, "got old value event");
 	});
 
 	p.page = 2;
 
-	equal(p.page, 2, "page set right");
+	assert.equal(p.page, 2, "page set right");
 
-	equal(p.offset, 10, "page offset set");
+	assert.equal(p.offset, 10, "page offset set");
 
 });
 
-test("getter with initial value", function() {
+QUnit.test("getter with initial value", function(assert) {
 
 	var comp = new SimpleObservable(1);
 
@@ -346,7 +349,7 @@ test("getter with initial value", function() {
 	var g = new Grabber();
 	// This assertion doesn't mean much.  It's mostly testing
 	// that there were no errors.
-	equal(g.vals.length, 0, "zero items in array");
+	assert.equal(g.vals.length, 0, "zero items in array");
 
 });
 
@@ -367,13 +370,13 @@ test("value generator is not called if default passed", function () {
 
 
 
-test('default behaviors with "*" work for attributes', function() {
-	expect(6);
+QUnit.test('default behaviors with "*" work for attributes', function(assert) {
+	assert.expect(6);
 	var DefaultMap = define.Constructor({
 		'*': {
 			type: 'number',
 			set: function(newVal) {
-				ok(true, 'set called');
+				assert.ok(true, 'set called');
 				return newVal;
 			}
 		},
@@ -385,17 +388,17 @@ test('default behaviors with "*" work for attributes', function() {
 
 	var map = new DefaultMap();
 
-	equal(map.someNumber, '5', 'default values are not type converted anymore');
+	assert.equal(map.someNumber, '5', 'default values are not type converted anymore');
 	map.someNumber = '5';
-	equal(map.someNumber, 5, 'on a set, they should be type converted');
+	assert.equal(map.someNumber, 5, 'on a set, they should be type converted');
 
 	map.number = '10'; // Custom set should be called
-	equal(map.number, 10, 'value of number should be converted to a number');
+	assert.equal(map.number, 10, 'value of number should be converted to a number');
 
 });
 
 
-test("nested define", function() {
+QUnit.test("nested define", function(assert) {
 	var nailedIt = 'Nailed it';
 
 	var Example = define.Constructor({
@@ -432,17 +435,18 @@ test("nested define", function() {
 	var nested = new NestedMap();
 
 	// values are correct
-	equal(nested.test.name, nailedIt);
-	equal(nested.examples.one.name, nailedIt);
-	equal(nested.examples.two.deep.name, nailedIt);
+	assert.equal(nested.test.name, nailedIt);
+	assert.equal(nested.examples.one.name, nailedIt);
+	assert.equal(nested.examples.two.deep.name, nailedIt);
 
 	// objects are correctly instanced
-	ok(nested.test instanceof Example);
-	ok(nested.examples.one instanceof Example);
-	ok(nested.examples.two.deep instanceof Example);
+	assert.ok(nested.test instanceof Example);
+	assert.ok(nested.examples.one instanceof Example);
+	assert.ok(nested.examples.two.deep instanceof Example);
 });
 
-test('Can make an attr alias a compute (#1470)', 9, function() {
+QUnit.test('Can make an attr alias a compute (#1470)', function(assert) {
+	assert.expect(9);
 	var computeValue = new SimpleObservable(1);
 
 	var GetMap = define.Constructor({
@@ -467,7 +471,7 @@ test('Can make an attr alias a compute (#1470)', 9, function() {
 
 	getMap.value = computeValue;
 
-	equal(getMap.value, 1, "initial value read from compute");
+	assert.equal(getMap.value, 1, "initial value read from compute");
 
 	var bindCallbacks = 0;
 
@@ -475,16 +479,16 @@ test('Can make an attr alias a compute (#1470)', 9, function() {
 
 		switch (bindCallbacks) {
 			case 0:
-				equal(newVal, 2, "0 - bind called with new val");
-				equal(oldVal, 1, "0 - bind called with old val");
+				assert.equal(newVal, 2, "0 - bind called with new val");
+				assert.equal(oldVal, 1, "0 - bind called with old val");
 				break;
 			case 1:
-				equal(newVal, 3, "1 - bind called with new val");
-				equal(oldVal, 2, "1 - bind called with old val");
+				assert.equal(newVal, 3, "1 - bind called with new val");
+				assert.equal(oldVal, 2, "1 - bind called with old val");
 				break;
 			case 2:
-				equal(newVal, 4, "2 - bind called with new val");
-				equal(oldVal, 3, "2 - bind called with old val");
+				assert.equal(newVal, 4, "2 - bind called with new val");
+				assert.equal(oldVal, 3, "2 - bind called with old val");
 				break;
 		}
 
@@ -498,8 +502,8 @@ test('Can make an attr alias a compute (#1470)', 9, function() {
 	// Try setting the value of the property
 	getMap.value = 3;
 
-	equal(getMap.value, 3, "read value is 3");
-	equal(computeValue.get(), 3, "the compute value is 3");
+	assert.equal(getMap.value, 3, "read value is 3");
+	assert.equal(computeValue.get(), 3, "the compute value is 3");
 
 	// Try setting to a new comptue
 	var newComputeValue = new SimpleObservable(4);
@@ -511,7 +515,7 @@ test('Can make an attr alias a compute (#1470)', 9, function() {
 
 
 
-test("One event on getters (#1585)", function() {
+QUnit.test("One event on getters (#1585)", function(assert) {
 
 	var Person = define.Constructor({
 		name: "*",
@@ -543,21 +547,21 @@ test("One event on getters (#1585)", function() {
 		personEvents++;
 	});
 
-	equal(appState.person, null, "no personId and no lastSetValue");
+	assert.equal(appState.person, null, "no personId and no lastSetValue");
 
 	appState.personId = 5;
-	equal(appState.person.name, "Jose", "a personId, providing Jose");
-	ok(appState.person instanceof Person, "got a person instance");
+	assert.equal(appState.person.name, "Jose", "a personId, providing Jose");
+	assert.ok(appState.person instanceof Person, "got a person instance");
 
 	appState.person = {
 		name: "Julia"
 	};
-	ok(appState.person instanceof Person, "got a person instance");
+	assert.ok(appState.person instanceof Person, "got a person instance");
 
-	equal(personEvents, 2);
+	assert.equal(personEvents, 2);
 });
 
-test('Can read a defined property with a set/get method (#1648)', function() {
+QUnit.test('Can read a defined property with a set/get method (#1648)', function(assert) {
 	// Problem: "get" is not passed the correct "lastSetVal"
 	// Problem: Cannot read the value of "foo"
 
@@ -575,15 +579,16 @@ test('Can read a defined property with a set/get method (#1648)', function() {
 
 	var map = new Map();
 
-	equal(map.foo, '', 'Calling .foo returned the correct value');
+	assert.equal(map.foo, '', 'Calling .foo returned the correct value');
 
 	map.foo = 'baz';
 
-	equal(map.foo, 'baz', 'Calling .foo returned the correct value');
+	assert.equal(map.foo, 'baz', 'Calling .foo returned the correct value');
 });
 
 
-test('Can bind to a defined property with a set/get method (#1648)', 3, function() {
+QUnit.test('Can bind to a defined property with a set/get method (#1648)', function(assert) {
+	assert.expect(3);
 	// Problem: "get" is not called before and after the "set"
 	// Problem: Function bound to "foo" is not called
 	// Problem: Cannot read the value of "foo"
@@ -603,17 +608,17 @@ test('Can bind to a defined property with a set/get method (#1648)', 3, function
 	var map = new Map();
 
 	map.bind('foo', function() {
-		ok(true, 'Bound function is called');
+		assert.ok(true, 'Bound function is called');
 	});
 
-	equal(map.foo, '', 'Calling .attr(\'foo\') returned the correct value');
+	assert.equal(map.foo, '', 'Calling .attr(\'foo\') returned the correct value');
 
 	map.foo = 'baz';
 
-	equal(map.foo, 'baz', 'Calling .attr(\'foo\') returned the correct value');
+	assert.equal(map.foo, 'baz', 'Calling .attr(\'foo\') returned the correct value');
 });
 
-test("type converters handle null and undefined in expected ways (1693)", function() {
+QUnit.test("type converters handle null and undefined in expected ways (1693)", function(assert) {
 
 	var Typer = define.Constructor({
 		date: {
@@ -645,17 +650,17 @@ test("type converters handle null and undefined in expected ways (1693)", functi
 		leaveAlone: undefined
 	});
 
-	equal(t.date, undefined, "converted to date");
+	assert.equal(t.date, undefined, "converted to date");
 
-	equal(t.string, undefined, "converted to string");
+	assert.equal(t.string, undefined, "converted to string");
 
-	equal(t.number, undefined, "converted to number");
+	assert.equal(t.number, undefined, "converted to number");
 
-	equal(t.boolean, undefined, "converted to boolean"); //Updated for canjs#2316
+	assert.equal(t.boolean, undefined, "converted to boolean"); //Updated for canjs#2316
 
-	equal(t.htmlbool, false, "converted to htmlbool");
+	assert.equal(t.htmlbool, false, "converted to htmlbool");
 
-	equal(t.leaveAlone, undefined, "left as object");
+	assert.equal(t.leaveAlone, undefined, "left as object");
 
 	t = new Typer({
 		date: null,
@@ -666,27 +671,27 @@ test("type converters handle null and undefined in expected ways (1693)", functi
 		leaveAlone: null
 	});
 
-	equal(t.date, null, "converted to date");
+	assert.equal(t.date, null, "converted to date");
 
-	equal(t.string, null, "converted to string");
+	assert.equal(t.string, null, "converted to string");
 
-	equal(t.number, null, "converted to number");
+	assert.equal(t.number, null, "converted to number");
 
-	equal(t.boolean, null, "converted to boolean"); //Updated for canjs#2316
+	assert.equal(t.boolean, null, "converted to boolean"); //Updated for canjs#2316
 
-	equal(t.htmlbool, false, "converted to htmlbool");
+	assert.equal(t.htmlbool, false, "converted to htmlbool");
 
-	equal(t.leaveAlone, null, "left as object");
+	assert.equal(t.leaveAlone, null, "left as object");
 
 });
 
-test('Initial value does not call getter', function() {
-	expect(0);
+QUnit.test('Initial value does not call getter', function(assert) {
+	assert.expect(0);
 
 	var Map = define.Constructor({
 		count: {
 			get: function(lastVal) {
-				ok(false, 'Should not be called');
+				assert.ok(false, 'Should not be called');
 				return lastVal;
 			}
 		}
@@ -697,7 +702,7 @@ test('Initial value does not call getter', function() {
 	});
 });
 
-test("getters produce change events", function() {
+QUnit.test("getters produce change events", function(assert) {
 	var Map = define.Constructor({
 		count: {
 			get: function(lastVal) {
@@ -714,15 +719,15 @@ test("getters produce change events", function() {
 	// });
 
 	map.bind('count', function() {
-		ok(true, "change called");
+		assert.ok(true, "change called");
 	});
 
 	map.count = 22;
 });
 
-test("Asynchronous virtual properties cause extra recomputes (#1915)", function() {
+QUnit.test("Asynchronous virtual properties cause extra recomputes (#1915)", function(assert) {
 
-	stop();
+	var done = assert.async();
 
 	var ran = false;
 
@@ -741,7 +746,7 @@ test("Asynchronous virtual properties cause extra recomputes (#1915)", function(
 				var foo = this.foo;
 				if (foo) {
 					if (ran) {
-						ok(false, 'Getter ran twice');
+						assert.ok(false, 'Getter ran twice');
 					}
 					ran = true;
 					return foo * 2;
@@ -754,15 +759,15 @@ test("Asynchronous virtual properties cause extra recomputes (#1915)", function(
 	vm.bind('bar', function() {});
 
 	setTimeout(function() {
-		equal(vm.bar, 10);
-		start();
+		assert.equal(vm.bar, 10);
+		done();
 	}, 200);
 
 });
 
 
 
-QUnit.test('Default values cannot be set (#8)', function() {
+QUnit.test('Default values cannot be set (#8)', function(assert) {
 	var Person = function() {};
 
 	define(Person.prototype, {
@@ -783,13 +788,13 @@ QUnit.test('Default values cannot be set (#8)', function() {
 
 	var p = new Person();
 
-	QUnit.equal(p.fullName, 'Chris Gomez', 'Fullname is correct');
+	assert.equal(p.fullName, 'Chris Gomez', 'Fullname is correct');
 	p.first = 'Sara';
-	QUnit.equal(p.fullName, 'Sara Gomez', 'Fullname is correct after update');
+	assert.equal(p.fullName, 'Sara Gomez', 'Fullname is correct after update');
 });
 
 
-QUnit.test('default type is setable', function() {
+QUnit.test('default type is setable', function(assert) {
 	var Person = function() {};
 
 	define(Person.prototype, {
@@ -804,25 +809,25 @@ QUnit.test('default type is setable', function() {
 
 	var p = new Person();
 
-	QUnit.ok(p.first === '1', typeof p.first);
-	QUnit.ok(p.last === '2', typeof p.last);
+	assert.ok(p.first === '1', typeof p.first);
+	assert.ok(p.last === '2', typeof p.last);
 });
 
-QUnit.test("expandos are added in define.setup (#25)", function() {
+QUnit.test("expandos are added in define.setup (#25)", function(assert) {
 	var MyMap = define.Constructor({});
 
 	var map = new MyMap({
 		prop: 4
 	});
 	map.on("prop", function() {
-		QUnit.ok(true, "prop event called");
+		assert.ok(true, "prop event called");
 	});
 	map.prop = 5;
 });
 
 
 
-QUnit.test('Set property with type compute', function() {
+QUnit.test('Set property with type compute', function(assert) {
 	var MyMap = define.Constructor({
 		computeProp: {
 			type: 'compute'
@@ -832,13 +837,13 @@ QUnit.test('Set property with type compute', function() {
 	var m = new MyMap();
 
 	m.computeProp = new SimpleObservable(0);
-	equal(m.computeProp, 0, 'Property has correct value');
+	assert.equal(m.computeProp, 0, 'Property has correct value');
 
 	m.computeProp = new SimpleObservable(1);
-	equal(m.computeProp, 1, 'Property has correct value');
+	assert.equal(m.computeProp, 1, 'Property has correct value');
 });
 
-QUnit.test('Compute type property can have a default value', function() {
+QUnit.test('Compute type property can have a default value', function(assert) {
 	var MyMap = define.Constructor({
 		computeProp: {
 			type: 'compute',
@@ -849,13 +854,13 @@ QUnit.test('Compute type property can have a default value', function() {
 	});
 
 	var m = new MyMap();
-	equal(m.computeProp, 0, 'Property has correct value');
+	assert.equal(m.computeProp, 0, 'Property has correct value');
 
 	m.computeProp = 1;
-	equal(m.computeProp, 1, 'Property has correct value');
+	assert.equal(m.computeProp, 1, 'Property has correct value');
 });
 
-QUnit.test('Compute type property with compute default value triggers change events when updated', function() {
+QUnit.test('Compute type property with compute default value triggers change events when updated', function(assert) {
 	var expected = 0;
 	var c = new SimpleObservable(0);
 
@@ -871,11 +876,11 @@ QUnit.test('Compute type property with compute default value triggers change eve
 	var m = new MyMap();
 
 	c.on(function(newVal) {
-		equal(newVal, expected, 'Compute fired change event');
+		assert.equal(newVal, expected, 'Compute fired change event');
 	});
 
 	m.on('computeProp', function(ev, newVal) {
-		equal(newVal, expected, 'Map fired change event');
+		assert.equal(newVal, expected, 'Map fired change event');
 	});
 
 	expected = 1;
@@ -885,7 +890,7 @@ QUnit.test('Compute type property with compute default value triggers change eve
 	c.set(expected);
 });
 
-QUnit.test('Compute type property can have a default value that is a compute', function() {
+QUnit.test('Compute type property can have a default value that is a compute', function(assert) {
 	var c = new SimpleObservable(0);
 
 	var MyMap = define.Constructor({
@@ -898,13 +903,13 @@ QUnit.test('Compute type property can have a default value that is a compute', f
 	});
 
 	var m = new MyMap();
-	equal(m.computeProp, 0, 'Property has correct value');
+	assert.equal(m.computeProp, 0, 'Property has correct value');
 
 	c.set(1);
-	equal(m.computeProp, 1, 'Property has correct value');
+	assert.equal(m.computeProp, 1, 'Property has correct value');
 });
 
-QUnit.test('Extensions can modify definitions', function() {
+QUnit.test('Extensions can modify definitions', function(assert) {
 	var oldExtensions = define.extensions;
 
 	define.behaviors.push('extended');
@@ -929,15 +934,15 @@ QUnit.test('Extensions can modify definitions', function() {
 
 	var map = new MyMap();
 
-	QUnit.equal(map.foo, 'extended', 'Value was set via extension');
-	QUnit.equal(map.bar, 'defined', 'Value was set via definition');
+	assert.equal(map.foo, 'extended', 'Value was set via extension');
+	assert.equal(map.bar, 'defined', 'Value was set via definition');
 
 	define.extensions = oldExtensions;
 });
 
 
-QUnit.test("Properties are enumerable", function() {
-	QUnit.expect(1);
+QUnit.test("Properties are enumerable", function(assert) {
+	assert.expect(1);
 
 	function VM(foo) {
 		this.foo = foo;
@@ -955,14 +960,14 @@ QUnit.test("Properties are enumerable", function() {
 		copy[key] = vm[key];
 
 	}
-	QUnit.deepEqual(copy,{
+	assert.deepEqual(copy,{
 		foo: "bar",
 		baz: "qux"
 	});
 
 });
 
-QUnit.test("Doesn't override canSymbol.iterator if already on the prototype", function() {
+QUnit.test("Doesn't override canSymbol.iterator if already on the prototype", function(assert) {
 	function MyMap() {}
 
 	MyMap.prototype[canSymbol.iterator || canSymbol.for("iterator")] = function() {
@@ -993,7 +998,7 @@ QUnit.test("Doesn't override canSymbol.iterator if already on the prototype", fu
 	map.foo = "bar";
 
 	canReflect.eachIndex(map, function(value) {
-		QUnit.deepEqual(value, ["it","worked"]);
+		assert.deepEqual(value, ["it","worked"]);
 	});
 });
 
@@ -1025,7 +1030,7 @@ QUnit.test("nullish values are not converted for type or Type", function(assert)
 });
 
 
-QUnit.test("shorthand getter (#56)", function() {
+QUnit.test("shorthand getter (#56)", function(assert) {
 	var Person = function(first, last) {
 		this.first = first;
 		this.last = last;
@@ -1041,11 +1046,11 @@ QUnit.test("shorthand getter (#56)", function() {
 	var p = new Person("Mohamed", "Cherif");
 
 	p.on("fullName", function(ev, newVal, oldVal) {
-		QUnit.equal(oldVal, "Mohamed Cherif");
-		QUnit.equal(newVal, "Justin Meyer");
+		assert.equal(oldVal, "Mohamed Cherif");
+		assert.equal(newVal, "Justin Meyer");
 	});
 
-	equal(p.fullName, "Mohamed Cherif", "fullName initialized right");
+	assert.equal(p.fullName, "Mohamed Cherif", "fullName initialized right");
 
 	queues.batch.start();
 	p.first = "Justin";
@@ -1053,7 +1058,7 @@ QUnit.test("shorthand getter (#56)", function() {
 	queues.batch.stop();
 });
 
-QUnit.test("shorthand getter setter (#56)", function() {
+QUnit.test("shorthand getter setter (#56)", function(assert) {
 	var Person = function(first, last) {
 		this.first = first;
 		this.last = last;
@@ -1074,17 +1079,17 @@ QUnit.test("shorthand getter setter (#56)", function() {
 	var p = new Person("Mohamed", "Cherif");
 
 	p.on("fullName", function(ev, newVal, oldVal) {
-		QUnit.equal(oldVal, "Mohamed Cherif");
-		QUnit.equal(newVal, "Justin Meyer");
+		assert.equal(oldVal, "Mohamed Cherif");
+		assert.equal(newVal, "Justin Meyer");
 	});
 
-	equal(p.fullName, "Mohamed Cherif", "fullName initialized right");
+	assert.equal(p.fullName, "Mohamed Cherif", "fullName initialized right");
 
 	p.fullName = "Justin Meyer";
 });
 
 
-QUnit.test("set and value work together (#87)", function(){
+QUnit.test("set and value work together (#87)", function(assert) {
 
 	var Type = define.Constructor({
 		prop: {
@@ -1097,11 +1102,12 @@ QUnit.test("set and value work together (#87)", function(){
 
 	var instance = new Type();
 
-	QUnit.equal(instance.prop, 4, "used setter");
+	assert.equal(instance.prop, 4, "used setter");
 
 });
 
-QUnit.test("async setter is provided", 5, function(){
+QUnit.test("async setter is provided", function(assert) {
+	assert.expect(5);
 	var RESOLVE;
 
 	var Type = define.Constructor({
@@ -1121,22 +1127,22 @@ QUnit.test("async setter is provided", 5, function(){
 
 	var instance = new Type();
 
-	QUnit.equal(instance.prop, 4, "used async setter");
+	assert.equal(instance.prop, 4, "used async setter");
 
 
-	QUnit.equal(instance.prop2, undefined, "used async setter");
+	assert.equal(instance.prop2, undefined, "used async setter");
 
 	instance.on("prop2", function(ev, newVal, oldVal){
-		QUnit.equal(newVal, 9, "updated");
-		QUnit.equal(oldVal, undefined, "updated");
+		assert.equal(newVal, 9, "updated");
+		assert.equal(oldVal, undefined, "updated");
 	});
 	RESOLVE(9);
 
-	QUnit.equal(instance.prop2, 9, "used async setter updates after");
+	assert.equal(instance.prop2, 9, "used async setter updates after");
 
 });
 
-QUnit.test('setter with default value causes an infinite loop (#142)', function(){
+QUnit.test('setter with default value causes an infinite loop (#142)', function(assert) {
 	var A = define.Constructor({
 		val: {
 			default: 'hello',
@@ -1148,10 +1154,10 @@ QUnit.test('setter with default value causes an infinite loop (#142)', function(
 	});
 
 	var a = new A();
-	QUnit.equal(a.val, 'hello', 'creating an instance should not cause an inifinte loop');
+	assert.equal(a.val, 'hello', 'creating an instance should not cause an inifinte loop');
 });
 
-QUnit.test('defined properties are configurable', function(){
+QUnit.test('defined properties are configurable', function(assert) {
 	var A = define.Constructor({
 		val: {
 			get: function(){
@@ -1173,19 +1179,19 @@ QUnit.test('defined properties are configurable', function(){
 		computedInitializers);
 
 	var a = new A();
-	QUnit.equal(a.val, "bar", "It was redefined");
+	assert.equal(a.val, "bar", "It was redefined");
 });
 
-testHelpers.dev.devOnlyTest("Setting a value with only a get() generates a warning (#202)", function() {
-	QUnit.expect(7);
+testHelpers.dev.devOnlyTest("Setting a value with only a get() generates a warning (#202)", function (assert) {
+	assert.expect(7);
 
 	var VM = function() {};
 
 	var message = "can-define: Set value for property "+canReflect.getName(VM.prototype)+".derivedProp ignored, as its definition has a zero-argument getter and no setter";
 	var finishErrorCheck = testHelpers.dev.willWarn(message, function(actualMessage, success) {
 
-		QUnit.equal(actualMessage, message, "Warning is expected message");
-		QUnit.ok(success);
+		assert.equal(actualMessage, message, "Warning is expected message");
+		assert.ok(success);
 	});
 
 
@@ -1201,24 +1207,24 @@ testHelpers.dev.devOnlyTest("Setting a value with only a get() generates a warni
 	vm.on("derivedProp", function() {});
 
 	vm.derivedProp = 'prop is set';
-	QUnit.equal(vm.derivedProp, "Hello World", "Getter value is preserved");
+	assert.equal(vm.derivedProp, "Hello World", "Getter value is preserved");
 
 	VM.shortName = "VM";
 
-	QUnit.equal(finishErrorCheck(), 1);
+	assert.equal(finishErrorCheck(), 1);
 
 	message = "can-define: Set value for property "+canReflect.getName(VM.prototype)+".derivedProp ignored, as its definition has a zero-argument getter and no setter";
 	finishErrorCheck = testHelpers.dev.willWarn(message, function(actualMessage, success) {
-		QUnit.equal(actualMessage, message, "Warning is expected message");
-		QUnit.ok(success);
+		assert.equal(actualMessage, message, "Warning is expected message");
+		assert.ok(success);
 	});
 
 	vm.derivedProp = 'prop is set';
-	QUnit.equal(finishErrorCheck(), 1);
+	assert.equal(finishErrorCheck(), 1);
 });
 
-testHelpers.dev.devOnlyTest("warn on using a Constructor for small-t type definitions", function() {
-	QUnit.expect(1);
+testHelpers.dev.devOnlyTest("warn on using a Constructor for small-t type definitions", function (assert) {
+	assert.expect(1);
 
 	var message = /can-define: the definition for [\w{}\.]+ uses a constructor for "type"\. Did you mean "Type"\?/;
 	var finishErrorCheck = testHelpers.dev.willWarn(message);
@@ -1240,12 +1246,12 @@ testHelpers.dev.devOnlyTest("warn on using a Constructor for small-t type defini
 		}
 	});
 
-	QUnit.equal(finishErrorCheck(), 1);
+	assert.equal(finishErrorCheck(), 1);
 
 });
 
-testHelpers.dev.devOnlyTest("warn with constructor for Value instead of Default (#340)", function() {
-	QUnit.expect(1);
+testHelpers.dev.devOnlyTest("warn with constructor for Value instead of Default (#340)", function (assert) {
+	assert.expect(1);
 
 	var message = /can-define: Change the 'Value' definition for [\w\.{}]+.currency to 'Default'./;
 	var finishErrorCheck = testHelpers.dev.willWarn(message);
@@ -1263,11 +1269,11 @@ testHelpers.dev.devOnlyTest("warn with constructor for Value instead of Default 
 			Value: Currency
 		}
 	});
-	QUnit.equal(finishErrorCheck(), 1);
+	assert.equal(finishErrorCheck(), 1);
 });
 
 
-QUnit.test("canReflect.onKeyValue (#363)", function(){
+QUnit.test("canReflect.onKeyValue (#363)", function(assert) {
 	var Greeting = function( message ) {
 		this.message = message;
 	};
@@ -1279,31 +1285,31 @@ QUnit.test("canReflect.onKeyValue (#363)", function(){
 	var greeting = new Greeting("Hello");
 
 	canReflect.onKeyValue(greeting, "message", function(newVal, oldVal) {
-		QUnit.equal(newVal, "bye");
-		QUnit.equal(oldVal, "Hello");
+		assert.equal(newVal, "bye");
+		assert.equal(oldVal, "Hello");
 	});
 
 	greeting.message = "bye";
 });
 
-QUnit.test("value lastSet has default value (#397)", function() {
+QUnit.test("value lastSet has default value (#397)", function(assert) {
 	var Defaulted = function() {};
 
 	define(Defaulted.prototype, {
 		hasDefault: {
 			default: 42,
 			value: function hasDefaultValue(props) {
-				QUnit.equal(props.lastSet.get(), 42, "props.lastSet works");
+				assert.equal(props.lastSet.get(), 42, "props.lastSet works");
 				props.resolve(props.lastSet.get());
 			}
 		}
 	});
 	var defaulted = new Defaulted();
-	QUnit.equal(defaulted.hasDefault, 42,
+	assert.equal(defaulted.hasDefault, 42,
 		"hasDefault value.lastSet set default value");
 });
 
-QUnit.test("binding computed properties do not observation recordings (#406)", function(){
+QUnit.test("binding computed properties do not observation recordings (#406)", function(assert) {
 	var Type = function() {};
 
 	define(Type.prototype, {
@@ -1319,7 +1325,7 @@ QUnit.test("binding computed properties do not observation recordings (#406)", f
 	ObservationRecorder.start();
 	inst.on("prop", function(){});
 	var records = ObservationRecorder.stop();
-	QUnit.equal(records.valueDependencies.size, 0, "nothing recorded");
+	assert.equal(records.valueDependencies.size, 0, "nothing recorded");
 });
 
 testHelpers.dev.devOnlyTest("warning when setting during a get", function(){
