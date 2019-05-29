@@ -1527,13 +1527,19 @@ canReflect.assignSymbols(DefineList.prototype,{
 				handler(this[key]);
 			};
 
-			singleReference.set(handler, this, translationHandler, key);
 			this.addEventListener('length', translationHandler);
 		}
+		singleReference.set(handler, this, translationHandler, "" + key);
 	},
 	// Called when a property reference is removed
 	"can.offKeyValue": function(key, handler) {
-		var translationHandler = singleReference.getAndDelete(handler, this, key);
+		var translationHandler;
+		if (typeof handler !== "undefined") {
+			translationHandler = singleReference.getAndDelete(handler, this, "" + key);
+			if(typeof translationHandler === "undefined") {
+				return; // supplied handler was not bound to the key, so do nothing
+			}
+		}
 		if (isNaN(key)) {
 			this.removeEventListener(key, translationHandler);
 		}
