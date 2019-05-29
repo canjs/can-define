@@ -538,21 +538,10 @@ make = {
 								canReflect.getName(this) +
 								" is being set in " +
 								(canReflect.getName(lastFn) || canReflect.getName(lastItem.fn)) +
-								". This can cause infinite loops and performance issues. ";
-							if(lastItem.context instanceof Observation &&
-								lastItem.context.context &&
-								lastItem.context.context._define
-							) {
-								// the observation comes from a Defined object and we should tell the user to use value() to
-								//   listen for changes and do other updates instead of get().
-								mutationWarning += 
-									"Use the value() behavior on other properties to safely set " +
-									prop +
-									". https://canjs.com/doc/can-define.types.value.html";
-							} else {
-								// Otherwise print a generic recommendation.
-								mutationWarning += "Use can-observation-recorder.ignore() to safely change values while deriving other ones. https://canjs.com/doc/can-observation-recorder.ignore.html";
-							}
+								". This can cause infinite loops and performance issues. " +
+								"Use the value() behavior for " +
+								prop +
+								" instead, and listen to other properties and observables with listenTo(). https://canjs.com/doc/can-define.types.value.html";
 							canLogDev.warn(mutationWarning);
 							queues.logStack();
 						}
