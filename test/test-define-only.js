@@ -6,7 +6,6 @@ var canSymbol = require("can-symbol");
 var SimpleObservable = require("can-simple-observable");
 var testHelpers = require("can-test-helpers");
 var canReflect = require("can-reflect");
-var Observation = require("can-observation");
 var ObservationRecorder = require("can-observation-recorder");
 
 QUnit.module("can-define");
