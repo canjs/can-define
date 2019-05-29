@@ -1534,9 +1534,9 @@ canReflect.assignSymbols(DefineList.prototype,{
 	// Called when a property reference is removed
 	"can.offKeyValue": function(key, handler) {
 		var translationHandler;
-		if (typeof handler !== "undefined") {
+		if (handler !== undefined) {
 			translationHandler = singleReference.getAndDelete(handler, this, "" + key);
-			if(typeof translationHandler === "undefined") {
+			if(translationHandler === undefined) {
 				return; // supplied handler was not bound to the key, so do nothing
 			}
 		}
