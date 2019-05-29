@@ -1327,3 +1327,116 @@ QUnit.test("binding computed properties do not observation recordings (#406)", f
 	var records = ObservationRecorder.stop();
 	assert.equal(records.valueDependencies.size, 0, "nothing recorded");
 });
+
+testHelpers.dev.devOnlyTest("warning when setting during a get", function(assert){
+	var msg = "can-define: The prop2 property on Type{} is being set in Type{}'s prop getter. This can cause infinite loops and performance issues. Use the value() behavior for prop2 instead, and listen to other properties and observables with listenTo(). https://canjs.com/doc/can-define.types.value.html";
+	var Type = function Type() {};
+	var teardownWarn = testHelpers.dev.willWarn(msg, function(text, match) {
+		if(match) {
+			assert.ok(true, "warning fired");
+		}
+	});
+
+	define(Type.prototype, {
+		prop: {
+			get: function(){
+				if(!this.prop2) {
+					this.prop2 = "baz";
+				}
+				return "";
+			}
+		},
+		prop2: "string"
+	});
+
+	var inst = new Type();
+
+	inst.on("prop", function(){});
+	inst.prop2 = "";
+	assert.equal(teardownWarn(), 1, "warning correctly generated");
+	teardownWarn = testHelpers.dev.willWarn(msg, function(text, match) {
+		if(match) {
+			assert.ok(false, "warning incorrectly fired");
+		}
+	});
+	inst.prop2 = "quux";
+	teardownWarn();
+});
+
+testHelpers.dev.devOnlyTest("warning when setting during a get (batched)", function(assert){
+	var msg = "can-define: The prop2 property on Type{} is being set in Type{}'s prop getter. This can cause infinite loops and performance issues. Use the value() behavior for prop2 instead, and listen to other properties and observables with listenTo(). https://canjs.com/doc/can-define.types.value.html";
+	var Type = function Type() {};
+	var teardownWarn = testHelpers.dev.willWarn(msg, function(text, match) {
+		if(match) {
+			assert.ok(true, "warning fired");
+		}
+	});
+
+	define(Type.prototype, {
+		prop: {
+			get: function(){
+				if(!this.prop2) {
+					this.prop2 = "baz";
+					return "";
+				}
+			}
+		},
+		prop2: "string"
+	});
+
+	var inst = new Type();
+
+	queues.batch.start();
+	inst.on("prop", function(){});
+	inst.prop2 = "";
+	queues.batch.stop();
+	assert.equal(teardownWarn(), 1, "warning correctly generated");
+	teardownWarn = testHelpers.dev.willWarn(msg, function(text, match) {
+		if(match) {
+			assert.ok(false, "warning incorrectly fired");
+		}
+	});
+	queues.batch.start();
+	inst.prop2 = "quux";
+	queues.batch.stop();
+	teardownWarn();
+});
+
+testHelpers.dev.devOnlyTest("warning when setting during a get (setter)", function(assert){
+	var msg = "can-define: The prop2 property on Type{} is being set in Type{}'s prop getter. This can cause infinite loops and performance issues. Use the value() behavior for prop2 instead, and listen to other properties and observables with listenTo(). https://canjs.com/doc/can-define.types.value.html";
+	var Type = function Type() {};
+	var teardownWarn = testHelpers.dev.willWarn(msg, function(text, match) {
+		if(match) {
+			assert.ok(true, "warning fired");
+		}
+	});
+
+	var cell;
+	define(Type.prototype, {
+		prop: {
+			get: function() {
+				if(!this.prop2) {
+					this.prop2 = "baz";
+				}
+				return cell;
+			},
+			set: function(val) {
+				cell = val;
+			}
+		},
+		prop2: "string"
+	});
+
+	var inst = new Type();
+
+	inst.on("prop", function(){}); // generates a warning
+	inst.prop2 = ""; // also generates a warning, as the bound getter will fire again
+	assert.equal(teardownWarn(), 1, "warning correctly generated");
+	teardownWarn = testHelpers.dev.willWarn(msg, function(text, match) {
+		if(match) {
+			assert.ok(false, "warning incorrectly fired");
+		}
+	});
+	inst.prop2 = "quux";
+	teardownWarn();
+});

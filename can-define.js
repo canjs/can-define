@@ -511,24 +511,44 @@ make = {
 				}
 				else {
 					var current = getCurrent.call(this);
-					if (newVal !== current) {
-						var dispatched;
-						setData.call(this, newVal);
-
-						dispatched = {
-							patches: [{type: "set", key: prop, value: newVal}],
-							type: prop,
-							target: this
-						};
-
-						//!steal-remove-start
-						if(process.env.NODE_ENV !== 'production') {
-							dispatched.reasonLog = [ canReflect.getName(this) + "'s", prop, "changed to", newVal, "from", current ];
-						}
-						//!steal-remove-end
-
-						this.dispatch(dispatched, [newVal, current]);
+					if (newVal === current) {
+						return;
 					}
+					var dispatched;
+					setData.call(this, newVal);
+
+					dispatched = {
+						patches: [{type: "set", key: prop, value: newVal}],
+						type: prop,
+						target: this
+					};
+
+					//!steal-remove-start
+					if(process.env.NODE_ENV !== 'production') {
+						var lastItem, lastFn;
+						dispatched.reasonLog = [ canReflect.getName(this) + "'s", prop, "changed to", newVal, "from", current ];
+
+						// If there are observations currently recording, this isn't a good time to
+						//   mutate values: it's likely a cycle, and even if it doesn't cycle infinitely,
+						//   it will likely cause unnecessary recomputation of derived values.  Warn the user.
+						if(ObservationRecorder.isRecording() && queues.stack().length && !this[inSetupSymbol]) {
+							lastItem = queues.stack()[queues.stack().length - 1];
+							lastFn = lastItem.context instanceof Observation ? lastItem.context.func : lastItem.fn;
+							var mutationWarning = "can-define: The " + prop + " property on " +
+								canReflect.getName(this) +
+								" is being set in " +
+								(canReflect.getName(lastFn) || canReflect.getName(lastItem.fn)) +
+								". This can cause infinite loops and performance issues. " +
+								"Use the value() behavior for " +
+								prop +
+								" instead, and listen to other properties and observables with listenTo(). https://canjs.com/doc/can-define.types.value.html";
+							canLogDev.warn(mutationWarning);
+							queues.logStack();
+						}
+					}
+					//!steal-remove-end
+
+					this.dispatch(dispatched, [newVal, current]);
 				}
 			};
 		},
