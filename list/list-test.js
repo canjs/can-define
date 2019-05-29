@@ -1290,10 +1290,12 @@ QUnit.test("Bound serialized lists update when they change length", function(){
 
 
 QUnit.test('listening to index and key events with symbol funciton', function() {
-	QUnit.expect(2);
+	QUnit.expect(6);
 	var list = new DefineList([ "a", "b" ]);
 	var indexListenerOk = true;
 	var keyListenerOk = true;
+	var persistentIndexCount = 2;
+	var persistentKeyCount = 2;
 
 	var indexHandler, keyHandler;
 
@@ -1302,9 +1304,17 @@ QUnit.test('listening to index and key events with symbol funciton', function() 
 		indexListenerOk = false;
 	});
 
+	list[canSymbol.for("can.onKeyValue")](0, function() {
+		QUnit.ok(persistentIndexCount--, 'index callback (persistent, called twice).');
+	});
+
 	list[canSymbol.for("can.onKeyValue")]('foo', keyHandler = function() {
 		QUnit.ok(keyListenerOk, 'key callback (once only).');
 		keyListenerOk = false;
+	});
+
+	list[canSymbol.for("can.onKeyValue")]('foo', function() {
+		QUnit.ok(persistentKeyCount--, 'key callback (persistent, called twice).');
 	});
 
 	list.splice(0, 2, "c", "d");
