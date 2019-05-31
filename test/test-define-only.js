@@ -1223,6 +1223,61 @@ testHelpers.dev.devOnlyTest("Setting a value with only a get() generates a warni
 	assert.equal(finishErrorCheck(), 1);
 });
 
+testHelpers.dev.devOnlyTest("Setter with getter that doesn't take `lastSet` throws an unhelpful error (#367)", function (assert) {
+	assert.expect(3);
+
+	var VM = function() {};
+
+	var message = "can-define: Set value for property "+canReflect.getName(VM.prototype)+".derivedProp ignored, as its definition has a zero-argument getter";
+	var finishErrorCheck = testHelpers.dev.willWarn(message, function(actualMessage, success) {
+
+		assert.equal(actualMessage, message, "Warning is expected message");
+		assert.ok(success);
+	});
+
+
+	define(VM.prototype, {
+		derivedProp: {
+			set: function(testVar) {
+    			return testVar;
+    		},
+			get: function() {
+				return "Bitovi Is Awesome";
+			}
+		}
+	});
+
+	assert.equal(finishErrorCheck(), 1);
+
+});
+
+testHelpers.dev.devOnlyTest("Default with getter that doesn't take `lastSet` throws an unhelpful error (#367)", function (assert) {
+	assert.expect(3);
+
+	var VM = function() {};
+
+	var message = "can-define: Default value for property "+canReflect.getName(VM.prototype)+".derivedProp ignored, as its definition has a zero-argument getter";
+
+	var finishErrorCheck = testHelpers.dev.willWarn(message, function(actualMessage, success) {
+
+		assert.equal(actualMessage, message, "Warning is expected message");
+		assert.ok(success);
+	});
+
+
+	define(VM.prototype, {
+		derivedProp: {
+			default: 'Amechi Egbe',
+			get: function() {
+				return "I Love Software";
+			}
+		}
+	});
+	// debugger
+	assert.equal(finishErrorCheck(), 1, 'There was 1 warning');
+
+});
+
 testHelpers.dev.devOnlyTest("warn on using a Constructor for small-t type definitions", function (assert) {
 	assert.expect(1);
 

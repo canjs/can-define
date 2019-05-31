@@ -233,6 +233,11 @@ define.property = function(typePrototype, prop, definition, dataInitializers, co
 
 	//!steal-remove-start
 	if(process.env.NODE_ENV !== 'production') {
+        if(definition.get && definition.get.length === 0 && ( definition.default || definition.Default ) ) {
+            canLogDev.warn("can-define: Default value for property " +
+                canReflect.getName(typePrototype)+"."+ prop +
+                " ignored, as its definition has a zero-argument getter");
+        }
 		if (type && canReflect.isConstructorLike(type) && !isDefineType(type)) {
 			canLogDev.warn(
 				"can-define: the definition for " + canReflect.getName(typePrototype) + "."+
@@ -346,6 +351,17 @@ define.property = function(typePrototype, prop, definition, dataInitializers, co
 	if (definition.get && definition.set) {
 		// the compute will set off events, so we can use the basic setter
 		setter = make.set.setter(prop, definition.set, make.read.lastSet(prop), setter, true);
+
+        // If there's zero-arg `get`, warn on all sets in dev mode
+        if (definition.get.length === 0 ) {
+            //!steal-remove-start
+            if(process.env.NODE_ENV !== 'production') {
+                canLogDev.warn("can-define: Set value for property " +
+                    canReflect.getName(typePrototype)+"."+ prop +
+                    " ignored, as its definition has a zero-argument getter");
+            }
+            //!steal-remove-end
+        }
 	}
 	// If there's a `set` and no `get`,
 	else if (definition.set) {
@@ -369,7 +385,6 @@ define.property = function(typePrototype, prop, definition, dataInitializers, co
 			//!steal-remove-end
 		};
 	}
-
 
 	// Add type behavior to the setter.
 	if (type) {
