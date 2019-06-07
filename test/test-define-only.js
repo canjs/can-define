@@ -1420,7 +1420,7 @@ testHelpers.dev.devOnlyTest("warning when setting during a get", function(assert
 });
 
 testHelpers.dev.devOnlyTest("warning when setting during a get (batched)", function(assert){
-	var msg = "can-define: The prop2 property on Type{} is being set in Type{}'s prop getter. This can cause infinite loops and performance issues. Use the value() behavior for prop2 instead, and listen to other properties and observables with listenTo(). https://canjs.com/doc/can-define.types.value.html";
+	var msg = /.* This can cause infinite loops and performance issues.*/;
 	var Type = function Type() {};
 	var teardownWarn = testHelpers.dev.willWarn(msg, function(text, match) {
 		if(match) {
@@ -1459,7 +1459,7 @@ testHelpers.dev.devOnlyTest("warning when setting during a get (batched)", funct
 });
 
 testHelpers.dev.devOnlyTest("warning when setting during a get (setter)", function(assert){
-	var msg = "can-define: The prop2 property on Type{} is being set in Type{}'s prop getter. This can cause infinite loops and performance issues. Use the value() behavior for prop2 instead, and listen to other properties and observables with listenTo(). https://canjs.com/doc/can-define.types.value.html";
+	var msg = /.* This can cause infinite loops and performance issues.*/;
 	var Type = function Type() {};
 	var teardownWarn = testHelpers.dev.willWarn(msg, function(text, match) {
 		if(match) {
