@@ -233,7 +233,7 @@ define.property = function(typePrototype, prop, definition, dataInitializers, co
 
 	//!steal-remove-start
 	if(process.env.NODE_ENV !== 'production') {
-		if(definition.get && definition.get.length === 0 && ( definition.default || definition.Default ) ) {
+		if(definition.get && definition.get.length === 0 && ( "default" in definition || "Default" in definition ) ) {
 				canLogDev.warn("can-define: Default value for property " +
 						canReflect.getName(typePrototype)+"."+ prop +
 						" ignored, as its definition has a zero-argument getter");

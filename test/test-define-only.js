@@ -1223,7 +1223,7 @@ testHelpers.dev.devOnlyTest("Setting a value with only a get() generates a warni
 	assert.equal(finishErrorCheck(), 1);
 });
 
-testHelpers.dev.devOnlyTest("Setter with getter that doesn't take `lastSet` throws an unhelpful error (#367)", function (assert) {
+testHelpers.dev.devOnlyTest("Setter with getter that doesn't take `lastSet` warns (#367)", function (assert) {
 	assert.expect(3);
 
 	var VM = function() {};
@@ -1251,7 +1251,7 @@ testHelpers.dev.devOnlyTest("Setter with getter that doesn't take `lastSet` thro
 
 });
 
-testHelpers.dev.devOnlyTest("Setter with Type or type that doesn't take `lastSet` should warn (#465)", function (assert) {
+testHelpers.dev.devOnlyTest("Getter with Type or type that doesn't take `lastSet` should warn (#465)", function (assert) {
 	assert.expect(6);
 
 	var VM = function() {};
@@ -1294,8 +1294,8 @@ testHelpers.dev.devOnlyTest("Setter with Type or type that doesn't take `lastSet
 
 });
 
-testHelpers.dev.devOnlyTest("Default with getter that doesn't take `lastSet` throws an unhelpful error (#367)", function (assert) {
-	assert.expect(3);
+testHelpers.dev.devOnlyTest("Default with getter that doesn't take `lastSet` warns (#367)", function (assert) {
+	assert.expect(6);
 
 	var VM = function() {};
 
@@ -1316,7 +1316,26 @@ testHelpers.dev.devOnlyTest("Default with getter that doesn't take `lastSet` thr
 			}
 		}
 	});
-	// debugger
+
+	assert.equal(finishErrorCheck(), 1, 'There was 1 warning');
+
+	message = "can-define: Default value for property "+canReflect.getName(VM.prototype)+".derivedProp ignored, as its definition has a zero-argument getter";
+	finishErrorCheck = testHelpers.dev.willWarn(message, function(actualMessage, success) {
+
+		assert.equal(actualMessage, message, "Warning is expected message");
+		assert.ok(success);
+	});
+
+
+	define(VM.prototype, {
+		derivedProp: {
+			default: '',
+			get: function() {
+				return "I Love Software";
+			}
+		}
+	});
+
 	assert.equal(finishErrorCheck(), 1, 'There was 1 warning');
 
 });
