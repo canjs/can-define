@@ -233,11 +233,19 @@ define.property = function(typePrototype, prop, definition, dataInitializers, co
 
 	//!steal-remove-start
 	if(process.env.NODE_ENV !== 'production') {
-        if(definition.get && definition.get.length === 0 && ( definition.default || definition.Default ) ) {
-            canLogDev.warn("can-define: Default value for property " +
-                canReflect.getName(typePrototype)+"."+ prop +
-                " ignored, as its definition has a zero-argument getter");
-        }
+		if(definition.get && definition.get.length === 0 && ( definition.default || definition.Default ) ) {
+				canLogDev.warn("can-define: Default value for property " +
+						canReflect.getName(typePrototype)+"."+ prop +
+						" ignored, as its definition has a zero-argument getter");
+		}
+
+		if(definition.get && definition.get.length === 0 && ( definition.type || definition.Type ) ) {
+			var warning = definition.type ? 'type' : 'Type';
+			canLogDev.warn("can-define: " + warning + " value for property " +
+					canReflect.getName(typePrototype)+"."+ prop +
+					" ignored, as its definition has a zero-argument getter");
+		}
+
 		if (type && canReflect.isConstructorLike(type) && !isDefineType(type)) {
 			canLogDev.warn(
 				"can-define: the definition for " + canReflect.getName(typePrototype) + "."+

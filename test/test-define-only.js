@@ -1239,11 +1239,54 @@ testHelpers.dev.devOnlyTest("Setter with getter that doesn't take `lastSet` thro
 	define(VM.prototype, {
 		derivedProp: {
 			set: function(testVar) {
-    			return testVar;
-    		},
+				return testVar;
+			},
 			get: function() {
 				return "Bitovi Is Awesome";
 			}
+		}
+	});
+
+	assert.equal(finishErrorCheck(), 1);
+
+});
+
+testHelpers.dev.devOnlyTest("Setter with Type or type that doesn't take `lastSet` should warn (#465)", function (assert) {
+	assert.expect(6);
+
+	var VM = function() {};
+
+	var message = "can-define: Type value for property "+canReflect.getName(VM.prototype)+".derivedProp ignored, as its definition has a zero-argument getter";
+	var finishErrorCheck = testHelpers.dev.willWarn(message, function(actualMessage, success) {
+
+		assert.equal(actualMessage, message, "Warning is expected message");
+		assert.ok(success);
+	});
+
+	define(VM.prototype, {
+		derivedProp: {
+			get: function() {
+				return 'someString';
+			},
+			Type: { foo: 'string' }
+		}
+	});
+
+	assert.equal(finishErrorCheck(), 1);
+
+	message = "can-define: type value for property "+canReflect.getName(VM.prototype)+".derivedProp ignored, as its definition has a zero-argument getter";
+	finishErrorCheck = testHelpers.dev.willWarn(message, function(actualMessage, success) {
+
+		assert.equal(actualMessage, message, "Warning is expected message");
+		assert.ok(success);
+	});
+
+	define(VM.prototype, {
+		derivedProp: {
+			get: function() {
+				return 'someString';
+			},
+			type: 'string'
 		}
 	});
 
