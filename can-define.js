@@ -239,7 +239,7 @@ define.property = function(typePrototype, prop, definition, dataInitializers, co
 						" ignored, as its definition has a zero-argument getter");
 		}
 
-		if(definition.get && definition.get.length === 0 && ( definition.type || definition.Type ) ) {
+		if(definition.get && definition.get.length === 0 && ((definition.type && definition.type !== defaultDefinition.type) || (definition.Type && definition.Type !== defaultDefinition.Type))) {
 			var warning = definition.type ? 'type' : 'Type';
 			canLogDev.warn("can-define: " + warning + " value for property " +
 					canReflect.getName(typePrototype)+"."+ prop +

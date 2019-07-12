@@ -1558,3 +1558,28 @@ testHelpers.dev.devOnlyTest("warning when setting during a get (setter)", functi
 	inst.prop2 = "quux";
 	teardownWarn();
 });
+
+testHelpers.dev.devOnlyTest("Getter that doesn't take `lastSet` without explicit Type or type should NOT warn (#468)", function (assert) {
+	assert.expect(1);
+
+	var VM = function() {};
+
+	var message = "can-define: type value for property "+canReflect.getName(VM.prototype)+".derivedProp ignored, as its definition has a zero-argument getter";
+	var finishErrorCheck = testHelpers.dev.willWarn(message);
+
+	define(VM.prototype, {
+		derivedProp: {
+			get: function() {
+				return 'someString';
+			}
+		},
+		"*": { // emulates can-define/map/map setting default type
+			type: define.types.observable
+		}
+	});
+
+	var vm = new VM();
+	canReflect.onKeyValue(vm, 'derivedProp', function() {});
+
+	assert.equal(finishErrorCheck(), 0);
+});
