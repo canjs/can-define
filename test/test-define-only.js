@@ -1406,7 +1406,7 @@ testHelpers.dev.devOnlyTest("warnings are given when type or default is ignored"
 		{
 			name: "zero-arg getter, no setter when property is set",
 			definition: {
-				get() { return "whatever"; }
+				get: function() { return "whatever"; }
 			},
 			warning: /Set value for property .* ignored/,
 			setProp: true,
@@ -1416,7 +1416,7 @@ testHelpers.dev.devOnlyTest("warnings are given when type or default is ignored"
 			name: "type with zero-arg getter, no setter",
 			definition: {
 				type: String,
-				get() { return "whatever"; }
+				get: function() { return "whatever"; }
 			},
 			warning: /type value for property .* ignored/,
 			setProp: false,
@@ -1426,7 +1426,7 @@ testHelpers.dev.devOnlyTest("warnings are given when type or default is ignored"
 			name: "Type with zero-arg getter, no setter",
 			definition: {
 				Type: {},
-				get() { return "whatever"; }
+				get: function() { return "whatever"; }
 			},
 			warning: /Type value for property .* ignored/,
 			setProp: false,
@@ -1435,7 +1435,7 @@ testHelpers.dev.devOnlyTest("warnings are given when type or default is ignored"
 		{
 			name: "only default type with zero-arg getter, no setter - should not warn",
 			definition: {
-				get() { return "whatever"; }
+				get: function() { return "whatever"; }
 			},
 			warning: /type value for property .* ignored/,
 			setProp: false,
@@ -1445,8 +1445,8 @@ testHelpers.dev.devOnlyTest("warnings are given when type or default is ignored"
 			name: "type with zero-arg getter, with setter - should not warn",
 			definition: {
 				type: String,
-				get() { return "whatever"; },
-				set (val) { return val; }
+				get: function() { return "whatever"; },
+				set: function (val) { return val; }
 			},
 			warning: /type value for property .* ignored/,
 			setProp: false,
@@ -1456,8 +1456,8 @@ testHelpers.dev.devOnlyTest("warnings are given when type or default is ignored"
 			name: "Type with zero-arg getter, with setter - should not warn",
 			definition: {
 				Type: {},
-				get() { return "whatever"; },
-				set (val) { return val; }
+				get: function() { return "whatever"; },
+				set: function (val) { return val; }
 			},
 			warning: /Type value for property .* ignored/,
 			setProp: false,
@@ -1467,7 +1467,7 @@ testHelpers.dev.devOnlyTest("warnings are given when type or default is ignored"
 			name: "default with zero-arg getter, no setter",
 			definition: {
 				default: "some thing",
-				get() { return "whatever"; }
+				get: function() { return "whatever"; }
 			},
 			warning: /default value for property .* ignored/,
 			setProp: false,
@@ -1477,7 +1477,7 @@ testHelpers.dev.devOnlyTest("warnings are given when type or default is ignored"
 			name: "Default with zero-arg getter, no setter",
 			definition: {
 				Default: function () {},
-				get() { return "whatever"; }
+				get: function() { return "whatever"; }
 			},
 			warning: /Default value for property .* ignored/,
 			setProp: false,
@@ -1487,8 +1487,8 @@ testHelpers.dev.devOnlyTest("warnings are given when type or default is ignored"
 			name: "default with zero-arg getter, with setter - should not warn",
 			definition: {
 				default: "some thing",
-				get() { return "whatever"; },
-				set (val) { return val; }
+				get: function() { return "whatever"; },
+				set: function (val) { return val; }
 			},
 			warning: /default value for property .* ignored/,
 			setProp: false,
@@ -1498,8 +1498,8 @@ testHelpers.dev.devOnlyTest("warnings are given when type or default is ignored"
 			name: "Default with zero-arg getter, with setter - should not warn",
 			definition: {
 				Default: function () {},
-				get() { return "whatever"; },
-				set (val) { return val; }
+				get: function() { return "whatever"; },
+				set: function (val) { return val; }
 			},
 			warning: /Default value for property .* ignored/,
 			setProp: false,
@@ -1507,7 +1507,7 @@ testHelpers.dev.devOnlyTest("warnings are given when type or default is ignored"
 		}
 	];
 
-	testCases.forEach((testCase) => {
+	testCases.forEach(function(testCase) {
 		var VM = function() {};
 		var warnCount = testHelpers.dev.willWarn(testCase.warning);
 
@@ -1528,6 +1528,6 @@ testHelpers.dev.devOnlyTest("warnings are given when type or default is ignored"
 		}
 
 
-		assert.equal(warnCount(), testCase.expectedWarnings, `got correct number of warnings for "${testCase.name}"`);
+		assert.equal(warnCount(), testCase.expectedWarnings, "got correct number of warnings for " + testCase.name);
 	});
 });
