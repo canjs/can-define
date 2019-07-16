@@ -1493,6 +1493,17 @@ testHelpers.dev.devOnlyTest("warnings are given when type or default is ignored"
 			warning: /default value for property .* ignored/,
 			setProp: false,
 			expectedWarnings: 0
+		},
+		{
+			name: "Default with zero-arg getter, with setter - should not warn",
+			definition: {
+				Default: function () {},
+				get() { return "whatever"; },
+				set (val) { return val; }
+			},
+			warning: /Default value for property .* ignored/,
+			setProp: false,
+			expectedWarnings: 0
 		}
 	];
 
@@ -1502,9 +1513,9 @@ testHelpers.dev.devOnlyTest("warnings are given when type or default is ignored"
 
 		define(VM.prototype, {
 			derivedProp: testCase.definition,
-			// "*": { // emulates can-define/map/map setting default type
-			// 	type: define.types.observable
-			// }
+			"*": { // emulates can-define/map/map setting default type
+				type: define.types.observable
+			}
 		});
 
 		var vm = new VM();
