@@ -233,20 +233,21 @@ define.property = function(typePrototype, prop, definition, dataInitializers, co
 
 	//!steal-remove-start
 	if(process.env.NODE_ENV !== 'production') {
-		if(definition.get && definition.get.length === 0 && !definition.set &&
-			( "default" in definition || "Default" in definition ) ) {
+		var hasZeroArgGetter = definition.get && definition.get.length === 0;
+		var noSetter = !definition.set;
+		var hasEitherDefault = ( "default" in definition || "Default" in definition );
+		var hasEitherType = (definition.type && definition.type !== defaultDefinition.type) || (definition.Type && definition.Type !== defaultDefinition.Type);
+
+		if(hasZeroArgGetter && noSetter && hasEitherDefault) {
 			var defaultOrDefault = definition.default ? 'default' : 'Default';
 				canLogDev.warn("can-define: " + defaultOrDefault + " value for property " +
 						canReflect.getName(typePrototype)+"."+ prop +
 						" ignored, as its definition has a zero-argument getter");
 		}
 
-		if(definition.get && definition.get.length === 0 && !definition.set &&
-			((definition.type && definition.type !== defaultDefinition.type) ||
-				(definition.Type && definition.Type !== defaultDefinition.Type))
-			) {
-			var warning = definition.type ? 'type' : 'Type';
-			canLogDev.warn("can-define: " + warning + " value for property " +
+		if(hasZeroArgGetter && noSetter && hasEitherType) {
+			var typeOrType = definition.type ? 'type' : 'Type';
+			canLogDev.warn("can-define: " + typeOrType + " value for property " +
 					canReflect.getName(typePrototype)+"."+ prop +
 					" ignored, as its definition has a zero-argument getter");
 		}
