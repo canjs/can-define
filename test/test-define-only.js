@@ -1182,164 +1182,6 @@ QUnit.test('defined properties are configurable', function(assert) {
 	assert.equal(a.val, "bar", "It was redefined");
 });
 
-testHelpers.dev.devOnlyTest("Setting a value with only a get() generates a warning (#202)", function (assert) {
-	assert.expect(7);
-
-	var VM = function() {};
-
-	var message = "can-define: Set value for property "+canReflect.getName(VM.prototype)+".derivedProp ignored, as its definition has a zero-argument getter and no setter";
-	var finishErrorCheck = testHelpers.dev.willWarn(message, function(actualMessage, success) {
-
-		assert.equal(actualMessage, message, "Warning is expected message");
-		assert.ok(success);
-	});
-
-
-	define(VM.prototype, {
-		derivedProp: {
-			get: function() {
-				return "Hello World";
-			}
-		}
-	});
-
-	var vm = new VM();
-	vm.on("derivedProp", function() {});
-
-	vm.derivedProp = 'prop is set';
-	assert.equal(vm.derivedProp, "Hello World", "Getter value is preserved");
-
-	VM.shortName = "VM";
-
-	assert.equal(finishErrorCheck(), 1);
-
-	message = "can-define: Set value for property "+canReflect.getName(VM.prototype)+".derivedProp ignored, as its definition has a zero-argument getter and no setter";
-	finishErrorCheck = testHelpers.dev.willWarn(message, function(actualMessage, success) {
-		assert.equal(actualMessage, message, "Warning is expected message");
-		assert.ok(success);
-	});
-
-	vm.derivedProp = 'prop is set';
-	assert.equal(finishErrorCheck(), 1);
-});
-
-testHelpers.dev.devOnlyTest("Setter with getter that doesn't take `lastSet` warns (#367)", function (assert) {
-	assert.expect(3);
-
-	var VM = function() {};
-
-	var message = "can-define: Set value for property "+canReflect.getName(VM.prototype)+".derivedProp ignored, as its definition has a zero-argument getter";
-	var finishErrorCheck = testHelpers.dev.willWarn(message, function(actualMessage, success) {
-
-		assert.equal(actualMessage, message, "Warning is expected message");
-		assert.ok(success);
-	});
-
-
-	define(VM.prototype, {
-		derivedProp: {
-			set: function(testVar) {
-				return testVar;
-			},
-			get: function() {
-				return "Bitovi Is Awesome";
-			}
-		}
-	});
-
-	assert.equal(finishErrorCheck(), 1);
-
-});
-
-testHelpers.dev.devOnlyTest("Getter with Type or type that doesn't take `lastSet` should warn (#465)", function (assert) {
-	assert.expect(6);
-
-	var VM = function() {};
-
-	var message = "can-define: Type value for property "+canReflect.getName(VM.prototype)+".derivedProp ignored, as its definition has a zero-argument getter";
-	var finishErrorCheck = testHelpers.dev.willWarn(message, function(actualMessage, success) {
-
-		assert.equal(actualMessage, message, "Warning is expected message");
-		assert.ok(success);
-	});
-
-	define(VM.prototype, {
-		derivedProp: {
-			get: function() {
-				return 'someString';
-			},
-			Type: { foo: 'string' }
-		}
-	});
-
-	assert.equal(finishErrorCheck(), 1);
-
-	message = "can-define: type value for property "+canReflect.getName(VM.prototype)+".derivedProp ignored, as its definition has a zero-argument getter";
-	finishErrorCheck = testHelpers.dev.willWarn(message, function(actualMessage, success) {
-
-		assert.equal(actualMessage, message, "Warning is expected message");
-		assert.ok(success);
-	});
-
-	define(VM.prototype, {
-		derivedProp: {
-			get: function() {
-				return 'someString';
-			},
-			type: 'string'
-		}
-	});
-
-	assert.equal(finishErrorCheck(), 1);
-
-});
-
-testHelpers.dev.devOnlyTest("Default with getter that doesn't take `lastSet` warns (#367)", function (assert) {
-	assert.expect(6);
-
-	var VM = function() {};
-
-	var message = "can-define: Default value for property "+canReflect.getName(VM.prototype)+".derivedProp ignored, as its definition has a zero-argument getter";
-
-	var finishErrorCheck = testHelpers.dev.willWarn(message, function(actualMessage, success) {
-
-		assert.equal(actualMessage, message, "Warning is expected message");
-		assert.ok(success);
-	});
-
-
-	define(VM.prototype, {
-		derivedProp: {
-			default: 'Amechi Egbe',
-			get: function() {
-				return "I Love Software";
-			}
-		}
-	});
-
-	assert.equal(finishErrorCheck(), 1, 'There was 1 warning');
-
-	message = "can-define: Default value for property "+canReflect.getName(VM.prototype)+".derivedProp ignored, as its definition has a zero-argument getter";
-	finishErrorCheck = testHelpers.dev.willWarn(message, function(actualMessage, success) {
-
-		assert.equal(actualMessage, message, "Warning is expected message");
-		assert.ok(success);
-	});
-
-
-	define(VM.prototype, {
-		derivedProp: {
-			default: '',
-			get: function() {
-				return "I Love Software";
-			}
-		}
-	});
-
-	assert.equal(finishErrorCheck(), 1, 'There was 1 warning');
-
-});
-
 testHelpers.dev.devOnlyTest("warn on using a Constructor for small-t type definitions", function (assert) {
 	assert.expect(1);
 
@@ -1559,27 +1401,122 @@ testHelpers.dev.devOnlyTest("warning when setting during a get (setter)", functi
 	teardownWarn();
 });
 
-testHelpers.dev.devOnlyTest("Getter that doesn't take `lastSet` without explicit Type or type should NOT warn (#468)", function (assert) {
-	assert.expect(1);
-
-	var VM = function() {};
-
-	var message = "can-define: type value for property "+canReflect.getName(VM.prototype)+".derivedProp ignored, as its definition has a zero-argument getter";
-	var finishErrorCheck = testHelpers.dev.willWarn(message);
-
-	define(VM.prototype, {
-		derivedProp: {
-			get: function() {
-				return 'someString';
-			}
+testHelpers.dev.devOnlyTest("warnings are given when type or default is ignored", function(assert) {
+	var testCases = [
+		{
+			name: "zero-arg getter, no setter when property is set",
+			definition: {
+				get() { return "whatever"; }
+			},
+			warning: /Set value for property .* ignored/,
+			setProp: true,
+			expectedWarnings: 1
 		},
-		"*": { // emulates can-define/map/map setting default type
-			type: define.types.observable
+		{
+			name: "type with zero-arg getter, no setter",
+			definition: {
+				type: String,
+				get() { return "whatever"; }
+			},
+			warning: /type value for property .* ignored/,
+			setProp: false,
+			expectedWarnings: 1
+		},
+		{
+			name: "Type with zero-arg getter, no setter",
+			definition: {
+				Type: {},
+				get() { return "whatever"; }
+			},
+			warning: /Type value for property .* ignored/,
+			setProp: false,
+			expectedWarnings: 1
+		},
+		{
+			name: "only default type with zero-arg getter, no setter - should not warn",
+			definition: {
+				get() { return "whatever"; }
+			},
+			warning: /type value for property .* ignored/,
+			setProp: false,
+			expectedWarnings: 0
+		},
+		{
+			name: "type with zero-arg getter, with setter - should not warn",
+			definition: {
+				type: String,
+				get() { return "whatever"; },
+				set (val) { return val; }
+			},
+			warning: /type value for property .* ignored/,
+			setProp: false,
+			expectedWarnings: 0
+		},
+		{
+			name: "Type with zero-arg getter, with setter - should not warn",
+			definition: {
+				Type: {},
+				get() { return "whatever"; },
+				set (val) { return val; }
+			},
+			warning: /Type value for property .* ignored/,
+			setProp: false,
+			expectedWarnings: 0
+		},
+		{
+			name: "default with zero-arg getter, no setter",
+			definition: {
+				default: "some thing",
+				get() { return "whatever"; }
+			},
+			warning: /default value for property .* ignored/,
+			setProp: false,
+			expectedWarnings: 1
+		},
+		{
+			name: "Default with zero-arg getter, no setter",
+			definition: {
+				Default: function () {},
+				get() { return "whatever"; }
+			},
+			warning: /Default value for property .* ignored/,
+			setProp: false,
+			expectedWarnings: 1
+		},
+		{
+			name: "default with zero-arg getter, with setter - should not warn",
+			definition: {
+				default: "some thing",
+				get() { return "whatever"; },
+				set (val) { return val; }
+			},
+			warning: /default value for property .* ignored/,
+			setProp: false,
+			expectedWarnings: 0
 		}
+	];
+
+	testCases.forEach((testCase) => {
+		var VM = function() {};
+		var warnCount = testHelpers.dev.willWarn(testCase.warning);
+
+		define(VM.prototype, {
+			derivedProp: testCase.definition,
+			// "*": { // emulates can-define/map/map setting default type
+			// 	type: define.types.observable
+			// }
+		});
+
+		var vm = new VM();
+
+		// read prop for 'lazy' setup
+		canReflect.onKeyValue(vm, 'derivedProp', function() {});
+
+		if (testCase.setProp) {
+			vm.derivedProp = "smashed it!";
+		}
+
+
+		assert.equal(warnCount(), testCase.expectedWarnings, `got correct number of warnings for "${testCase.name}"`);
 	});
-
-	var vm = new VM();
-	canReflect.onKeyValue(vm, 'derivedProp', function() {});
-
-	assert.equal(finishErrorCheck(), 0);
 });
