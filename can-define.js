@@ -236,8 +236,8 @@ define.property = function(typePrototype, prop, definition, dataInitializers, co
 		var hasZeroArgGetter = definition.get && definition.get.length === 0;
 		var noSetter = !definition.set;
 		var defaultInDefinition = ( "default" in definition || "Default" in definition );
-		var typeInDefinition = (definition.type && defaultDefinition && definition.type !== defaultDefinition.type)
-											||	(definition.Type && defaultDefinition && definition.Type !== defaultDefinition.Type);
+		var typeInDefinition = (definition.type && defaultDefinition && definition.type !== defaultDefinition.type) ||
+			(definition.Type && defaultDefinition && definition.Type !== defaultDefinition.Type);
 
 		if(hasZeroArgGetter && noSetter && defaultInDefinition) {
 			var defaultOrDefault = "default" in definition ? "default" : "Default";
