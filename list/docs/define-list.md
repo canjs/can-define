@@ -1,6 +1,6 @@
 @module {function} can-define/list/list
 @parent can-observables
-@collection can-core
+@collection can-legacy
 @group can-define/list/list.prototype prototype
 @group can-define/list/list/events events
 @alias can.DefineList

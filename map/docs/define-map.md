@@ -1,6 +1,6 @@
 @module {function} can-define/map/map
 @parent can-observables
-@collection can-core
+@collection can-legacy
 @group can-define/map/map.prototype prototype
 @group can-define/map/map.static static
 @group can-define/map/map/events events
