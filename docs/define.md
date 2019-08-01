@@ -1,6 +1,6 @@
 @module {function} can-define
 @parent can-observables
-@collection can-core
+@collection can-legacy
 @description Defines observable properties and their behavior on a prototype object. This
 function is not commonly used directly. [can-define/map/map]
 and [can-define/list/list] are more commonly used. Types and
