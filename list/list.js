@@ -130,6 +130,10 @@ var DefineList = Construct.extend("DefineList",
 					patches = [{type: "splice", insert: newVal, index: index, deleteCount: 0}];
 					dispatched = {
 						type: how,
+						action: "splice",
+						insert: newVal,
+						index: index,
+						deleteCount: 0,
 						patches: patches
 					};
 
@@ -148,7 +152,10 @@ var DefineList = Construct.extend("DefineList",
 					patches = [{type: "splice", index: index, deleteCount: oldVal.length}];
 					dispatched = {
 						type: how,
-						patches: patches
+						patches: patches,
+						action: "splice",
+						index: index, deleteCount: oldVal.length,
+						target: this
 					};
 					//!steal-remove-start
 					if(process.env.NODE_ENV !== 'production') {

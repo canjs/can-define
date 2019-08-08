@@ -433,7 +433,8 @@ define.makeDefineInstanceKey = function(constructor) {
 		}
 
 		this.prototype.dispatch({
-			type: "can.keys",
+			action: "can.keys",
+			type: "can.keys", // TODO: Remove in 6.0
 			target: this.prototype
 		});
 	};
@@ -470,8 +471,12 @@ make = {
 				computeObj.oldValue = newVal;
 
 				map.dispatch({
-					type: prop,
-					target: map
+					action: "set",
+					key: "prop",
+					target: map,
+					value: newVal,
+					oldValue: oldValue,
+					type: prop, // TODO: Remove in 6.0
 				}, [newVal, oldValue]);
 			}
 		};
@@ -547,11 +552,15 @@ make = {
 					var dispatched;
 					setData.call(this, newVal);
 
-					dispatched = {
-						patches: [{type: "set", key: prop, value: newVal}],
-						type: prop,
-						target: this
-					};
+						dispatched = {
+							patches: [{type: "set", key: prop, value: newVal}],
+							target: this,
+							action: "set",
+							value: newVal,
+							oldValue: current,
+							key: prop,
+							type: prop // TODO: Remove in 6.0
+						};
 
 					//!steal-remove-start
 					if(process.env.NODE_ENV !== 'production') {
@@ -1141,13 +1150,18 @@ define.expando = function(map, prop, value) {
 		if(!map[inSetupSymbol]) {
 			queues.batch.start();
 			map.dispatch({
-				type: "can.keys",
-				target: map
+				action: "can.keys",
+				target: map,
+				type: "can.keys" // TODO: Remove in 6.0
 			});
 			if(Object.prototype.hasOwnProperty.call(map._data, prop)) {
 				map.dispatch({
-					type: prop,
+					action: "add",
 					target: map,
+					value:  map._data[prop],
+					oldValue: undefined,
+					key: prop,
+					type: prop, // TODO: Remove in 6.0
 					patches: [{type: "add", key: prop, value: map._data[prop]}],
 				},[map._data[prop], undefined]);
 			} else {

@@ -1199,7 +1199,7 @@ canTestHelpers.devOnlyTest("can.hasKey and can.hasOwnKey (#303) (#412)", functio
 	assert.equal(vm[hasOwnKeySymbol]("parentDerivedProp"), false, "vm.hasOwnKey('parentDerivedProp') false");
 
 	assert.equal(vm[hasOwnKeySymbol]("anotherProp"), false, "vm.hasOwnKey('anotherProp') false");
-	
+
 	var map = new DefineMap({expandoKey: undefined});
 	assert.equal(map[hasKeySymbol]("expandoKey"), true, "map.hasKey('expandoKey')  (#412)");
 });
@@ -1632,4 +1632,8 @@ QUnit.test("'*' wildcard type definitions that use DefineMap constructors works 
 	map.set( "foo", {});
 	var foo = map.get( "foo" );
 	assert.ok(foo instanceof MyType);
+});
+
+require("can-reflect-tests/observables/map-like/instance/on-event-get-set-delete-key")("DefineMap", function(){
+    return new DefineMap();
 });
