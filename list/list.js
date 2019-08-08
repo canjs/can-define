@@ -168,7 +168,6 @@ var DefineList = Construct.extend("DefineList",
 					this.dispatch(how, [ newVal, index ]);
 				}
 			} else {
-				console.log("list dispatching", attr, newVal, oldVal);
 				this.dispatch({
 					type: "" + attr,
 					target: this
