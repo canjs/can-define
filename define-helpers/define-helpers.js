@@ -96,7 +96,7 @@ var defineHelpers = {
 				this.dispatch({
 					action: "delete",
 					key: prop,
-					newValue: undefined,
+					value: undefined,
 					oldValue: oldValue,
 					type: prop, // TODO: Remove in 6.0
 					target: this,

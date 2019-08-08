@@ -474,7 +474,7 @@ make = {
 					action: "set",
 					key: "prop",
 					target: map,
-					newValue: newVal,
+					value: newVal,
 					oldValue: oldValue,
 					type: prop, // TODO: Remove in 6.0
 				}, [newVal, oldValue]);
@@ -556,7 +556,7 @@ make = {
 							patches: [{type: "set", key: prop, value: newVal}],
 							target: this,
 							action: "set",
-							newValue: newVal,
+							value: newVal,
 							oldValue: current,
 							key: prop,
 							type: prop // TODO: Remove in 6.0
@@ -1158,7 +1158,7 @@ define.expando = function(map, prop, value) {
 				map.dispatch({
 					action: "add",
 					target: map,
-					newValue:  map._data[prop],
+					value:  map._data[prop],
 					oldValue: undefined,
 					key: prop,
 					type: prop, // TODO: Remove in 6.0
