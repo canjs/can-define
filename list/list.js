@@ -305,7 +305,7 @@ var DefineList = Construct.extend("DefineList",
 			}
 
 			// if nothing has changed, then return
-			if (allSame && this._length <= added.length  && !onlyUndefinedValues) {
+			if (allSame && this._length <= added.length && !onlyUndefinedValues) {
 				return added;
 			}
 
