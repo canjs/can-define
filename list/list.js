@@ -293,7 +293,7 @@ var DefineList = Construct.extend("DefineList",
 
 				// make sure added values are not an array of all `undefined` values (#471)
 				if (typeof args[listIndex] !== 'undefined') {
-					onlyUndefinedValues = false
+					onlyUndefinedValues = false;
 				}
 
 				added.push(args[listIndex]);
