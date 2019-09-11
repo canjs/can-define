@@ -31,6 +31,16 @@ QUnit.test("creating an instance", function(assert) {
     list.push("d");
 });
 
+QUnit.test("creating an instance handles having only `undefined` values (#471)", function(assert) {
+	var list = new DefineList([ undefined, undefined, undefined ]);
+
+	assert.deepEqual(list.get(), [
+		undefined,
+		undefined,
+		undefined
+	], 'serialized');
+});
+
 QUnit.test('list attr changes length', function(assert) {
 	var l = new DefineList([
 		0,
@@ -79,7 +89,6 @@ QUnit.test('list splice', function(assert) {
 		3
 	], 'serialized');
 });
-
 
 QUnit.test('Array accessor methods', function(assert) {
 	assert.expect(11);

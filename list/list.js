@@ -281,6 +281,7 @@ var DefineList = Construct.extend("DefineList",
 				added = [],
 				i, len, listIndex,
 				allSame = args.length > 2,
+				onlyUndefinedValues = true,
 				oldLength = this._length;
 
 			index = index || 0;
@@ -289,6 +290,12 @@ var DefineList = Construct.extend("DefineList",
 			for (i = 0, len = args.length - 2; i < len; i++) {
 				listIndex = i + 2;
 				args[listIndex] = this.__type(args[listIndex], listIndex);
+
+				// make sure added values are not an array of all `undefined` values (#471)
+				if (typeof args[listIndex] !== 'undefined') {
+					onlyUndefinedValues = false
+				}
+
 				added.push(args[listIndex]);
 
 				// Now lets check if anything will change
@@ -298,7 +305,7 @@ var DefineList = Construct.extend("DefineList",
 			}
 
 			// if nothing has changed, then return
-			if (allSame && this._length <= added.length) {
+			if (allSame && this._length <= added.length  && !onlyUndefinedValues) {
 				return added;
 			}
 
