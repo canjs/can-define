@@ -342,9 +342,12 @@ for(var prop in define.eventsProto) {
 	});
 }
 
-var eventsProtoSymbols = ("getOwnPropertySymbols" in Object) ?
-  Object.getOwnPropertySymbols(define.eventsProto) :
-  [canSymbol.for("can.onKeyValue"), canSymbol.for("can.offKeyValue")];
+var eventsProtoSymbols = (
+	"getOwnPropertySymbols" in Object &&
+	typeof canSymbol("symbol") === "symbol"
+) ?
+	Object.getOwnPropertySymbols(define.eventsProto) :
+	[canSymbol.for("can.onKeyValue"), canSymbol.for("can.offKeyValue")];
 
 eventsProtoSymbols.forEach(function(sym) {
   Object.defineProperty(DefineList.prototype, sym, {
