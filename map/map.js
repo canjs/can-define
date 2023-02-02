@@ -294,17 +294,20 @@ function getSymbolsForIE(obj){
 	});
 }
 // Copy symbols over, but they aren't supported in IE
-var eventsProtoSymbols = ("getOwnPropertySymbols" in Object) ?
-  Object.getOwnPropertySymbols(define.eventsProto) :
-  getSymbolsForIE(define.eventsProto);
+var eventsProtoSymbols = (
+	"getOwnPropertySymbols" in Object &&
+	typeof canSymbol("symbol") === "symbol"
+) ?
+	Object.getOwnPropertySymbols(define.eventsProto) :
+	getSymbolsForIE(define.eventsProto);
 
 eventsProtoSymbols.forEach(function(sym) {
-  Object.defineProperty(DefineMap.prototype, sym, {
-  	configurable: true,
-    enumerable:false,
-    value: define.eventsProto[sym],
-    writable: true
-  });
+	Object.defineProperty(DefineMap.prototype, sym, {
+		configurable: true,
+		enumerable:false,
+		value: define.eventsProto[sym],
+		writable: true
+	});
 });
 
 

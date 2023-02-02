@@ -51,7 +51,7 @@
     "can-reflect-tests": "^1.0.0",
     "can-test-helpers": "^1.1.4",
     "detect-cyclic-packages": "^1.1.0",
-    "jshint": "^2.9.1",
+    "jshint": "^2.13.6",
     "serve": "^11.0.0",
     "steal": "^2.0.0",
     "steal-qunit": "^2.0.0",
