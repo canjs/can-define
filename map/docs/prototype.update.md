@@ -7,7 +7,6 @@
 
   Sets each value in `props` to a property on this map instance named after the
   corresponding key in `props`, effectively merging `props` into the Map.
-  Properties not in `props` will be set to `undefined`.
 
   ```js
   import {DefineMap, DefineList} from "can";
@@ -18,16 +17,16 @@
   });
 
   const obj = new MyMap({
-    list: ["1", "2", "3"],
-    foo: "bar"
+    list: ["1", "2", "3"]
   });
 
   obj.update({
-    list: ["first"]
+    list: ["first"],
+	foo: "bar"
   });
 
-  console.log( obj.serialize() ); //-> { list: ["first"] }
-  console.log( obj.foo ); //-> undefined
+  console.log( obj.serialize() ); //-> { list: ["first"], foo: 'bar' }
+  console.log( obj.foo ); //-> bar
   ```
   @codepen
 
