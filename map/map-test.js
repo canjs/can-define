@@ -1637,3 +1637,22 @@ QUnit.test("'*' wildcard type definitions that use DefineMap constructors works 
 require("can-reflect-tests/observables/map-like/instance/on-event-get-set-delete-key")("DefineMap", function(){
     return new DefineMap();
 });
+
+QUnit.test("for in works (#34)", function(){
+    var MyMap = DefineMap.extend({
+        zed: "string",
+        method: function(){
+
+        }
+    });
+
+    var m = new MyMap({foo: "bar", zed: "ted"});
+    
+    for(var prop in m) {
+        if(prop === "foo" || prop === "zed") {
+            QUnit.ok(true, prop)
+        } else {
+            QUnit.ok(false, prop);
+        }
+    }
+});
